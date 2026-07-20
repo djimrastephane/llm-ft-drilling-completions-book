@@ -1,0 +1,26 @@
+# Acknowledgements {.unnumbered}
+
+This book exists because drilling and completions reports capture far
+more than operational summaries. Behind short entries such as "POOH to
+change BHA due to erratic torque" sit decisions, experience, and
+operational context that are obvious to the engineers involved in the
+operation but often invisible to a general-purpose model that has never
+seen anything like it.
+
+Thanks are due to the open-source communities behind the tools this book
+relies on throughout: Python, Quarto, Jupyter, PyTorch, Hugging Face
+Transformers, PEFT, and the broader open-weight model ecosystem. None of
+the engineering in this book would be reproducible without them.
+
+Finally, thanks to every reader working through this material on their
+own operational data. If you find an error, a fine-tuning claim that
+doesn't hold up under evaluation, or a chapter that assumes something it
+shouldn't, please open an issue in the companion repository —
+corrections from practitioners are what keep a book like this honest.
+
+The ideas, engineering examples, educational approach, and technical
+validation presented in this book are the author's. AI tools, including
+Claude, were used throughout the project to assist with code generation,
+editing, documentation, and iterative review. All engineering decisions,
+implementation choices, and final content remain the responsibility of
+the author.

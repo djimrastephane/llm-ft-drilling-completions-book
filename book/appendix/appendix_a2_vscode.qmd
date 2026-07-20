@@ -1,0 +1,46 @@
+# Appendix A2: Using VS Code {#sec-appendix-a2 .unnumbered}
+
+This appendix assumes you've completed [Part 0](../chapters/chapter_00.qmd) —
+Python installed, `.venv` created and active, packages installed via
+`pip install -r requirements.txt`. Everything below is specific to
+working with this book's code in Visual Studio Code.
+
+## Install VS Code and the Python extension
+
+Download VS Code from [code.visualstudio.com](https://code.visualstudio.com),
+then open the Extensions panel (`Ctrl+Shift+X` / `Cmd+Shift+X`) and
+install **Python** (by Microsoft).
+
+## Open the project folder
+
+`File > Open Folder...` and select the
+`llm-ft-drilling-completions-book` folder you cloned in Part 0.
+
+## Select the virtual environment as your interpreter
+
+Press `Ctrl+Shift+P` / `Cmd+Shift+P`, type **Python: Select
+Interpreter**, and choose the `.venv` you created in Part 0 (it will be
+listed as a recommended interpreter for this folder).
+
+**Expected result:** the bottom status bar shows `.venv` (or
+`Python 3.11.x ('.venv')`) instead of a system Python.
+
+## Run a chapter script
+
+Open `book/code/chapter_01/load_local_model.py` and press the ▶ **Run**
+button in the top-right corner, or right-click inside the editor and
+choose **Run Python File in Terminal**. Output appears in VS Code's
+integrated terminal.
+
+## Run the tests
+
+Open the Testing panel (flask icon in the sidebar) and click **Configure
+Python Tests**, choosing `pytest` and the `book` folder. Tests then
+appear as a tree you can run individually or all at once.
+
+## Troubleshooting
+
+| Symptom | Likely cause |
+|---|---|
+| VS Code doesn't offer `.venv` as an interpreter | Make sure you opened the repository root (or `book/`) as the workspace folder, not a parent folder. |
+| `ModuleNotFoundError` when running a script | Confirm the selected interpreter (bottom status bar) is `.venv`, not a system Python. |

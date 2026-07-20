@@ -1,0 +1,6 @@
+.DS_Store
+
+# Not part of this book -- unexplained pre-existing folder found at repo
+# root during scaffolding (see chat history). Excluded defensively so it
+# is never committed by accident.
+/forge_archive/

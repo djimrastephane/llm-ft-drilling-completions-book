@@ -1,0 +1,98 @@
+<!--
+STATUS: placeholder only -- this chapter has not been written yet.
+Part 0 doesn't follow templates/chapter_template.qmd (no Operational
+Problem/persona framing, no chapter-status progress bar) -- it's a
+straight setup walkthrough, mirroring the previous book's Part 0. Fill in
+each numbered section below with the real, tested steps for this book's
+stack (Python, a virtual environment, requirements.txt, and a hardware
+check for fine-tuning). Section numbers are referenced elsewhere
+(book/README.md, appendix/appendix_a_environment_setup.qmd) -- keep them
+stable if you renumber.
+-->
+
+# Part 0: Preparing Your Local LLM Workshop {#sec-chapter-00}
+
+## Learning objectives
+
+By the end of this chapter, you will be able to:
+
+- Install Python and confirm it works
+- Create and activate a virtual environment for this book
+- Install this book's dependencies
+- Check whether your machine has a GPU fine-tuning can use, and know
+  what to expect if it doesn't
+- Run `setup_check.py` and get a clean bill of health before Chapter 1
+
+## 0.1 Why this chapter exists
+
+<!-- TODO: one or two paragraphs, same spirit as the previous book's
+Part 0 opener -- no assumed prior experience, explain that everything
+past this chapter assumes a working environment. -->
+
+## 0.2 Install Python
+
+<!-- TODO: platform-specific instructions (macOS/Windows/Linux), the
+minimum supported Python version (3.11, matching requirements.txt /
+environment.yml), and how to confirm with `python3 --version`. -->
+
+## 0.3 Clone this repository
+
+<!-- TODO: `git clone` instructions, or a link back to the Download ZIP
+option in the root README, for readers without git experience. -->
+
+## 0.4 Create and activate a virtual environment
+
+<!-- TODO: `python3 -m venv .venv` / activation on each OS, what the
+`(.venv)` prompt prefix means, common "not activated" mistakes. -->
+
+## 0.5 Install requirements
+
+<!-- TODO: `pip install -r requirements.txt` from inside `book/`, what a
+successful install looks like, roughly how long it takes given torch's
+size. -->
+
+## 0.6 Check your hardware
+
+<!-- TODO: a short script/snippet checking `torch.cuda.is_available()`
+and `torch.backends.mps.is_available()`, explaining in plain language
+what GPU vs CPU-only means for later chapters' training time (see
+Appendix A, Section 3). No GPU should not feel like a dead end -- explain
+the CPU-friendly path. -->
+
+## 0.7 Choose your workshop (editor or notebook)
+
+<!-- TODO: point to Appendices A1-A5 (Jupyter, VS Code, PyCharm,
+Positron, terminal-only), same framing as the previous book: no wrong
+choice. -->
+
+## 0.8 Run the setup check
+
+<!-- TODO: `python code/setup_check.py`, expected output, what each
+failure message means. -->
+
+## 0.9 Optional: install a local model runtime
+
+<!-- TODO: brief mention of Ollama (ollama.com) as an optional
+convenience for later chapters that compare a fine-tuned checkpoint
+against a familiar local runtime -- not required for the fine-tuning
+chapters themselves, which use `transformers`/`peft` directly. -->
+
+## 0.10 First success checkpoint
+
+<!-- TODO: a short checklist mirroring the root README's "First Success
+Checkpoint" section. -->
+
+## 0.11 Troubleshooting
+
+<!-- TODO: common setup errors (Python not found, venv not active,
+pip install failures, torch install issues per platform) -- this is the
+section Appendix A, Section 5 refers readers back to. -->
+
+## What can you do now that you couldn't do before?
+
+<!-- TODO: one or two sentences of concrete new capability. -->
+
+## Suggested next step
+
+**Coming up in Chapter 1:** <!-- TODO: bridge to loading and running the
+first local model. -->

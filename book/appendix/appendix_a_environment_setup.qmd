@@ -1,0 +1,103 @@
+# Appendix A: Environment Setup {#sec-appendix-a .unnumbered}
+
+[Part 0](../chapters/chapter_00.qmd) covers everything you need to
+install Python, create a virtual environment, check your hardware, and
+run the book's chapter scripts — start there if you haven't already.
+This appendix covers a few things Part 0 doesn't: the training dataset's
+layout, rendering this book itself (not just running its code), a
+data-handling note for your own reports, and troubleshooting for a few
+less common errors.
+
+If you'd like a guide specific to the editor or notebook environment you
+chose in Part 0, see Appendices A1–A5 instead.
+
+## 1. The training dataset
+
+**This section is not yet finalized.** Unlike the author's previous book,
+which relied on a fully public archive, this book's sample training data
+is still being sourced and cleared as chapters are written. See
+`book/datasets/README.md` for the current status. When it lands, Chapters
+1–5 are expected to use a small, curated sample training set
+(`datasets/sample_training_set/`) and Part II's "at scale" chapters a
+larger training set (`datasets/full_training_set/`), following the same
+two-tier layout as the previous book's `sample_ddrs/` and
+`forge_archive/`.
+
+## 2. Rendering the book with Quarto
+
+Running the chapter scripts (Part 0) doesn't require anything beyond
+Python. Rebuilding this book itself — the HTML and PDF you're reading —
+is a separate step that needs [Quarto](https://quarto.org) 1.7 or later:
+
+```bash
+quarto --version
+```
+
+If that's not recognised, install Quarto from
+[quarto.org](https://quarto.org) for your operating system.
+
+With Quarto installed and your virtual environment active:
+
+```bash
+quarto render
+```
+
+Output is written to `_book/`. For live-editing a single chapter while
+you write:
+
+```bash
+quarto preview chapters/chapter_01.qmd
+```
+
+Or, if you prefer conda/mamba instead of the `.venv` approach from Part 0:
+
+```bash
+conda env create -f environment.yml
+conda activate llm-ft-drilling-completions-book
+```
+
+## 3. Hardware notes
+
+Fine-tuning, even parameter-efficiently, is more hardware-sensitive than
+retrieval. Rough guidance, to be refined as chapters are written:
+
+- **GPU (NVIDIA/CUDA or Apple Silicon/MPS):** the comfortable path from
+  Chapter 5 onward. Enables 4-/8-bit quantized (QLoRA) fine-tuning of
+  small models in minutes rather than hours.
+- **CPU only:** still possible for the earliest chapters (loading a
+  model, baseline prompting, tokenization) and for fine-tuning a very
+  small model, but training runs will be noticeably slower. Expect to
+  reduce dataset size and steps for CPU-only exercises.
+- **No cloud account or paid API is required anywhere in this book.**
+
+## 4. A note on data handling
+
+Real drilling and completions reports are typically confidential. Once
+this repository ships sample training data, the same rules apply
+throughout:
+
+- Never commit real, confidential reports, extracted text, training
+  examples, or model checkpoints trained on them to a public repository.
+- If you're experimenting on a shared machine, confirm your
+  organisation's data classification policy covers running third-party
+  Python packages (model downloads, tokenizers) against confidential
+  well data.
+- Add your own archive's path to `.gitignore` before dropping any
+  confidential reports into a local `datasets/` folder for testing.
+- Before fine-tuning on your own organisation's data, confirm you have
+  the right to use it for this purpose — that determination is outside
+  the scope of this book.
+
+## 5. Troubleshooting
+
+Part 0, Section 0.11 (once written) will cover the common setup errors
+(Python not found, virtual environment not active, and so on). A few
+more specific to rendering the book or running heavier fine-tuning
+packages:
+
+| Symptom | Likely cause |
+|---|---|
+| `quarto render` fails on a code cell | Activate `.venv` before rendering — Quarto uses whichever Python is on `PATH`. Confirm with `which python` and `python -c "import transformers"`. |
+| `ModuleNotFoundError: peft` or `trl` (Chapter 5+) | Re-run `pip install -r requirements.txt`; these are heavier dependencies that pull in `torch` and sometimes need a platform-specific `torch` install first. |
+| `bitsandbytes` fails to import | It's Linux + NVIDIA GPU only (see `requirements.txt`). On macOS or CPU-only Linux, skip 4-/8-bit quantized fine-tuning and use full-precision LoRA instead. |
+| Training is extremely slow | Confirm a GPU is actually being used (`torch.cuda.is_available()` or `torch.backends.mps.is_available()`); on CPU-only hardware, reduce dataset size and steps as suggested in the relevant chapter. |

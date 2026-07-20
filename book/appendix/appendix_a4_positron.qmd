@@ -1,0 +1,50 @@
+# Appendix A4: Using Positron {#sec-appendix-a4 .unnumbered}
+
+This appendix assumes you've completed [Part 0](../chapters/chapter_00.qmd) —
+Python installed, `.venv` created and active, packages installed via
+`pip install -r requirements.txt`. Everything below is specific to
+working with this book's code in [Positron](https://positron.posit.co),
+Posit's data-science-focused IDE.
+
+## Install Positron
+
+Download it from [positron.posit.co](https://positron.posit.co) for your
+operating system.
+
+## Open the project folder
+
+`File > Open Folder...` and select the `book/` folder inside your
+cloned `llm-ft-drilling-completions-book` repository (this matches the
+author's own workflow described in `book/README.md`).
+
+## Select the Python interpreter
+
+Click the interpreter selector in the top-right corner (or bottom
+status bar) and choose the `.venv` created in Part 0.
+
+**Expected result:** the console pane shows a Python prompt using that
+`.venv`'s packages.
+
+## Run a chapter script
+
+Open `code/chapter_01/load_local_model.py` and click **Run File**, or
+select code and press `Ctrl+Enter` / `Cmd+Enter` to run it line by line
+in the console — useful for inspecting a model's output interactively.
+
+## Preview a chapter while writing
+
+From the integrated terminal:
+
+```bash
+quarto preview chapters/chapter_01.qmd
+```
+
+This live-reloads a single chapter in a browser tab as you edit it —
+the author's own drafting workflow.
+
+## Troubleshooting
+
+| Symptom | Likely cause |
+|---|---|
+| Interpreter selector doesn't list `.venv` | Confirm you opened `book/` (not the repository root) as the workspace, and that `.venv` was created inside it. |
+| `quarto preview` command not found | Quarto isn't installed or isn't on `PATH` — see Appendix A, Section 2. |

@@ -1,0 +1,89 @@
+# Appendix B: Drilling, Completions & Fine-Tuning Glossary {#sec-appendix-b .unnumbered}
+
+This glossary supports Chapter 2's training-example builder and every
+later chapter's "Engineering Translation" callouts. It is split into two
+parts: common oilfield shorthand you'll see in raw report text, and the
+fine-tuning/ML vocabulary this book introduces gradually, gathered here
+for quick reference. Neither list is exhaustive — abbreviation usage
+varies by operator, rig contractor, and basin, and the ML terminology
+here is deliberately scoped to what this book actually uses.
+
+## B.1 Common oilfield abbreviations
+
+| Abbreviation | Expansion |
+|---|---|
+| AFE | authorization for expenditure |
+| BHA | bottom hole assembly |
+| BOP | blowout preventer |
+| CBL | cement bond log |
+| CIRC | circulate |
+| COND | condition |
+| CSG | casing |
+| DFIT | diagnostic fracture injection test |
+| DFS | days from spud |
+| DHSV | downhole safety valve |
+| DLS | dogleg severity |
+| DOL | days on location |
+| DP | drill pipe |
+| ECD | equivalent circulating density |
+| EMW | equivalent mud weight |
+| FIT | formation integrity test |
+| FR | from |
+| GPM | gallons per minute |
+| HWDP | heavy weight drill pipe |
+| KOP | kick-off point |
+| LOT | leak-off test |
+| MD | measured depth |
+| MIRU | move in, rig up |
+| MW | mud weight |
+| MWD | measurement while drilling |
+| NMDC | non-magnetic drill collar |
+| NPT | non-productive time |
+| OBSD | observed |
+| PBTD | plugged back total depth |
+| PDC | polycrystalline diamond compact (bit type) |
+| PJSM | pre-job safety meeting |
+| POOH | pull out of hole |
+| PPG | pounds per gallon |
+| PU | pick up (pipe) |
+| PUW | pick up weight |
+| RIH | run in hole |
+| RKB | rotary kelly bushing |
+| ROP | rate of penetration |
+| RPM | revolutions per minute |
+| SICP | shut-in casing pressure |
+| SIDPP | shut-in drill pipe pressure |
+| SPP | stand pipe pressure |
+| STDS | stands (of drill pipe) |
+| TD | total depth |
+| TIH | trip in hole |
+| TOOH | trip out of hole |
+| TVD | true vertical depth |
+| WOB | weight on bit |
+| WOC | wait on cement |
+| WOW | wait on weather |
+| XO | crossover (sub) |
+
+::: {.callout-warning title="Abbreviations are not universal"}
+The same three letters can mean different things across operators and
+basins — build your abbreviation dictionary from *your* archive's actual
+usage before trusting it against your own reports.
+:::
+
+## B.2 Fine-tuning and local LLM vocabulary
+
+| Term | Plain-language meaning |
+|---|---|
+| Base model | The general-purpose model before any domain fine-tuning — Chapter 1's starting point. |
+| Fine-tuning | Updating a model's weights on your own data so it performs better on your specific task or domain. |
+| LoRA (Low-Rank Adaptation) | A parameter-efficient fine-tuning method that trains a small add-on to the model instead of every weight — Chapter 5's technique. |
+| QLoRA | LoRA fine-tuning on a quantized (compressed) copy of the base model, cutting memory needs further. |
+| Quantization | Storing a model's weights at lower numerical precision to shrink memory and speed up inference, at some accuracy cost. |
+| Checkpoint | A saved snapshot of a model's weights at a point during training — Chapter 8. |
+| Tokenizer | The component that splits text into the sub-word units ("tokens") a model actually processes — Chapter 4. |
+| Instruction/response pair | A single training example: an instruction (and optional input) paired with the desired output — Chapter 2's core data format. |
+| Epoch | One full pass through the training dataset. |
+| Perplexity | A numeric measure of how well a model predicts held-out text; lower is generally better — Chapter 11. |
+| Hallucination | A fluent but factually unsupported model output — Chapter 10 covers detecting and mitigating it. |
+| Drift | A model's behavior changing (often degrading on cases it used to get right) across versions or over time — Chapter 12. |
+| RAG (retrieval-augmented generation) | Combining a model with a retrieval step over external documents, instead of relying only on what's in its weights — Chapter 9. |

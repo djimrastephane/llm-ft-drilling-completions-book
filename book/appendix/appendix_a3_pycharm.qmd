@@ -1,0 +1,46 @@
+# Appendix A3: Using PyCharm Community {#sec-appendix-a3 .unnumbered}
+
+This appendix assumes you've completed [Part 0](../chapters/chapter_00.qmd) —
+Python installed, `.venv` created and active, packages installed via
+`pip install -r requirements.txt`. Everything below is specific to
+working with this book's code in PyCharm Community Edition (free).
+
+## Install PyCharm Community
+
+Download it from
+[jetbrains.com/pycharm/download](https://www.jetbrains.com/pycharm/download/)
+— choose the **Community** edition, not Professional.
+
+## Open the project folder
+
+`File > Open...` and select the `llm-ft-drilling-completions-book`
+folder you cloned in Part 0.
+
+## Point PyCharm at your virtual environment
+
+`File > Settings` (Windows/Linux) or `PyCharm > Settings` (macOS) >
+**Project: llm-ft-drilling-completions-book > Python Interpreter** > gear
+icon > **Add** > **Existing environment**, and browse to the `.venv`
+folder created in Part 0 (`.venv/bin/python` on macOS/Linux,
+`.venv\Scripts\python.exe` on Windows).
+
+**Expected result:** the interpreter dropdown at the bottom of the
+Settings page shows your `.venv` path.
+
+## Run a chapter script
+
+Right-click `book/code/chapter_01/load_local_model.py` in the Project
+panel and choose **Run 'load_local_model'**. Output appears in the Run
+panel at the bottom.
+
+## Run the tests
+
+Right-click the `book/tests` folder and choose **Run 'pytest in
+tests'**. PyCharm shows a tree of passing/failing tests.
+
+## Troubleshooting
+
+| Symptom | Likely cause |
+|---|---|
+| Interpreter list doesn't show `.venv` | Confirm Part 0's virtual environment was actually created inside the project folder, not elsewhere. |
+| Red underlines on valid imports | PyCharm hasn't finished indexing, or the wrong interpreter is selected — check the bottom-right corner of the window. |

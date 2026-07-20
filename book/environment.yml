@@ -1,0 +1,26 @@
+name: llm-ft-drilling-completions-book
+channels:
+  - conda-forge
+  - pytorch
+dependencies:
+  - python=3.11
+  - pytorch=2.5.*
+  - numpy=1.26.*
+  - jupyter=1.0.*
+  - ipykernel=6.29.*
+  - pytest=9.1.*
+  - pip
+  - pip:
+      - transformers==4.46.2
+      - accelerate==1.1.1
+      - huggingface_hub==0.26.2
+      - peft==0.13.2
+      - trl==0.12.0
+      - datasets==3.1.0
+      # bitsandbytes: Linux + NVIDIA GPU only -- see requirements.txt note.
+      - sentencepiece==0.2.0
+      - sentence-transformers==3.1.1
+      - faiss-cpu==1.8.0.post1
+      - rank-bm25==0.2.2
+      - evaluate==0.4.3
+      - scikit-learn==1.5.2

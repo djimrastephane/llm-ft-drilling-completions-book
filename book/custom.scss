@@ -1,0 +1,54 @@
+/*-- scss:rules --*/
+// Shared across light and dark themes.
+
+pre.sourceCode {
+  font-size: 0.9em;
+}
+
+// Long unbroken strings (file paths, module names) in table cells --
+// e.g. every chapter's "Repository files" table -- otherwise force the
+// whole page to scroll horizontally on narrow/mobile viewports.
+.table code {
+  word-break: break-all;
+  white-space: normal;
+}
+
+// Chapter status strip: progress bar / estimated time / difficulty.
+// Metadata, not content -- deliberately lighter than a real callout so it
+// doesn't compete with Operational Problem, Field notes, etc.
+.chapter-status {
+  border-left: 4px solid $link-color;
+  padding: 0.4em 0.9em;
+  margin: 1em 0 1.5em 0;
+  font-size: 0.92em;
+  border-radius: 2px;
+}
+
+// "WHAT YOU BUILT" milestone box -- a callout-tip with a distinct accent
+// so it reads as an end-of-chapter achievement marker, not another
+// mid-chapter "Engineering Translation" explanation.
+.callout.built-box {
+  border-left-color: #2e7d32;
+}
+.callout.built-box .callout-title-container {
+  color: #2e7d32;
+}
+
+// Pipeline diagrams (TikZ, compiled to SVG) ship as two colour variants --
+// <img> tags can't inherit currentColor from the page like inline SVG can,
+// so instead of one adaptive image we show/hide the light- or dark-suited
+// variant based on the same body.quarto-light / body.quarto-dark class
+// Quarto's own theme toggle already sets.
+.pipeline-diagram {
+  text-align: center;
+  margin: 1em 0;
+}
+.pipeline-diagram .diagram-dark {
+  display: none;
+}
+body.quarto-dark .pipeline-diagram .diagram-light {
+  display: none;
+}
+body.quarto-dark .pipeline-diagram .diagram-dark {
+  display: inline;
+}

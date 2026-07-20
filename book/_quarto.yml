@@ -1,0 +1,146 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "Fine-Tuning Local LLM for Drilling & Completions"
+  subtitle: "A hands-on guide to fine-tuning and deploying local language models for drilling and completions engineering"
+  author: "Djimra Stephane Soulanoudjingar"
+  date: today
+  date-format: "MMMM YYYY"
+  page-footer:
+    left: "Fine-Tuning Local LLM for Drilling & Completions"
+    right: "Built with Quarto"
+  repo-url: https://github.com/djimrastephane/llm-ft-drilling-completions-book
+  repo-actions: [edit, issue]
+  downloads: [pdf]
+  cover-image: figures/cover.jpg
+  cover-image-alt: "Fine-Tuning Local LLM for Drilling & Completions, book cover"
+  sidebar:
+    style: docked
+    collapse-level: 2
+
+  chapters:
+    - index.qmd
+    - preface.qmd
+    - acknowledgements.qmd
+
+    - part: "Part 0 — Preparing Your Local LLM Workshop"
+      chapters:
+        - chapters/chapter_00.qmd
+
+    - part: "Part I — Foundations"
+      chapters:
+        - chapters/chapter_01.qmd
+        - chapters/chapter_02.qmd
+        - chapters/chapter_03.qmd
+        - chapters/chapter_04.qmd
+        - chapters/chapter_05.qmd
+
+    - part: "Part II — Industrialising the System"
+      chapters:
+        - chapters/chapter_06.qmd
+        - chapters/chapter_07.qmd
+        - chapters/chapter_08.qmd
+        - chapters/chapter_09.qmd
+        - chapters/chapter_10.qmd
+        - chapters/chapter_11.qmd
+        - chapters/chapter_12.qmd
+        - chapters/chapter_13.qmd
+
+    - part: "Appendices"
+      chapters:
+        - appendix/appendix_a_environment_setup.qmd
+        - appendix/appendix_a1_jupyter.qmd
+        - appendix/appendix_a2_vscode.qmd
+        - appendix/appendix_a3_pycharm.qmd
+        - appendix/appendix_a4_positron.qmd
+        - appendix/appendix_a5_terminal.qmd
+        - appendix/appendix_b_glossary.qmd
+
+    - references.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme:
+      light: [cosmo, custom.scss, custom-light.scss]
+      dark: [darkly, custom.scss, custom-dark.scss]
+    code-fold: false
+    code-tools: true
+    code-copy: true
+    highlight-style: github
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    fig-cap-location: bottom
+    link-external-newwindow: true
+
+  pdf:
+    documentclass: scrbook
+    papersize: letter
+    toc: true
+    number-sections: true
+    colorlinks: true
+    geometry:
+      - margin=1in
+    include-in-header:
+      text: |
+        % scrbook defaults to \flushbottom (it's a two-sided book class),
+        % which stretches inter-paragraph and list spacing to make every
+        % page end at exactly the same baseline. That's invisible on
+        % dense pages, but pages with a short paragraph next to an
+        % itemize list can end up with large, awkward-looking gaps as
+        % LaTeX inserts that stretch. \raggedbottom lets pages end at
+        % their natural height instead.
+        \raggedbottom
+
+        % Long inline `code` spans (e.g. file paths) otherwise overflow
+        % past the page margin instead of wrapping -- seqsplit allows a
+        % break at any character while \ttfamily keeps the monospace font.
+        \usepackage{seqsplit}
+        \let\oldtexttt\texttt
+        \renewcommand{\texttt}[1]{{\ttfamily\seqsplit{#1}}}
+
+        % Long lines inside fenced code blocks (long import paths, CLI
+        % commands) otherwise run off the page instead of wrapping. Pandoc's
+        % own Highlighting environment is plain fancyvrb, which can't break
+        % lines; fvextra extends it so we can redefine Highlighting here to
+        % wrap at the page edge, breaking mid-word if there's no other option.
+        \usepackage{fvextra}
+        \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\}}
+
+        % Chapter status strips, difficulty badges, and Field notes titles
+        % use block-drawing characters and emoji (progress bars, coloured
+        % difficulty circles, a wrench icon, a checkmark) that render fine
+        % in HTML but have no glyph in the PDF engine's fonts -- without a
+        % mapping they'd print as blank boxes. Each one is always paired
+        % with an adjacent text label carrying the same meaning
+        % ("Beginner", "1 / 13", "Field notes"), so the PDF-safe
+        % substitution below just needs to preserve the bar shape (as
+        % plain ASCII) or drop the purely decorative icon.
+        \usepackage{newunicodechar}
+        \newunicodechar{█}{\#}
+        \newunicodechar{░}{.}
+        \newunicodechar{✓}{}
+        \newunicodechar{🟢}{}
+        \newunicodechar{🟠}{}
+        \newunicodechar{🔴}{}
+        \newunicodechar{🔧}{}
+
+        % Real report/training-data excerpts (quoted in fenced code blocks
+        % with no language, e.g. callouts showing raw report text) come
+        % through as plain LaTeX `verbatim`, not the Highlighting
+        % environment above -- the kernel's `verbatim` has no concept of
+        % line wrapping at all, so long report lines ran off the page.
+        % Redefine it to route through fvextra's Verbatim instead.
+        \renewenvironment{verbatim}{\VerbatimEnvironment\begin{Verbatim}[breaklines,breakanywhere]}{\end{Verbatim}}
+
+execute:
+  freeze: auto
+  echo: true
+  warning: false
+  cache: false
+
+jupyter: python3

@@ -1,0 +1,101 @@
+# Preface {.unnumbered}
+
+## Why this book exists
+
+I wrote this book because I kept seeing the same gap on drilling and
+completions teams considering local LLMs: a general-purpose model is
+fluent, but it doesn't actually know how *this* operation talks —
+report shorthand, sequencing conventions, the judgment calls a
+completions engineer makes without writing out the reasoning. You can
+paper over that with an enormous prompt every time, or you can fine-tune
+a small local model on your own operational text so it has actually
+learned the domain. This book teaches the second path, end to end, in
+plain Python.
+
+Parameter-efficient fine-tuning methods like LoRA [@hu2021lora] and its
+quantized successor QLoRA [@dettmers2023qlora] made this practical on
+ordinary hardware — a full retrain of a foundation model is out of reach
+for almost everyone; adapting a few percent of its parameters on a
+consumer GPU is not. This book builds on that shift: you fine-tune a
+small open-weight model, evaluate it honestly, and keep it current, all
+running locally.
+
+## What this protects
+
+Fine-tuning on operational text raises the same stakes as any system
+trained on a company's own data: what goes into the model can, in
+principle, come back out of it. This book treats that as a first-class
+constraint, not an afterthought — training data handling, what stays
+local, and what an evaluation harness should catch before a fine-tuned
+model is trusted are covered starting in Part I, not bolted on at the
+end.
+
+A fine-tuned model doesn't replace an engineer's judgment. It replaces
+having to explain your operation's conventions to a generic assistant
+every single time. Deciding what a result means, or whether a model's
+answer is safe to act on, stays yours to make.
+
+## Why "industrial"
+
+A demo that fine-tunes a model on a handful of hand-picked examples is
+easy to build and easy to find online. An industrial system is
+different. It has to:
+
+- Handle real, messy training data — inconsistent formatting, duplicate
+  or near-duplicate reports, missing fields.
+- Prove the fine-tune actually improved something, with numbers, not
+  impressions.
+- Never silently regress on cases the base model already got right.
+- Be auditable and reproducible by someone who was not in the room when
+  it was trained.
+
+Every chapter in Part II exists because a toy fine-tuning script fails at
+one of these requirements. We fix them one at a time, in the order you
+would actually hit them in the field.
+
+## How to read this book
+
+This book borrows the practical-first, project-based spirit of *Python
+Crash Course* [@matthes2023python] — small wins early, theory only when
+the code in front of you needs it, a working artifact at the end of every
+chapter — but assumes considerably less going in. You do not need to have
+written Python before. You do not need to know what a function or a loop
+is before Chapter 1; each concept is explained in plain language,
+translated into terms an engineer already knows, exactly when you need it
+to solve the problem in front of you.
+
+If you've never installed Python or set up a project folder before, start
+with Part 0 — it gets you to a working setup in whichever editor or
+notebook tool you're most comfortable with, with no assumption that
+you've done this before.
+
+Read it in order the first time. Each chapter assumes the code from the
+previous one exists and works — this is a build, not a reference manual.
+After your first pass, use it as a reference: jump to the chapter that
+matches the problem you currently have (Chapter 6 if your training data
+is messy, Chapter 11 if you're not sure the fine-tune helped, Chapter 12
+if you suspect a newer version regressed).
+
+Type the code yourself. Do not copy-paste from the companion repository
+until you have typed it once and watched it run. This is slower and it is
+worth it — and if you finish this book able to say "I can build this,"
+rather than "I understand the theory," it did its job.
+
+## A note on data
+
+Daily drilling and completions reports are typically operationally
+sensitive and confidential. Unlike the author's previous book on
+retrieval, which could rely on a fully public Department of
+Energy-funded archive (Utah FORGE), this book's training data choice is
+still being finalized as chapters are written — see
+`book/datasets/README.md` for the current, up-to-date policy on what is
+and isn't committed to this public repository.
+
+The *technique* in this book generalises directly to a confidential
+archive regardless of which sample data ships with it: everything from
+Chapter 6 onward — data quality gates, evaluation, drift detection —
+exists precisely because production training data is messier and more
+sensitive than a clean example set. If you point this book's code at
+your own organisation's reports, do not commit them to a public
+repository, and see [Appendix A](appendix/appendix_a_environment_setup.qmd)
+for a data-handling checklist once it is written.

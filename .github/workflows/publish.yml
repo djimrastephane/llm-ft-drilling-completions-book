@@ -1,0 +1,50 @@
+name: Publish book to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "book/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          tinytex: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Chapter code cells are expected to run with eval:false once drafted,
+      # same as the author's previous book -- Quarto still starts a Jupyter
+      # kernel per chapter but never executes or imports anything inside it.
+      # Only jupyter/ipykernel are needed for that; installing the full
+      # requirements.txt (torch, transformers, peft...) here just adds
+      # minutes of unnecessary install time and risk for a render that
+      # never uses any of it.
+      - name: Install minimal render dependencies
+        run: pip install jupyter ipykernel
+
+      - name: Register Jupyter kernel
+        run: python -m ipykernel install --user --name python3
+
+      - name: Render and publish to gh-pages
+        uses: quarto-dev/quarto-actions/publish@v2
+        with:
+          target: gh-pages
+          path: book
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

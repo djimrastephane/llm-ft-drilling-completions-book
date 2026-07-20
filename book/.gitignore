@@ -1,0 +1,39 @@
+# Quarto build output
+/_book/
+/.quarto/
+/_freeze/
+*_files/
+*_cache/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Secrets
+.env
+.env.*
+
+# Fine-tuning artifacts -- large binaries that don't belong in git.
+# Training/eval data under datasets/ is tracked deliberately (see
+# datasets/README.md for the policy); only generated/derived artefacts
+# and model weights are ignored here.
+*.safetensors
+*.bin
+*.gguf
+*.pt
+*.ckpt
+checkpoints/
+runs/
+wandb/
+mlruns/
+datasets/*.jsonl.cache
+
+# OS
+.DS_Store
+
+# Editor
+.vscode/
+.positron/

@@ -1,0 +1,57 @@
+# Appendix A5: Terminal Only {#sec-appendix-a5 .unnumbered}
+
+This appendix assumes you've completed [Part 0](../chapters/chapter_00.qmd) —
+Python installed, `.venv` created and active, packages installed via
+`pip install -r requirements.txt`. No editor or notebook tool is
+required at all; everything in this book can be followed with a
+terminal and a plain text editor.
+
+## Activate your environment
+
+Every time you open a new terminal window to work on this book:
+
+```bash
+cd llm-ft-drilling-completions-book/book
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+```
+
+**Expected result:** your prompt now starts with `(.venv)`.
+
+## Edit a file
+
+Any plain text editor works — `nano`, `vim`, `notepad`, or a GUI editor
+that isn't a full IDE. For example:
+
+```bash
+nano code/chapter_01/load_local_model.py
+```
+
+## Run a chapter script
+
+```bash
+python code/chapter_01/load_local_model.py
+```
+
+Output prints directly to the terminal.
+
+## Run the tests
+
+```bash
+pytest -v
+```
+
+## Render the book (optional)
+
+Rendering the book itself (not just running its code) needs Quarto —
+see Appendix A, Section 2:
+
+```bash
+quarto render
+```
+
+## Troubleshooting
+
+| Symptom | Likely cause |
+|---|---|
+| `command not found: python` | Try `python3` instead — some systems only alias `python` after activating a virtual environment. |
+| Script runs but prints nothing | Confirm you're running it from inside `book/`, not the repository root — chapter scripts assume that working directory for relative paths. |

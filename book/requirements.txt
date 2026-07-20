@@ -1,0 +1,37 @@
+# Core model loading and local inference (Chapter 1)
+torch==2.5.1
+transformers==4.46.2
+accelerate==1.1.1
+huggingface_hub==0.26.2
+
+# Fine-tuning (Chapters 5, 7, 8)
+peft==0.13.2
+trl==0.12.0
+datasets==3.1.0
+# bitsandbytes powers 4-/8-bit QLoRA fine-tuning -- Linux + NVIDIA GPU
+# only. macOS (Apple Silicon/MPS) and CPU-only readers skip this and use
+# full-precision or LoRA-without-quantization instead; see Chapter 5.
+bitsandbytes==0.44.1; sys_platform == "linux"
+
+# Tokenization / embeddings (Chapter 4)
+sentencepiece==0.2.0
+sentence-transformers==3.1.1
+
+# Hybrid fine-tuning + retrieval (Chapter 9)
+faiss-cpu==1.8.0.post1
+rank-bm25==0.2.2
+
+# Evaluation and drift detection (Chapters 11-12)
+evaluate==0.4.3
+scikit-learn==1.5.2
+
+# Companion app (book/app/streamlit_app.py) -- optional, only needed to run
+# the interactive base-vs-fine-tuned comparison app.
+streamlit==1.59.0
+
+# Notebooks and book authoring
+jupyter==1.0.0
+ipykernel==6.29.5
+
+# Testing (companion exercises)
+pytest==9.1.1
