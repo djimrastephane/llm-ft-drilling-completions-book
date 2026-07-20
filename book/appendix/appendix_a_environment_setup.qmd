@@ -96,10 +96,10 @@ changes:
 
 ## 5. Troubleshooting
 
-Part 0, Section 0.11 (once written) will cover the common setup errors
-(Python not found, virtual environment not active, and so on). A few
-more specific to rendering the book or running heavier fine-tuning
-packages:
+[Part 0, Section 0.11](../chapters/chapter_00.qmd) covers the common
+setup errors (Python not found, virtual environment not active, and so
+on). A few more specific to rendering the book or running heavier
+fine-tuning packages:
 
 | Symptom | Likely cause |
 |---|---|

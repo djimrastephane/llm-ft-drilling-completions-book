@@ -1,9 +1,10 @@
 # Fine-Tuning Local LLM for Drilling & Completions
 
-> **Status: repository scaffold, no chapter content written yet.** This
-> README describes the planned book so the structure below makes sense as
-> it fills in. See [RELEASE.md](RELEASE.md) / [CHANGELOG.md](CHANGELOG.md)
-> for what actually exists at any point in time.
+> **Status: early draft.** Part 0 is written; Chapters 1–13 are still
+> placeholders. This README describes the planned book so the structure
+> below makes sense as it fills in. See [RELEASE.md](RELEASE.md) /
+> [CHANGELOG.md](CHANGELOG.md) for what actually exists at any point in
+> time.
 
 This repository will contain the chapters, code, and training data for
 **Fine-Tuning Local LLM for Drilling & Completions** — a hands-on,
@@ -40,17 +41,26 @@ git clone https://github.com/djimrastephane/llm-ft-drilling-completions-book.git
 ```
 
 Never used a terminal or Git before? That's exactly what **Start Here**
-and **Part 0** below are for (once written) — nothing past this point will
-assume you already know how.
+and **Part 0** below are for — nothing past this point assumes you
+already know how.
 
 ---
 
 # Start Here
 
-Once Part 0 and Chapter 1 exist, this section will walk a brand-new reader
-through: installing Python and a local model runtime, running
-`setup_check.py`, and completing Chapter 1. For now, the folder structure
-below is the scaffold that content will land in.
+This README has one job: get you to successfully complete Part 0. If
+this is your first Python project, do these steps in order:
+
+1. Read [Part 0: Preparing Your Local LLM Workshop](book/chapters/chapter_00.qmd) — installs Python, clones this repository, and gets your environment ready. No prior experience assumed.
+2. Run `setup_check.py` — one command that confirms everything is working.
+3. Continue to Chapter 1 (not yet written) once it lands.
+
+| Step | Typical time |
+|---|---|
+| Part 0 | ~30–45 minutes |
+
+You don't need to understand everything before you start — you need to
+run the first command. Everything else follows from there.
 
 ---
 
@@ -163,17 +173,17 @@ patience, on CPU — is enough.
 | Positron | Data science workflows |
 | Terminal only | Minimal setup |
 
-Part 0 (once written) will cover general setup, with a short dedicated
-walkthrough for each option in Appendices A1–A5, mirroring the previous
-book.
+[Part 0](book/chapters/chapter_00.qmd) covers general setup, with a
+short dedicated walkthrough for each option in Appendices A1–A5,
+mirroring the previous book.
 
 ---
 
 # Table of Contents (planned)
 
-Everything below is the planned chapter map — content does not exist yet.
-For the full repository layout (folder tree, part/chapter file map) see
-[`book/README.md`](book/README.md).
+Part 0 is written; the chapter map below for Chapters 1–13 is still
+planned, not yet drafted. For the full repository layout (folder tree,
+part/chapter file map) see [`book/README.md`](book/README.md).
 
 [![Publish book to GitHub Pages](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml)
 [![Code tests Linux](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-linux.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-linux.yml)

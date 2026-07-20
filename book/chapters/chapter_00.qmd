@@ -1,22 +1,15 @@
-<!--
-STATUS: placeholder only -- this chapter has not been written yet.
-Part 0 doesn't follow templates/chapter_template.qmd (no Operational
-Problem/persona framing, no chapter-status progress bar) -- it's a
-straight setup walkthrough, mirroring the previous book's Part 0. Fill in
-each numbered section below with the real, tested steps for this book's
-stack (Python, a virtual environment, requirements.txt, and a hardware
-check for fine-tuning). Section numbers are referenced elsewhere
-(book/README.md, appendix/appendix_a_environment_setup.qmd) -- keep them
-stable if you renumber.
--->
-
 # Part 0: Preparing Your Local LLM Workshop {#sec-chapter-00}
+
+::: {.chapter-status}
+**Estimated time:** 30–45 min &nbsp;·&nbsp; **Difficulty:** 🟢 Beginner &nbsp;·&nbsp; No prior programming experience assumed
+:::
 
 ## Learning objectives
 
 By the end of this chapter, you will be able to:
 
 - Install Python and confirm it works
+- Get a copy of this book's companion repository onto your own machine
 - Create and activate a virtual environment for this book
 - Install this book's dependencies
 - Check whether your machine has a GPU fine-tuning can use, and know
@@ -25,74 +18,281 @@ By the end of this chapter, you will be able to:
 
 ## 0.1 Why this chapter exists
 
-<!-- TODO: one or two paragraphs, same spirit as the previous book's
-Part 0 opener -- no assumed prior experience, explain that everything
-past this chapter assumes a working environment. -->
+Every chapter from here on assumes four things are already true: Python
+is installed, this repository is on your machine, a virtual environment
+for it is active, and this book's packages are installed inside that
+environment. None of that is difficult, but skipping or rushing it is
+the single most common reason a reader gets stuck before Chapter 1 even
+starts — usually with a confusing error that has nothing to do with
+drilling, completions, or language models, and everything to do with one
+of these four things not being true yet.
+
+This chapter does all four, one step at a time, with no assumption that
+you've done any of it before. If you already have a working Python
+setup and just want the short version, jump to Section 0.5 (install
+requirements) and Section 0.8 (run the setup check) — you can always
+come back for the rest.
 
 ## 0.2 Install Python
 
-<!-- TODO: platform-specific instructions (macOS/Windows/Linux), the
-minimum supported Python version (3.11, matching requirements.txt /
-environment.yml), and how to confirm with `python3 --version`. -->
+This book targets **Python 3.11 or later** — the same version pinned in
+`requirements.txt` and `environment.yml`.
+
+::: {.callout-tip title="Engineering Translation: what is Python, here?"}
+Python is the programming language every script in this book is written
+in. Installing it is like installing the one piece of shop equipment
+every other tool in this book plugs into — nothing past this section
+runs without it.
+:::
+
+**macOS:** Python 3 usually needs to be installed explicitly (the
+system's built-in `python3` is often older or missing entirely).
+Download the latest 3.11+ installer from
+[python.org/downloads](https://www.python.org/downloads/) and run it, or
+if you have [Homebrew](https://brew.sh) installed:
+
+```bash
+brew install python@3.11
+```
+
+**Windows:** download the installer from
+[python.org/downloads](https://www.python.org/downloads/). On the first
+installer screen, check **"Add python.exe to PATH"** before clicking
+Install — this is the step almost everyone forgets, and it's what
+Section 0.11 below assumes you didn't.
+
+**Linux:** most distributions ship Python 3, but check the version — it
+may be older than 3.11. On Ubuntu/Debian:
+
+```bash
+sudo apt update && sudo apt install python3 python3-venv python3-pip
+```
+
+**Confirm it worked:**
+
+```bash
+python3 --version
+```
+
+**Expected output:** something like `Python 3.11.9` (any 3.11 or later
+patch version is fine). If you see `command not found` or a version
+below 3.11, revisit the install step for your platform above.
 
 ## 0.3 Clone this repository
 
-<!-- TODO: `git clone` instructions, or a link back to the Download ZIP
-option in the root README, for readers without git experience. -->
+If you're comfortable with `git`:
+
+```bash
+git clone https://github.com/djimrastephane/llm-ft-drilling-completions-book.git
+cd llm-ft-drilling-completions-book
+```
+
+Never used `git` before? Click the **Download ZIP** button on the
+repository's GitHub page instead, unzip it, and open a terminal inside
+the unzipped folder.
+
+**Expected output:** a folder named
+`llm-ft-drilling-completions-book` (or similar) containing, among other
+things, a `book/` folder — everything from here on happens inside `book/`.
+
+```bash
+cd book
+```
 
 ## 0.4 Create and activate a virtual environment
 
-<!-- TODO: `python3 -m venv .venv` / activation on each OS, what the
-`(.venv)` prompt prefix means, common "not activated" mistakes. -->
+::: {.callout-tip title="Engineering Translation: what is a virtual environment?"}
+A virtual environment is a private, self-contained set of Python
+packages just for this project — like a dedicated toolbox for this book
+that doesn't get mixed up with tools installed for anything else on your
+machine. Without it, this book's packages (and their exact versions)
+could conflict with something else Python-related already on your
+system.
+:::
+
+From inside `book/`:
+
+```bash
+python3 -m venv .venv
+```
+
+**What just happened?** This created a `.venv` folder holding a private
+copy of Python and an empty toolbox, specific to this project.
+
+Now activate it — you'll need to do this every time you open a new
+terminal window to work on this book:
+
+```bash
+source .venv/bin/activate          # macOS/Linux
+.venv\Scripts\activate             # Windows (Command Prompt or PowerShell)
+```
+
+**Expected result:** your terminal prompt now starts with `(.venv)`.
+That prefix is your confirmation the virtual environment is active —
+if it's missing, the next step will install packages into the wrong
+place.
 
 ## 0.5 Install requirements
 
-<!-- TODO: `pip install -r requirements.txt` from inside `book/`, what a
-successful install looks like, roughly how long it takes given torch's
-size. -->
+With `(.venv)` showing in your prompt and still inside `book/`:
+
+```bash
+pip install -r requirements.txt
+```
+
+**What just happened?** `pip` read the list of packages this book needs
+— `transformers`, `torch`, `peft`, and the rest — and installed them
+into your `.venv`. `torch` in particular is a large download (several
+hundred MB to a few GB depending on platform and whether a GPU build is
+selected), so this step can take a few minutes even on a fast
+connection. That's normal.
+
+**Expected output:** a long scroll of `Downloading...` and
+`Installing collected packages...` lines, ending with something like
+`Successfully installed torch-... transformers-... peft-... ...` and no
+red `ERROR` lines.
+
+::: {.callout-note title="bitsandbytes and your platform"}
+`requirements.txt` installs `bitsandbytes` (used for 4-/8-bit QLoRA
+fine-tuning) only on Linux — it has no working build for macOS. If
+you're on macOS or a CPU-only machine, this is expected and not an
+error; Chapter 5 explains the full-precision LoRA path you'll use
+instead.
+:::
 
 ## 0.6 Check your hardware
 
-<!-- TODO: a short script/snippet checking `torch.cuda.is_available()`
-and `torch.backends.mps.is_available()`, explaining in plain language
-what GPU vs CPU-only means for later chapters' training time (see
-Appendix A, Section 3). No GPU should not feel like a dead end -- explain
-the CPU-friendly path. -->
+Fine-tuning, even the parameter-efficient kind this book uses, is more
+sensitive to your hardware than simply running a model is. This section
+doesn't require you to buy anything — it just sets expectations for
+later chapters.
+
+```{python}
+#| eval: false
+import torch
+
+if torch.cuda.is_available():
+    print(f"CUDA GPU available: {torch.cuda.get_device_name(0)}")
+elif torch.backends.mps.is_available():
+    print("Apple Silicon MPS device available")
+else:
+    print("No GPU detected -- CPU-only.")
+```
+
+**What just happened?** This checks for three possibilities: an
+NVIDIA GPU (`cuda`), an Apple Silicon Mac's built-in accelerator
+(`mps`), or neither.
+
+**What this means for you:**
+
+- **CUDA GPU:** the most comfortable path. Chapter 5's fine-tune, and
+  the heavier Part II chapters, will run in minutes.
+- **Apple Silicon MPS:** works well for this book's small models, though
+  somewhat slower than a dedicated CUDA GPU.
+- **CPU-only:** every chapter is still designed to run — you'll use a
+  smaller model and fewer training steps where a chapter calls for it,
+  at the cost of longer wait times, not a dead end.
 
 ## 0.7 Choose your workshop (editor or notebook)
 
-<!-- TODO: point to Appendices A1-A5 (Jupyter, VS Code, PyCharm,
-Positron, terminal-only), same framing as the previous book: no wrong
-choice. -->
+You don't need a specific editor to follow this book. Pick whichever of
+these you're most comfortable with — there is no wrong choice, and all
+five run the exact same code:
+
+| Environment | Recommended for | Guide |
+|---|---|---|
+| Jupyter Notebook | Learning and experimentation | [Appendix A1](../appendix/appendix_a1_jupyter.qmd) |
+| VS Code | General coding | [Appendix A2](../appendix/appendix_a2_vscode.qmd) |
+| PyCharm Community | Larger projects | [Appendix A3](../appendix/appendix_a3_pycharm.qmd) |
+| Positron | Data science workflows | [Appendix A4](../appendix/appendix_a4_positron.qmd) |
+| Terminal only | Minimal setup | [Appendix A5](../appendix/appendix_a5_terminal.qmd) |
+
+If you're not sure, Jupyter Notebook or VS Code are the most common
+starting points. You can always switch later — nothing in this book
+locks you into one choice.
 
 ## 0.8 Run the setup check
 
-<!-- TODO: `python code/setup_check.py`, expected output, what each
-failure message means. -->
+With `(.venv)` active and requirements installed, from inside `book/`:
+
+```bash
+python code/setup_check.py
+```
+
+**Expected output:**
+
+```
+Fine-Tuning Local LLM for Drilling & Completions -- setup check
+
+[OK] Python 3.11.9
+[OK] torch importable
+[OK] transformers importable
+[OK] peft importable
+[OK] datasets importable
+[OK] accelerate importable
+[INFO] No GPU detected -- CPU-only. Fine-tuning chapters will still work with a small model, just more slowly.
+
+Workshop is ready.
+```
+
+(Your `[INFO]` line will instead name a CUDA GPU or MPS if you have one
+— see Section 0.6.)
+
+If you instead see any `[FAIL]` line, do not continue to Chapter 1 yet
+— see Section 0.11, Troubleshooting, below.
 
 ## 0.9 Optional: install a local model runtime
 
-<!-- TODO: brief mention of Ollama (ollama.com) as an optional
-convenience for later chapters that compare a fine-tuned checkpoint
-against a familiar local runtime -- not required for the fine-tuning
-chapters themselves, which use `transformers`/`peft` directly. -->
+Chapters 1–13 use `transformers` and `peft` directly — nothing here
+requires any additional software. If you'd also like a familiar,
+general-purpose way to run local models outside this book's own code
+(useful later for quick comparisons), [Ollama](https://ollama.com) is a
+convenient optional install:
+
+```bash
+# after installing from ollama.com
+ollama pull qwen2.5:7b-instruct
+ollama serve
+```
+
+This step is entirely optional and can be skipped for now.
 
 ## 0.10 First success checkpoint
 
-<!-- TODO: a short checklist mirroring the root README's "First Success
-Checkpoint" section. -->
+You are ready for Chapter 1 when:
+
+::: {.callout-caution title="CHECKPOINT — Part 0"}
+- [x] `python3 --version` reports 3.11 or later
+- [x] This repository is on your machine, with a `book/` folder
+- [x] Your terminal prompt shows `(.venv)`
+- [x] `pip install -r requirements.txt` finished with no `ERROR` lines
+- [x] `python code/setup_check.py` printed `Workshop is ready.`
+:::
+
+If every box above is true, you're done with Part 0.
 
 ## 0.11 Troubleshooting
 
-<!-- TODO: common setup errors (Python not found, venv not active,
-pip install failures, torch install issues per platform) -- this is the
-section Appendix A, Section 5 refers readers back to. -->
+| Symptom | Likely cause |
+|---|---|
+| `command not found: python3` (Windows) | Python wasn't added to `PATH` during install — re-run the installer and check "Add python.exe to PATH" (Section 0.2). |
+| `python3 --version` shows a version below 3.11 | You have an older Python 3 install alongside a newer one; try `python3.11 --version` explicitly, or reinstall from python.org. |
+| Prompt never shows `(.venv)` after activating | Confirm you ran the activate command from *inside* `book/`, and that `.venv/` actually exists there (Section 0.4). |
+| `pip install -r requirements.txt` fails partway through | Re-run the same command — a partial download is the most common cause and simply retrying often finishes the job. If it fails on `torch` specifically, try `pip install torch` alone first, then re-run `pip install -r requirements.txt`. |
+| `setup_check.py` reports `[FAIL] <package> not importable` | `(.venv)` isn't active, or `pip install -r requirements.txt` didn't finish successfully — re-check Sections 0.4 and 0.5. |
+| `ModuleNotFoundError: No module named 'torch.backends'` when checking hardware | Your `torch` install didn't complete — re-run `pip install -r requirements.txt` and check for `ERROR` lines. |
 
 ## What can you do now that you couldn't do before?
 
-<!-- TODO: one or two sentences of concrete new capability. -->
+You have a working Python environment, this book's dependencies
+installed, and a hardware check that tells you what to expect from
+later fine-tuning chapters — everything Chapter 1 assumes is already in
+place.
 
 ## Suggested next step
 
-**Coming up in Chapter 1:** <!-- TODO: bridge to loading and running the
-first local model. -->
+**Coming up in Chapter 1:** with your workshop ready, Chapter 1 loads a
+general-purpose local model for the first time and generates its first
+completion — the base model you'll spend the rest of Part I fine-tuning
+into something that actually understands drilling and completions
+reports.
