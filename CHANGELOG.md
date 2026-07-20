@@ -27,4 +27,14 @@ highlights in narrative form.
   base model this book fine-tunes starting in Chapter 5. Every quoted
   report excerpt and model output in this chapter is from a real,
   verified run against the committed sample dataset -- nothing invented.
-  Chapters 2–13 remain placeholders.
+- **Chapter 2: Turning Drilling & Completions Reports into Training
+  Examples** (`chapters/chapter_02.qmd`) fully drafted, with working,
+  tested code (`code/chapter_02/build_training_examples.py`,
+  `code/chapter_02/challenge/challenge.py`, `tests/test_chapter_02.py`).
+  Extracts each report's own self-reported PRESENT OPERATIONS / ACTIVITY
+  PLANNED fields with `pdfplumber` and turns them into 18 real
+  instruction/response training examples from 9 of the 10 sample
+  reports (the completion report uses a different field layout, handled
+  in the challenge exercise). Every field value and example count in
+  the chapter is from a real, verified run. Chapters 3–13 remain
+  placeholders.

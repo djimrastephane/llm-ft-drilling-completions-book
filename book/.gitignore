@@ -30,6 +30,7 @@ runs/
 wandb/
 mlruns/
 datasets/*.jsonl.cache
+datasets/training_examples/
 
 # OS
 .DS_Store

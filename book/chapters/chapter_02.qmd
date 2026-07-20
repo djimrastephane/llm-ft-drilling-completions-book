@@ -1,111 +1,4 @@
-<!--
-STATUS: placeholder only -- this chapter has not been written yet.
-Draft it by filling in every TODO/comment section below, per
-templates/chapter_template.qmd and book/README.md's chapter map.
--->
-
-<!--
-CHAPTER TEMPLATE
-================
-Copy this file into chapters/chapter_NN.qmd and fill in every section.
-Do not delete a section — if it doesn't apply, write one sentence saying why.
-
-Audience: drilling/completions/intervention/production engineers and
-petroleum data scientists. Assume zero Python experience and zero software
-engineering experience. Assume strong operational experience, strong Excel
-skills, curiosity about AI, and willingness to type code manually. The
-reader should never ask "why am I learning this?" — every concept appears
-only after they've hit the problem it solves. Problem first, technology
-second. If forced to choose between technical completeness and reader
-confidence, choose reader confidence. The reader should finish saying
-"I can build this," not "I understand the theory."
-
-Style rules:
-- Problem first. Never introduce a concept (tokenization, LoRA adapters,
-  quantization, evaluation metrics, or anything else) before the reader
-  has felt the failure that makes it necessary.
-- Every chapter must produce a runnable artifact the reader can point to
-  and say "I built that."
-- Minimal mathematics. If you need an equation, put the intuition in prose
-  first and the equation second, not the other way around.
-- No chapter should run past ~20 pages without a practical exercise
-  checkpoint.
-- Code blocks must run as-is against the companion repository's sample
-  training data. Do not show elided/pseudocode as if it were runnable.
-- Avoid jargon in plain-English explanations. Bad: "This applies a
-  low-rank update to the attention projections." Good: "We taught the
-  model a small, targeted correction instead of retraining it from
-  scratch."
-- Every claimed result (a metric, an evaluation score, a before/after
-  comparison) must come from an actual run of this book's own code
-  against real training data — never invented or estimated.
-
-Required structural elements (do not skip any of these):
-1. A visual progress marker at the very top, e.g. `Base Model ↓ Fine-Tuned Model`.
-2. "## Operational Problem" as the first section after Learning objectives,
-   written in the language of a drilling morning call (a question someone
-   would actually ask out loud), never "today we will learn X."
-3. Before EVERY code block: "## What problem are we solving?", "## Inputs",
-   "## Expected Output".
-4. After EVERY code block: "## What just happened?" in plain English.
-5. An "Engineering Translation" callout for every new programming or AI
-   concept introduced (LoRA adapter -> a small swappable correction sheet
-   clipped to the model, tokenizer -> the standard word-breakdown table
-   everyone on the crew uses, checkpoint -> a saved snapshot of training
-   progress, evaluation set -> a fixed exam the model has never seen,
-   epoch -> one full pass through the training data, etc.) — invent the
-   right analogy for whatever concept the chapter actually introduces.
-6. If the chapter introduces a new AI/ML concept, include a
-   "## Why prompting alone falls short" (or equivalent "why the simpler
-   thing fails") section before introducing the new technique — show the
-   question, why the simpler approach gets it wrong or inconsistent, then
-   the fix.
-7. A "## Production Reality" section: what this chapter's examples
-   deliberately simplify away, and what a messier real training pipeline
-   looks like (inconsistent report formats, duplicate or near-duplicate
-   entries, class imbalance, limited hardware, drift between training and
-   production data, etc.).
-8. A closing "## What can you do now that you couldn't do before?" section
-   — one or two sentences of concrete new capability, not a theory recap.
-9. A ".chapter-status" div directly under the pipeline diagram: a 12-block
-   progress bar (N filled for chapter N, rest empty), an estimated time,
-   and a difficulty badge (🟢/🟠/🔴). See markup below.
-10. Exactly one named persona (Mike/completions, Sarah/intervention,
-    Sean/production, Oumy/drilling — see index.qmd's roster) appears in
-    the opening sentence(s) of "## Operational Problem", asking the
-    motivating question. Pick whichever persona the chapter's question
-    naturally belongs to. Personas may be echoed once more in "##
-    Practical exercise" for bookend effect, but never appear in Theory,
-    Production Reality, or Field notes — those sections stay factual and
-    unattributed, since their content must be independently verified
-    against a real run, not invented dialogue.
-11. A difficulty badge line under both exercise headings: "## Practical
-    exercise" gets 🟢 **Beginner** always; "## Challenge exercise" gets
-    🟠 **Intermediate** by default, escalated to 🔴 **Advanced** only when
-    the challenge is genuinely harder than a typical chapter's (a
-    judgment call, not a mechanical rule).
-12. A "CHECKPOINT" box (`callout-caution`, GFM task-list checkboxes) and a
-    "WHAT YOU BUILT" box (`callout-tip .built-box`), placed together right
-    after "## Repository files" and before the closing "## What can you do
-    now..." / "## Suggested next step" pair. CHECKPOINT is a terse,
-    checkable skills list; WHAT YOU BUILT names the concrete artifact.
-    Neither replaces "## Key takeaways" (conceptual) or "## What can you
-    do now" (prose) — each reinforces achievement from a different angle.
-13. "## Suggested next step" opens with a bolded **Coming up in Chapter
-    N+1:** line before its bridging paragraph.
--->
-
 # Turning Drilling & Completions Reports into Training Examples {#sec-chapter-02}
-
-<!-- Progress marker: a small pipeline diagram showing this chapter's
-input -> output transformation (2-4 boxes, vertical flow with arrows).
-Add it to the DIAGRAMS dict in figures/diagrams/generate_diagrams.py and
-run that script -- it compiles TikZ -> PDF via pdflatex, then produces
-three files per diagram: pipeline_ch02_light.svg and _dark.svg (for
-HTML), and pipeline_ch02.pdf (for PDF output -- see the note below on
-why this can't just reuse the SVG). Do NOT use plain ASCII art here; it
-doesn't get the crisp, theme-aware rendering the rest of the book's
-diagrams have. -->
 
 ::: {.content-visible when-format="html"}
 ::: {.pipeline-diagram}
@@ -117,221 +10,412 @@ diagrams have. -->
 ::: {.content-visible when-format="pdf"}
 ![](../figures/diagrams/pipeline_ch02.pdf){width="180" fig-align="center"}
 :::
-<!-- PDF format embeds the compiled .pdf directly, not the SVG -- Quarto's
-LaTeX pipeline needs rsvg-convert to rasterize an SVG for PDF output,
-which may not be installed on the CI runner. generate_diagrams.py should
-save the compiled PDF alongside both SVG variants for exactly this
-reason -- always reference the .pdf here, never the .svg.
-
-fig-align="center" is required on this line -- a bare image (no caption)
-isn't wrapped in pandoc's usual centering figure environment, so without
-it the diagram renders flush against the left margin instead of
-centered. The HTML version doesn't need this (.pipeline-diagram's
-text-align: center in custom.scss already handles it there). -->
-
-<!-- Chapter status strip (rule 9). Progress bar is 12 characters total,
-N filled for chapter N. Estimated time is a plausible range for a reader
-typing every example. Difficulty is the chapter's overall level, usually
-🟢 for Part I and early Part II, 🟠/🔴 as fine-tuning and evaluation get
-more involved. -->
 
 ::: {.chapter-status}
-Progress `██░░░░░░░░░░░` **2 / 13** &nbsp;·&nbsp; **Estimated time:** 30-40 min &nbsp;·&nbsp; **Difficulty:** 🟢 Beginner
+Progress `██░░░░░░░░░░░` **2 / 13** &nbsp;·&nbsp; **Estimated time:** 30–40 min &nbsp;·&nbsp; **Difficulty:** 🟢 Beginner
 :::
 
 ## Learning objectives
 
 By the end of this chapter, you will be able to:
 
-- Objective 1 (a concrete capability, not a topic — "load a local
-  open-weight model with `transformers` and generate a completion", not
-  "learn about language models")
-- Objective 2
-- Objective 3
+- Extract structured fields from a real report PDF with `pdfplumber`
+- Explain what an instruction/response training example is, and why its
+  `output` should come from the report itself rather than a written
+  summary
+- Turn a folder of reports into a training-ready `.jsonl` file
+- Recognize when a report doesn't match your extractor's assumptions,
+  and handle that case instead of silently getting it wrong
 
 ## Operational Problem
 
-<!-- One or two paragraphs, opening with ONE named persona (rule 10)
-asking a question in the language of a drilling morning call ("Why does
-the model keep getting our sequencing wrong?", "Can we trust this answer
-enough to act on it?"). Describe the real problem this chapter solves.
-Ground it in a scenario: a specific fine-tuning attempt, a specific
-question someone needed answered correctly, a specific way the current
-(base model or manual) approach fails. Never open with "Today we will
-learn X." Example opening: "Sarah, the intervention engineer, asks:
-'...'" -->
+Oumy, still turning over what Chapter 1 showed her, asks the obvious
+next question: *"The report file itself already says what happened,
+plainly — 'Present Operations,' 'Activity Planned.' Why can't we just
+point the model at that?"*
 
-## Example training excerpt
+Because a model doesn't learn from being pointed at a folder of PDFs. It
+learns from *training examples* — a specific, structured shape a
+fine-tuning process (Chapter 5) can actually consume. This chapter turns
+that folder of PDFs into exactly that shape, using nothing but the
+reports' own words.
 
-<!-- A short, realistic (synthetic or anonymised) instruction/response
-training example that motivates the chapter's technique. Show it as a
-callout so it's visually distinct from narrative text. -->
+## Example report excerpt
 
-::: {.callout-note title="Sample training example"}
-```json
-{
-  "instruction": "Summarize the operational risk in this report excerpt.",
-  "input": "0600-1130 POOH FR 9,842' TO CHANGE BHA. ERRATIC TORQUE OBSD LAST 3 STDS.",
-  "output": "Erratic torque over the last three stands before pulling out of hole suggests a developing hole-cleaning or BHA issue that should be monitored on the next run."
-}
+The same real report from Chapter 1, `Drilling_038` (2020-11-26), has
+two short, plain-language fields sitting right at the top of the form,
+before any of the technical tables:
+
+::: {.callout-note title="Sample report excerpt -- FORGE-16A-78-32_Drilling_038_2020-11-26.pdf"}
+```
+PRESENT OPERATIONS: PIPE FREE, TRIP OUT OF HOLE FOR BHA INSPECTION
+ACTIVITY PLANNED: INSPECT BHA, TRIP IN HOLE DRILL CURVE
 ```
 :::
 
+These two fields — a snapshot of "what's happening right now" and
+"what's planned next" — exist on every drilling report in this book's
+archive. They're the raw material this chapter turns into training
+examples.
+
 ## Theory
 
-<!-- The minimum theory required to understand *why* the implementation
-below works. If this section would exceed ~1.5 pages, you are including
-theory the reader doesn't need yet — cut it or defer it to a later
-chapter. Prefer diagrams and worked examples over formal definitions.
-
-If this section needs its own flow diagram (an algorithm's internal
-steps, not the chapter-opening progress marker), it follows the same
-TikZ -> PDF/SVG pattern, added to THEORY_DIAGRAMS (not DIAGRAMS) in
-figures/diagrams/generate_diagrams.py. The generator only draws a
-straight vertical chain; a diagram that branches (a yes/no decision)
-needs that support added first, or should stay as prose/ASCII for now.
-
-Add an "Engineering Translation" callout for every new concept this
-chapter introduces — see rule 5 above. Example: -->
-
-::: {.callout-tip title="Engineering Translation: <concept>"}
-<!-- One or two plain-language sentences mapping the concept onto
-something the reader already knows from field operations. -->
+::: {.callout-tip title="Engineering Translation: instruction/response pair"}
+A **training example** is like a single flashcard: the question you'd
+ask (the *instruction*, plus optional *input* context), and the correct
+answer (the *output*), written down together so a model can study from
+it later. This book uses that three-part shape — `instruction`,
+`input`, `output` — throughout.
 :::
 
-<!-- If this chapter introduces a new AI/ML concept, add a
-"## Why prompting alone falls short" (or equivalent) section here, before
-the new technique, following rule 6 above. -->
+::: {.callout-tip title="Engineering Translation: field extraction"}
+**Field extraction** means finding one specific labeled piece of
+information inside a big block of text — the way you'd scan a paper
+form for the line that starts with "Total:" rather than reading the
+whole page. This chapter does it with regular expressions (*regex*): a
+compact pattern-matching syntax for "find text that looks like this."
+:::
+
+## Why not just write our own summaries?
+
+A tempting shortcut: read each report and write a one-sentence summary
+by hand (or ask another AI to write one), and use that as the training
+`output`. Resist it. The moment a summary is written by anyone other
+than the report itself, it can be subtly wrong — a detail dropped, a
+number transposed, a plausible-sounding guess where the report was
+actually ambiguous — and that error becomes permanent, invisible ground
+truth. Later chapters build a data quality gate (Chapter 6) and an
+evaluation harness (Chapter 11) that both assume your labels are
+trustworthy; if the labels themselves are fabricated, everything built
+on top of them inherits the mistake.
+
+This chapter's technique sidesteps the problem entirely: every `output`
+below is the report's own field value, extracted verbatim. Nothing is
+summarized, paraphrased, or invented. It's a narrower kind of training
+example than a rich free-text summary would be — Chapter 7 builds
+richer ones — but every word of it is real.
 
 ## Implementation
 
-<!-- Step-by-step, runnable code, broken into named steps if more than one
-logical block is involved. For EACH code block, follow this exact pattern: -->
-
-### Step 1: <what this step accomplishes>
+### Step 1: Extract structured fields from one report
 
 ## What problem are we solving?
 
-<!-- One or two sentences: what does this specific block of code solve? -->
+Before anything can become a training example, you need the report's
+raw text, and then the two specific fields inside it — `PRESENT
+OPERATIONS` and `ACTIVITY PLANNED` — pulled out from everything else on
+the form (casing tables, mud properties, survey data) that isn't
+relevant here.
 
 ## Inputs
 
-<!-- Bullet list: what does this code need to run? -->
+- One report PDF, e.g. `datasets/sample_training_set/FORGE-16A-78-32_Drilling_038_2020-11-26.pdf`
 
 ## Expected Output
 
-<!-- What should the reader see when they run this? Show a concrete example. -->
+A dictionary of the fields this report actually contains.
 
 ```{python}
 #| eval: false
-# Minimal working example — replace with chapter-specific code.
-print("Hello, local LLM")
+import re
+import pdfplumber
+
+FIELD_PATTERNS = {
+    "well_name": r"WELL NAME:\s*(.+?)\s+JOB:",
+    "rpt_date": r"RPT DATE:\s*([\d/]+)",
+    "rpt_num": r"RPT NUM\.?:\s*(\d+)",
+    "present_operations": r"PRESENT OPERATIONS:\s*(.+?)\nACTIVITY PLANNED",
+    "activity_planned": r"ACTIVITY PLANNED:\s*(.+?)\n",
+}
+
+def extract_text(pdf_path):
+    with pdfplumber.open(pdf_path) as pdf:
+        return pdf.pages[0].extract_text()
+
+def extract_fields(text):
+    fields = {}
+    for name, pattern in FIELD_PATTERNS.items():
+        match = re.search(pattern, text)
+        fields[name] = match.group(1).strip() if match else None
+    return fields
+
+text = extract_text("datasets/sample_training_set/FORGE-16A-78-32_Drilling_038_2020-11-26.pdf")
+print(extract_fields(text))
+```
+
+Running this exact code prints:
+
+```
+{'well_name': 'FORGE 16A [78]-32', 'rpt_date': '11/26/2020', 'rpt_num': '38',
+ 'present_operations': 'PIPE FREE, TRIP OUT OF HOLE FOR BHA INSPECTION',
+ 'activity_planned': 'INSPECT BHA, TRIP IN HOLE DRILL CURVE'}
 ```
 
 ## What just happened?
 
-<!-- Plain-English explanation, no unnecessary jargon. Bad: "This applies
-a low-rank update to the attention projections." Good: "We taught the
-model a small, targeted correction instead of retraining it from
-scratch." -->
+`pdfplumber` read the PDF and returned its text as one long string —
+column layout flattened, so lines that appear side by side on the page
+(like a table's column headers and a row of values) can end up on
+separate lines here. `extract_fields` then used regex to find each
+labeled field regardless of exactly where it landed in that string.
 
 ## Production Reality
 
-<!-- What does this chapter's example deliberately simplify away? What
-does a messier, real, multi-well or multi-operator training pipeline
-look like for this same problem? Follow rule 7 above. -->
+This regex assumes a specific, fixed field layout — the one every
+`Drilling_NNN` report in this archive happens to share. `pdfplumber`
+itself doesn't get everything right either: scanned or handwritten
+reports don't have extractable text at all (Chapter 6 covers detecting
+that). And even for a clean, digital report, a different operator's
+form, or even this same operator's *completion* reports, can use
+different field labels entirely — which is exactly what you'll run into
+next.
+
+### Step 2: Turn one report's fields into training examples
+
+## What problem are we solving?
+
+Extracted fields aren't training examples yet — they need to be
+reshaped into the `instruction` / `input` / `output` triples a
+fine-tuning process expects, and a report that doesn't have both fields
+needs to be skipped rather than silently producing a broken example.
+
+## Inputs
+
+- The `extract_fields()` dictionary from Step 1, for every report in
+  `datasets/sample_training_set/`
+
+## Expected Output
+
+Two training examples per successfully-parsed report; a printed notice
+naming any report that was skipped.
+
+```{python}
+#| eval: false
+from datetime import datetime
+
+def normalize_date(raw_date):
+    return datetime.strptime(raw_date, "%m/%d/%Y").strftime("%Y-%m-%d")
+
+def build_examples_for_report(pdf_path):
+    text = extract_text(pdf_path)
+    fields = extract_fields(text)
+
+    if not fields["present_operations"] or not fields["activity_planned"]:
+        return []  # unrecognized field layout -- see Production Reality above
+
+    context = (
+        f"Well: {fields['well_name']} | Report #{fields['rpt_num']} | "
+        f"Date: {normalize_date(fields['rpt_date'])}"
+    )
+    return [
+        {
+            "instruction": "What are the present operations reported on this well?",
+            "input": context,
+            "output": fields["present_operations"],
+        },
+        {
+            "instruction": "What activity is planned next?",
+            "input": context,
+            "output": fields["activity_planned"],
+        },
+    ]
+```
+
+Running `build_examples_for_report()` on `Drilling_038` prints:
+
+```json
+[
+  {
+    "instruction": "What are the present operations reported on this well?",
+    "input": "Well: FORGE 16A [78]-32 | Report #38 | Date: 2020-11-26",
+    "output": "PIPE FREE, TRIP OUT OF HOLE FOR BHA INSPECTION"
+  },
+  {
+    "instruction": "What activity is planned next?",
+    "input": "Well: FORGE 16A [78]-32 | Report #38 | Date: 2020-11-26",
+    "output": "INSPECT BHA, TRIP IN HOLE DRILL CURVE"
+  }
+]
+```
+
+## What just happened?
+
+Each report becomes two training examples, one per field, sharing the
+same `input` context (well, report number, date) so the model can learn
+to condition its answer on which report is being asked about.
+`normalize_date` just makes every date consistently `YYYY-MM-DD`, since
+this archive's own reports don't all format dates the same way.
+
+### Step 3: Build and save the full training set
+
+## What problem are we solving?
+
+One report is a proof of concept; Chapter 5's fine-tune needs the whole
+sample archive, saved to a file the next chapters can load without
+re-running PDF extraction every time.
+
+## Inputs
+
+- Every PDF in `datasets/sample_training_set/`
+
+## Expected Output
+
+A `.jsonl` file (one JSON object per line — the standard format this
+book uses for training data) plus a summary line reporting how many
+examples were built and how many reports were skipped.
+
+```{python}
+#| eval: false
+import json
+from pathlib import Path
+
+SAMPLE_SET_DIR = Path("datasets/sample_training_set")
+OUTPUT_PATH = Path("datasets/training_examples/sample_training_examples.jsonl")
+
+def build_training_examples(sample_dir=SAMPLE_SET_DIR):
+    examples, skipped = [], []
+    for pdf_path in sorted(sample_dir.glob("*.pdf")):
+        report_examples = build_examples_for_report(pdf_path)
+        if report_examples:
+            examples.extend(report_examples)
+        else:
+            skipped.append(pdf_path.name)
+    if skipped:
+        print(f"Skipped {len(skipped)} report(s) with an unrecognized field layout: {skipped}")
+    return examples
+
+def save_examples_jsonl(examples, output_path=OUTPUT_PATH):
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", encoding="utf-8") as f:
+        for example in examples:
+            f.write(json.dumps(example) + "\n")
+
+examples = build_training_examples()
+save_examples_jsonl(examples)
+print(f"Built {len(examples)} training examples -> {OUTPUT_PATH}")
+```
+
+Running this exact code prints:
+
+```
+Skipped 1 report(s) with an unrecognized field layout: ['FORGE-16A-78-32_Completion_003_2021-01-06.pdf']
+Built 18 training examples -> datasets/training_examples/sample_training_examples.jsonl
+```
+
+## What just happened?
+
+Nine of the ten sample reports use the drilling-report field layout, so
+each contributes two examples — 18 total. The tenth,
+`Completion_003`, is a *completion* report using different field labels
+(`Present Ops:` / `Next 24 Hours:` instead of `PRESENT OPERATIONS:` /
+`ACTIVITY PLANNED:`) and gets correctly skipped rather than silently
+producing a garbage example. `datasets/training_examples/` is generated,
+not committed to this repository — regenerate it any time by re-running
+this script (see `book/.gitignore`).
 
 ## Practical exercise
 
 🟢 **Beginner**
 
-<!-- A guided exercise using the sample training data, with a clear,
-checkable "you'll know you got it right when..." condition. This is not
-optional — every chapter has one. -->
+**Try it yourself:** run `python code/chapter_02/build_training_examples.py`
+from inside `book/`, then open the generated
+`datasets/training_examples/sample_training_examples.jsonl` in a text
+editor.
 
-**Try it yourself:** ...
-
-**You'll know it worked when:** ...
+**You'll know it worked when:** the script prints `Built 18 training
+examples`, the file has exactly 18 lines, and the first one matches
+report `#3` (`Drilling_003`, 2020-10-22) — the earliest report in the
+sample set.
 
 ## Field notes
 
-<!-- Optional but encouraged, and should recur often across the book: a
-short, real, independently-verified vignette showing where the tool this
-chapter just built actually breaks (or, in a later chapter, where a
-previous chapter's tool breaks and this chapter's technique fixes it).
-Every number and quote here must be checked against a real run before
-writing it down -- run the code, don't estimate the outcome. The payoff
-is a moment where the reader sees, concretely, why the next chapter's
-added complexity is earning its keep, not complexity for its own sake.
+::: {.callout-warning title="Field notes: one field, not the whole story"}
+**Query/Action:** extracting fields for reports `#49` and `#50` — the
+same packers-fail-to-fishing sequence referenced in the author's
+previous book.
 
-Format:
-  Query/Action -> the (surprising) result -> the real training/eval data
-  that explains why -> the one-sentence lesson. -->
+**Result:** report `#49`'s `activity_planned` is literally `"FISHING
+OPERATIONS"` — confirming that real event directly from this archive.
+Report `#50`'s `present_operations`, the very next day, is `"TRIP IN
+HOLE WITH DIRECTIONAL BHA"` — not a restatement of "fishing" at all,
+even though report `#49` had just announced it as the plan.
 
-::: {.callout-warning title="Field notes: <short description>"}
-**Query:** `"..."`
+**Why:** the reports say (report `#49`, activity planned): `"FISHING
+OPERATIONS"`; (report `#50`, present operations): `"TRIP IN HOLE WITH
+DIRECTIONAL BHA"`. Each field is a narrow, honest snapshot of *one*
+report at *one* moment — it was never written to also summarize what
+happened the next day.
 
-**Result:** ...
-
-**Why:** the training/eval data shows:
-
-- "..."
-- "..."
-
-but never shows "...".
-
-**Lesson:** ...
+**Lesson:** even perfectly clean, extractive ground truth like this only
+answers questions about a single report in isolation. Connecting the
+story across reports — the plan in `#49` to the actual outcome by
+`#50` — needs more than two fields from one PDF. That's exactly why
+Part II exists: Chapter 9's hybrid retrieval is what eventually lets a
+question span more than one report.
 :::
 
 ## Challenge exercise
 
-🟠 **Intermediate** <!-- escalate to 🔴 Advanced per rule 11 if warranted -->
+🟠 **Intermediate**
 
-<!-- A harder, more open-ended extension for readers who want to go
-further. No solution is provided in the main text; a reference solution
-lives in the companion repository under `code/chapter_NN/challenge/`. -->
-
-**Challenge:** ...
+**Challenge:** extend `build_examples_for_report()` to also handle the
+completion report's different field layout (`Present Ops:` / `Next 24
+Hours:`, and a two-digit-year date format), so all 10 sample reports
+contribute examples instead of 9. A reference solution is at
+`code/chapter_02/challenge/challenge.py` — it produces 20 training
+examples total, 0 reports skipped.
 
 ## Key takeaways
 
-- Takeaway 1
-- Takeaway 2
-- Takeaway 3
+- A training example in this book is an `instruction` / `input` /
+  `output` triple — a single flashcard the model can study from.
+- Using a report's own self-reported fields as the `output` avoids
+  fabricating ground truth; the label is never anyone's guess.
+- `pdfplumber` plus a handful of regex patterns reliably extracts
+  structured fields from a fixed-form report — but only the form layout
+  it was written for.
+- Different report types (drilling vs. completion) can use different
+  field labels even within the same archive. Detect and skip what your
+  extractor doesn't recognize, rather than silently producing a bad
+  example.
 
 ## Repository files
 
-<!-- Exact paths in the companion repo relevant to this chapter. -->
-
 | File | Purpose |
 |---|---|
-| `code/chapter_02/build_training_examples.py` | ... |
-| `datasets/...` | ... |
+| `code/chapter_02/build_training_examples.py` | Extracts fields and builds instruction/response training examples |
+| `code/chapter_02/challenge/challenge.py` | Reference solution: also handles the completion report's field layout |
+| `datasets/sample_training_set/` | The 10 source report PDFs this chapter reads |
+| `datasets/training_examples/sample_training_examples.jsonl` | Generated output (not committed — regenerate by running the script) |
 | `notebooks/chapter_02_explore.ipynb` | Interactive companion notebook |
 
-<!-- Rule 12: CHECKPOINT + WHAT YOU BUILT, together, here. -->
-
 ::: {.callout-caution title="CHECKPOINT — Chapter 2"}
-- [x] Skill 1 gained this chapter, phrased as something done, not learned
-- [x] Skill 2
-- [x] Skill 3
+- [x] Extracted structured fields from a real report PDF with `pdfplumber`
+- [x] Built instruction/response training examples using a report's own
+      words as ground truth
+- [x] Detected and skipped a report with an unrecognized field layout,
+      instead of silently mishandling it
 :::
 
 ::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}
-**`artifact_name.py`** — one or two sentences naming the concrete artifact
-and what it hands off to the next chapter.
+**`build_training_examples.py`** — turns the 9 drilling-format reports
+in `datasets/sample_training_set/` into 18 real training examples,
+saved to `datasets/training_examples/sample_training_examples.jsonl`.
+Chapter 5 fine-tunes on data built exactly this way, at a larger scale.
 :::
 
 ## What can you do now that you couldn't do before?
 
-<!-- One or two sentences of concrete new capability, following rule 8
-above. Not a theory recap — a plain statement of what the reader can now
-do that they couldn't before this chapter. -->
+You can turn a folder of real, inconsistently-formatted report PDFs into
+a training-ready dataset without inventing a single label — and you know
+precisely which reports your extractor handles and which it doesn't,
+instead of hoping.
 
 ## Suggested next step
 
-<!-- Rule 13: open with a bolded "Coming up in Chapter N+1:" line, then
-one paragraph bridging to the next chapter: what limitation of today's
-artifact motivates tomorrow's work? -->
-
-**Coming up in Chapter N+1:** ...
+**Coming up in Chapter 3:** before spending any time actually
+fine-tuning, Chapter 3 runs a proper baseline test — the base model
+against a batch of real questions drawn from the training examples you
+just built — so you have hard, reproducible evidence of exactly what it
+gets wrong, and something concrete to compare Chapter 5's fine-tuned
+model against afterward.
