@@ -1,42 +1,48 @@
 # Datasets
 
-This folder is where the book's training data will live, mirroring the
-two-tier layout of the author's previous book (`sample_ddrs/` /
-`forge_archive/`):
+This book reuses the same source archive as the author's previous book,
+[`ddr-rag-book`](https://github.com/djimrastephane/ddr-rag-book): real,
+publicly available Daily Drilling Reports and completion reports from
+**Utah FORGE** (well FORGE 16A(78)-32), a Department of Energy-funded
+enhanced geothermal system research well. No anonymisation is applied or
+needed -- this is public data.
 
-- `sample_training_set/` — a small, curated set of instruction/response
-  training examples for Part I (Chapters 1–5).
-- `full_training_set/` — a larger training set for Part II's
-  "at scale" chapters (6–13).
+- `full_training_set/` — the full 76-report Utah FORGE archive. Source
+  for Part II's "at scale" chapters (6–13).
+- `sample_training_set/` — the same 10-report curated subset used in
+  `ddr-rag-book`'s Part I (including the real stuck-pipe report,
+  `Drilling_038`, and the packers-fail-to-fishing sequence,
+  `Drilling_049`/`050`), for Chapters 1–5. Reproducible from
+  `full_training_set/` via `code/chapter_01/build_sample_training_set.py`.
 
-**Status: empty.** No data has been sourced or committed yet.
+Both tiers are raw report PDFs, not yet training examples --
+turning them into instruction/response training pairs is Chapter 2's
+job. Derived artifacts (extracted text, formatted training files, model
+checkpoints) are gitignored; see `book/.gitignore`.
 
 ## Policy for what gets committed here
 
-Daily drilling and completions reports are typically confidential.
-Unlike the author's previous book, which could rely on a fully public
-Department of Energy-funded archive (Utah FORGE), this book's dataset
-has not been finalized. Before anything is committed to this folder in a
-public repository, it must be either:
+This dataset is public DOE-funded research data, safe to commit, share,
+and publish, exactly as in the previous book. That is *not* true the
+moment this book's code is pointed at anyone's own organisation's
+confidential reports instead:
 
-1. **Genuinely public data** the author has the right to redistribute
-   (e.g. another public research well archive, or a synthetically
-   generated training set that doesn't encode any real operator's
-   confidential reports), or
-2. **Fully synthetic** examples written or generated specifically for
-   this book, containing no real, identifiable operational data.
+- Never commit real, confidential reports, extracted text, training
+  examples derived from them, or model checkpoints trained on them to a
+  public repository.
+- If you're experimenting on a shared machine, confirm your
+  organisation's data classification policy covers running third-party
+  Python packages (model downloads, tokenizers) against confidential
+  well data.
+- Add your own archive's path to `.gitignore` before dropping any
+  confidential reports into a local `datasets/` folder for testing.
+- Before fine-tuning on your own organisation's data, confirm you have
+  the right to use it for this purpose -- that determination is outside
+  the scope of this book.
 
-Real, confidential reports from any operator must never be committed
-here. If you (the author, or a reader following along with your own
-data) need to experiment with confidential reports, keep them outside
-this repository entirely and add their path to `.gitignore` locally —
-see `appendix/appendix_a_environment_setup.qmd`, Section 4.
+## License note
 
-## Once data lands
-
-Each chapter's **Repository files** table will list the exact files it
-depends on here. If either tier needs to be rebuilt or regenerated from
-source, the script that does it will live at
-`code/chapter_01/build_sample_training_set.py` and
-`code/chapter_08/build_full_training_set.py`, mirroring the previous
-book's `build_sample_archive.py` / `build_full_archive.py` convention.
+The Utah FORGE report PDFs under `full_training_set/` and
+`sample_training_set/` are public DOE-funded research data and are not
+covered by either of this repository's licenses (MIT for code, CC BY 4.0
+for book text) -- consult the original Utah FORGE source for its terms.

@@ -26,7 +26,7 @@ the license permits.
 
 This license applies only to the book's text. Code (`book/code/`,
 `book/notebooks/`) is licensed separately under the MIT License -- see
-[LICENSE](LICENSE). Any drilling and completions report data placed under
-`book/datasets/` must itself be cleared for redistribution by the
-author before it is committed -- see `book/datasets/README.md` for the
-policy this book follows.
+[LICENSE](LICENSE). The Utah FORGE Daily Drilling Report and completion
+report data in `book/datasets/` is public data from the U.S. Department
+of Energy-funded Utah FORGE project and is not covered by either license
+here; consult the original source for its terms.

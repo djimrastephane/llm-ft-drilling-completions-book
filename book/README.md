@@ -55,8 +55,8 @@ book/
 ├── pytest.ini                 pytest configuration (testpaths, markers)
 │
 ├── datasets/
-│   ├── sample_training_set/   Small curated training set (Part I)
-│   └── full_training_set/     Larger training set (Part II)
+│   ├── sample_training_set/   10 real, curated Utah FORGE reports (Part I)
+│   └── full_training_set/     Full 76-report Utah FORGE archive (Part II)
 │
 ├── notebooks/                 Interactive Jupyter/Quarto companion notebooks
 ├── figures/                   Book figures and diagrams
@@ -146,6 +146,6 @@ hardware.
 
 Code (`code/`, `notebooks/`) is licensed under the [MIT License](../LICENSE).
 The book's text (chapters, preface, appendices) is licensed under
-[CC BY 4.0](../LICENSE-CONTENT.md). Any drilling and completions report
-data placed under `datasets/` must be cleared for redistribution before
-being committed — see `datasets/README.md`.
+[CC BY 4.0](../LICENSE-CONTENT.md). The Utah FORGE report data in
+`datasets/` is public DOE-funded research data, not covered by either
+license — see `datasets/README.md`.

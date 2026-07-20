@@ -84,18 +84,18 @@ rather than "I understand the theory," it did its job.
 ## A note on data
 
 Daily drilling and completions reports are typically operationally
-sensitive and confidential. Unlike the author's previous book on
-retrieval, which could rely on a fully public Department of
-Energy-funded archive (Utah FORGE), this book's training data choice is
-still being finalized as chapters are written — see
-`book/datasets/README.md` for the current, up-to-date policy on what is
-and isn't committed to this public repository.
+sensitive and confidential — which is exactly why this book reuses the
+same source as the author's previous book on retrieval: real, publicly
+available Daily Drilling and completion reports from **Utah FORGE**, a
+Department of Energy-funded enhanced geothermal system research well
+(FORGE 16A(78)-32). No anonymisation was applied, because none was
+needed. See `book/datasets/README.md` for the exact layout and policy.
 
-The *technique* in this book generalises directly to a confidential
-archive regardless of which sample data ships with it: everything from
-Chapter 6 onward — data quality gates, evaluation, drift detection —
-exists precisely because production training data is messier and more
-sensitive than a clean example set. If you point this book's code at
-your own organisation's reports, do not commit them to a public
-repository, and see [Appendix A](appendix/appendix_a_environment_setup.qmd)
-for a data-handling checklist once it is written.
+That said, the *technique* in this book generalises directly to a
+confidential archive: everything from Chapter 6 onward — data quality
+gates, evaluation, drift detection — exists precisely because production
+training data is messier and more sensitive than this public one. If you
+point this book's code at your own organisation's reports instead, do
+not commit them to a public repository, and see
+[Appendix A](appendix/appendix_a_environment_setup.qmd) for a
+data-handling checklist once it is written.

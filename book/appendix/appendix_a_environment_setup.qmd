@@ -13,15 +13,19 @@ chose in Part 0, see Appendices A1–A5 instead.
 
 ## 1. The training dataset
 
-**This section is not yet finalized.** Unlike the author's previous book,
-which relied on a fully public archive, this book's sample training data
-is still being sourced and cleared as chapters are written. See
-`book/datasets/README.md` for the current status. When it lands, Chapters
-1–5 are expected to use a small, curated sample training set
-(`datasets/sample_training_set/`) and Part II's "at scale" chapters a
-larger training set (`datasets/full_training_set/`), following the same
-two-tier layout as the previous book's `sample_ddrs/` and
-`forge_archive/`.
+Chapters 1–5 use ten real, curated Daily Drilling and completion reports
+from the public Utah FORGE archive (well FORGE 16A(78)-32) — already
+committed as PDFs in `datasets/sample_training_set/`, the same
+curated subset used in the author's previous book. Part II's "at scale"
+chapters use the full 76-report archive, committed at
+`datasets/full_training_set/`. Nothing needs to be generated or
+downloaded to start: cloning the repository (Part 0) gives you the full
+dataset. See `book/datasets/README.md` for the full policy and license
+note.
+
+If you want to reproduce the curated subset from the full archive, or
+extend it with more reports, see
+`code/chapter_01/build_sample_training_set.py`.
 
 ## 2. Rendering the book with Quarto
 
@@ -72,9 +76,11 @@ retrieval. Rough guidance, to be refined as chapters are written:
 
 ## 4. A note on data handling
 
-Real drilling and completions reports are typically confidential. Once
-this repository ships sample training data, the same rules apply
-throughout:
+This book's own data (`datasets/sample_training_set/`,
+`datasets/full_training_set/`) is public and safe to commit, share, and
+publish — that's true throughout this repository. The moment you point
+this book's code at your own organisation's reports instead, that
+changes:
 
 - Never commit real, confidential reports, extracted text, training
   examples, or model checkpoints trained on them to a public repository.
