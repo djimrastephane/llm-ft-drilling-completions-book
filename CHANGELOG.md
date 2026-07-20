@@ -18,4 +18,13 @@ highlights in narrative form.
   fully drafted — Python install, cloning the repository, virtual
   environment setup, installing requirements, a hardware (GPU/CPU)
   check, choosing an editor, running `setup_check.py`, and
-  troubleshooting. Chapters 1–13 remain placeholders.
+  troubleshooting.
+- **Chapter 1: Loading and Running Your First Local LLM**
+  (`chapters/chapter_01.qmd`) fully drafted, with working, tested code
+  (`code/chapter_01/load_local_model.py`,
+  `code/chapter_01/challenge/challenge.py`,
+  `tests/test_chapter_01.py`). Establishes Qwen2.5-1.5B-Instruct as the
+  base model this book fine-tunes starting in Chapter 5. Every quoted
+  report excerpt and model output in this chapter is from a real,
+  verified run against the committed sample dataset -- nothing invented.
+  Chapters 2–13 remain placeholders.
