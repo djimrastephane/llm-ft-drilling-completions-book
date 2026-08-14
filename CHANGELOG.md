@@ -105,3 +105,17 @@ highlights in narrative form.
   from a training set this small. Challenge exercise: a lighter
   `q_proj`/`v_proj`-only LoRA config trains half as many parameters
   (`0.0705%`) and scores `10/16`. Chapters 6–13 remain placeholders.
+
+### Changed
+
+- **Chapter 3** gains a new "When fine-tuning is, and is not, the right
+  tool" section, after "Why not just eyeball a few answers?". Scopes
+  what fine-tuning is actually good for (domain vocabulary, writing
+  style, measurable before/after, staying local) against what it's
+  weaker at (recalling one specific fact from one specific report,
+  citing sources, replacing retrieval, proving generalization from a
+  small dataset) -- so the chapter doesn't imply fine-tuning alone
+  solves factual lookup, and points ahead to Chapter 9's combination of
+  fine-tuning with retrieval. Written after Chapter 5 shipped, so it
+  can point at that chapter's real held-out result as concrete
+  evidence rather than a promise.

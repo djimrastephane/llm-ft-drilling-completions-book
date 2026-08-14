@@ -115,6 +115,47 @@ every time; every answer saved to
 single number — how many answers contained the report's actual value —
 that Chapter 5 can reproduce and compare against after fine-tuning.
 
+## When fine-tuning is, and is not, the right tool
+
+Every question this chapter asks has the same shape: "what does *this
+specific report* say?" — a fact lookup. That's a deliberate, narrow
+choice (Chapter 2 explains why), but it's worth being honest about what
+it does and doesn't tell you about fine-tuning in general, before
+Chapter 5 spends real time on it.
+
+Fine-tuning (Chapter 5 onward) is genuinely good at:
+
+- Teaching a model your operation's vocabulary and shorthand (the
+  `POOH`/`BHA`-style terms Chapter 4 tests directly)
+- Adapting its writing style to match how your reports are actually
+  written, instead of a generic assistant's voice
+- Replacing vague, generic-sounding answers with ones that reflect your
+  domain's actual patterns and judgment calls
+- Making "did this get better?" measurable and reproducible, which is
+  the entire point of this chapter's harness
+
+It is a weaker tool for:
+
+- Recalling one specific fact from one specific report it may or may
+  not have trained on — memorizing 16 answers is not the same as
+  building a lookup system, and Chapter 5 shows exactly where that
+  distinction breaks down
+- Citing which source document an answer came from — a fine-tuned
+  model's weights don't carry provenance
+- Replacing a proper document search / retrieval system for questions
+  that span reports it never trained on
+- Proving anything about generalization from a small training set on
+  its own — that claim needs a held-out check, not just a lower loss
+  number
+
+This book starts with fine-tuning anyway, because *teaching the model
+your domain* is a real, necessary step even for a system that will
+later add retrieval on top of it. Chapter 9 is where those two
+techniques combine — fine-tuning for how your operation talks and
+reasons, retrieval for grounding answers in a specific, citable report.
+Neither replaces the other; Chapter 5's own results are the concrete
+evidence for why.
+
 ## Implementation
 
 ### Step 1: Turn Chapter 2's training examples into baseline questions
