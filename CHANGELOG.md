@@ -186,3 +186,9 @@ highlights in narrative form.
   `needs_review` flag. Reworded both to state plainly that those 2
   flags are a decision still owed to a human, not one the gate already
   made.
+- Chapter 0's optional Ollama install (0.9) told readers to pull
+  `qwen2.5:7b-instruct` -- a different, much larger model than the
+  `Qwen2.5-1.5B-Instruct` this book actually loads and fine-tunes from
+  Chapter 1 onward. Changed to `qwen2.5:1.5b-instruct` so an optional
+  side-by-side comparison via Ollama uses the same model size, not a
+  bigger one that would quietly look better for the wrong reason.

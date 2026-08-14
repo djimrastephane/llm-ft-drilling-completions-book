@@ -255,11 +255,14 @@ Chapters 1–13 use `transformers` and `peft` directly — nothing here
 requires any additional software. If you'd also like a familiar,
 general-purpose way to run local models outside this book's own code
 (useful later for quick comparisons), [Ollama](https://ollama.com) is a
-convenient optional install:
+convenient optional install. Pull the same size model this book uses
+throughout (`Qwen2.5-1.5B-Instruct`, from Chapter 1 on) so any
+comparison you make is apples-to-apples, not a bigger model quietly
+doing better:
 
 ```bash
 # after installing from ollama.com
-ollama pull qwen2.5:7b-instruct
+ollama pull qwen2.5:1.5b-instruct
 ollama serve
 ```
 
