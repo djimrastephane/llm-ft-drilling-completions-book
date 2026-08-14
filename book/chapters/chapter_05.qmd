@@ -1,111 +1,4 @@
-<!--
-STATUS: placeholder only -- this chapter has not been written yet.
-Draft it by filling in every TODO/comment section below, per
-templates/chapter_template.qmd and book/README.md's chapter map.
--->
-
-<!--
-CHAPTER TEMPLATE
-================
-Copy this file into chapters/chapter_NN.qmd and fill in every section.
-Do not delete a section — if it doesn't apply, write one sentence saying why.
-
-Audience: drilling/completions/intervention/production engineers and
-petroleum data scientists. Assume zero Python experience and zero software
-engineering experience. Assume strong operational experience, strong Excel
-skills, curiosity about AI, and willingness to type code manually. The
-reader should never ask "why am I learning this?" — every concept appears
-only after they've hit the problem it solves. Problem first, technology
-second. If forced to choose between technical completeness and reader
-confidence, choose reader confidence. The reader should finish saying
-"I can build this," not "I understand the theory."
-
-Style rules:
-- Problem first. Never introduce a concept (tokenization, LoRA adapters,
-  quantization, evaluation metrics, or anything else) before the reader
-  has felt the failure that makes it necessary.
-- Every chapter must produce a runnable artifact the reader can point to
-  and say "I built that."
-- Minimal mathematics. If you need an equation, put the intuition in prose
-  first and the equation second, not the other way around.
-- No chapter should run past ~20 pages without a practical exercise
-  checkpoint.
-- Code blocks must run as-is against the companion repository's sample
-  training data. Do not show elided/pseudocode as if it were runnable.
-- Avoid jargon in plain-English explanations. Bad: "This applies a
-  low-rank update to the attention projections." Good: "We taught the
-  model a small, targeted correction instead of retraining it from
-  scratch."
-- Every claimed result (a metric, an evaluation score, a before/after
-  comparison) must come from an actual run of this book's own code
-  against real training data — never invented or estimated.
-
-Required structural elements (do not skip any of these):
-1. A visual progress marker at the very top, e.g. `Base Model ↓ Fine-Tuned Model`.
-2. "## Operational Problem" as the first section after Learning objectives,
-   written in the language of a drilling morning call (a question someone
-   would actually ask out loud), never "today we will learn X."
-3. Before EVERY code block: "## What problem are we solving?", "## Inputs",
-   "## Expected Output".
-4. After EVERY code block: "## What just happened?" in plain English.
-5. An "Engineering Translation" callout for every new programming or AI
-   concept introduced (LoRA adapter -> a small swappable correction sheet
-   clipped to the model, tokenizer -> the standard word-breakdown table
-   everyone on the crew uses, checkpoint -> a saved snapshot of training
-   progress, evaluation set -> a fixed exam the model has never seen,
-   epoch -> one full pass through the training data, etc.) — invent the
-   right analogy for whatever concept the chapter actually introduces.
-6. If the chapter introduces a new AI/ML concept, include a
-   "## Why prompting alone falls short" (or equivalent "why the simpler
-   thing fails") section before introducing the new technique — show the
-   question, why the simpler approach gets it wrong or inconsistent, then
-   the fix.
-7. A "## Production Reality" section: what this chapter's examples
-   deliberately simplify away, and what a messier real training pipeline
-   looks like (inconsistent report formats, duplicate or near-duplicate
-   entries, class imbalance, limited hardware, drift between training and
-   production data, etc.).
-8. A closing "## What can you do now that you couldn't do before?" section
-   — one or two sentences of concrete new capability, not a theory recap.
-9. A ".chapter-status" div directly under the pipeline diagram: a 12-block
-   progress bar (N filled for chapter N, rest empty), an estimated time,
-   and a difficulty badge (🟢/🟠/🔴). See markup below.
-10. Exactly one named persona (Mike/completions, Sarah/intervention,
-    Sean/production, Oumy/drilling — see index.qmd's roster) appears in
-    the opening sentence(s) of "## Operational Problem", asking the
-    motivating question. Pick whichever persona the chapter's question
-    naturally belongs to. Personas may be echoed once more in "##
-    Practical exercise" for bookend effect, but never appear in Theory,
-    Production Reality, or Field notes — those sections stay factual and
-    unattributed, since their content must be independently verified
-    against a real run, not invented dialogue.
-11. A difficulty badge line under both exercise headings: "## Practical
-    exercise" gets 🟢 **Beginner** always; "## Challenge exercise" gets
-    🟠 **Intermediate** by default, escalated to 🔴 **Advanced** only when
-    the challenge is genuinely harder than a typical chapter's (a
-    judgment call, not a mechanical rule).
-12. A "CHECKPOINT" box (`callout-caution`, GFM task-list checkboxes) and a
-    "WHAT YOU BUILT" box (`callout-tip .built-box`), placed together right
-    after "## Repository files" and before the closing "## What can you do
-    now..." / "## Suggested next step" pair. CHECKPOINT is a terse,
-    checkable skills list; WHAT YOU BUILT names the concrete artifact.
-    Neither replaces "## Key takeaways" (conceptual) or "## What can you
-    do now" (prose) — each reinforces achievement from a different angle.
-13. "## Suggested next step" opens with a bolded **Coming up in Chapter
-    N+1:** line before its bridging paragraph.
--->
-
 # Your First LoRA Fine-Tune {#sec-chapter-05}
-
-<!-- Progress marker: a small pipeline diagram showing this chapter's
-input -> output transformation (2-4 boxes, vertical flow with arrows).
-Add it to the DIAGRAMS dict in figures/diagrams/generate_diagrams.py and
-run that script -- it compiles TikZ -> PDF via pdflatex, then produces
-three files per diagram: pipeline_ch05_light.svg and _dark.svg (for
-HTML), and pipeline_ch05.pdf (for PDF output -- see the note below on
-why this can't just reuse the SVG). Do NOT use plain ASCII art here; it
-doesn't get the crisp, theme-aware rendering the rest of the book's
-diagrams have. -->
 
 ::: {.content-visible when-format="html"}
 ::: {.pipeline-diagram}
@@ -117,23 +10,6 @@ diagrams have. -->
 ::: {.content-visible when-format="pdf"}
 ![](../figures/diagrams/pipeline_ch05.pdf){width="180" fig-align="center"}
 :::
-<!-- PDF format embeds the compiled .pdf directly, not the SVG -- Quarto's
-LaTeX pipeline needs rsvg-convert to rasterize an SVG for PDF output,
-which may not be installed on the CI runner. generate_diagrams.py should
-save the compiled PDF alongside both SVG variants for exactly this
-reason -- always reference the .pdf here, never the .svg.
-
-fig-align="center" is required on this line -- a bare image (no caption)
-isn't wrapped in pandoc's usual centering figure environment, so without
-it the diagram renders flush against the left margin instead of
-centered. The HTML version doesn't need this (.pipeline-diagram's
-text-align: center in custom.scss already handles it there). -->
-
-<!-- Chapter status strip (rule 9). Progress bar is 12 characters total,
-N filled for chapter N. Estimated time is a plausible range for a reader
-typing every example. Difficulty is the chapter's overall level, usually
-🟢 for Part I and early Part II, 🟠/🔴 as fine-tuning and evaluation get
-more involved. -->
 
 ::: {.chapter-status}
 Progress `█████░░░░░░░░` **5 / 13** &nbsp;·&nbsp; **Estimated time:** 45-60 min &nbsp;·&nbsp; **Difficulty:** 🟠 Intermediate
@@ -143,195 +19,443 @@ Progress `█████░░░░░░░░` **5 / 13** &nbsp;·&nbsp; **E
 
 By the end of this chapter, you will be able to:
 
-- Objective 1 (a concrete capability, not a topic — "load a local
-  open-weight model with `transformers` and generate a completion", not
-  "learn about language models")
-- Objective 2
-- Objective 3
+- Explain what a LoRA adapter is: a small set of extra weights trained
+  on top of a frozen base model, not a rewrite of the model itself
+- Fine-tune the base model on Chapter 2's 16 training examples with a
+  plain PyTorch training loop — no framework magic hidden from you
+- Rerun Chapter 3's training baseline against your fine-tuned model and
+  measure a real, honest improvement
+- Run, for the first time in this book, a held-out generalization check
+  against Chapter 2's reserved report — and explain, from a real run,
+  exactly *how* the fine-tuned model fails on it
 
 ## Operational Problem
 
-<!-- One or two paragraphs, opening with ONE named persona (rule 10)
-asking a question in the language of a drilling morning call ("Why does
-the model keep getting our sequencing wrong?", "Can we trust this answer
-enough to act on it?"). Describe the real problem this chapter solves.
-Ground it in a scenario: a specific fine-tuning attempt, a specific
-question someone needed answered correctly, a specific way the current
-(base model or manual) approach fails. Never open with "Today we will
-learn X." Example opening: "Sarah, the intervention engineer, asks:
-'...'" -->
+Mike, the completions engineer, has watched this book build up evidence
+for four chapters — the base model doesn't know this well's vocabulary,
+doesn't know its specific reports, and its embeddings don't already
+understand the shorthand. He's ready for the payoff, but wary of a
+different failure: *"If we fine-tune this on sixteen examples, are we
+teaching it our operation — or just teaching it to repeat sixteen
+sentences back at us?"*
 
-## Example training excerpt
+That's exactly the right question, and this chapter answers it two
+ways, not one. It fine-tunes the base model on Chapter 2's 16 training
+examples, then checks *both* whether it learned those exact examples
+(training recall) *and* whether that learning transfers to a report it
+never saw during training (generalization, using Chapter 2's reserved
+`Drilling_037`). Chapter 3 already scored the base model `0/16` and
+`0/2` on both. This chapter reruns that exact same harness against the
+fine-tuned model — same questions, same scoring, same code — so the
+comparison means something.
 
-<!-- A short, realistic (synthetic or anonymised) instruction/response
-training example that motivates the chapter's technique. Show it as a
-callout so it's visually distinct from narrative text. -->
+## Example: what the model actually trains on
 
-::: {.callout-note title="Sample training example"}
-```json
-{
-  "instruction": "Summarize the operational risk in this report excerpt.",
-  "input": "0600-1130 POOH FR 9,842' TO CHANGE BHA. ERRATIC TORQUE OBSD LAST 3 STDS.",
-  "output": "Erratic torque over the last three stands before pulling out of hole suggests a developing hole-cleaning or BHA issue that should be monitored on the next run."
-}
+Fine-tuning doesn't feed the model `instruction`/`input`/`output`
+dictionaries directly — it feeds it the same chat-formatted text Chapter
+1's `generate_reply` builds, except this time with the correct answer
+appended as the assistant's turn:
+
+::: {.callout-note title="What one training example looks like, chat-formatted"}
+```
+<|im_start|>system
+You are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>
+<|im_start|>user
+What are the present operations reported on this well?
+Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22<|im_end|>
+<|im_start|>assistant
+RIGGING UP WITH FRONTIER CREWS AND SUPERVISION AND JW JONES TRUCKING<|im_end|>
 ```
 :::
 
+Fine-tuning's whole job is to adjust the model so that, given the
+`system` and `user` turns above, it becomes more likely to produce that
+exact `assistant` turn — and nothing else changes about how the model
+reads or generates text.
+
 ## Theory
 
-<!-- The minimum theory required to understand *why* the implementation
-below works. If this section would exceed ~1.5 pages, you are including
-theory the reader doesn't need yet — cut it or defer it to a later
-chapter. Prefer diagrams and worked examples over formal definitions.
-
-If this section needs its own flow diagram (an algorithm's internal
-steps, not the chapter-opening progress marker), it follows the same
-TikZ -> PDF/SVG pattern, added to THEORY_DIAGRAMS (not DIAGRAMS) in
-figures/diagrams/generate_diagrams.py. The generator only draws a
-straight vertical chain; a diagram that branches (a yes/no decision)
-needs that support added first, or should stay as prose/ASCII for now.
-
-Add an "Engineering Translation" callout for every new concept this
-chapter introduces — see rule 5 above. Example: -->
-
-::: {.callout-tip title="Engineering Translation: <concept>"}
-<!-- One or two plain-language sentences mapping the concept onto
-something the reader already knows from field operations. -->
+::: {.callout-tip title="Engineering Translation: LoRA adapter"}
+Full fine-tuning would mean updating all 1.5 billion of the base
+model's numbers. A **LoRA adapter** is a small, separate set of numbers
+— a swappable correction sheet clipped to the model — that gets trained
+instead, while the original 1.5 billion stay frozen, untouched. At
+inference time the model reads its usual weights *and* the correction
+sheet together, as if the sheet had been written directly into the
+model.
 :::
 
-<!-- If this chapter introduces a new AI/ML concept, add a
-"## Why prompting alone falls short" (or equivalent) section here, before
-the new technique, following rule 6 above. -->
+::: {.callout-tip title="Engineering Translation: epoch and loss"}
+One **epoch** is one full pass through the training data — all 16
+examples, once. **Loss** is a single number measuring how wrong the
+model's predictions were on that pass; it should generally fall as
+training continues, the way a golf score should generally fall as you
+improve. Chapter 11 covers proper evaluation metrics; loss here is just
+a training-time signal, not a measure of correctness by itself.
+:::
+
+::: {.callout-tip title="Engineering Translation: training recall vs. generalization"}
+**Training recall** is how well the model reproduces the exact examples
+it trained on — an open-book test where it already saw the answer key.
+**Generalization** is how well it does on something it never saw — the
+real test of whether it learned anything transferable. A model can
+score perfectly on the first and close to zero on the second; Chapter 3
+built the held-out check specifically to catch that gap.
+:::
+
+## Why LoRA instead of updating the whole model?
+
+A full fine-tune — updating all 1.5 billion parameters — is a
+reasonable thing to *want*: more of the model can adapt, in principle.
+It's a much harder thing to actually run: 1.5 billion trainable
+parameters means 1.5 billion optimizer states to keep in memory, and a
+saved checkpoint the same multi-gigabyte size as the base model itself,
+for every fine-tune you ever run. LoRA trains a small fraction of that
+— for this chapter's setup, about `0.14%` of the model's parameters —
+and saves a corresponding adapter file measured in megabytes, not
+gigabytes. You'll see the exact numbers for both in Step 2.
 
 ## Implementation
 
-<!-- Step-by-step, runnable code, broken into named steps if more than one
-logical block is involved. For EACH code block, follow this exact pattern: -->
-
-### Step 1: <what this step accomplishes>
+### Step 1: Format a training example and mask the prompt out of the loss
 
 ## What problem are we solving?
 
-<!-- One or two sentences: what does this specific block of code solve? -->
+The model shouldn't be trained to predict the *question* — only the
+*answer*. This step builds the full chat-formatted text for one
+example, then marks every token before the assistant's turn as "don't
+compute loss here."
 
 ## Inputs
 
-<!-- Bullet list: what does this code need to run? -->
+- The tokenizer loaded in Chapter 1
+- One training example (`instruction`, `input`, `output`)
 
 ## Expected Output
 
-<!-- What should the reader see when they run this? Show a concrete example. -->
+Two tensors of matching shape: the full token sequence, and a labels
+tensor where the prompt portion is replaced with `-100` (PyTorch's
+"ignore this position" marker for loss computation).
 
 ```{python}
 #| eval: false
-# Minimal working example — replace with chapter-specific code.
-print("Hello, local LLM")
+import torch
+
+def build_training_ids(tokenizer, example: dict) -> tuple[torch.Tensor, torch.Tensor]:
+    user_message = f"{example['instruction']}\n{example['input']}"
+    prompt_only = tokenizer.apply_chat_template(
+        [{"role": "user", "content": user_message}], tokenize=False, add_generation_prompt=True
+    )
+    full_text = tokenizer.apply_chat_template(
+        [
+            {"role": "user", "content": user_message},
+            {"role": "assistant", "content": example["output"]},
+        ],
+        tokenize=False,
+        add_generation_prompt=False,
+    )
+    prompt_ids = tokenizer(prompt_only, return_tensors="pt", add_special_tokens=False)["input_ids"]
+    full_ids = tokenizer(full_text, return_tensors="pt", add_special_tokens=False)["input_ids"]
+    labels = full_ids.clone()
+    labels[:, : prompt_ids.shape[1]] = -100
+    return full_ids, labels
+
+
+input_ids, labels = build_training_ids(tokenizer, examples[0])
+print(f"Full sequence: {input_ids.shape[1]} tokens, {int((labels[0] == -100).sum())} masked (prompt)")
+```
+
+Running this exact code prints:
+
+```
+Full sequence: 92 tokens, 71 masked (prompt)
 ```
 
 ## What just happened?
 
-<!-- Plain-English explanation, no unnecessary jargon. Bad: "This applies
-a low-rank update to the attention projections." Good: "We taught the
-model a small, targeted correction instead of retraining it from
-scratch." -->
+92 tokens make up the full chat-formatted example; the first 71 —
+everything through `<|im_start|>assistant` — are masked out of the
+loss, leaving only the 21 tokens of the actual answer for the model to
+be trained on. This is the same masking idea Chapter 3's baseline used
+in reverse: there, the answer was hidden from the model at inference
+time; here, everything *except* the answer is hidden from the loss at
+training time.
 
 ## Production Reality
 
-<!-- What does this chapter's example deliberately simplify away? What
-does a messier, real, multi-well or multi-operator training pipeline
-look like for this same problem? Follow rule 7 above. -->
+Real fine-tuning pipelines batch many examples together with padding,
+not one at a time — Chapter 7 covers formatting and chunking training
+data at scale. This chapter keeps it to one example per step
+deliberately, so every line of the training loop in Step 3 stays easy
+to read and reason about.
+
+### Step 2: Wrap the base model with a LoRA adapter
+
+## What problem are we solving?
+
+Turn the frozen base model into one with a small, trainable adapter
+attached — everything else about the model stays exactly as Chapter 1
+loaded it.
+
+## Inputs
+
+- The loaded `model` from Chapter 1
+- A `LoraConfig` naming which layers get an adapter
+
+## Expected Output
+
+A wrapped model, plus a printed count of how many parameters are
+actually trainable.
+
+```{python}
+#| eval: false
+from peft import LoraConfig, TaskType, get_peft_model
+
+LORA_CONFIG = LoraConfig(
+    r=8,
+    lora_alpha=16,
+    lora_dropout=0.05,
+    target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+    task_type=TaskType.CAUSAL_LM,
+)
+
+lora_model = get_peft_model(model, LORA_CONFIG)
+lora_model.print_trainable_parameters()
+```
+
+Running this exact code prints:
+
+```
+trainable params: 2,179,072 || all params: 1,545,893,376 || trainable%: 0.1410
+```
+
+## What just happened?
+
+`target_modules` names the specific weight matrices inside each
+attention layer that get a LoRA adapter attached —
+`q_proj`/`k_proj`/`v_proj`/`o_proj` are the query, key, value, and
+output projections every attention layer has. `r=8` sets the adapter's
+size (its "rank" — a small number by design). The result: `2,179,072`
+trainable parameters out of `1,545,893,376` total — `0.141%`. Everything
+else in the model is frozen and will never change during this chapter's
+training.
+
+## Production Reality
+
+`target_modules` and `r` are real hyperparameters a production
+fine-tuning pipeline would sweep, not fix once — different layers
+targeted, or a larger rank, trade off adapter size against how much the
+model can actually learn. This chapter's challenge exercise tries a
+smaller `target_modules` list and shows the real effect on results.
+
+### Step 3: Fine-tune, then measure recall *and* generalization
+
+## What problem are we solving?
+
+Actually train the adapter on Chapter 2's 16 examples, then answer
+Mike's question with numbers: did the model learn these exact examples,
+and separately, did anything transfer to a report it never saw?
+
+## Inputs
+
+- The wrapped `lora_model` from Step 2
+- Chapter 2's 16 training examples, and its held-out report's 2 examples
+- Chapter 3's `run_baseline` harness, reused unchanged
+
+## Expected Output
+
+A loss that falls across 20 epochs, then two before/after score
+comparisons.
+
+```{python}
+#| eval: false
+def fine_tune(lora_model, tokenizer, examples: list[dict], num_epochs: int = 20) -> None:
+    lora_model.train()
+    optimizer = torch.optim.AdamW(lora_model.parameters(), lr=2e-4)
+    for epoch in range(num_epochs):
+        epoch_loss = 0.0
+        for example in examples:
+            input_ids, labels = build_training_ids(tokenizer, example)
+            loss = lora_model(input_ids=input_ids, labels=labels).loss
+            loss.backward()
+            optimizer.step()
+            optimizer.zero_grad()
+            epoch_loss += loss.item()
+        if (epoch + 1) % 5 == 0 or epoch == 0:
+            print(f"  epoch {epoch + 1}/{num_epochs}: avg loss {epoch_loss / len(examples):.4f}")
+    lora_model.eval()
+
+
+def score(results: list[dict]) -> tuple[int, int]:
+    return sum(r["matched_expected"] for r in results), len(results)
+
+
+print("Before fine-tuning:")
+print(f"  Training baseline:  {score(run_baseline(model, tokenizer, examples))}")
+print(f"  Held-out baseline:  {score(run_baseline(model, tokenizer, held_out_examples))}")
+
+fine_tune(lora_model, tokenizer, examples)
+
+print("After fine-tuning:")
+print(f"  Training recall:         {score(run_baseline(lora_model, tokenizer, examples))}")
+print(f"  Held-out generalization: {score(run_baseline(lora_model, tokenizer, held_out_examples))}")
+```
+
+Running this exact code prints:
+
+```
+Before fine-tuning:
+  Training baseline:  0/16
+  Held-out baseline:  0/2
+
+  epoch 1/20: avg loss 4.7173
+  epoch 5/20: avg loss 1.2688
+  epoch 10/20: avg loss 0.3360
+  epoch 15/20: avg loss 0.1850
+  epoch 20/20: avg loss 0.1201
+
+After fine-tuning:
+  Training recall:         13/16
+  Held-out generalization: 0/2
+```
+
+## What just happened?
+
+Training recall jumped from `0/16` to `13/16` — real, measurable
+learning, not a training artifact. Held-out generalization stayed at
+`0/2`, exactly where it started. Sixteen examples was enough for this
+small model to memorize sixteen answers; it was not enough to teach it
+anything that transfers to a report it never saw. That's not a bug —
+it's the honest, predictable result of a training set this size, and
+precisely why Chapter 2 reserved that report in the first place.
+
+Looking at *which* answers came back wrong is more revealing than the
+scores alone. Every one of the 3 training misses and both held-out
+misses is a real answer from a *different* report, borrowed wholesale
+— never an invented guess:
+
+| Question | Expected | Model said | Actually belongs to |
+|---|---|---|---|
+| Report #3, activity planned | `CONTINUE RIGGING UP...` | `CONTINUE BUILDING CURVE TO 65°` | Report #36 |
+| Report #36, present ops | `BUILDING CURVE SECTION...` | `PIPE FREE, TRIP OUT OF HOLE...` | Report #38 |
+| Report #48, present ops | `LAYING DOWN COOLING BHA 31` | `CIRCULATE FOR TEMPERATURE` | Report #49 |
+| Report #37 (held-out), present ops | `RIG UP SCHLUMBERGER...` | `PIPE FREE, TRIP OUT OF HOLE...` | Report #38 |
+| Report #37 (held-out), activity planned | `RUN UBI LOG...` | `CONTINUE BUILDING CURVE TO 65°` | Report #36 |
+
+The fine-tuned model didn't get vaguer or more hesitant on questions it
+couldn't answer — the way the honest, ungrounded base model did back in
+Chapter 3. It got *more* confident, and confidently wrong, reaching for
+the nearest memorized answer instead. That's a materially worse failure
+mode for a production system than "I don't know," and it's the direct
+consequence of training on too little, too narrow a dataset.
 
 ## Practical exercise
 
 🟢 **Beginner**
 
-<!-- A guided exercise using the sample training data, with a clear,
-checkable "you'll know you got it right when..." condition. This is not
-optional — every chapter has one. -->
+**Try it yourself:** run
+`python code/chapter_05/first_lora_finetune.py` from inside `book/` (it
+takes about 5 minutes on CPU) and watch the loss fall across the 20
+epochs.
 
-**Try it yourself:** ...
-
-**You'll know it worked when:** ...
+**You'll know it worked when:** you see `Training recall: 13/16` and
+`Held-out generalization: 0/2` — and you can explain, in one sentence,
+why those two numbers moving so differently is exactly the point.
 
 ## Field notes
 
-<!-- Optional but encouraged, and should recur often across the book: a
-short, real, independently-verified vignette showing where the tool this
-chapter just built actually breaks (or, in a later chapter, where a
-previous chapter's tool breaks and this chapter's technique fixes it).
-Every number and quote here must be checked against a real run before
-writing it down -- run the code, don't estimate the outcome. The payoff
-is a moment where the reader sees, concretely, why the next chapter's
-added complexity is earning its keep, not complexity for its own sake.
+::: {.callout-warning title="Field notes: wrong, but never randomly wrong"}
+**Query:** every one of this chapter's 5 wrong answers (3 training
+misses, both held-out misses), collected as a set.
 
-Format:
-  Query/Action -> the (surprising) result -> the real training/eval data
-  that explains why -> the one-sentence lesson. -->
+**Result:** all 5 are word-for-word answers that belong to *other* real
+reports in the training set — `"PIPE FREE, TRIP OUT OF HOLE FOR BHA
+INSPECTION"` (really report #38's answer) shows up twice, once for
+report #36's question and once for the held-out report #37's question.
 
-::: {.callout-warning title="Field notes: <short description>"}
-**Query:** `"..."`
+**Why:** with only 16 examples and 20 epochs of repetition, the model
+learned a shortcut: *produce something that looks like a report answer
+from this well*, without reliably learning *which* answer belongs to
+*which specific report*. Its confusion isn't noise — it consistently
+reaches for one of a small set of memorized, real sentences.
 
-**Result:** ...
-
-**Why:** the training/eval data shows:
-
-- "..."
-- "..."
-
-but never shows "...".
-
-**Lesson:** ...
+**Lesson:** a fine-tuned model's mistakes are diagnostic. Random
+gibberish would suggest something broken in training; consistently
+borrowed real answers point specifically at "not enough distinct
+training signal to tell reports apart" — exactly what Chapter 6's data
+quality gate and Chapter 7's richer training examples exist to fix.
 :::
 
 ## Challenge exercise
 
-🟠 **Intermediate** <!-- escalate to 🔴 Advanced per rule 11 if warranted -->
+🟠 **Intermediate**
 
-<!-- A harder, more open-ended extension for readers who want to go
-further. No solution is provided in the main text; a reference solution
-lives in the companion repository under `code/chapter_NN/challenge/`. -->
-
-**Challenge:** ...
+**Challenge:** Step 2 targets all four attention projections
+(`q_proj`, `k_proj`, `v_proj`, `o_proj`). A more common minimal LoRA
+setup only targets `q_proj` and `v_proj`. Rerun fine-tuning with that
+lighter config and see whether training recall changes. A reference
+solution is at `code/chapter_05/challenge/challenge.py` — on a real
+run, it trains `1,089,536` parameters (`0.0705%`, about half of this
+chapter's setup) and scores `10/16` training recall, down from `13/16`.
 
 ## Key takeaways
 
-- Takeaway 1
-- Takeaway 2
-- Takeaway 3
+- A LoRA adapter trains a small fraction of a model's parameters (here,
+  `0.141%`) while the rest stay frozen — a real fine-tune, not a
+  simulation of one, at a fraction of full fine-tuning's cost.
+- Training recall and generalization are different claims that need
+  different evidence. This chapter's model aced the first (`0/16` →
+  `13/16`) and made zero progress on the second (`0/2` → `0/2`), on the
+  exact same fine-tune.
+- A fine-tuned model's wrong answers are worth reading, not just
+  counting. Every miss here was a real, memorized answer from a
+  *different* report — evidence of a specific, fixable data problem,
+  not random model failure.
+- Sixteen examples is enough to prove fine-tuning works mechanically.
+  It is deliberately not enough to teach real operational judgment —
+  that's what Part II's larger, higher-quality training sets are for.
 
 ## Repository files
 
-<!-- Exact paths in the companion repo relevant to this chapter. -->
-
 | File | Purpose |
 |---|---|
-| `code/chapter_05/first_lora_finetune.py` | ... |
-| `datasets/...` | ... |
+| `code/chapter_05/first_lora_finetune.py` | Fine-tunes a LoRA adapter on Chapter 2's training examples and reports training/held-out scores |
+| `code/chapter_05/challenge/challenge.py` | Reference solution: a lighter `q_proj`/`v_proj`-only LoRA config |
+| `checkpoints/chapter_05_lora/` | Generated adapter (not committed — regenerate by running the script) |
 | `notebooks/chapter_05_explore.ipynb` | Interactive companion notebook |
 
-<!-- Rule 12: CHECKPOINT + WHAT YOU BUILT, together, here. -->
-
 ::: {.callout-caution title="CHECKPOINT — Chapter 5"}
-- [x] Skill 1 gained this chapter, phrased as something done, not learned
-- [x] Skill 2
-- [x] Skill 3
+- [x] Fine-tuned a LoRA adapter on real training data with a plain
+      PyTorch training loop
+- [x] Measured a real improvement in training recall (`0/16` → `13/16`)
+- [x] Ran a held-out generalization check for the first time, and
+      found it did *not* improve (`0/2` → `0/2`)
+- [x] Traced every wrong answer back to a specific, explainable cause
+      rather than shrugging at "the model got it wrong"
 :::
 
 ::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}
-**`artifact_name.py`** — one or two sentences naming the concrete artifact
-and what it hands off to the next chapter.
+**`first_lora_finetune.py`** — trains a LoRA adapter on Chapter 2's 16
+examples and saves it to `checkpoints/chapter_05_lora/` (about 8 MB,
+next to the base model's ~2.9 GB of weights on disk). Reruns Chapter
+3's exact baseline harness before and after, against both the training
+set and the held-out report, so the comparison is honest and
+reproducible.
 :::
 
 ## What can you do now that you couldn't do before?
 
-<!-- One or two sentences of concrete new capability, following rule 8
-above. Not a theory recap — a plain statement of what the reader can now
-do that they couldn't before this chapter. -->
+You can fine-tune a real language model on your own data and produce
+real, measurable evidence of what it learned — and, just as
+importantly, honest evidence of what it didn't, instead of assuming a
+falling loss number means the job is done.
 
 ## Suggested next step
 
-<!-- Rule 13: open with a bolded "Coming up in Chapter N+1:" line, then
-one paragraph bridging to the next chapter: what limitation of today's
-artifact motivates tomorrow's work? -->
-
-**Coming up in Chapter N+1:** ...
+**Coming up in Chapter 6:** this chapter's fine-tune worked exactly as
+a 16-example, single-well dataset should: real memorization, no
+generalization. The obvious next move is more data — but simply
+pointing this same pipeline at hundreds of reports, without checking
+them first, would just memorize more inconsistencies faster. Chapter 6
+builds a data quality gate: the checks a training set needs to pass
+*before* it's trusted at the scale Part II is about to introduce.

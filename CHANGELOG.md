@@ -88,4 +88,20 @@ highlights in narrative form.
   sentence-embedding) than against `"birthday party"` (`0.320`) --
   concrete evidence that off-the-shelf embeddings can't be assumed to
   already understand domain-specific, safety-relevant vocabulary.
-  Chapters 5–13 remain placeholders.
+- **Chapter 5: Your First LoRA Fine-Tune** (`chapters/chapter_05.qmd`)
+  fully drafted, with working, tested code
+  (`code/chapter_05/first_lora_finetune.py`,
+  `code/chapter_05/challenge/challenge.py`, `tests/test_chapter_05.py`).
+  Fine-tunes a LoRA adapter (`peft`, plain PyTorch training loop, no
+  framework abstraction) on Chapter 2's 16 training examples, then
+  reruns Chapter 3's exact baseline harness against both the training
+  set and Chapter 2's held-out report for the first time. Real run:
+  training recall `0/16` -> `13/16` after 20 epochs (2,179,072 /
+  0.141% of parameters trainable); held-out generalization stays at
+  `0/2` -- unchanged. Every one of the 5 wrong answers (3 training
+  misses, both held-out misses) is traced to a real, verbatim answer
+  borrowed from a *different* training report, never a novel guess --
+  concrete, diagnostic evidence of memorization without generalization
+  from a training set this small. Challenge exercise: a lighter
+  `q_proj`/`v_proj`-only LoRA config trains half as many parameters
+  (`0.0705%`) and scores `10/16`. Chapters 6–13 remain placeholders.
