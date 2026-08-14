@@ -26,6 +26,9 @@ By the end of this chapter, you will be able to:
 - Turn a folder of reports into a training-ready `.jsonl` file
 - Recognize when a report doesn't match your extractor's assumptions,
   and handle that case instead of silently getting it wrong
+- Explain why one recognized, well-formed report should still be
+  deliberately held out of training, before fine-tuning ever enters
+  the picture
 
 ## Operational Problem
 
@@ -246,13 +249,19 @@ to condition its answer on which report is being asked about.
 `normalize_date` just makes every date consistently `YYYY-MM-DD`, since
 this archive's own reports don't all format dates the same way.
 
-### Step 3: Build and save the full training set
+### Step 3: Build and save the full training set — minus one report, on purpose
 
 ## What problem are we solving?
 
 One report is a proof of concept; Chapter 5's fine-tune needs the whole
 sample archive, saved to a file the next chapters can load without
-re-running PDF extraction every time.
+re-running PDF extraction every time. But if Chapter 5 trains on every
+report and then tests on those same reports, a good score would only
+prove the model *memorized* 18 flashcards — not that fine-tuning taught
+it anything that generalizes. This step reserves one drilling report,
+`Drilling_037` (2020-11-25), out of the training set entirely, so
+Chapter 5 has a report the model has genuinely never seen to test
+against.
 
 ## Inputs
 
@@ -261,8 +270,9 @@ re-running PDF extraction every time.
 ## Expected Output
 
 A `.jsonl` file (one JSON object per line — the standard format this
-book uses for training data) plus a summary line reporting how many
-examples were built and how many reports were skipped.
+book uses for training data) plus summary lines reporting the held-out
+report, how many examples were built, and how many reports were
+skipped.
 
 ```{python}
 #| eval: false
@@ -271,15 +281,21 @@ from pathlib import Path
 
 SAMPLE_SET_DIR = Path("datasets/sample_training_set")
 OUTPUT_PATH = Path("datasets/training_examples/sample_training_examples.jsonl")
+HELD_OUT_REPORT = "FORGE-16A-78-32_Drilling_037_2020-11-25.pdf"
 
 def build_training_examples(sample_dir=SAMPLE_SET_DIR):
-    examples, skipped = [], []
+    examples, skipped, held_out = [], [], []
     for pdf_path in sorted(sample_dir.glob("*.pdf")):
+        if pdf_path.name == HELD_OUT_REPORT:
+            held_out.append(pdf_path.name)
+            continue
         report_examples = build_examples_for_report(pdf_path)
         if report_examples:
             examples.extend(report_examples)
         else:
             skipped.append(pdf_path.name)
+    if held_out:
+        print(f"Reserved {len(held_out)} held-out report(s) for Chapter 5's generalization check: {held_out}")
     if skipped:
         print(f"Skipped {len(skipped)} report(s) with an unrecognized field layout: {skipped}")
     return examples
@@ -298,20 +314,42 @@ print(f"Built {len(examples)} training examples -> {OUTPUT_PATH}")
 Running this exact code prints:
 
 ```
+Reserved 1 held-out report(s) for Chapter 5's generalization check: ['FORGE-16A-78-32_Drilling_037_2020-11-25.pdf']
 Skipped 1 report(s) with an unrecognized field layout: ['FORGE-16A-78-32_Completion_003_2021-01-06.pdf']
-Built 18 training examples -> datasets/training_examples/sample_training_examples.jsonl
+Built 16 training examples -> datasets/training_examples/sample_training_examples.jsonl
 ```
 
 ## What just happened?
 
-Nine of the ten sample reports use the drilling-report field layout, so
-each contributes two examples — 18 total. The tenth,
-`Completion_003`, is a *completion* report using different field labels
-(`Present Ops:` / `Next 24 Hours:` instead of `PRESENT OPERATIONS:` /
-`ACTIVITY PLANNED:`) and gets correctly skipped rather than silently
-producing a garbage example. `datasets/training_examples/` is generated,
-not committed to this repository — regenerate it any time by re-running
-this script (see `book/.gitignore`).
+Of the ten sample reports, one (`Completion_003`) is a *completion*
+report using different field labels (`Present Ops:` / `Next 24 Hours:`
+instead of `PRESENT OPERATIONS:` / `ACTIVITY PLANNED:`) and gets
+correctly skipped rather than silently producing a garbage example. A
+second, `Drilling_037`, is a perfectly normal, recognized drilling
+report — it isn't skipped for a data-quality reason, it's *deliberately
+withheld* from training. That leaves eight reports, each contributing
+two examples — 16 total. `datasets/training_examples/` is generated, not
+committed to this repository — regenerate it any time by re-running this
+script (see `book/.gitignore`).
+
+::: {.callout-tip title="Engineering Translation: held-out data"}
+**Held-out data** is data you deliberately keep out of training so you
+have something honest to test on afterward — like a well test string
+never touched during a workover, kept clean specifically so its
+before/after readings mean something. A model tested only on the exact
+data it trained on can't tell you whether it learned anything general;
+it can only tell you whether it memorized.
+:::
+
+This is a deliberately simple first training set — every `output` is a
+single field value copied verbatim from a report, not a rich summary or
+judgment call. That's on purpose (see "Why not just write our own
+summaries?" above), but it also means this training set mostly teaches
+field recall, not operational reasoning. Later chapters build richer
+training examples (Chapter 7) and a proper evaluation harness beyond
+one held-out report (Chapter 11); this chapter's job is just to get a
+first, honest training/held-out split in place before fine-tuning ever
+starts.
 
 ## Practical exercise
 
@@ -322,10 +360,10 @@ from inside `book/`, then open the generated
 `datasets/training_examples/sample_training_examples.jsonl` in a text
 editor.
 
-**You'll know it worked when:** the script prints `Built 18 training
-examples`, the file has exactly 18 lines, and the first one matches
-report `#3` (`Drilling_003`, 2020-10-22) — the earliest report in the
-sample set.
+**You'll know it worked when:** the script prints `Built 16 training
+examples`, the file has exactly 16 lines, the first one matches report
+`#3` (`Drilling_003`, 2020-10-22) — the earliest report in the sample
+set — and no line anywhere in the file mentions `Report #37`.
 
 ## Field notes
 
@@ -360,9 +398,10 @@ question span more than one report.
 
 **Challenge:** extend `build_examples_for_report()` to also handle the
 completion report's different field layout (`Present Ops:` / `Next 24
-Hours:`, and a two-digit-year date format), so all 10 sample reports
-contribute examples instead of 9. A reference solution is at
-`code/chapter_02/challenge/challenge.py` — it produces 20 training
+Hours:`, and a two-digit-year date format), so 9 of the 10 sample
+reports contribute examples instead of 8 (`Drilling_037` stays reserved
+either way — see Step 3). A reference solution is at
+`code/chapter_02/challenge/challenge.py` — it produces 18 training
 examples total, 0 reports skipped.
 
 ## Key takeaways
@@ -378,6 +417,10 @@ examples total, 0 reports skipped.
   field labels even within the same archive. Detect and skip what your
   extractor doesn't recognize, rather than silently producing a bad
   example.
+- Skipping and holding out are different things done for different
+  reasons: a report gets *skipped* because your extractor can't parse
+  it; a report gets *held out* on purpose, even though it parses fine,
+  so there's an honest, unseen test left once fine-tuning starts.
 
 ## Repository files
 
@@ -395,13 +438,17 @@ examples total, 0 reports skipped.
       words as ground truth
 - [x] Detected and skipped a report with an unrecognized field layout,
       instead of silently mishandling it
+- [x] Reserved one recognized, well-formed report as held-out data,
+      instead of training on everything available
 :::
 
 ::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}
-**`build_training_examples.py`** — turns the 9 drilling-format reports
-in `datasets/sample_training_set/` into 18 real training examples,
-saved to `datasets/training_examples/sample_training_examples.jsonl`.
-Chapter 5 fine-tunes on data built exactly this way, at a larger scale.
+**`build_training_examples.py`** — turns 8 of the 9 drilling-format
+reports in `datasets/sample_training_set/` into 16 real training
+examples, saved to `datasets/training_examples/sample_training_examples.jsonl`.
+The 9th, `Drilling_037`, is reserved untouched for Chapter 5's held-out
+generalization check. Chapter 5 fine-tunes on data built exactly this
+way, at a larger scale.
 :::
 
 ## What can you do now that you couldn't do before?
@@ -415,7 +462,8 @@ instead of hoping.
 
 **Coming up in Chapter 3:** before spending any time actually
 fine-tuning, Chapter 3 runs a proper baseline test — the base model
-against a batch of real questions drawn from the training examples you
-just built — so you have hard, reproducible evidence of exactly what it
-gets wrong, and something concrete to compare Chapter 5's fine-tuned
-model against afterward.
+against a batch of real questions drawn from the 16 training examples
+you just built — so you have hard, reproducible evidence of exactly what
+it gets wrong, and something concrete to compare Chapter 5's fine-tuned
+model against afterward. `Drilling_037`, held out here, stays untouched
+until Chapter 5.

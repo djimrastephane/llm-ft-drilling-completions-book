@@ -87,11 +87,18 @@ def test_ask_baseline_returns_expected_shape(loaded_model):
 def test_run_baseline_over_sample_set_never_matches_without_report_text(loaded_model):
     # The base model is only ever given each report's metadata here, never
     # its actual text -- so it has no way to produce the exact reported
-    # value. A real run against this book's sample archive confirms 0/18.
+    # value. A real run against this book's 16 training examples (8 of 9
+    # drilling reports -- Drilling_037 is held out, see Chapter 2)
+    # confirms 0/16.
     model, tokenizer = loaded_model
     examples = build_training_examples()
 
     results = run_baseline(model, tokenizer, examples)
 
-    assert len(results) == len(examples) == 18
+    assert len(results) == len(examples) == 16
     assert sum(r["matched_expected"] for r in results) == 0
+
+
+def test_training_baseline_never_includes_the_held_out_report():
+    examples = build_training_examples()
+    assert all("Report #37" not in example["input"] for example in examples)

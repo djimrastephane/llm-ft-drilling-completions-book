@@ -18,7 +18,9 @@ highlights in narrative form.
   fully drafted — Python install, cloning the repository, virtual
   environment setup, installing requirements, a hardware (GPU/CPU)
   check, choosing an editor, running `setup_check.py`, and
-  troubleshooting.
+  troubleshooting. A callout right after "Why this chapter exists" makes
+  the already-know-Python shortcut path (skip 0.2/0.6/0.7, still do
+  0.3/0.4/0.5/0.8) visually distinct instead of buried in prose.
 - **Chapter 1: Loading and Running Your First Local LLM**
   (`chapters/chapter_01.qmd`) fully drafted, with working, tested code
   (`code/chapter_01/load_local_model.py`,
@@ -32,26 +34,40 @@ highlights in narrative form.
   tested code (`code/chapter_02/build_training_examples.py`,
   `code/chapter_02/challenge/challenge.py`, `tests/test_chapter_02.py`).
   Extracts each report's own self-reported PRESENT OPERATIONS / ACTIVITY
-  PLANNED fields with `pdfplumber` and turns them into 18 real
-  instruction/response training examples from 9 of the 10 sample
+  PLANNED fields with `pdfplumber` and turns them into 16 real
+  instruction/response training examples from 8 of the 10 sample
   reports (the completion report uses a different field layout, handled
-  in the challenge exercise). Every field value and example count in
-  the chapter is from a real, verified run.
+  in the challenge exercise). One further drilling report,
+  `Drilling_037`, is deliberately reserved as held-out data
+  (`HELD_OUT_REPORT`) -- never included in training by any script in
+  this book -- so Chapter 5 can measure generalization, not just
+  training-set recall. Every field value and example count in the
+  chapter is from a real, verified run.
 - **Chapter 3: Baseline Prompting: What the Model Gets Wrong Before
   Fine-Tuning** (`chapters/chapter_03.qmd`) fully drafted, with working,
   tested code (`code/chapter_03/baseline_prompting.py`,
   `code/chapter_03/challenge/challenge.py`, `tests/test_chapter_03.py`).
-  Runs the unmodified base model against Chapter 2's 18 training
+  Runs the unmodified base model against Chapter 2's 16 training
   examples with each `output` withheld, and saves the results to
-  `datasets/training_examples/baseline_results.jsonl` -- the fixed
-  baseline Chapter 5's fine-tuned model gets compared against. On a
-  real run against the sample archive, the base model scores `0/18`
-  on exact-match (it correctly declines to guess rather than
-  hallucinating a wrong answer); the challenge exercise shows that
-  score rising to `6/18` once each report's full text is included as
-  context. Also fixes a real bug surfaced while drafting this chapter:
+  `datasets/training_examples/training_baseline_results.jsonl` -- the
+  fixed training baseline Chapter 5's fine-tuned model gets compared
+  against. On a real run against the sample archive, the base model
+  scores `0/16` on exact-match (it correctly declines to guess rather
+  than hallucinating a wrong answer); the challenge exercise shows that
+  score rising to `6/16` once each report's full text is included as
+  context. The chapter is explicit that this is a *training* baseline,
+  not evidence of generalization -- Chapter 5 has to report a second,
+  separate score against the held-out report to make that claim
+  honestly. Also fixes a real bug surfaced while drafting this chapter:
   `code/chapter_01/load_local_model.py` now disables `transformers`'
   TensorFlow/Flax backend probing (`USE_TF=0`, `USE_FLAX=0`), since an
   unrelated, broken TensorFlow install on a shared/Anaconda-style
   environment was segfaulting model loading for every chapter that
-  imports it. Chapters 4–13 remain placeholders.
+  imports it.
+- Implemented `figures/diagrams/generate_diagrams.py` (previously an
+  unimplemented stub): renders each chapter's opening pipeline diagram
+  via TikZ -> pdflatex -> PDF, converted to light/dark themed SVGs for
+  HTML with `pdftocairo`. Generated `pipeline_ch01`–`pipeline_ch13`
+  (`.pdf`, `_light.svg`, `_dark.svg`), which was also required for the
+  Quarto PDF book output to compile at all (missing diagram files
+  previously failed the LaTeX build). Chapters 4–13 remain placeholders.

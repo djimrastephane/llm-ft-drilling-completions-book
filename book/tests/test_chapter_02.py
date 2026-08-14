@@ -3,6 +3,7 @@
 import json
 
 from build_training_examples import (
+    HELD_OUT_REPORT,
     SAMPLE_SET_DIR,
     build_examples_for_report,
     build_training_examples,
@@ -51,10 +52,28 @@ def test_build_training_examples_over_sample_set():
     examples = build_training_examples()
 
     # 9 of the 10 sample reports use the drilling-report layout; the
-    # completion report is skipped by this chapter's script.
-    assert len(examples) == 18
+    # completion report is skipped, and 1 drilling report (HELD_OUT_REPORT)
+    # is deliberately reserved for Chapter 5's held-out generalization
+    # check -- leaving 8 reports, 16 examples.
+    assert len(examples) == 16
     outputs = [example["output"] for example in examples]
     assert "PIPE FREE, TRIP OUT OF HOLE FOR BHA INSPECTION" in outputs
+
+
+def test_build_training_examples_never_includes_the_held_out_report():
+    examples = build_training_examples()
+
+    assert all("Report #37" not in example["input"] for example in examples)
+
+
+def test_held_out_report_still_has_two_extractable_examples():
+    # Reserved from training, but still a normal, recognized drilling
+    # report -- Chapter 5 needs its examples for the generalization check.
+    examples = build_examples_for_report(SAMPLE_SET_DIR / HELD_OUT_REPORT)
+
+    assert len(examples) == 2
+    for example in examples:
+        assert "Report #37" in example["input"]
 
 
 def test_save_examples_jsonl_round_trips(tmp_path):

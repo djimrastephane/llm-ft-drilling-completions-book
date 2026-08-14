@@ -19,7 +19,7 @@ from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from build_training_examples import SAMPLE_SET_DIR, extract_text  # noqa: E402
+from build_training_examples import HELD_OUT_REPORT, SAMPLE_SET_DIR, extract_text  # noqa: E402
 
 DRILLING_PATTERNS = {
     "well_name": r"WELL NAME:\s*(.+?)\s+JOB:",
@@ -87,6 +87,8 @@ def main() -> None:
     examples = []
     skipped = []
     for pdf_path in sorted(SAMPLE_SET_DIR.glob("*.pdf")):
+        if pdf_path.name == HELD_OUT_REPORT:
+            continue  # reserved for Chapter 5's generalization check -- never trained on
         report_examples = build_examples_for_report(pdf_path)
         if report_examples:
             examples.extend(report_examples)

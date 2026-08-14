@@ -9,6 +9,12 @@ Only handles the "DAILY DRILLING REPORT" field layout; see this
 chapter's Production Reality section and challenge exercise for the
 completion report, which uses different field labels.
 
+One drilling report (HELD_OUT_REPORT) is deliberately excluded from the
+training set -- reserved so Chapter 5 can measure whether fine-tuning
+generalizes to a report the model never trained on, not just whether it
+memorized the training set. See this chapter's Production Reality
+section.
+
 Usage:
     python code/chapter_02/build_training_examples.py
 """
@@ -23,6 +29,10 @@ import pdfplumber
 BOOK_ROOT = Path(__file__).resolve().parents[2]
 SAMPLE_SET_DIR = BOOK_ROOT / "datasets" / "sample_training_set"
 OUTPUT_PATH = BOOK_ROOT / "datasets" / "training_examples" / "sample_training_examples.jsonl"
+
+# Reserved for Chapter 5's held-out generalization check -- never included
+# in the training set built below, by any script in this book.
+HELD_OUT_REPORT = "FORGE-16A-78-32_Drilling_037_2020-11-25.pdf"
 
 FIELD_PATTERNS = {
     "well_name": r"WELL NAME:\s*(.+?)\s+JOB:",
@@ -80,12 +90,18 @@ def build_examples_for_report(pdf_path: Path) -> list[dict]:
 def build_training_examples(sample_dir: Path = SAMPLE_SET_DIR) -> list[dict]:
     examples = []
     skipped = []
+    held_out = []
     for pdf_path in sorted(sample_dir.glob("*.pdf")):
+        if pdf_path.name == HELD_OUT_REPORT:
+            held_out.append(pdf_path.name)
+            continue
         report_examples = build_examples_for_report(pdf_path)
         if report_examples:
             examples.extend(report_examples)
         else:
             skipped.append(pdf_path.name)
+    if held_out:
+        print(f"Reserved {len(held_out)} held-out report(s) for Chapter 5's generalization check: {held_out}")
     if skipped:
         print(f"Skipped {len(skipped)} report(s) with an unrecognized field layout: {skipped}")
     return examples

@@ -28,10 +28,18 @@ drilling, completions, or language models, and everything to do with one
 of these four things not being true yet.
 
 This chapter does all four, one step at a time, with no assumption that
-you've done any of it before. If you already have a working Python
-setup and just want the short version, jump to Section 0.5 (install
-requirements) and Section 0.8 (run the setup check) — you can always
-come back for the rest.
+you've done any of it before.
+
+::: {.callout-tip title="Already comfortable with Python and virtual environments?"}
+Skip the explanations in **0.2** (installing Python), **0.6** (hardware
+check), and **0.7** (choosing an editor) — you already know that part.
+You still need to actually do **0.3** (clone this repository), **0.4**
+(create this book's own virtual environment), **0.5** (install its
+requirements), and **0.8** (run the setup check) like everyone else —
+they're specific to this book, not to Python in general — but you can
+move through them fast. If 0.8 comes back clean, you're done with this
+chapter.
+:::
 
 ## 0.2 Install Python
 

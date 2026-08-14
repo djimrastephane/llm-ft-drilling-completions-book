@@ -65,7 +65,7 @@ def main() -> None:
     matched = sum(r["matched_expected"] for r in results)
 
     print(f"With report text included: {matched}/{len(results)} answers contained the expected value verbatim")
-    print("(baseline_prompting.py, with no report text, scored 0/18 -- see Chapter 3)")
+    print("(baseline_prompting.py's training baseline, with no report text, scored 0/16 -- see Chapter 3)")
 
 
 if __name__ == "__main__":

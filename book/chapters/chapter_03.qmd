@@ -19,8 +19,9 @@ Progress `███░░░░░░░░░░` **3 / 13** &nbsp;·&nbsp; **E
 
 By the end of this chapter, you will be able to:
 
-- Turn Chapter 2's training examples into a fixed batch of baseline
-  questions, with each example's own `output` withheld from the model
+- Turn Chapter 2's training examples into a fixed batch of *training*
+  baseline questions, with each example's own `output` withheld from
+  the model
 - Run the unmodified base model against that exact batch and save its
   answers to a reusable results file
 - Explain why a baseline must reuse the *same* prompts a later
@@ -28,6 +29,9 @@ By the end of this chapter, you will be able to:
 - Describe, from a real run against this book's own archive, the
   specific way this base model fails when it isn't given a report's
   content — and why that's different from wild hallucination
+- Explain why a training baseline alone can't prove fine-tuning
+  generalizes, and why Chapter 5 needs a separate check against
+  Chapter 2's held-out report
 
 ## Operational Problem
 
@@ -45,6 +49,14 @@ prompts Chapter 2 built, asks the base model every one of them with the
 real answer hidden, and saves the results to a file — a fixed,
 reproducible baseline Chapter 5's fine-tuned model gets held against,
 not a vibe.
+
+One caveat up front, because it matters for how you read Chapter 5's
+result later: everything in this chapter runs on the same 16 examples
+Chapter 5 trains on. That makes it a **training baseline**, not a test
+of generalization — proof the model *can learn these exact examples*,
+not proof it learned anything beyond them. Chapter 2 reserved one
+report, `Drilling_037`, specifically so Chapter 5 has something the
+model genuinely never trained on to test against too.
 
 ## Example baseline question
 
@@ -97,11 +109,11 @@ one lucky answer is representative of the other seventeen, and you have
 nothing saved to point to later if someone asks how you know fine-tuning
 helped.
 
-This chapter's harness fixes all three: the same 18 questions, every
-time; every answer saved to
-`datasets/training_examples/baseline_results.jsonl`; and a single number
-— how many answers contained the report's actual value — that Chapter 5
-can reproduce and compare against after fine-tuning.
+This chapter's harness fixes all three: the same 16 training questions,
+every time; every answer saved to
+`datasets/training_examples/training_baseline_results.jsonl`; and a
+single number — how many answers contained the report's actual value —
+that Chapter 5 can reproduce and compare against after fine-tuning.
 
 ## Implementation
 
@@ -232,18 +244,18 @@ failure: the harness needed the report's real value, and didn't get it.
 ## Production Reality
 
 `max_new_tokens=60` caps the reply short on purpose, so this chapter's
-18-question run finishes in a couple of minutes on CPU. A shorter cap
+16-question run finishes in a couple of minutes on CPU. A shorter cap
 also means some replies (like the one above) get cut off mid-sentence
 rather than reaching a natural stopping point — acceptable here because
 `matched_expected` only checks for the report's specific value, which
 would appear (or not) well before token 60 in every one of this
 archive's short, single-line field outputs.
 
-### Step 3: Run the full baseline and save it for Chapter 5
+### Step 3: Run the full training baseline and save it for Chapter 5
 
 ## What problem are we solving?
 
-One question proves the harness works. Chapter 5 needs all 18, saved
+One question proves the harness works. Chapter 5 needs all 16, saved
 somewhere it can load without re-running the base model.
 
 ## Inputs
@@ -252,21 +264,21 @@ somewhere it can load without re-running the base model.
 
 ## Expected Output
 
-A summary line reporting how many of the 18 answers matched, and a
+A summary line reporting how many of the 16 answers matched, and a
 saved `.jsonl` file with one result per question.
 
 ```{python}
 #| eval: false
 import json
 
-OUTPUT_PATH = BOOK_ROOT / "datasets" / "training_examples" / "baseline_results.jsonl"
+TRAINING_BASELINE_OUTPUT_PATH = BOOK_ROOT / "datasets" / "training_examples" / "training_baseline_results.jsonl"
 
 
 def run_baseline(model, tokenizer, examples: list[dict]) -> list[dict]:
     return [ask_baseline(model, tokenizer, example) for example in examples]
 
 
-def save_results_jsonl(results: list[dict], output_path: Path = OUTPUT_PATH) -> None:
+def save_results_jsonl(results: list[dict], output_path: Path = TRAINING_BASELINE_OUTPUT_PATH) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8") as f:
         for result in results:
@@ -277,26 +289,47 @@ results = run_baseline(model, tokenizer, examples)
 save_results_jsonl(results)
 
 matched = sum(r["matched_expected"] for r in results)
-print(f"Baseline: {matched}/{len(results)} answers contained the report's actual value verbatim")
-print(f"Saved -> {OUTPUT_PATH}")
+print(f"Training baseline: {matched}/{len(results)} answers contained the report's actual value verbatim")
+print(f"Saved -> {TRAINING_BASELINE_OUTPUT_PATH}")
 ```
 
 Running this exact code prints:
 
 ```
-Baseline: 0/18 answers contained the report's actual value verbatim
-Saved -> datasets/training_examples/baseline_results.jsonl
+Training baseline: 0/16 answers contained the report's actual value verbatim
+Saved -> datasets/training_examples/training_baseline_results.jsonl
 ```
 
 ## What just happened?
 
-Every one of the 18 questions built from the 9 recognized sample reports
-came back with `matched_expected: false`. Not one exact number, status,
-or operation name from the archive appears in any answer — because the
-model was never given any of them, and it has no other way to know
-which specific well this is. `0/18` is this chapter's baseline number.
-Chapter 5 reruns this exact harness against the fine-tuned model and
-compares its score directly against this one.
+Every one of the 16 questions built from the 8 recognized, non-held-out
+sample reports came back with `matched_expected: false`. Not one exact
+number, status, or operation name from the archive appears in any
+answer — because the model was never given any of them, and it has no
+other way to know which specific well this is. `0/16` is this chapter's
+training baseline. Chapter 5 reruns this exact harness against the
+fine-tuned model and compares its score directly against this one — but
+that comparison alone only shows training recall. See below.
+
+## Training recall vs. generalization
+
+A `0/16` baseline is easy to beat: fine-tune on these same 16 examples,
+rerun this harness, and the score will very likely improve — a small
+model with a handful of LoRA-adjustable parameters (Chapter 5) can
+often just memorize 16 short flashcards. That improvement would be
+real, but it would only prove the model *learned these exact examples*,
+not that it learned anything that transfers to a report it has never
+seen.
+
+That's exactly why Chapter 2 reserved `Drilling_037` out of training
+entirely. Chapter 5 has to report two separate numbers, not one:
+training-set recall on these 16 examples, and a held-out generalization
+score on `Drilling_037`'s own 2 examples — a report the fine-tuned model
+never trained on. Only the second number is evidence of learning that
+generalizes; the first is evidence of memorization capacity. Neither
+number alone tells the full story, and Chapter 11 later replaces this
+one-report check with a proper evaluation harness — but even a single
+honest held-out report beats zero.
 
 ## Practical exercise
 
@@ -304,13 +337,14 @@ compares its score directly against this one.
 
 **Try it yourself:** run
 `python code/chapter_03/baseline_prompting.py` from inside `book/`,
-then open `datasets/training_examples/baseline_results.jsonl` and read
-through all 18 answers.
+then open `datasets/training_examples/training_baseline_results.jsonl`
+and read through all 16 answers.
 
-**You'll know it worked when:** the script prints `Baseline: 0/18`, the
-file has exactly 18 lines, and none of the model's answers contain a
-specific operation, status, or number from the actual report — most
-will instead say something like "not explicitly stated."
+**You'll know it worked when:** the script prints `Training baseline:
+0/16`, the file has exactly 16 lines, none of the model's answers
+contain a specific operation, status, or number from the actual report
+(most will instead say something like "not explicitly stated"), and no
+line mentions `Report #37` — that report is reserved, not tested here.
 
 ## Field notes
 
@@ -344,13 +378,13 @@ memorizing individual report values.
 🟠 **Intermediate**
 
 **Challenge:** `baseline_prompting.py` only ever gives the model each
-report's metadata, never its actual text — so `0/18` mostly proves the
+report's metadata, never its actual text — so `0/16` mostly proves the
 model has no way to know the answer, not that fine-tuning is the only
 possible fix. Extend the harness to include each report's full extracted
 text (from Chapter 2's `extract_text()`) alongside the question, and
 re-measure the match rate. A reference solution is at
 `code/chapter_03/challenge/challenge.py` — on a real run, it scores
-`6/18`, up from `0/18`, but still well short of perfect: even reading the
+`6/16`, up from `0/16`, but still well short of perfect: even reading the
 report directly, this small base model doesn't reliably reproduce its
 exact wording. Keep that number in mind for Chapter 9, which combines
 fine-tuning with exactly this kind of retrieved context.
@@ -359,13 +393,17 @@ fine-tuning with exactly this kind of retrieved context.
 
 - A baseline is only useful if it's fixed and reproducible: same
   questions, same withheld answers, saved results, every time.
-- This chapter's baseline questions are Chapter 2's real training
-  examples, with the `output` withheld — not a separate, invented test
-  set.
+- This chapter's training baseline questions are Chapter 2's real
+  training examples, with the `output` withheld — not a separate,
+  invented test set.
 - On this book's sample archive, the unmodified base model scores
-  `0/18` on exact-match — not because it hallucinates wildly, but
+  `0/16` on exact-match — not because it hallucinates wildly, but
   because it correctly (and unhelpfully) admits it wasn't given the
   report's content.
+- A training baseline only measures memorization capacity. Proving
+  fine-tuning generalizes needs a separate score on data the model
+  never trained on — Chapter 2's held-out report, `Drilling_037`, exists
+  for exactly that reason, and Chapter 5 reports both numbers.
 - `matched_expected` is a deliberately crude, honest scoring rule.
   Chapter 11 builds something more forgiving; this chapter's harness
   exists so there's a saved, comparable number to build on.
@@ -374,25 +412,28 @@ fine-tuning with exactly this kind of retrieved context.
 
 | File | Purpose |
 |---|---|
-| `code/chapter_03/baseline_prompting.py` | Builds baseline questions from Chapter 2's training examples, runs the base model, saves results |
+| `code/chapter_03/baseline_prompting.py` | Builds training baseline questions from Chapter 2's training examples, runs the base model, saves results |
 | `code/chapter_03/challenge/challenge.py` | Reference solution: re-runs the same questions with each report's full text included |
-| `datasets/training_examples/baseline_results.jsonl` | Generated output (not committed — regenerate by running the script) |
+| `datasets/training_examples/training_baseline_results.jsonl` | Generated output (not committed — regenerate by running the script) |
 | `notebooks/chapter_03_explore.ipynb` | Interactive companion notebook |
 
 ::: {.callout-caution title="CHECKPOINT — Chapter 3"}
-- [x] Turned Chapter 2's training examples into baseline questions with
-      the answer withheld
-- [x] Ran the base model against all 18 questions and saved every answer
-- [x] Measured a real, reproducible baseline score (`0/18`) to compare
-      Chapter 5's fine-tuned model against
+- [x] Turned Chapter 2's training examples into training baseline
+      questions with the answer withheld
+- [x] Ran the base model against all 16 questions and saved every answer
+- [x] Measured a real, reproducible training baseline score (`0/16`) to
+      compare Chapter 5's fine-tuned model against
+- [x] Can explain why this training baseline alone won't prove
+      generalization, and what Chapter 5's held-out check adds
 :::
 
 ::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}
 **`baseline_prompting.py`** — runs the unmodified base model against
-Chapter 2's 18 training examples with every answer hidden, and saves the
-results to `datasets/training_examples/baseline_results.jsonl`.
-Chapter 5 reruns this same harness against the fine-tuned model and
-compares scores directly.
+Chapter 2's 16 training examples with every answer hidden, and saves the
+results to `datasets/training_examples/training_baseline_results.jsonl`.
+Chapter 5 reruns this same harness against the fine-tuned model for a
+training-recall comparison, and runs a second, separate check against
+the held-out report for a generalization comparison.
 :::
 
 ## What can you do now that you couldn't do before?
@@ -400,7 +441,9 @@ compares scores directly.
 You can produce a fixed, reproducible number for exactly how well the
 base model performs on your own training questions — something to point
 to, not just a feeling — and you have it saved to a file Chapter 5 will
-compare against directly.
+compare against directly. You can also tell the difference between "the
+model learned its training set" and "the model generalizes," and you
+know which one this chapter's number actually proves.
 
 ## Suggested next step
 
@@ -408,4 +451,6 @@ compare against directly.
 how the model represents text internally — but "text" isn't what a
 model actually reads. Chapter 4 opens up tokenization and embeddings,
 the layer underneath every prompt this chapter sent, so LoRA fine-tuning
-doesn't feel like a black box when you get there.
+doesn't feel like a black box when you get there. Chapter 5 then reruns
+this chapter's training baseline against the fine-tuned model, and runs
+its held-out counterpart against `Drilling_037` for the first time.
