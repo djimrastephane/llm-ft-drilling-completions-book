@@ -107,15 +107,15 @@ Traceable, Evaluated, Continuously Updated Model
 
 By the end of the book you should be able to:
 
-- ✓ Run a general-purpose local LLM and evaluate its out-of-the-box
+- Run a general-purpose local LLM and evaluate its out-of-the-box
   answers to drilling and completions questions
-- ✓ Turn raw drilling and completions reports into a training dataset
-- ✓ Run a first parameter-efficient (LoRA) fine-tune of a local model
-- ✓ Apply data quality gates to training data before fine-tuning
-- ✓ Fine-tune at scale with checkpointing and experiment tracking
-- ✓ Combine a fine-tuned model with retrieval (hybrid RAG + fine-tuning)
-- ✓ Evaluate a fine-tuned model's quality and detect hallucinations
-- ✓ Detect drift across model versions and keep the model current as new
+- Turn raw drilling and completions reports into a training dataset
+- Run a first parameter-efficient (LoRA) fine-tune of a local model
+- Apply data quality gates to training data before fine-tuning
+- Fine-tune at scale with checkpointing and experiment tracking
+- Combine a fine-tuned model with retrieval (hybrid RAG + fine-tuning)
+- Evaluate a fine-tuned model's quality and detect hallucinations
+- Detect drift across model versions and keep the model current as new
   reports arrive
 
 ## Who This Book Is For
