@@ -70,4 +70,22 @@ highlights in narrative form.
   HTML with `pdftocairo`. Generated `pipeline_ch01`–`pipeline_ch13`
   (`.pdf`, `_light.svg`, `_dark.svg`), which was also required for the
   Quarto PDF book output to compile at all (missing diagram files
-  previously failed the LaTeX build). Chapters 4–13 remain placeholders.
+  previously failed the LaTeX build).
+- **Chapter 4: Tokenization and Embeddings for Domain Fine-Tuning**
+  (`chapters/chapter_04.qmd`) fully drafted, with working, tested code
+  (`code/chapter_04/tokenize_and_embed.py`,
+  `code/chapter_04/challenge/challenge.py`, `tests/test_chapter_04.py`).
+  Shows, from real runs, exactly how the base model's tokenizer splits
+  this book's oilfield shorthand (`POOH`, `BHA`, ... each split into two
+  arbitrary sub-word pieces), then measures whether either the base
+  model's raw input embeddings or a general-purpose sentence-embedding
+  model (`sentence-transformers`) already recognize that shorthand as
+  equivalent to its spelled-out meaning. Neither does reliably: `BHA` vs.
+  `"bottom hole assembly"` scores `-0.035` raw / `0.115`
+  sentence-embedding, both statistically indistinguishable from an
+  unrelated phrase. Field notes: the safety-critical term `BOP`
+  (blowout preventer) scores *lower* against its own meaning (`0.059`
+  sentence-embedding) than against `"birthday party"` (`0.320`) --
+  concrete evidence that off-the-shelf embeddings can't be assumed to
+  already understand domain-specific, safety-relevant vocabulary.
+  Chapters 5–13 remain placeholders.
