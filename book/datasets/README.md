@@ -15,6 +15,13 @@ needed -- this is public data.
   `Drilling_049`/`050`), for Chapters 1–5. Reproducible from
   `full_training_set/` via `code/chapter_01/build_sample_training_set.py`.
 
+Part II's data-quality and traceability chapters (6, 9, 10) are informed
+by [`industrial-ddr-finetuning`](https://github.com/djimrastephane/industrial-ddr-finetuning),
+a private companion project that has already run a schema-v2 extraction
+pipeline (field-level status, verbatim evidence spans, validation, review
+workflow) over this same 76-report archive. This book teaches that
+pipeline's techniques from scratch in Part II rather than reusing its code.
+
 Both tiers are raw report PDFs, not yet training examples --
 turning them into instruction/response training pairs is Chapter 2's
 job. Derived artifacts (extracted text, formatted training files, model

@@ -107,6 +107,14 @@ must be independently verified before being written down — this book
 does not present fabricated or borrowed results as if they came from a
 real run.
 
+Chapters 6, 9, and 10 in particular are informed by the author's private
+companion project [`industrial-ddr-finetuning`](https://github.com/djimrastephane/industrial-ddr-finetuning),
+which runs a schema-v2 extraction pipeline (field-level status, verbatim
+evidence spans, automated validation, review workflow) over this same
+FORGE archive — see `book/datasets/README.md`. The book's own
+implementations are written from scratch for teaching purposes, not
+copied from it.
+
 ## Recommended workflow in Positron (for authors drafting new chapters)
 
 This section describes the author's own workflow for *writing* new

@@ -21,6 +21,16 @@ and exercises — but this time the destination is a small, fine-tuned
 language model that runs entirely on your own machine, not a retrieval
 pipeline over a document archive.
 
+Part II's "industrializing" chapters (6–13: data quality gates, evidence
+traceability, evaluation, drift detection, continuous retraining) are
+informed by the author's private companion project
+[`industrial-ddr-finetuning`](https://github.com/djimrastephane/industrial-ddr-finetuning),
+which already runs a schema-v2 extraction pipeline (per-field status,
+verbatim evidence spans, automated validation, and a review workflow)
+over this same Utah FORGE archive. That repo is private (its `raw_data/`
+mirrors the same public PDFs used here); this book's Part II chapters
+teach the underlying techniques from scratch rather than depending on it.
+
 ### What You're Building
 
 Starting from a general-purpose local model that answers drilling and
