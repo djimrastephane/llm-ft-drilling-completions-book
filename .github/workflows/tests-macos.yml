@@ -31,5 +31,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # `slow` tests download and run the ~3GB base model -- fine locally,
+      # but too slow/expensive to repeat on three OS runners on every push
+      # (macOS and Windows have both hit the 20-minute job timeout running
+      # them). CI checks the fast, deterministic majority of the suite;
+      # slow tests are still meant to be run locally before a chapter
+      # ships (see tests/test_chapter_01.py's docstring).
       - name: Run tests
-        run: pytest -v
+        run: pytest -v -m "not slow"
