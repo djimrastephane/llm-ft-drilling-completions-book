@@ -361,12 +361,14 @@ phrase, `"birthday party"`?
 | `BOP` vs. `"blowout preventer"` | `0.131` | `0.059` |
 | `BOP` vs. `"birthday party"` | `-0.105` | `0.320` |
 
-**Why:** neither embedding approach has ever seen enough of this
-archive's specific usage to anchor `BOP` to its real meaning. The
-sentence-embedding model's `0.320` for `"birthday party"` almost
-certainly picks up on `B`/`P`-sounding surface similarity
-(`BOP`/`birthday party`) rather than anything about well control — a
-coincidence, not a judgment, but a costly one to trust blindly.
+**Why:** the safest claim this result supports is the direct one —
+neither embedding approach encodes the equivalence between `BOP` and
+"blowout preventer" strongly enough for this task. Exactly *why* the
+sentence-embedding model happens to place `"birthday party"` closer is
+not something these two numbers prove on their own (this chapter
+doesn't inspect the model's internals to confirm a specific cause); what
+they do prove is that whatever `0.320` is picking up on, it isn't
+domain understanding of well control.
 
 **Lesson:** a safety-critical abbreviation is exactly the kind of term
 where "the embedding space probably has this covered" is the most

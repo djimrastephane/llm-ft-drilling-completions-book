@@ -248,6 +248,16 @@ targeted, or a larger rank, trade off adapter size against how much the
 model can actually learn. This chapter's challenge exercise tries a
 smaller `target_modules` list and shows the real effect on results.
 
+One more deliberate choice, worth naming directly: this chapter's
+training loop runs entirely on CPU, the same as Chapter 1's default. A
+GPU or Apple Silicon (MPS) machine can fine-tune this faster, but this
+book keeps every reader's numbers reproducible against the same
+baseline rather than depending on whichever accelerator a given machine
+happens to have. If you have a GPU and want to try it, `model.to("cuda")`
+(or `"mps"`) before Step 2, and moving `input_ids`/`labels` in
+`build_training_ids` to the same device, is the change — the rest of
+this chapter's logic doesn't depend on which device it runs on.
+
 ### Step 3: Fine-tune, then measure recall *and* generalization
 
 ## What problem are we solving?

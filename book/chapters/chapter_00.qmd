@@ -1,4 +1,4 @@
-# Part 0: Preparing Your Local LLM Workshop {#sec-chapter-00}
+# Part 0: Preparing Your Local LLM Workshop {#sec-chapter-00 .unnumbered}
 
 ::: {.chapter-status}
 **Estimated time:** 30–45 min &nbsp;·&nbsp; **Difficulty:** 🟢 Beginner &nbsp;·&nbsp; No prior programming experience assumed

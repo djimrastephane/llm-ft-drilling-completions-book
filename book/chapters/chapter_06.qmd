@@ -399,9 +399,12 @@ in this archive is exactly where it should be.
 ::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}
 **`data_quality_gate.py`** — checks the full 76-report archive for
 extraction failures and cross-report duplicate values, and separates
-what needs automatic exclusion from what needs a human decision.
-Chapter 7 builds its formatted, chunked training set on top of the 75
-reports this gate actually passed.
+what needs automatic exclusion from what needs a human decision. It
+leaves this archive with 75 reports that passed extraction, 2 of which
+still carry an open `needs_review` flag — not yet resolved either way.
+Chapter 7 builds its formatted, chunked training set on top of those 75
+extractable reports, and should treat the 2 flags as a decision still
+owed, not a detail already handled.
 :::
 
 ## What can you do now that you couldn't do before?
@@ -414,9 +417,12 @@ skimming 76 reports by eye.
 
 ## Suggested next step
 
-**Coming up in Chapter 7:** this chapter decided *which* of the 76
-reports are trustworthy enough to use. It didn't turn any of them into
-training examples — Chapter 2's approach, one regex extraction per
-report, worked fine for 10 reports typed out one at a time, but Chapter
-7 needs to format and chunk 75 reports' worth of training data at scale,
-without re-doing that work by hand.
+**Coming up in Chapter 7:** this chapter surfaced, for all 76 reports,
+which ones extract cleanly and which field values deserve a second look
+— it didn't unilaterally decide the 2 `needs_review` cases, and it
+didn't turn anything into a training example yet. Those 2 flags should
+be accepted or excluded, by a person, before Chapter 7 runs. Chapter
+2's approach, one regex extraction per report, worked fine for 10
+reports typed out one at a time, but Chapter 7 needs to format and
+chunk 75 reports' worth of training data at scale, without re-doing
+that work by hand.

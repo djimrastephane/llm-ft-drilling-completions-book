@@ -9,14 +9,30 @@ documented (and reproducible) in chapters/chapter_05.qmd itself.
 Skip locally if you're offline or on modest hardware:
 
     pytest -v -m "not slow"
+
+`first_lora_finetune` imports `peft` at module load time, which would
+otherwise turn a missing `peft` into a hard collection error for this
+whole file -- breaking `pytest -m "not slow"` even though none of that
+file's `not slow` tests actually need it. `importorskip` turns a
+missing `peft` into a clean skip instead.
 """
 
-import pytest
-import torch
+import os
 
-from build_training_examples import build_training_examples
-from load_local_model import MODEL_NAME, load_model_and_tokenizer
-from first_lora_finetune import build_lora_model, build_training_ids, fine_tune, score
+# Must happen before peft (which imports transformers) -- see
+# load_local_model.py's own note on the same guard.
+os.environ.setdefault("USE_TF", "0")
+os.environ.setdefault("USE_FLAX", "0")
+
+import pytest
+
+peft = pytest.importorskip("peft")
+
+import torch  # noqa: E402
+
+from build_training_examples import build_training_examples  # noqa: E402
+from load_local_model import MODEL_NAME, load_model_and_tokenizer  # noqa: E402
+from first_lora_finetune import build_lora_model, build_training_ids, fine_tune, score  # noqa: E402
 
 
 @pytest.fixture(scope="module")

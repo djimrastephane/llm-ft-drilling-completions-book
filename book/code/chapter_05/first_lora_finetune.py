@@ -6,6 +6,14 @@ harness twice: once against those same 16 training examples (training
 recall), and once against Chapter 2's held-out report, Drilling_037
 (generalization) -- a report the fine-tuned model never trained on.
 
+This training loop intentionally never moves the model or tensors to a
+GPU or Apple Silicon (MPS) device -- everything runs on CPU, same as
+Chapter 1's default. That's a deliberate choice, not an oversight: it
+keeps this chapter's ~5-minute runtime and its exact printed numbers
+reproducible for every reader on the same hardware baseline the rest of
+the book assumes, rather than depending on whichever accelerator (or
+none) a given machine happens to have.
+
 Usage:
     python code/chapter_05/first_lora_finetune.py
 """

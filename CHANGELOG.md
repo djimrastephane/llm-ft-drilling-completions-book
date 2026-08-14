@@ -132,3 +132,41 @@ highlights in narrative form.
   fine-tuning with retrieval. Written after Chapter 5 shipped, so it
   can point at that chapter's real held-out result as concrete
   evidence rather than a promise.
+
+### Fixed
+
+- **Chapter numbering was off by one in rendered HTML/PDF output.**
+  `chapters/chapter_00.qmd` (Part 0) sat inside Quarto's normal numbered
+  chapter sequence, so it silently became "Chapter 1" and pushed every
+  real chapter's rendered number one ahead of its own status-strip label
+  (conceptual Chapter 6 rendered as "6" in its status strip but "7" in
+  the book's actual heading/TOC). Marked Part 0's heading `.unnumbered`;
+  verified in both HTML and PDF that Chapter 1 now renders as "1" and
+  Chapter 6 as "6".
+- `tests/test_chapter_05.py` imports `first_lora_finetune`, which
+  imports `peft` at module load time -- on a machine without `peft`
+  installed, that turned into a hard collection error for the whole
+  file (and, per pytest's collection behavior, could abort the entire
+  `pytest -m "not slow"` run, not just skip this one file). Now uses
+  `pytest.importorskip("peft")`, ordered after the same `USE_TF=0`
+  guard `load_local_model.py` sets, so a missing `peft` skips cleanly
+  instead of segfaulting or erroring out collection.
+- Chapter 5's training loop never moved the model or tensors to a GPU
+  or MPS device, silently running CPU-only regardless of what hardware
+  was available -- correct behavior, but undocumented. Now stated
+  explicitly, in both the code's module docstring and the chapter text,
+  as a deliberate reproducibility choice, not an oversight.
+- Chapter 4's Field notes overstated what its embedding-similarity
+  numbers prove -- claiming a specific, unverified cause (character-level
+  surface similarity) for why `"birthday party"` scored higher than
+  `"blowout preventer"`. Narrowed the claim to what the numbers actually
+  show: the embeddings don't encode the domain equivalence strongly
+  enough for this task, without asserting a specific mechanism this
+  chapter never actually inspected.
+- Chapter 6's closing sections ("WHAT YOU BUILT", "Suggested next step")
+  described the gate as having "decided which reports are trustworthy"
+  and Chapter 7 building on "the 75 reports this gate actually passed"
+  -- blurring the fact that 2 of those 75 still carry an unresolved
+  `needs_review` flag. Reworded both to state plainly that those 2
+  flags are a decision still owed to a human, not one the gate already
+  made.
