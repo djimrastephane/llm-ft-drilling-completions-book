@@ -104,7 +104,20 @@ highlights in narrative form.
   concrete, diagnostic evidence of memorization without generalization
   from a training set this small. Challenge exercise: a lighter
   `q_proj`/`v_proj`-only LoRA config trains half as many parameters
-  (`0.0705%`) and scores `10/16`. Chapters 6–13 remain placeholders.
+  (`0.0705%`) and scores `10/16`.
+- **Chapter 6: A Data Quality Gate for Training Data**
+  (`chapters/chapter_06.qmd`) fully drafted, with working, tested code
+  (`code/chapter_06/data_quality_gate.py`,
+  `code/chapter_06/challenge/challenge.py`, `tests/test_chapter_06.py`).
+  Runs Chapter 2's field extractor across the full 76-report archive
+  (not just the 10-report sample) for the first time: `75/76` reports
+  pass extraction, and a cross-report duplicate-value check finds 6
+  duplicate groups, 4 consecutive (a continued operation across days,
+  no action needed) and 2 non-consecutive (flagged for human review,
+  not auto-excluded) -- including report `#49`'s `present_operations`
+  matching report `#70`'s, 21 days apart. Challenge exercise adds a
+  chronological-order check, which the real archive passes cleanly (0
+  issues across 75 reports). Chapters 7–13 remain placeholders.
 
 ### Changed
 
