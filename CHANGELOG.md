@@ -117,7 +117,23 @@ highlights in narrative form.
   not auto-excluded) -- including report `#49`'s `present_operations`
   matching report `#70`'s, 21 days apart. Challenge exercise adds a
   chronological-order check, which the real archive passes cleanly (0
-  issues across 75 reports). Chapters 7–13 remain placeholders.
+  issues across 75 reports).
+- **Chapter 7: Formatting and Chunking a Training Set at Scale**
+  (`chapters/chapter_07.qmd`) fully drafted, with working, tested code
+  (`code/chapter_07/format_training_chunks.py`,
+  `code/chapter_07/challenge/challenge.py`, `tests/test_chapter_07.py`).
+  Goes beyond Chapter 2's two summary fields into each report's
+  `TIME BREAKDOWN` operational log -- one training example per logged
+  time window, split ("chunked") at word boundaries when an entry runs
+  too long. Real run across the 74 reports Chapter 6's gate and Chapter
+  2's held-out reservation leave available: `669` training examples
+  (over 40x Chapter 2's 16, from the same archive), `125` requiring
+  chunking, and `3` chunks filtered out for containing `(cid:N)`
+  undecoded-glyph artifacts -- a real PDF-extraction defect found inside
+  the single longest entry in the archive (report `#21`, a step-rate-test
+  sub-table `pdfplumber` couldn't decode). Challenge exercise reruns
+  with a smaller chunk size (150 vs. 300 chars): `855` examples, `405`
+  chunked. Chapters 8–13 remain placeholders.
 
 ### Changed
 
