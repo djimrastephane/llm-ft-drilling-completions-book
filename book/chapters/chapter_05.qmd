@@ -321,18 +321,22 @@ After fine-tuning:
 
 ## What just happened?
 
-Training recall jumped from `0/16` to `13/16` — real, measurable
-learning, not a training artifact. Held-out generalization stayed at
-`0/2`, exactly where it started. Sixteen examples was enough for this
-small model to memorize sixteen answers; it was not enough to teach it
-anything that transfers to a report it never saw. That's not a bug —
-it's the honest, predictable result of a training set this size, and
-precisely why Chapter 2 reserved that report in the first place.
+Be precise about what this run actually shows: fine-tuning **changed**
+the model, not simply "improved" it. Training recall jumped from
+`0/16` to `13/16` — real, measurable learning, not a training artifact.
+Held-out generalization stayed at `0/2`, exactly where it started.
+Sixteen examples was enough for this small model to memorize sixteen
+answers; it was not enough to teach it anything that transfers to a
+report it never saw. That's not a bug — it's the honest, predictable
+result of a training set this size, and precisely why Chapter 2
+reserved that report in the first place.
 
-Looking at *which* answers came back wrong is more revealing than the
-scores alone. Every one of the 3 training misses and both held-out
-misses is a real answer from a *different* report, borrowed wholesale
-— never an invented guess:
+Of the 18 total questions across both checks (16 training + 2
+held-out), 13 training answers came back right, which leaves 5 wrong —
+3 from the training set, 2 from the held-out report. Looking at
+*which* answers came back wrong is more revealing than the scores
+alone. Every one of those 5 is a real answer from a *different* report,
+borrowed wholesale — never an invented guess:
 
 | Question | Expected | Model said | Actually belongs to |
 |---|---|---|---|
@@ -348,6 +352,14 @@ Chapter 3. It got *more* confident, and confidently wrong, reaching for
 the nearest memorized answer instead. That's a materially worse failure
 mode for a production system than "I don't know," and it's the direct
 consequence of training on too little, too narrow a dataset.
+
+The principle behind all three results together: a tiny fine-tune can
+teach a model to prefer the *shape* of your archive — its vocabulary,
+its formatting, the fact that answers are short, well-specific field
+values — without teaching it reliable judgment over reports it hasn't
+seen. Shape is real and worth having. It is not the same thing as
+judgment, and this chapter's numbers are exactly what the difference
+looks like.
 
 ## Practical exercise
 
