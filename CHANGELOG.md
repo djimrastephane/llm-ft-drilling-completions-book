@@ -36,5 +36,22 @@ highlights in narrative form.
   instruction/response training examples from 9 of the 10 sample
   reports (the completion report uses a different field layout, handled
   in the challenge exercise). Every field value and example count in
-  the chapter is from a real, verified run. Chapters 3–13 remain
-  placeholders.
+  the chapter is from a real, verified run.
+- **Chapter 3: Baseline Prompting: What the Model Gets Wrong Before
+  Fine-Tuning** (`chapters/chapter_03.qmd`) fully drafted, with working,
+  tested code (`code/chapter_03/baseline_prompting.py`,
+  `code/chapter_03/challenge/challenge.py`, `tests/test_chapter_03.py`).
+  Runs the unmodified base model against Chapter 2's 18 training
+  examples with each `output` withheld, and saves the results to
+  `datasets/training_examples/baseline_results.jsonl` -- the fixed
+  baseline Chapter 5's fine-tuned model gets compared against. On a
+  real run against the sample archive, the base model scores `0/18`
+  on exact-match (it correctly declines to guess rather than
+  hallucinating a wrong answer); the challenge exercise shows that
+  score rising to `6/18` once each report's full text is included as
+  context. Also fixes a real bug surfaced while drafting this chapter:
+  `code/chapter_01/load_local_model.py` now disables `transformers`'
+  TensorFlow/Flax backend probing (`USE_TF=0`, `USE_FLAX=0`), since an
+  unrelated, broken TensorFlow install on a shared/Anaconda-style
+  environment was segfaulting model loading for every chapter that
+  imports it. Chapters 4–13 remain placeholders.

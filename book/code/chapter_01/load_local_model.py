@@ -11,7 +11,16 @@ Usage:
     python code/chapter_01/load_local_model.py
 """
 
+import os
 import time
+
+# Force transformers to skip its TensorFlow/Flax backend probing. This book
+# only ever uses the PyTorch backend; on some shared/Anaconda-style
+# environments an unrelated, broken TensorFlow install can crash the
+# process during this probe, even though this project never imports
+# TensorFlow itself.
+os.environ.setdefault("USE_TF", "0")
+os.environ.setdefault("USE_FLAX", "0")
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer

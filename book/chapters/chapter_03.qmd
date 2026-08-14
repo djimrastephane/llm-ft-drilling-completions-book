@@ -1,111 +1,4 @@
-<!--
-STATUS: placeholder only -- this chapter has not been written yet.
-Draft it by filling in every TODO/comment section below, per
-templates/chapter_template.qmd and book/README.md's chapter map.
--->
-
-<!--
-CHAPTER TEMPLATE
-================
-Copy this file into chapters/chapter_NN.qmd and fill in every section.
-Do not delete a section — if it doesn't apply, write one sentence saying why.
-
-Audience: drilling/completions/intervention/production engineers and
-petroleum data scientists. Assume zero Python experience and zero software
-engineering experience. Assume strong operational experience, strong Excel
-skills, curiosity about AI, and willingness to type code manually. The
-reader should never ask "why am I learning this?" — every concept appears
-only after they've hit the problem it solves. Problem first, technology
-second. If forced to choose between technical completeness and reader
-confidence, choose reader confidence. The reader should finish saying
-"I can build this," not "I understand the theory."
-
-Style rules:
-- Problem first. Never introduce a concept (tokenization, LoRA adapters,
-  quantization, evaluation metrics, or anything else) before the reader
-  has felt the failure that makes it necessary.
-- Every chapter must produce a runnable artifact the reader can point to
-  and say "I built that."
-- Minimal mathematics. If you need an equation, put the intuition in prose
-  first and the equation second, not the other way around.
-- No chapter should run past ~20 pages without a practical exercise
-  checkpoint.
-- Code blocks must run as-is against the companion repository's sample
-  training data. Do not show elided/pseudocode as if it were runnable.
-- Avoid jargon in plain-English explanations. Bad: "This applies a
-  low-rank update to the attention projections." Good: "We taught the
-  model a small, targeted correction instead of retraining it from
-  scratch."
-- Every claimed result (a metric, an evaluation score, a before/after
-  comparison) must come from an actual run of this book's own code
-  against real training data — never invented or estimated.
-
-Required structural elements (do not skip any of these):
-1. A visual progress marker at the very top, e.g. `Base Model ↓ Fine-Tuned Model`.
-2. "## Operational Problem" as the first section after Learning objectives,
-   written in the language of a drilling morning call (a question someone
-   would actually ask out loud), never "today we will learn X."
-3. Before EVERY code block: "## What problem are we solving?", "## Inputs",
-   "## Expected Output".
-4. After EVERY code block: "## What just happened?" in plain English.
-5. An "Engineering Translation" callout for every new programming or AI
-   concept introduced (LoRA adapter -> a small swappable correction sheet
-   clipped to the model, tokenizer -> the standard word-breakdown table
-   everyone on the crew uses, checkpoint -> a saved snapshot of training
-   progress, evaluation set -> a fixed exam the model has never seen,
-   epoch -> one full pass through the training data, etc.) — invent the
-   right analogy for whatever concept the chapter actually introduces.
-6. If the chapter introduces a new AI/ML concept, include a
-   "## Why prompting alone falls short" (or equivalent "why the simpler
-   thing fails") section before introducing the new technique — show the
-   question, why the simpler approach gets it wrong or inconsistent, then
-   the fix.
-7. A "## Production Reality" section: what this chapter's examples
-   deliberately simplify away, and what a messier real training pipeline
-   looks like (inconsistent report formats, duplicate or near-duplicate
-   entries, class imbalance, limited hardware, drift between training and
-   production data, etc.).
-8. A closing "## What can you do now that you couldn't do before?" section
-   — one or two sentences of concrete new capability, not a theory recap.
-9. A ".chapter-status" div directly under the pipeline diagram: a 12-block
-   progress bar (N filled for chapter N, rest empty), an estimated time,
-   and a difficulty badge (🟢/🟠/🔴). See markup below.
-10. Exactly one named persona (Mike/completions, Sarah/intervention,
-    Sean/production, Oumy/drilling — see index.qmd's roster) appears in
-    the opening sentence(s) of "## Operational Problem", asking the
-    motivating question. Pick whichever persona the chapter's question
-    naturally belongs to. Personas may be echoed once more in "##
-    Practical exercise" for bookend effect, but never appear in Theory,
-    Production Reality, or Field notes — those sections stay factual and
-    unattributed, since their content must be independently verified
-    against a real run, not invented dialogue.
-11. A difficulty badge line under both exercise headings: "## Practical
-    exercise" gets 🟢 **Beginner** always; "## Challenge exercise" gets
-    🟠 **Intermediate** by default, escalated to 🔴 **Advanced** only when
-    the challenge is genuinely harder than a typical chapter's (a
-    judgment call, not a mechanical rule).
-12. A "CHECKPOINT" box (`callout-caution`, GFM task-list checkboxes) and a
-    "WHAT YOU BUILT" box (`callout-tip .built-box`), placed together right
-    after "## Repository files" and before the closing "## What can you do
-    now..." / "## Suggested next step" pair. CHECKPOINT is a terse,
-    checkable skills list; WHAT YOU BUILT names the concrete artifact.
-    Neither replaces "## Key takeaways" (conceptual) or "## What can you
-    do now" (prose) — each reinforces achievement from a different angle.
-13. "## Suggested next step" opens with a bolded **Coming up in Chapter
-    N+1:** line before its bridging paragraph.
--->
-
 # Baseline Prompting: What the Model Gets Wrong Before Fine-Tuning {#sec-chapter-03}
-
-<!-- Progress marker: a small pipeline diagram showing this chapter's
-input -> output transformation (2-4 boxes, vertical flow with arrows).
-Add it to the DIAGRAMS dict in figures/diagrams/generate_diagrams.py and
-run that script -- it compiles TikZ -> PDF via pdflatex, then produces
-three files per diagram: pipeline_ch03_light.svg and _dark.svg (for
-HTML), and pipeline_ch03.pdf (for PDF output -- see the note below on
-why this can't just reuse the SVG). Do NOT use plain ASCII art here; it
-doesn't get the crisp, theme-aware rendering the rest of the book's
-diagrams have. -->
 
 ::: {.content-visible when-format="html"}
 ::: {.pipeline-diagram}
@@ -117,23 +10,6 @@ diagrams have. -->
 ::: {.content-visible when-format="pdf"}
 ![](../figures/diagrams/pipeline_ch03.pdf){width="180" fig-align="center"}
 :::
-<!-- PDF format embeds the compiled .pdf directly, not the SVG -- Quarto's
-LaTeX pipeline needs rsvg-convert to rasterize an SVG for PDF output,
-which may not be installed on the CI runner. generate_diagrams.py should
-save the compiled PDF alongside both SVG variants for exactly this
-reason -- always reference the .pdf here, never the .svg.
-
-fig-align="center" is required on this line -- a bare image (no caption)
-isn't wrapped in pandoc's usual centering figure environment, so without
-it the diagram renders flush against the left margin instead of
-centered. The HTML version doesn't need this (.pipeline-diagram's
-text-align: center in custom.scss already handles it there). -->
-
-<!-- Chapter status strip (rule 9). Progress bar is 12 characters total,
-N filled for chapter N. Estimated time is a plausible range for a reader
-typing every example. Difficulty is the chapter's overall level, usually
-🟢 for Part I and early Part II, 🟠/🔴 as fine-tuning and evaluation get
-more involved. -->
 
 ::: {.chapter-status}
 Progress `███░░░░░░░░░░` **3 / 13** &nbsp;·&nbsp; **Estimated time:** 20-30 min &nbsp;·&nbsp; **Difficulty:** 🟢 Beginner
@@ -143,195 +19,393 @@ Progress `███░░░░░░░░░░` **3 / 13** &nbsp;·&nbsp; **E
 
 By the end of this chapter, you will be able to:
 
-- Objective 1 (a concrete capability, not a topic — "load a local
-  open-weight model with `transformers` and generate a completion", not
-  "learn about language models")
-- Objective 2
-- Objective 3
+- Turn Chapter 2's training examples into a fixed batch of baseline
+  questions, with each example's own `output` withheld from the model
+- Run the unmodified base model against that exact batch and save its
+  answers to a reusable results file
+- Explain why a baseline must reuse the *same* prompts a later
+  fine-tuned model will be tested on, not a different, looser sample
+- Describe, from a real run against this book's own archive, the
+  specific way this base model fails when it isn't given a report's
+  content — and why that's different from wild hallucination
 
 ## Operational Problem
 
-<!-- One or two paragraphs, opening with ONE named persona (rule 10)
-asking a question in the language of a drilling morning call ("Why does
-the model keep getting our sequencing wrong?", "Can we trust this answer
-enough to act on it?"). Describe the real problem this chapter solves.
-Ground it in a scenario: a specific fine-tuning attempt, a specific
-question someone needed answered correctly, a specific way the current
-(base model or manual) approach fails. Never open with "Today we will
-learn X." Example opening: "Sarah, the intervention engineer, asks:
-'...'" -->
+Sarah, the intervention engineer, is skeptical: *"Before we spend any
+time fine-tuning this thing, how do we even know it's wrong today? And
+once it's fine-tuned, how do we prove it actually got better, instead of
+just feeling better?"*
 
-## Example training excerpt
+Chapter 1 showed the base model producing a fluent, generic answer with
+no report-specific detail. That was one question, read once, judged by
+eye. It's not something you can compare against later, and it isn't
+built from the same training examples Chapter 5 will actually fine-tune
+on. This chapter fixes both problems: it takes the exact instruction/input
+prompts Chapter 2 built, asks the base model every one of them with the
+real answer hidden, and saves the results to a file — a fixed,
+reproducible baseline Chapter 5's fine-tuned model gets held against,
+not a vibe.
 
-<!-- A short, realistic (synthetic or anonymised) instruction/response
-training example that motivates the chapter's technique. Show it as a
-callout so it's visually distinct from narrative text. -->
+## Example baseline question
 
-::: {.callout-note title="Sample training example"}
+Chapter 2 turned report `Drilling_038` (2020-11-26 — the stuck-pipe day
+from Chapter 1) into this training example:
+
+::: {.callout-note title="Training example -- from Chapter 2"}
 ```json
 {
-  "instruction": "Summarize the operational risk in this report excerpt.",
-  "input": "0600-1130 POOH FR 9,842' TO CHANGE BHA. ERRATIC TORQUE OBSD LAST 3 STDS.",
-  "output": "Erratic torque over the last three stands before pulling out of hole suggests a developing hole-cleaning or BHA issue that should be monitored on the next run."
+  "instruction": "What activity is planned next?",
+  "input": "Well: FORGE 16A [78]-32 | Report #38 | Date: 2020-11-26",
+  "output": "INSPECT BHA, TRIP IN HOLE DRILL CURVE"
 }
 ```
 :::
 
+A training example and a baseline question are the same prompt used two
+different ways. Fine-tuning (Chapter 5) shows the model the `output` so
+it can learn from it. A baseline never does — this chapter sends the
+model only the `instruction` and `input`, then compares whatever it says
+back against the `output` it was never shown.
+
 ## Theory
 
-<!-- The minimum theory required to understand *why* the implementation
-below works. If this section would exceed ~1.5 pages, you are including
-theory the reader doesn't need yet — cut it or defer it to a later
-chapter. Prefer diagrams and worked examples over formal definitions.
-
-If this section needs its own flow diagram (an algorithm's internal
-steps, not the chapter-opening progress marker), it follows the same
-TikZ -> PDF/SVG pattern, added to THEORY_DIAGRAMS (not DIAGRAMS) in
-figures/diagrams/generate_diagrams.py. The generator only draws a
-straight vertical chain; a diagram that branches (a yes/no decision)
-needs that support added first, or should stay as prose/ASCII for now.
-
-Add an "Engineering Translation" callout for every new concept this
-chapter introduces — see rule 5 above. Example: -->
-
-::: {.callout-tip title="Engineering Translation: <concept>"}
-<!-- One or two plain-language sentences mapping the concept onto
-something the reader already knows from field operations. -->
+::: {.callout-tip title="Engineering Translation: baseline"}
+A **baseline** is a fixed, saved measurement taken *before* you change
+anything — like recording a well's pressure before an intervention, so
+you have something concrete to compare the after-reading against. A
+baseline you can't reproduce, or that used different questions each
+time, isn't useful for that comparison.
 :::
 
-<!-- If this chapter introduces a new AI/ML concept, add a
-"## Why prompting alone falls short" (or equivalent) section here, before
-the new technique, following rule 6 above. -->
+::: {.callout-tip title="Engineering Translation: exact-match scoring"}
+This chapter's `matched_expected` check asks one narrow question: does
+the model's answer contain the report's exact expected value, word for
+word? It's the simplest possible scoring rule — strict enough to never
+give false credit, but too strict to reward an answer that's correct in
+substance but phrased differently. Chapter 11 builds a more forgiving
+evaluation harness; this chapter deliberately starts with the crude,
+honest version.
+:::
+
+## Why not just eyeball a few answers?
+
+A tempting shortcut: run the model on two or three questions, read the
+replies, and decide informally whether it "seems okay." That's exactly
+what Chapter 1 did, and it doesn't scale into evidence. You can't compare
+"seemed okay" across a before-and-after fine-tune, you can't tell whether
+one lucky answer is representative of the other seventeen, and you have
+nothing saved to point to later if someone asks how you know fine-tuning
+helped.
+
+This chapter's harness fixes all three: the same 18 questions, every
+time; every answer saved to
+`datasets/training_examples/baseline_results.jsonl`; and a single number
+— how many answers contained the report's actual value — that Chapter 5
+can reproduce and compare against after fine-tuning.
 
 ## Implementation
 
-<!-- Step-by-step, runnable code, broken into named steps if more than one
-logical block is involved. For EACH code block, follow this exact pattern: -->
-
-### Step 1: <what this step accomplishes>
+### Step 1: Turn Chapter 2's training examples into baseline questions
 
 ## What problem are we solving?
 
-<!-- One or two sentences: what does this specific block of code solve? -->
+Each Chapter 2 training example is a dictionary with `instruction`,
+`input`, and `output`. A baseline question is just the first two, joined
+into the single string the model actually receives — the `output` must
+never appear in it, or the test proves nothing.
 
 ## Inputs
 
-<!-- Bullet list: what does this code need to run? -->
+- One training example (as built by `build_training_examples()` in
+  Chapter 2)
 
 ## Expected Output
 
-<!-- What should the reader see when they run this? Show a concrete example. -->
+A plain-text prompt string, with no trace of the expected answer.
 
 ```{python}
 #| eval: false
-# Minimal working example — replace with chapter-specific code.
-print("Hello, local LLM")
+import sys
+from pathlib import Path
+
+BOOK_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(BOOK_ROOT / "code" / "chapter_01"))
+sys.path.insert(0, str(BOOK_ROOT / "code" / "chapter_02"))
+
+from build_training_examples import build_training_examples
+from load_local_model import MODEL_NAME, generate_reply, load_model_and_tokenizer
+
+
+def build_prompt(example: dict) -> str:
+    return f"{example['instruction']}\n{example['input']}"
+
+
+examples = build_training_examples()
+print(build_prompt(examples[0]))
+```
+
+Running this exact code prints:
+
+```
+What are the present operations reported on this well?
+Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22
 ```
 
 ## What just happened?
 
-<!-- Plain-English explanation, no unnecessary jargon. Bad: "This applies
-a low-rank update to the attention projections." Good: "We taught the
-model a small, targeted correction instead of retraining it from
-scratch." -->
+`build_prompt` concatenates `instruction` and `input` with a newline —
+nothing more. `build_training_examples()` is the exact same function
+Chapter 2 uses to build the training set, imported directly rather than
+copied, so this chapter's questions are guaranteed to be the same ones
+Chapter 5 eventually trains on.
 
 ## Production Reality
 
-<!-- What does this chapter's example deliberately simplify away? What
-does a messier, real, multi-well or multi-operator training pipeline
-look like for this same problem? Follow rule 7 above. -->
+Every one of these questions only ever gives the model the report's
+*metadata* — well name, report number, date — never the report's actual
+text. That's deliberate: it isolates exactly what fine-tuning is for
+(Chapter 5 bakes each report's specific facts into the model's weights,
+so it no longer needs the text handed to it). A separate, equally valid
+question — can the model answer correctly when it *is* given the report
+text? — is this chapter's challenge exercise, and it previews why
+Chapter 9 eventually combines fine-tuning with retrieval instead of
+picking one or the other.
+
+### Step 2: Ask the base model, with the real answer hidden
+
+## What problem are we solving?
+
+For one baseline question, get the base model's answer and check it
+against the report's real value — the smallest unit of this chapter's
+harness.
+
+## Inputs
+
+- The loaded `model` and `tokenizer` from Chapter 1
+- One training example
+
+## Expected Output
+
+A dictionary recording the question, the hidden expected answer, the
+model's actual answer, and whether they matched.
+
+```{python}
+#| eval: false
+def ask_baseline(model, tokenizer, example: dict, max_new_tokens: int = 60) -> dict:
+    prompt = build_prompt(example)
+    answer = generate_reply(model, tokenizer, prompt, max_new_tokens=max_new_tokens)
+    expected = example["output"]
+    return {
+        "instruction": example["instruction"],
+        "input": example["input"],
+        "expected": expected,
+        "base_model_answer": answer,
+        "matched_expected": expected.strip().lower() in answer.strip().lower(),
+    }
+
+
+model, tokenizer = load_model_and_tokenizer(MODEL_NAME)
+print(ask_baseline(model, tokenizer, examples[0]))
+```
+
+Running this exact code prints:
+
+```json
+{
+  "instruction": "What are the present operations reported on this well?",
+  "input": "Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22",
+  "expected": "RIGGING UP WITH FRONTIER CREWS AND SUPERVISION AND JW JONES TRUCKING",
+  "base_model_answer": "The report you've provided appears to be for a well called \"FORGE 16A [78]-32\" and it is dated October 22, 2020. The specific details of what operations were reported are not explicitly stated in your message. However, based",
+  "matched_expected": false
+}
+```
+
+## What just happened?
+
+The model was asked exactly what Chapter 2's `input` field contains —
+well name, report number, date — and nothing else. It answers honestly
+that "the specific details... are not explicitly stated," rather than
+inventing a plausible-sounding operation. That's a meaningfully
+*better* failure than confident fabrication would be, but it's still a
+failure: the harness needed the report's real value, and didn't get it.
+
+## Production Reality
+
+`max_new_tokens=60` caps the reply short on purpose, so this chapter's
+18-question run finishes in a couple of minutes on CPU. A shorter cap
+also means some replies (like the one above) get cut off mid-sentence
+rather than reaching a natural stopping point — acceptable here because
+`matched_expected` only checks for the report's specific value, which
+would appear (or not) well before token 60 in every one of this
+archive's short, single-line field outputs.
+
+### Step 3: Run the full baseline and save it for Chapter 5
+
+## What problem are we solving?
+
+One question proves the harness works. Chapter 5 needs all 18, saved
+somewhere it can load without re-running the base model.
+
+## Inputs
+
+- Every training example from `build_training_examples()`
+
+## Expected Output
+
+A summary line reporting how many of the 18 answers matched, and a
+saved `.jsonl` file with one result per question.
+
+```{python}
+#| eval: false
+import json
+
+OUTPUT_PATH = BOOK_ROOT / "datasets" / "training_examples" / "baseline_results.jsonl"
+
+
+def run_baseline(model, tokenizer, examples: list[dict]) -> list[dict]:
+    return [ask_baseline(model, tokenizer, example) for example in examples]
+
+
+def save_results_jsonl(results: list[dict], output_path: Path = OUTPUT_PATH) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", encoding="utf-8") as f:
+        for result in results:
+            f.write(json.dumps(result) + "\n")
+
+
+results = run_baseline(model, tokenizer, examples)
+save_results_jsonl(results)
+
+matched = sum(r["matched_expected"] for r in results)
+print(f"Baseline: {matched}/{len(results)} answers contained the report's actual value verbatim")
+print(f"Saved -> {OUTPUT_PATH}")
+```
+
+Running this exact code prints:
+
+```
+Baseline: 0/18 answers contained the report's actual value verbatim
+Saved -> datasets/training_examples/baseline_results.jsonl
+```
+
+## What just happened?
+
+Every one of the 18 questions built from the 9 recognized sample reports
+came back with `matched_expected: false`. Not one exact number, status,
+or operation name from the archive appears in any answer — because the
+model was never given any of them, and it has no other way to know
+which specific well this is. `0/18` is this chapter's baseline number.
+Chapter 5 reruns this exact harness against the fine-tuned model and
+compares its score directly against this one.
 
 ## Practical exercise
 
 🟢 **Beginner**
 
-<!-- A guided exercise using the sample training data, with a clear,
-checkable "you'll know you got it right when..." condition. This is not
-optional — every chapter has one. -->
+**Try it yourself:** run
+`python code/chapter_03/baseline_prompting.py` from inside `book/`,
+then open `datasets/training_examples/baseline_results.jsonl` and read
+through all 18 answers.
 
-**Try it yourself:** ...
-
-**You'll know it worked when:** ...
+**You'll know it worked when:** the script prints `Baseline: 0/18`, the
+file has exactly 18 lines, and none of the model's answers contain a
+specific operation, status, or number from the actual report — most
+will instead say something like "not explicitly stated."
 
 ## Field notes
 
-<!-- Optional but encouraged, and should recur often across the book: a
-short, real, independently-verified vignette showing where the tool this
-chapter just built actually breaks (or, in a later chapter, where a
-previous chapter's tool breaks and this chapter's technique fixes it).
-Every number and quote here must be checked against a real run before
-writing it down -- run the code, don't estimate the outcome. The payoff
-is a moment where the reader sees, concretely, why the next chapter's
-added complexity is earning its keep, not complexity for its own sake.
+::: {.callout-warning title="Field notes: the model invents the wrong kind of document"}
+**Query:** report `#49`'s "What activity is planned next?" question —
+the same fishing-operations report referenced in Chapter 2's Field
+notes.
 
-Format:
-  Query/Action -> the (surprising) result -> the real training/eval data
-  that explains why -> the one-sentence lesson. -->
+**Result:** *"The text you provided appears to be from an online forum
+or discussion board where someone has posted their progress on a
+project called 'FORGE 16A' with the report number #49 and the date of
+December 7, 2020. Without more context about what this refers..."*
 
-::: {.callout-warning title="Field notes: <short description>"}
-**Query:** `"..."`
+**Why:** report `#49`'s real `activity_planned` value is `"FISHING
+OPERATIONS"` — the model was never given that, only the metadata string
+`"Well: FORGE 16A [78]-32 | Report #49 | Date: 2020-12-07"`. Rather than
+guess at an oilfield operation, it guesses at what *kind of document*
+would contain a bare project name and report number — and lands on "an
+online forum or discussion board post," which is a reasonable guess for
+generic internet text and a completely wrong one for a daily drilling
+report.
 
-**Result:** ...
-
-**Why:** the training/eval data shows:
-
-- "..."
-- "..."
-
-but never shows "...".
-
-**Lesson:** ...
+**Lesson:** this base model doesn't just lack this well's facts — it
+doesn't yet recognize the *shape* of the document it's being asked
+about. That's a second, deeper gap fine-tuning has to close, beyond
+memorizing individual report values.
 :::
 
 ## Challenge exercise
 
-🟠 **Intermediate** <!-- escalate to 🔴 Advanced per rule 11 if warranted -->
+🟠 **Intermediate**
 
-<!-- A harder, more open-ended extension for readers who want to go
-further. No solution is provided in the main text; a reference solution
-lives in the companion repository under `code/chapter_NN/challenge/`. -->
-
-**Challenge:** ...
+**Challenge:** `baseline_prompting.py` only ever gives the model each
+report's metadata, never its actual text — so `0/18` mostly proves the
+model has no way to know the answer, not that fine-tuning is the only
+possible fix. Extend the harness to include each report's full extracted
+text (from Chapter 2's `extract_text()`) alongside the question, and
+re-measure the match rate. A reference solution is at
+`code/chapter_03/challenge/challenge.py` — on a real run, it scores
+`6/18`, up from `0/18`, but still well short of perfect: even reading the
+report directly, this small base model doesn't reliably reproduce its
+exact wording. Keep that number in mind for Chapter 9, which combines
+fine-tuning with exactly this kind of retrieved context.
 
 ## Key takeaways
 
-- Takeaway 1
-- Takeaway 2
-- Takeaway 3
+- A baseline is only useful if it's fixed and reproducible: same
+  questions, same withheld answers, saved results, every time.
+- This chapter's baseline questions are Chapter 2's real training
+  examples, with the `output` withheld — not a separate, invented test
+  set.
+- On this book's sample archive, the unmodified base model scores
+  `0/18` on exact-match — not because it hallucinates wildly, but
+  because it correctly (and unhelpfully) admits it wasn't given the
+  report's content.
+- `matched_expected` is a deliberately crude, honest scoring rule.
+  Chapter 11 builds something more forgiving; this chapter's harness
+  exists so there's a saved, comparable number to build on.
 
 ## Repository files
 
-<!-- Exact paths in the companion repo relevant to this chapter. -->
-
 | File | Purpose |
 |---|---|
-| `code/chapter_03/baseline_prompting.py` | ... |
-| `datasets/...` | ... |
+| `code/chapter_03/baseline_prompting.py` | Builds baseline questions from Chapter 2's training examples, runs the base model, saves results |
+| `code/chapter_03/challenge/challenge.py` | Reference solution: re-runs the same questions with each report's full text included |
+| `datasets/training_examples/baseline_results.jsonl` | Generated output (not committed — regenerate by running the script) |
 | `notebooks/chapter_03_explore.ipynb` | Interactive companion notebook |
 
-<!-- Rule 12: CHECKPOINT + WHAT YOU BUILT, together, here. -->
-
 ::: {.callout-caution title="CHECKPOINT — Chapter 3"}
-- [x] Skill 1 gained this chapter, phrased as something done, not learned
-- [x] Skill 2
-- [x] Skill 3
+- [x] Turned Chapter 2's training examples into baseline questions with
+      the answer withheld
+- [x] Ran the base model against all 18 questions and saved every answer
+- [x] Measured a real, reproducible baseline score (`0/18`) to compare
+      Chapter 5's fine-tuned model against
 :::
 
 ::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}
-**`artifact_name.py`** — one or two sentences naming the concrete artifact
-and what it hands off to the next chapter.
+**`baseline_prompting.py`** — runs the unmodified base model against
+Chapter 2's 18 training examples with every answer hidden, and saves the
+results to `datasets/training_examples/baseline_results.jsonl`.
+Chapter 5 reruns this same harness against the fine-tuned model and
+compares scores directly.
 :::
 
 ## What can you do now that you couldn't do before?
 
-<!-- One or two sentences of concrete new capability, following rule 8
-above. Not a theory recap — a plain statement of what the reader can now
-do that they couldn't before this chapter. -->
+You can produce a fixed, reproducible number for exactly how well the
+base model performs on your own training questions — something to point
+to, not just a feeling — and you have it saved to a file Chapter 5 will
+compare against directly.
 
 ## Suggested next step
 
-<!-- Rule 13: open with a bolded "Coming up in Chapter N+1:" line, then
-one paragraph bridging to the next chapter: what limitation of today's
-artifact motivates tomorrow's work? -->
-
-**Coming up in Chapter N+1:** ...
+**Coming up in Chapter 4:** fine-tuning (Chapter 5) works by adjusting
+how the model represents text internally — but "text" isn't what a
+model actually reads. Chapter 4 opens up tokenization and embeddings,
+the layer underneath every prompt this chapter sent, so LoRA fine-tuning
+doesn't feel like a black box when you get there.
