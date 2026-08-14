@@ -18,6 +18,7 @@ dependencies:
       - trl==0.12.0
       - datasets==3.1.0
       # bitsandbytes: Linux + NVIDIA GPU only -- see requirements.txt note.
+      - pdfplumber==0.11.9
       - sentencepiece==0.2.0
       - sentence-transformers==3.1.1
       - faiss-cpu==1.8.0.post1

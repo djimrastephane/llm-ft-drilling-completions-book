@@ -1,10 +1,19 @@
 # Fine-Tuning Local LLM for Drilling & Completions
 
-> **Status: early draft.** Part 0 is written; Chapters 1–13 are still
-> placeholders. This README describes the planned book so the structure
-> below makes sense as it fills in. See [RELEASE.md](RELEASE.md) /
-> [CHANGELOG.md](CHANGELOG.md) for what actually exists at any point in
-> time.
+[![Code tests Linux](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-linux.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-linux.yml)
+[![Code tests macOS](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml)
+[![Code tests Windows](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-windows.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-windows.yml)
+[![Publish book to GitHub Pages](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml)
+
+> **Status: early draft.** Part 0 and Chapters 1–3 are written; Chapters
+> 4–13 are still placeholders. This README describes the planned book so
+> the structure below makes sense as it fills in. See
+> [RELEASE.md](RELEASE.md) / [CHANGELOG.md](CHANGELOG.md) for what
+> actually exists at any point in time.
+>
+> The "Publish book to GitHub Pages" workflow is manual-only
+> (`workflow_dispatch`) until more chapters are drafted — its badge
+> reflects the last manual run, not every push to `main`.
 
 This repository will contain the chapters, code, and training data for
 **Fine-Tuning Local LLM for Drilling & Completions** — a hands-on,

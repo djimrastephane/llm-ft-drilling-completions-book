@@ -1,10 +1,10 @@
 name: Publish book to GitHub Pages
 
+# Manual only for now: this book still has placeholder-only chapters
+# (4-13) in its nav, so publishing isn't triggered by every push to main
+# yet. Run this from the Actions tab (or `gh workflow run publish.yml`)
+# once you're ready for the book to be publicly browsable.
 on:
-  push:
-    branches: [main]
-    paths:
-      - "book/**"
   workflow_dispatch:
 
 permissions:
@@ -17,6 +17,25 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # quarto-actions/publish's gh-pages target requires the branch to
+      # already exist on the remote -- it doesn't create one for you (see
+      # https://github.com/quarto-dev/quarto-actions/blob/main/publish/action.yml).
+      # This makes that a one-time, self-healing step instead of a manual
+      # `quarto publish gh-pages` a human has to remember to run first.
+      - name: Ensure gh-pages branch exists
+        run: |
+          if ! git ls-remote --exit-code --heads origin gh-pages > /dev/null 2>&1; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git checkout --orphan gh-pages
+            git rm -rf . > /dev/null 2>&1 || true
+            git commit --allow-empty -m "Initialize gh-pages branch"
+            git push origin gh-pages
+            git checkout main
+          fi
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
