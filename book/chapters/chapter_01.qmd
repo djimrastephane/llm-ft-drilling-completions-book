@@ -92,14 +92,17 @@ current standards, which is exactly why it's usable without a GPU;
 Chapter 5 revisits this size trade-off when you fine-tune it.
 
 ::: {.callout-tip title="Engineering Translation: pretraining"}
-**Pretraining** is the process that produced Qwen2.5-1.5B-Instruct in
-the first place — reading a huge amount of general text and adjusting
-every one of its 1.5 billion numbers, over and over, until it can write
-fluent, grammatical, sensibly-reasoned language and follow
-instructions. That's a separate, much bigger job than anything this
-book does. **Fine-tuning** — this book's whole subject, starting in
-Chapter 5 — takes a model that's already been through that process and
-adjusts it further, on a much smaller amount of your own text.
+Getting to "Qwen2.5-1.5B-Instruct" from nothing takes more than one
+stage, both far bigger jobs than anything this book does.
+**Pretraining** reads a huge amount of general text and adjusts every
+one of the model's 1.5 billion numbers, over and over, until it can
+write fluent, grammatical, sensibly-reasoned language. A further stage
+— instruction tuning, the reason for the `-Instruct` in the name — then
+trains it specifically to follow prompts and hold a conversation,
+rather than just continue a piece of text. **Fine-tuning** — this
+book's whole subject, starting in Chapter 5 — takes a model that's
+already been through both of those stages and adjusts it further, on a
+much smaller amount of your own text.
 :::
 
 ## Why not train a model from scratch on our own reports?
@@ -118,9 +121,12 @@ every well, every year, is nowhere near enough text on its own to teach
 a model language itself, let alone your domain on top of it. Fine-tuning
 sidesteps that problem entirely: it starts from a model that has
 already learned to read, write, and reason, and only asks it to learn
-one more, much narrower thing — how *this* operation talks and what its
-reports actually say. That's a small enough job to do on a laptop,
-which training a model from scratch never would be.
+one more, much narrower thing — how *this* operation talks: its
+shorthand, its sequencing, the shape of its reports. That's a small
+enough job to do on a laptop, which training a model from scratch never
+would be. It's also a different job from memorizing every fact in the
+archive — Chapter 3 covers that distinction directly, and Chapter 5
+measures exactly where fine-tuning alone does and doesn't get there.
 
 ## Why not just use a cloud AI assistant?
 

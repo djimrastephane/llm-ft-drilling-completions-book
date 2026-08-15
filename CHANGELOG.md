@@ -239,3 +239,14 @@ highlights in narrative form.
   of updating the whole model?" (that's full vs. parameter-efficient
   fine-tuning of an already-pretrained model; this is pretrained vs.
   from-scratch in the first place).
+- That new "pretraining" callout conflated pretraining with instruction
+  tuning, crediting pretraining alone with teaching the model to
+  "follow instructions" -- technically two separate stages (the second
+  is the reason for the `-Instruct` in the model's name). Split them
+  out explicitly. Separately, "how this operation talks and what its
+  reports actually say" overclaimed fine-tuning's reliability at exact
+  factual recall, contradicting Chapter 3's "when fine-tuning is, and
+  is not, the right tool" and Chapter 5's own measured result (`0/50`
+  exact-match at scale). Narrowed to what fine-tuning actually teaches
+  reliably -- vocabulary, sequencing, report shape -- with a forward
+  pointer to where the factual-recall distinction is actually covered.
