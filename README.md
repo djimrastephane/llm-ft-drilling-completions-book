@@ -1,60 +1,122 @@
 # Fine-Tuning Local LLM for Drilling & Completions
 
-[![Code tests Linux](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-linux.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-linux.yml)
-[![Code tests macOS](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml)
-[![Code tests Windows](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-windows.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-windows.yml)
-[![Publish book to GitHub Pages](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml)
+**First time here? Jump straight to [Start Here](#start-here).**
 
-> **Status: in progress.** Part 0 and Chapters 1–9 are written, tested,
-> and passing CI on Linux/macOS/Windows; Chapters 10–13 are still
-> placeholders. Every quoted number in Chapters 1–9 comes from a real,
-> reproducible run of this repository's own code — see
-> [RELEASE.md](RELEASE.md) / [CHANGELOG.md](CHANGELOG.md) for the full
-> history of what's landed.
->
-> The "Publish book to GitHub Pages" workflow is manual-only
-> (`workflow_dispatch`) until the remaining chapters are drafted — its
-> badge reflects the last manual run, not every push to `main`.
-
-This repository will contain the chapters, code, and training data for
+This repository contains the chapters, code, and training data for
 **Fine-Tuning Local LLM for Drilling & Completions** — a hands-on,
 build-as-you-go book that teaches drilling and completions engineers how
 to fine-tune and run a private, local large language model on their own
 operational data, assuming zero prior programming or machine-learning
 experience.
 
-It follows the same build-as-you-go structure as the author's previous
-book, [*Building Industrial RAG Systems from Daily Drilling
-Reports*](https://github.com/djimrastephane/ddr-rag-book) (`ddr-rag-book`):
-a Quarto book, one chapter at a time, each shipping runnable code, tests,
-and exercises — but this time the destination is a small, fine-tuned
-language model that runs entirely on your own machine, not a retrieval
-pipeline over a document archive.
+In *Fine-Tuning Local LLM for Drilling & Completions*, you build a
+working, fine-tuned local model from scratch, one chapter at a time:
+loading a general-purpose open-weight model, turning real reports into
+training data, measuring exactly what the base model gets wrong, running
+your first LoRA fine-tune, then hardening that prototype at scale —
+checkpointing, data quality gates, and pairing it with retrieval for
+grounded, citable answers — no cloud training service, no black-box
+trainer, no data leaving your machine.
 
-Part II's "industrializing" chapters (6–13: data quality gates, evidence
-traceability, evaluation, drift detection, continuous retraining) are
-informed by the author's private companion project
-[`industrial-ddr-finetuning`](https://github.com/djimrastephane/industrial-ddr-finetuning),
-which already runs a schema-v2 extraction pipeline (per-field status,
-verbatim evidence spans, automated validation, and a review workflow)
-over this same Utah FORGE archive. That repo is private (its `raw_data/`
-mirrors the same public PDFs used here); this book's Part II chapters
-teach the underlying techniques from scratch rather than depending on it.
+Every example uses real, publicly available Daily Drilling Reports from
+**Utah FORGE** — a Department of Energy-funded geothermal research well —
+not synthetic stand-ins. A real stuck-pipe event, a real report the
+fine-tuned model never trained on, and a real held-out generalization
+result all appear exactly as they came out of this book's own code.
+
+### Why Not Just Prompt a Cloud AI Assistant?
+
+A fair question before installing anything: ChatGPT, Claude, and similar
+hosted assistants already run instruction-tuned models capable of a
+fluent conversation. Why bother loading, and then fine-tuning, your own?
+
+Because a hosted assistant never actually learns your operation. Ask
+`Qwen2.5-1.5B-Instruct` — the small, general-purpose model this book
+starts from — about a real report from its own archive, and it answers
+fluently and confidently about nothing in particular. A real report from
+this book's sample archive says: *"During the slide lost tool face and
+became stuck."* Asked what the crew should watch for on the next curve
+section, the untouched base model replies:
+
+```
+Based on the information provided in the driller's report that "during
+the slide lost tool face and became stuck," it suggests that there was
+an issue with the drill bit or other tools getting caught during the
+descent of the drill string...
+
+1. Tool Catching: The drill bit or any attached tools may have become
+   entangled due to debris, mud cake buildup, or other obstructions.
+2. Drill String Configuration: There might be a misalignment or
+   improper configuration of the drill string...
+```
+
+"Trip out of hole" — basic, everyday oilfield terminology — is treated
+like an English idiom the model has to guess at, because its general
+training data apparently didn't include enough real oilfield operational
+text to have learned it. A hosted API can't fix that either: you're
+given access to someone else's model, not the weights themselves, so
+there's nothing to fine-tune (Chapter 1 covers this in more depth).
+There's also a data question a hosted assistant forces on you that a
+local model doesn't — every prompt, and every report excerpt you paste
+into it, leaves your machine, and real drilling and completions reports
+are usually confidential.
+
+This book fixes both problems: it fine-tunes a small local model
+directly on your own reports, chapter by chapter (Chapter 5 onward). And
+because fine-tuning alone is a weak tool for citing an exact source —
+Chapter 8 measured that weakness directly, `0/50` exact-match on its own
+training sample — Chapter 9 pairs it with real retrieval so the final
+answer comes back grounded and traceable to the report it came from.
 
 ### What You're Building
 
-Starting from a general-purpose local model that answers drilling and
-completions questions generically (or gets the shorthand and the
-operational context wrong), you fine-tune it — chapter by chapter — into a
-model that has actually learned your domain's language, reports, and
-judgment calls. No cloud training service, no proprietary API, no data
-leaving your machine: every chapter runs against models and hardware you
-control.
+The box below is a **real, verified transcript from Chapter 9's own
+code** — not an illustration, and not something invented for this
+README. Report `#37` is the one report this book's fine-tuned model
+never saw during training (Chapter 2 held it out on purpose). Asked what
+happened on that report's `20:30–21:30` window:
+
+```
+Without retrieval (fine-tuned model alone):
+  Production Casing Run Csg & Cement Rig up casing
+
+With retrieval (Chapter 9's hybrid system):
+  Trip out of hole with BHA #18. Stop at 5,800' and circulate to cool
+  hole and tools.
+  Source: Report #37, 20:30-21:30
+```
+
+The first answer is fluent, plausible, and wrong — a pattern borrowed
+from a different report entirely. The second is close to word-for-word
+what report `#37` actually says, found by a real keyword-retrieval index
+built over the archive and handed to the fine-tuned model as grounding
+text before it answered. Nothing about report `#37` was in the training
+data; only the retrieval step was.
+
+That's the destination — and, just as importantly, this book doesn't
+stop at the win. Chapter 5 shows the same honest picture when the fix
+*isn't* in place yet: fine-tuning alone lifted training-set recall from
+`0/16` to `13/16`, while held-out generalization stayed exactly at
+`0/2`. Real, working code, and the real limitations that motivate the
+next chapter — not a happy path with the failures edited out.
 
 - Link to the [official source code repository](https://github.com/djimrastephane/llm-ft-drilling-completions-book)
 - License: code is [MIT](LICENSE); the book's text is [CC BY 4.0](LICENSE-CONTENT.md)
+- Progress: Part 0 and Chapters 1–9 are written, tested, and passing CI;
+  Chapters 10–13 are still placeholders. See
+  [CHANGELOG.md](CHANGELOG.md) for the full history of what's landed and
+  why, and [RELEASE.md](RELEASE.md) for per-release highlights — there's
+  no tagged release yet.
+- The book isn't published to GitHub Pages yet — the "Publish book to
+  GitHub Pages" workflow (badge below) is manual-only until the
+  remaining chapters are drafted. Read written chapters directly as
+  `.qmd` source under [`book/chapters/`](book/chapters), or render the
+  whole book locally with `quarto render` (see Quickstart in
+  [`book/README.md`](book/README.md)).
 
-To get a copy of this repository, click the [Download ZIP](https://github.com/djimrastephane/llm-ft-drilling-completions-book/archive/refs/heads/main.zip) button, or run the following in a terminal:
+To get a copy of this repository, click the [Download
+ZIP](https://github.com/djimrastephane/llm-ft-drilling-completions-book/archive/refs/heads/main.zip)
+button, or run the following in a terminal:
 
 ```bash
 git clone https://github.com/djimrastephane/llm-ft-drilling-completions-book.git
@@ -64,30 +126,56 @@ Never used a terminal or Git before? That's exactly what **Start Here**
 and **Part 0** below are for — nothing past this point assumes you
 already know how.
 
+### Project Map
+
+A few things share the name "FORGE" or connect to a companion project in
+this book — worth telling apart before you start:
+
+| Piece | What it is | Where it's used |
+|---|---|---|
+| Ten-report sample archive | `book/datasets/sample_training_set/`, committed in this repo | The main path through Chapters 1–5 |
+| 76-report full Utah FORGE archive | `book/datasets/full_training_set/`, committed in this repo | Scale exercises from Chapter 6 onward |
+| Companion app | `book/app/`, in this repo | Planned base-vs-fine-tuned UI — not implemented yet, see [`book/app/README.md`](book/app/README.md) |
+| Companion project (`industrial-ddr-finetuning`) | A separate, private repository | Referenced for real numbers/technique in Part II; not required to follow the book |
+| Your own report archive | Not included — it's yours | The adaptation path after you finish the book |
+
+Everything in the first two rows runs from this one repository. The
+fourth is optional and lives elsewhere — see **Companion Pipeline**
+below.
+
 ---
 
 # Start Here
 
-This README has one job: get you to successfully complete Part 0 and
-into Chapter 1. If this is your first Python project, do these steps in
-order:
+This README has one job: get you to successfully run Chapter 1.
+Everything else in this file is reference material for later.
+
+If this is your first Python project, do these steps in order:
 
 1. Read [Part 0: Preparing Your Local LLM Workshop](book/chapters/chapter_00.qmd) — installs Python, clones this repository, and gets your environment ready. No prior experience assumed.
-2. Run `setup_check.py` — one command that confirms everything is working.
-3. Continue to [Chapter 1: Loading and Running Your First Local LLM](book/chapters/chapter_01.qmd) — load a real open-weight model and generate your first answer, entirely on your own machine.
-4. Keep going through Chapter 9 (see the [Table of Contents](#table-of-contents) below) — each chapter builds directly on the last one's saved output.
+2. Run `setup_check.py` — one command that confirms everything is working before you touch a real model.
+3. Work through [Chapter 1: Loading and Running Your First Local LLM](book/chapters/chapter_01.qmd) — load a real open-weight model on your own machine, and watch it get real oilfield shorthand wrong (see "Why Not Just Prompt a Cloud AI Assistant?" above).
+4. Continue sequentially through Chapter 9 — each chapter builds on the last one's saved output: a training example, a baseline result, a checkpoint, or a retrieval index.
+5. Chapters 10–13 aren't written yet — [CHANGELOG.md](CHANGELOG.md) and the [Table of Contents](#table-of-contents) below track progress.
 
 | Step | Typical time |
 |---|---|
-| Part 0 | ~30–45 minutes |
-| Chapters 1–9, typing every example | several hours across multiple sessions — Chapters 5 and 8 each include a real fine-tuning run (~5 min and ~30 min on CPU) |
+| Part 0 | 30–45 min |
+| Chapter 1 | 20–30 min |
+| Chapter 2 | 30–40 min |
+| Chapter 3 | 20–30 min |
 
-You don't need to understand everything before you start — you need to
-run the first command. Everything else follows from there.
+See [How Long Does Each Chapter Take](#how-long-does-each-chapter-take)
+below for the full breakdown through Chapter 9. You don't need to
+understand everything before you start — you need to run the first
+command. Everything else follows from there.
 
 ---
 
 # Your Learning Journey
+
+Each arrow below is one or more chapters of real, working code — not a
+diagram of what's theoretically possible.
 
 ```
 Base Local LLM
@@ -107,23 +195,26 @@ Hybrid Fine-Tuning + Retrieval
 Traceable, Evaluated, Continuously Updated Model
 ```
 
+By the last arrow, you're not reading about fine-tuning — you built a
+working system yourself, and you understand every piece of it.
+
 ## What You Will Build and Learn
 
-Chapters 1–9 (below) already do this, for real, against this book's own
-Utah FORGE archive — Chapters 10–13 are still planned. By the end of the
-finished book you should be able to:
+By the end of Chapters 1–9 you will have built seven real, working
+artifacts — not seven topics you read about:
 
-- Run a general-purpose local LLM and evaluate its out-of-the-box
-  answers to drilling and completions questions ✅
-- Turn raw drilling and completions reports into a training dataset ✅
-- Run a first parameter-efficient (LoRA) fine-tune of a local model ✅
-- Apply data quality gates to training data before fine-tuning ✅
-- Fine-tune at scale with checkpointing and experiment tracking ✅
-- Combine a fine-tuned model with retrieval (hybrid RAG + fine-tuning) ✅
-- Evaluate a fine-tuned model's quality and detect hallucinations
-  (planned — Chapters 10–11)
-- Detect drift across model versions and keep the model current as new
-  reports arrive (planned — Chapters 12–13)
+- ✓ **Local model loading and inference script** — run a general-purpose local LLM and evaluate its out-of-the-box answers to drilling and completions questions
+- ✓ **Domain training-example builder** — turn raw drilling and completions reports into a training dataset
+- ✓ **Baseline prompting harness** — measure exactly, and reproducibly, what the base model gets wrong before you touch it
+- ✓ **First LoRA fine-tune** — a real, working parameter-efficient fine-tune, with an honest held-out generalization result
+- ✓ **Data quality gate** — catch bad training data before it ever reaches fine-tuning
+- ✓ **Checkpointed fine-tune at scale** — real experiment tracking and resumable checkpoints, no black-box trainer
+- ✓ **Hybrid fine-tuning + retrieval system** — grounded, citable answers, demonstrated above
+
+By the end of the finished book you'll also be able to:
+
+- Evaluate a fine-tuned model's quality and detect hallucinations (planned — Chapters 10–11)
+- Detect drift across model versions and keep the model current as new reports arrive (planned — Chapters 12–13)
 
 ## Who This Book Is For
 
@@ -152,6 +243,23 @@ This book is probably not for you if:
 None of that is a criticism — it just means your time is better spent
 elsewhere.
 
+## Reader Contract
+
+- **Part I** (Chapters 1–5) builds a working, fine-tuned prototype
+  against the ten-report sample archive, including an honest measurement
+  of where a small fine-tune does and doesn't generalize.
+- **Part II** (Chapters 6–13) hardens that prototype against industrial
+  failure modes: data quality gating, formatting and chunking at scale,
+  checkpointed fine-tuning with experiment tracking, hybrid retrieval,
+  traceability, evaluation, drift detection, and continuous retraining.
+- Some of Part II's chapters are informed by the author's separate,
+  private companion project `industrial-ddr-finetuning`, not by this
+  repository's own code — each chapter says so where it applies.
+- This book teaches an inspectable, from-scratch architecture and
+  working components — not a full enterprise deployment with
+  authentication, monitoring, permissions, governance, or support
+  operations.
+
 ## Expected Background
 
 **Helpful:**
@@ -168,6 +276,31 @@ elsewhere.
 - software engineering
 - Git
 - Linux
+
+## How Long Does Each Chapter Take
+
+| Chapter | Typical time |
+|---|---|
+| Part 0 | 30–45 min |
+| Chapter 1 | 20–30 min |
+| Chapter 2 | 30–40 min |
+| Chapter 3 | 20–30 min |
+| Chapter 4 | 30–40 min |
+| Chapter 5 | 45–60 min |
+| Chapter 6 | 30–40 min |
+| Chapter 7 | 30–40 min |
+| Chapter 8 | 45–60 min |
+| Chapter 9 | 45–60 min |
+| Chapter 10* | 30–40 min |
+| Chapter 11* | 30–40 min |
+| Chapter 12* | 30–40 min |
+| Chapter 13* | 45–60 min |
+
+\* Chapters 10–13 aren't written yet — these are provisional estimates
+from the repository scaffold, not a written chapter's own measurement.
+
+There's no need to do this in one sitting — most readers spread it
+across several days, a chapter or two at a time.
 
 ## Minimum Computer Requirements
 
@@ -187,69 +320,139 @@ elsewhere.
 
 **No cloud account required. No paid API required.** Everything in this
 book is designed to run locally, using small open-weight models and
-parameter-efficient fine-tuning (LoRA/QLoRA) so a single consumer GPU — or
-patience, on CPU — is enough.
+parameter-efficient fine-tuning (LoRA/QLoRA) so a single consumer GPU —
+or patience, on CPU — is enough.
 
 ## Choose Your Workshop
 
 | Environment | Recommended for |
 |---|---|
-| Jupyter Notebook | Learning and experimentation |
-| VS Code | General coding |
-| PyCharm Community | Larger projects |
-| Positron | Data science workflows |
-| Terminal only | Minimal setup |
+| [Jupyter Notebook](book/appendix/appendix_a1_jupyter.qmd) | Learning and experimentation |
+| [VS Code](book/appendix/appendix_a2_vscode.qmd) | General coding |
+| [PyCharm Community](book/appendix/appendix_a3_pycharm.qmd) | Larger projects |
+| [Positron](book/appendix/appendix_a4_positron.qmd) | Data science workflows |
+| [Terminal only](book/appendix/appendix_a5_terminal.qmd) | Minimal setup |
 
-[Part 0](book/chapters/chapter_00.qmd) covers general setup, with a
-short dedicated walkthrough for each option in Appendices A1–A5,
-mirroring the previous book.
+**There is no wrong choice. All examples run identically in every one of
+these.** [Part 0](book/chapters/chapter_00.qmd) covers general setup;
+each link above has a short, dedicated walkthrough for that specific
+tool.
+
+## First Success Checkpoint
+
+You are ready for Chapter 1 when:
+
+- ✅ Python runs
+- ✅ `setup_check.py` runs successfully
+- ✅ the sample training set exists in `book/datasets/sample_training_set/`
+- ✅ your virtual environment is active
+
+All four checks are covered in Part 0 — if any of them aren't true yet,
+that's exactly what it's for.
+
+## Common Reader Journeys
+
+**"I am a drilling or completions engineer with no coding experience."**
+→ Start with Part 0 and proceed sequentially, one chapter at a time.
+
+**"I already know Python."**
+→ Skip Part 0 and start directly at Chapter 1.
+
+**"I already fine-tune LLMs professionally."**
+→ Skim Part I for context — it's short, and Chapter 5's held-out result
+is worth knowing before Part II — then start at Chapter 6, where data
+quality gating, checkpointing at scale, and hybrid retrieval are
+covered.
+
+## What Makes This Book Different
+
+- Uses real drilling and completions reports rather than synthetic examples
+- Uses public, DOE-funded operational data — no confidentiality concerns, nothing invented
+- Assumes zero programming or machine-learning experience
+- Trains with a manual PyTorch loop, not a black-box trainer, so every step is inspectable
+- Reports honest negative results (`0/50` exact-match, `0/2` held-out generalization) instead of only showing successes
+- Teaches industrial constraints (data quality gating, checkpointing at scale, hybrid retrieval, traceability) rather than a toy happy path
 
 ---
 
 # Table of Contents
 
 Part 0 and Chapters 1–9 are written, tested, and passing CI; Chapters
-10–13 are still placeholders. For the full repository layout (folder
-tree, part/chapter file map) see [`book/README.md`](book/README.md).
+10–13 are still placeholders. This repository's `.qmd` chapter files are
+Quarto Markdown — GitHub's file viewer shows them as plain unformatted
+source, since there's no published GitHub Pages site yet (see
+"Progress" above). For the full repository layout (folder tree,
+part/chapter file map) see [`book/README.md`](book/README.md).
 
 [![Publish book to GitHub Pages](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml)
 [![Code tests Linux](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-linux.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-linux.yml)
 [![Code tests Windows](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-windows.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-windows.yml)
 [![Code tests macOS](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml)
 
-| Status | Chapter | Artifact |
-|---|---|---|
-| ✅ | [Part 0: Preparing Your Local LLM Workshop](book/chapters/chapter_00.qmd) | environment + hardware check (`setup_check.py`) |
-| ✅ | [Ch 1: Loading and Running Your First Local LLM](book/chapters/chapter_01.qmd) | `code/chapter_01/load_local_model.py` |
-| ✅ | [Ch 2: Turning Drilling & Completions Reports into Training Examples](book/chapters/chapter_02.qmd) | `code/chapter_02/build_training_examples.py` |
-| ✅ | [Ch 3: Baseline Prompting — What the Model Gets Wrong Before Fine-Tuning](book/chapters/chapter_03.qmd) | `code/chapter_03/baseline_prompting.py` |
-| ✅ | [Ch 4: Tokenization and Embeddings for Domain Fine-Tuning](book/chapters/chapter_04.qmd) | `code/chapter_04/tokenize_and_embed.py` |
-| ✅ | [Ch 5: Your First LoRA Fine-Tune](book/chapters/chapter_05.qmd) | `code/chapter_05/first_lora_finetune.py` |
-| ✅ | [Ch 6: A Data Quality Gate for Training Data](book/chapters/chapter_06.qmd) | `code/chapter_06/data_quality_gate.py` |
-| ✅ | [Ch 7: Formatting and Chunking a Training Set at Scale](book/chapters/chapter_07.qmd) | `code/chapter_07/format_training_chunks.py` |
-| ✅ | [Ch 8: Fine-Tuning at Scale — Checkpoints and Experiment Tracking](book/chapters/chapter_08.qmd) | `code/chapter_08/finetune_at_scale.py` |
-| ✅ | [Ch 9: Hybrid System — Combining Fine-Tuning with Retrieval](book/chapters/chapter_09.qmd) | `code/chapter_09/hybrid_rag_finetune.py` |
-| — | Ch 10: Traceable Outputs and Hallucination Mitigation | `code/chapter_10/traceable_outputs.py` |
-| — | Ch 11: Evaluating a Fine-Tuned Domain Model | `code/chapter_11/eval_finetuned_model.py` |
-| — | Ch 12: Detecting Drift Across Model Versions | `code/chapter_12/detect_model_drift.py` |
-| — | Ch 13: Continuous Fine-Tuning — Keeping the Model Current | `code/chapter_13/continuous_finetune.py` |
-| ✅ | Appendix A: Environment Setup | — |
-| ✅ | Appendices A1–A5: Jupyter / VS Code / PyCharm / Positron / Terminal-only | — |
-| ✅ | [Appendix B: Drilling, Completions & Fine-Tuning Glossary](book/appendix/appendix_b_glossary.qmd) | — |
+The "Publish book to GitHub Pages" workflow is manual-only
+(`workflow_dispatch`) until the remaining chapters are drafted — its
+badge reflects the last manual run, not every push to `main`.
+
+| Status | Chapter | Main Code (Quick Access) | All Code + Supplementary |
+|---|---|---|---|
+| ✅ | [Part 0: Preparing Your Local LLM Workshop](book/chapters/chapter_00.qmd) | [setup_check.py](book/code/setup_check.py) | — |
+| ✅ | [Ch 1: Loading and Running Your First Local LLM](book/chapters/chapter_01.qmd) | - [load_local_model.py](book/code/chapter_01/load_local_model.py)<br/>- [chapter_01_explore.ipynb](book/notebooks/chapter_01_explore.ipynb) | [./book/code/chapter_01](book/code/chapter_01) |
+| ✅ | [Ch 2: Turning Drilling & Completions Reports into Training Examples](book/chapters/chapter_02.qmd) | - [build_training_examples.py](book/code/chapter_02/build_training_examples.py)<br/>- [chapter_02_explore.ipynb](book/notebooks/chapter_02_explore.ipynb) | [./book/code/chapter_02](book/code/chapter_02) |
+| ✅ | [Ch 3: Baseline Prompting — What the Model Gets Wrong Before Fine-Tuning](book/chapters/chapter_03.qmd) | - [baseline_prompting.py](book/code/chapter_03/baseline_prompting.py)<br/>- [chapter_03_explore.ipynb](book/notebooks/chapter_03_explore.ipynb) | [./book/code/chapter_03](book/code/chapter_03) |
+| ✅ | [Ch 4: Tokenization and Embeddings for Domain Fine-Tuning](book/chapters/chapter_04.qmd) | - [tokenize_and_embed.py](book/code/chapter_04/tokenize_and_embed.py)<br/>- [chapter_04_explore.ipynb](book/notebooks/chapter_04_explore.ipynb) | [./book/code/chapter_04](book/code/chapter_04) |
+| ✅ | [Ch 5: Your First LoRA Fine-Tune](book/chapters/chapter_05.qmd) | - [first_lora_finetune.py](book/code/chapter_05/first_lora_finetune.py)<br/>- [chapter_05_explore.ipynb](book/notebooks/chapter_05_explore.ipynb) | [./book/code/chapter_05](book/code/chapter_05) |
+| ✅ | [Ch 6: A Data Quality Gate for Training Data](book/chapters/chapter_06.qmd) | - [data_quality_gate.py](book/code/chapter_06/data_quality_gate.py)<br/>- [chapter_06_explore.ipynb](book/notebooks/chapter_06_explore.ipynb) | [./book/code/chapter_06](book/code/chapter_06) |
+| ✅ | [Ch 7: Formatting and Chunking a Training Set at Scale](book/chapters/chapter_07.qmd) | - [format_training_chunks.py](book/code/chapter_07/format_training_chunks.py)<br/>- [chapter_07_explore.ipynb](book/notebooks/chapter_07_explore.ipynb) | [./book/code/chapter_07](book/code/chapter_07) |
+| ✅ | [Ch 8: Fine-Tuning at Scale — Checkpoints and Experiment Tracking](book/chapters/chapter_08.qmd) | - [finetune_at_scale.py](book/code/chapter_08/finetune_at_scale.py)<br/>- [chapter_08_explore.ipynb](book/notebooks/chapter_08_explore.ipynb) | [./book/code/chapter_08](book/code/chapter_08) |
+| ✅ | [Ch 9: Hybrid System — Combining Fine-Tuning with Retrieval](book/chapters/chapter_09.qmd) | - [hybrid_rag_finetune.py](book/code/chapter_09/hybrid_rag_finetune.py)<br/>- [chapter_09_explore.ipynb](book/notebooks/chapter_09_explore.ipynb) | [./book/code/chapter_09](book/code/chapter_09) |
+| — | Ch 10: Traceable Outputs and Hallucination Mitigation | [traceable_outputs.py](book/code/chapter_10/traceable_outputs.py) | [./book/code/chapter_10](book/code/chapter_10) |
+| — | Ch 11: Evaluating a Fine-Tuned Domain Model | [eval_finetuned_model.py](book/code/chapter_11/eval_finetuned_model.py) | [./book/code/chapter_11](book/code/chapter_11) |
+| — | Ch 12: Detecting Drift Across Model Versions | [detect_model_drift.py](book/code/chapter_12/detect_model_drift.py) | [./book/code/chapter_12](book/code/chapter_12) |
+| — | Ch 13: Continuous Fine-Tuning — Keeping the Model Current | [continuous_finetune.py](book/code/chapter_13/continuous_finetune.py) | [./book/code/chapter_13](book/code/chapter_13) |
+| ✅ | Appendix A: Environment Setup | — | [./book/appendix](book/appendix) |
+| ✅ | Appendices A1–A5: Jupyter / VS Code / PyCharm / Positron / Terminal-only | — | [./book/appendix](book/appendix) |
+| ✅ | [Appendix B: Drilling, Completions & Fine-Tuning Glossary](book/appendix/appendix_b_glossary.qmd) | — | [appendix_b_glossary.qmd](book/appendix/appendix_b_glossary.qmd) |
 
 Every ✅ chapter ships with working, tested code and a companion
 notebook — see [Automated Tests](#automated-tests) below. Every quoted
 number in a ✅ chapter comes from an actual run of that chapter's own
 code against this repository's real Utah FORGE archive, not an
-estimate.
+estimate. A few examples: Chapter 6's data quality gate found `75/76`
+reports pass extraction with `6` duplicate field-value groups; Chapter
+8's "at scale" fine-tune measured training loss falling `2.755 → 2.164 →
+1.821` across 3 real epochs; Chapter 9 measured BM25 keyword retrieval
+finding the correct source report `4/4` times on real test queries,
+against `3/4` for dense sentence embeddings.
+
+## Companion Pipeline
+
+[`industrial-ddr-finetuning`](https://github.com/djimrastephane/industrial-ddr-finetuning)
+is a separate, private repository: a real, working schema-v2 extraction
+pipeline (per-field status, verbatim evidence spans, automated
+validation, review workflow) built against this book's same public Utah
+FORGE archive, which Chapters 6, 9, and 10 in particular reference for
+verified real-world numbers and technique. This book's own code never
+depends on it — every chapter's script in `book/code/chapter_NN/` runs
+standalone against the committed sample or full archive under
+`book/datasets/`. The book's own implementations are written from
+scratch for teaching purposes, not copied from it.
+
+### What this becomes
+
+The companion pipeline applies the same fine-tuning, data-quality, and
+retrieval logic the book builds to the operator's full report archive at
+production scale — this book's chapters teach the underlying techniques
+standalone, at a scope one reader can run and inspect on their own
+machine.
 
 ## Companion App (planned)
 
 An optional Streamlit companion app is planned under
 [`book/app/`](book/app), reusing the book's own chapter code (base model
 loading, fine-tuning, and evaluation), to show a question answered
-side-by-side by the base model and the fine-tuned model. See
-[`book/app/README.md`](book/app/README.md) for current status.
+side-by-side by the base model and the fine-tuned model. Not implemented
+yet — see [`book/app/README.md`](book/app/README.md) for current status
+and the exact files it plans to reuse.
 
 ## Exercises
 
@@ -262,23 +465,38 @@ chapter's code under `book/code/chapter_NN/challenge/`.
 Every drafted chapter's real code is tested in
 [`book/tests/`](book/tests) — 52 tests across Chapters 1–9 as of this
 writing, run on Linux, Windows, and macOS on every push that touches
-`book/**` (badges at the top of this README).
+`book/**` (badges above). Run them yourself from the `book/` directory:
 
 ```bash
-cd book
 pip install -r requirements.txt
 pytest -v
 ```
 
-Chapters 5, 8, and 9 include tests marked `slow` (they load and
-generate from the real base model, and Chapter 8's fine-tuning tests
-take a few minutes) or that need a checkpoint from a previous chapter's
-script to already exist on disk (skipped automatically if it doesn't —
-see each test file's own docstring). Skip the slow ones locally with:
+Chapters 5, 8, and 9 include tests marked `slow` (they load and generate
+from the real base model, and Chapter 8's fine-tuning tests take a few
+minutes) or that need a checkpoint from a previous chapter's script to
+already exist on disk (skipped automatically if it doesn't — see each
+test file's own docstring). Skip the slow ones locally with:
 
 ```bash
 pytest -v -m "not slow"
 ```
+
+## Bonus Material
+
+Every written chapter ends with a **Repository files** table listing the
+exact files that back everything the chapter claims. A few worth knowing
+about on their own:
+
+- [`book/code/chapter_01/build_sample_training_set.py`](book/code/chapter_01/build_sample_training_set.py)
+  reproduces this book's curated 10-report sample archive from the full
+  76-report Utah FORGE archive.
+- Each chapter's **Field notes** callout is a real, independently
+  verified result checked against the actual archive before being
+  written down — not an illustrative estimate.
+- [`book/appendix/appendix_b_glossary.qmd`](book/appendix/appendix_b_glossary.qmd)
+  covers drilling, completions, and fine-tuning terminology used
+  throughout the book.
 
 ## Questions, Feedback, and Contributing to This Repository
 

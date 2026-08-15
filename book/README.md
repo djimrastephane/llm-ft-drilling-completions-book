@@ -7,13 +7,9 @@ operational data, assuming no prior programming experience.
 
 Readers start with a general-purpose local model and a folder of drilling
 and completions reports, and finish with a fine-tuned model that
-understands their domain — one working chapter at a time.
-
-**Status:** Part 0 and Chapters 1–9 are written, with working, tested
-code and real, verified results; Chapters 10–13 are still placeholders.
-See the [root README](../README.md#table-of-contents) for the
-per-chapter status table, or [`CHANGELOG.md`](../CHANGELOG.md) for the
-full history of what landed and why.
+understands their domain — one working chapter at a time, using real,
+publicly available Daily Drilling Reports from Utah FORGE (a DOE-funded
+geothermal research well) throughout.
 
 ## Quickstart
 
@@ -25,10 +21,17 @@ pip install -r requirements.txt
 quarto render                       # builds the book to _book/
 ```
 
+The sample training archive is already committed under `datasets/` — no
+generation or download step needed.
+
 New to Python or unsure where to start? **Part 0 — Preparing Your Local
-LLM Workshop** (`chapters/chapter_00.qmd`) will walk through setup one
-command at a time, with plain-English explanations and no assumed prior
-experience, mirroring the previous book's Part 0.
+LLM Workshop** (`chapters/chapter_00.qmd`) walks through the setup above
+one command at a time, with plain-English explanations and no assumed
+prior experience. It works with any editor — Jupyter Notebook, VS Code,
+PyCharm Community, Positron, or a terminal alone — with a short dedicated
+guide for each in Appendices A1–A5. [Appendix
+A](appendix/appendix_a_environment_setup.qmd) covers what's left: the
+dataset, rendering the book, and hardware notes.
 
 ## Project structure
 
@@ -76,10 +79,13 @@ book/
 
 **Part 0 — Preparing Your Local LLM Workshop** (`chapters/chapter_00.qmd`,
 ✅ written): environment and hardware setup for readers with no prior
-programming experience, IDE-agnostic, each with a short dedicated guide
+programming experience, IDE-agnostic — Jupyter Notebook, VS Code, PyCharm
+Community, Positron, or terminal only, each with a short dedicated guide
 in Appendices A1–A5.
 
-**Part I — Foundations** (✅ all 5 chapters written and tested):
+**Part I — Foundations** (10 real, curated Utah FORGE reports — a
+genuine stuck-pipe event and more — fully reproducible offline; ✅ all 5
+chapters written and tested):
 
 | Ch. | Artifact you build |
 |---|---|
@@ -90,7 +96,12 @@ in Appendices A1–A5.
 | 5 | First LoRA fine-tune |
 
 **Part II — Industrialising the System** (✅ Chapters 6–9 written and
-tested; Chapters 10–13 still placeholders):
+tested; Chapters 10–13 still placeholders; Chapters 6, 9, and 10 in
+particular are informed by the author's private companion project
+**`industrial-ddr-finetuning`**, built specifically against this book's
+public archive — real per-report extraction, a real 75/76 data-quality
+gate result, and real, verified checkpointed fine-tuning and retrieval
+numbers):
 
 | Ch. | Status | Artifact you build |
 |---|---|---|
@@ -105,29 +116,36 @@ tested; Chapters 10–13 still placeholders):
 
 Each written Part II chapter includes a simplified, standalone
 implementation in `code/chapter_NN/` (no external service required to
-follow along). Every specific number or result a written chapter states
-comes from an actual, independently-verified run of this book's own
-code against real training data — this book does not present
-fabricated or borrowed results as if they came from a real run. A few
-examples: Chapter 6's data quality gate found `75/76` reports pass
-extraction with `6` duplicate field-value groups; Chapter 8's "at
-scale" fine-tune measured training loss falling `2.755 → 2.164 →
-1.821` across 3 real epochs; Chapter 9 measured BM25 keyword retrieval
-finding the correct source report `4/4` times on real test queries,
-against `3/4` for dense sentence embeddings.
+follow along) plus pointers to the exact files behind any private
+companion-project number it cites. Where a chapter states a specific
+number or result, it was independently verified against this book's own
+code and real training data before being written down — this book does
+not present fabricated or borrowed results as if they came from a real
+run. A few examples: Chapter 6's data quality gate found `75/76` reports
+pass extraction with `6` duplicate field-value groups; Chapter 8's "at
+scale" fine-tune measured training loss falling `2.755 → 2.164 → 1.821`
+across 3 real epochs; Chapter 9 measured BM25 keyword retrieval finding
+the correct source report `4/4` times on real test queries, against
+`3/4` for dense sentence embeddings.
 
-Chapters 6, 9, and 10 in particular are informed by the author's private
-companion project [`industrial-ddr-finetuning`](https://github.com/djimrastephane/industrial-ddr-finetuning),
-which runs a schema-v2 extraction pipeline (field-level status, verbatim
-evidence spans, automated validation, review workflow) over this same
-FORGE archive — see `book/datasets/README.md`. The book's own
-implementations are written from scratch for teaching purposes, not
-copied from it.
+## Relationship to the companion pipeline
+
+[**`industrial-ddr-finetuning`**](https://github.com/djimrastephane/industrial-ddr-finetuning)
+is a separate, private repository from this book. This book's own code
+never depends on it — every chapter's `code/chapter_NN/` scripts run
+standalone against the committed `datasets/` archive. Its
+schema-v2 extraction pipeline (field-level status, verbatim evidence
+spans, automated validation, review workflow) runs over this same public
+FORGE archive; where Part II cites a number from it, the chapter text
+says so explicitly. See `datasets/README.md` for how the two projects
+relate.
 
 ## Recommended workflow in Positron (for authors drafting new chapters)
 
 This section describes the author's own workflow for *writing* new
-chapters — it is not a requirement for readers.
+chapters — it is not a requirement for readers. Readers following the
+book should start with Part 0 and Appendices A1–A5, which cover five
+different editors on equal footing.
 
 1. Open `book/` as the Positron workspace root.
 2. Create and select the `.venv` interpreter (see Quickstart above).
@@ -140,6 +158,17 @@ chapters — it is not a requirement for readers.
    single chapter while writing.
 6. Run `quarto render` before committing, to catch any chapter that
    fails to execute end to end.
+
+## Reproducing the whole book
+
+```bash
+pip install -r requirements.txt
+quarto render
+```
+
+Output is written to `_book/`. No API keys or paid services are required
+— every chapter runs against small, open-weight local models
+(`Qwen2.5-1.5B-Instruct`) and parameter-efficient (LoRA) fine-tuning.
 
 ## Running tests
 

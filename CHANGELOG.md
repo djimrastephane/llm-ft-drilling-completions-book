@@ -193,6 +193,20 @@ highlights in narrative form.
   fine-tuning with retrieval. Written after Chapter 5 shipped, so it
   can point at that chapter's real held-out result as concrete
   evidence rather than a promise.
+- Both `README.md` (root) and `book/README.md` restructured to follow
+  the same section design as the author's previous book,
+  [`ddr-rag-book`](https://github.com/djimrastephane/ddr-rag-book):
+  added a "Why Not Just Prompt a Cloud AI Assistant?" section and a
+  "What You're Building" transcript box (the real Chapter 9 with/without
+  retrieval answer on held-out report `#37`, plus Chapter 5's `0/16 →
+  13/16` training-recall vs. `0/2` held-out result), a Project Map
+  table, a Reader Contract, a full per-chapter "How Long Does Each
+  Chapter Take" table (reusing each chapter's own in-book "Estimated
+  time" status-strip value), a First Success Checkpoint, Common Reader
+  Journeys, What Makes This Book Different, a dedicated Companion
+  Pipeline section, and a Bonus Material section -- none of it invented,
+  every quoted number and transcript pulled from this book's own
+  already-shipped chapter content.
 
 ### Fixed
 
