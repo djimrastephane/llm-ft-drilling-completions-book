@@ -155,7 +155,29 @@ highlights in narrative form.
   -- evidence it has learned the archive's vocabulary and phrasing
   before it has learned which facts belong to which report. Challenge
   exercise: a checkpoint reloaded on a fully fresh process reproduces
-  its own logged held-out score exactly. Chapters 9–13 remain
+  its own logged held-out score exactly.
+- **Chapter 9: Hybrid System: Combining Fine-Tuning with Retrieval**
+  (`chapters/chapter_09.qmd`) fully drafted, with working, tested code
+  (`code/chapter_09/hybrid_rag_finetune.py`,
+  `code/chapter_09/challenge/challenge.py`, `tests/test_chapter_09.py`).
+  Builds a BM25 keyword-retrieval index over all 75 quality-gated
+  reports -- held-out report included, since retrieval should find
+  facts regardless of what the fine-tuned model trained on -- and
+  combines it with Chapter 8's fine-tuned checkpoint. Real run:
+  BM25 finds the correct report in the top 3 for `4/4` real test
+  queries; dense sentence embeddings only `3/4` (missing exactly the
+  query that ranked report `#38`'s real answer `340th` out of 677 with
+  embeddings vs. `1st` with BM25 -- the same domain-vocabulary gap
+  Chapter 4 found, now confirmed at the sentence level). Caught and
+  fixed a real design bug while verifying: using the fine-tuned
+  model's templated input as the retrieval query finds nothing useful,
+  since that string is nearly identical across hundreds of chunks --
+  retrieval needs a real information-need query, kept separate from
+  the model's generation prompt. Field notes: across the 4 test cases,
+  retrieval found the correct source every time, but the fine-tuned
+  model only faithfully used that source some of the time -- finding
+  the right document and using it faithfully are measurably different
+  problems, which Chapter 10 picks up directly. Chapters 10–13 remain
   placeholders.
 
 ### Changed
