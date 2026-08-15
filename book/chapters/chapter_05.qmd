@@ -76,13 +76,23 @@ reads or generates text.
 ## Theory
 
 ::: {.callout-tip title="Engineering Translation: LoRA adapter"}
-Full fine-tuning would mean updating all 1.5 billion of the base
-model's numbers. A **LoRA adapter** is a small, separate set of numbers
-— a swappable correction sheet clipped to the model — that gets trained
-instead, while the original 1.5 billion stay frozen, untouched. At
-inference time the model reads its usual weights *and* the correction
-sheet together, as if the sheet had been written directly into the
-model.
+**LoRA** stands for **Low-Rank Adaptation**. Full fine-tuning would mean
+updating all 1.5 billion of the base model's numbers. A **LoRA adapter**
+is a small, separate set of numbers — a swappable correction sheet
+clipped to the model — that gets trained instead, while the original 1.5
+billion stay frozen, untouched. At inference time the model reads its
+usual weights *and* the correction sheet together, as if the sheet had
+been written directly into the model.
+
+"Low-rank" describes *how* that correction sheet stays small: instead of
+writing out one full grid of correction numbers — one for every
+connection in the layer — LoRA reconstructs that grid from two much
+shorter lists of numbers multiplied together, the way a large table can
+sometimes be rebuilt from just a row list and a column list instead of
+every cell being typed out by hand. How long those two lists are is the
+adapter's **rank** (`r=8` in Step 2 below) — short by design, and far
+shorter than the grid it reconstructs. Fewer numbers to store and train,
+at the cost of only approximating what a full-size correction could do.
 :::
 
 ::: {.callout-tip title="Engineering Translation: epoch and loss"}

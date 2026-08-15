@@ -210,6 +210,21 @@ highlights in narrative form.
 
 ### Fixed
 
+- **"LoRA" was used from Chapter 0 onward (including the book's own
+  table of contents) but the acronym itself was never expanded where a
+  reader would actually encounter it.** Chapter 5's "Engineering
+  Translation: LoRA adapter" callout explained the mechanism (a small,
+  frozen-base "correction sheet") but not what the letters stood for or
+  why it's called "low-rank" -- only Appendix B's glossary spelled out
+  "Low-Rank Adaptation," and a first-time reader has no reason to check
+  it before or during Chapter 5. Added "LoRA stands for Low-Rank
+  Adaptation" to that callout, plus a plain-language explanation of what
+  "low-rank" means (the correction sheet is rebuilt from two much
+  shorter lists of numbers multiplied together -- like a large table
+  rebuilt from a row list and a column list instead of every cell typed
+  out by hand -- with the **rank**, `r=8` in Step 2, being how long
+  those lists are), matching the book's existing physical-analogy style
+  instead of introducing matrix-multiplication terminology unexplained.
 - **Chapter numbering was off by one in rendered HTML/PDF output.**
   `chapters/chapter_00.qmd` (Part 0) sat inside Quarto's normal numbered
   chapter sequence, so it silently became "Chapter 1" and pushed every
