@@ -203,6 +203,20 @@ highlights in narrative form.
   rank 1 -- with an explicit new sentence that LoRA's correction is
   added on top of the frozen weights, not swapped in for them. The new
   figure above makes both points visually as well as in prose.
+- Third review pass on the same figure and callout: the diagram's
+  "computed, never stored" label overstated a real implementation
+  detail (some PEFT workflows do merge/materialize the combined
+  weights, e.g. for export) -- changed to "produced from A x B", and
+  the matching prose changed from "without ever storing that full-size
+  version directly" to "without needing to store that full-size
+  version separately". "What the model reads at inference" became
+  "Effective weights used at inference" (the model uses combined
+  weights, it doesn't "read" a table). The Step 2 label became "Frozen
+  base weights + LoRA correction = adapted model behavior" to state
+  the addition as its own equation. Figure caption (HTML and PDF)
+  rewritten to: "LoRA trains two small adapter tables. Their product
+  creates a full-size correction, which is added to the frozen base
+  weights. The original model is not rewritten."
 
 ### Changed
 

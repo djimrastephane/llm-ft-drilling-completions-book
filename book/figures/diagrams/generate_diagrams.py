@@ -141,10 +141,10 @@ LORA_TIKZ_TEMPLATE = r"""
 \node[font=\scriptsize] at (2.77,-2.70) {Table B};
 \node[font=\scriptsize] at (2.77,-2.95) {trained, small};
 \node[font=\scriptsize] at (5.81,-2.70) {Full-size correction};
-\node[font=\scriptsize] at (5.81,-2.95) {computed, never stored};
+\node[font=\scriptsize] at (5.81,-2.95) {produced from A $\times$ B};
 
 \draw[textcolor, dashed, line width=0.5pt] (-0.3,-3.30) -- (8.72,-3.30);
-\node[font=\bfseries\small] at (4.21,-4.00) {Step 2 -- added on top, not swapped in};
+\node[font=\bfseries\small] at (4.21,-4.00) {Frozen base weights + LoRA correction = adapted model behavior};
 
 \foreach \i in {0,...,4} { \foreach \j in {0,...,4} {
   \draw[frozencell] ($(0,-4.60) + (\j*0.48,-\i*0.48)$) rectangle ++(0.42,0.42); } }
@@ -159,8 +159,8 @@ LORA_TIKZ_TEMPLATE = r"""
 \node[font=\scriptsize] at (1.17,-7.55) {frozen, unchanged};
 \node[font=\scriptsize] at (4.21,-7.30) {LoRA correction};
 \node[font=\scriptsize] at (4.21,-7.55) {from Step 1};
-\node[font=\scriptsize] at (7.25,-7.30) {What the model reads};
-\node[font=\scriptsize] at (7.25,-7.55) {at inference};
+\node[font=\scriptsize] at (7.25,-7.30) {Effective weights};
+\node[font=\scriptsize] at (7.25,-7.55) {used at inference};
 
 \end{tikzpicture}
 \end{document}
