@@ -9,11 +9,13 @@ Readers start with a general-purpose local model and a folder of drilling
 and completions reports, and finish with a fine-tuned model that
 understands their domain — one working chapter at a time.
 
-**Status:** repository scaffold only. No chapter text, code, or training
-data has been written yet; this file documents the planned structure so
-it's easy to see where each future piece belongs.
+**Status:** Part 0 and Chapters 1–9 are written, with working, tested
+code and real, verified results; Chapters 10–13 are still placeholders.
+See the [root README](../README.md#table-of-contents) for the
+per-chapter status table, or [`CHANGELOG.md`](../CHANGELOG.md) for the
+full history of what landed and why.
 
-## Quickstart (once content exists)
+## Quickstart
 
 ```bash
 python3 -m venv .venv
@@ -70,14 +72,14 @@ book/
     └── appendix_b_glossary.qmd             Drilling, completions & fine-tuning terms
 ```
 
-## Chapter map (planned)
+## Chapter map
 
-**Part 0 — Preparing Your Local LLM Workshop** (`chapters/chapter_00.qmd`):
-environment and hardware setup for readers with no prior programming
-experience, IDE-agnostic, each with a short dedicated guide in Appendices
-A1–A5.
+**Part 0 — Preparing Your Local LLM Workshop** (`chapters/chapter_00.qmd`,
+✅ written): environment and hardware setup for readers with no prior
+programming experience, IDE-agnostic, each with a short dedicated guide
+in Appendices A1–A5.
 
-**Part I — Foundations:**
+**Part I — Foundations** (✅ all 5 chapters written and tested):
 
 | Ch. | Artifact you build |
 |---|---|
@@ -87,25 +89,32 @@ A1–A5.
 | 4 | Tokenization and embedding walkthrough |
 | 5 | First LoRA fine-tune |
 
-**Part II — Industrialising the System:**
+**Part II — Industrialising the System** (✅ Chapters 6–9 written and
+tested; Chapters 10–13 still placeholders):
 
-| Ch. | Artifact you build |
-|---|---|
-| 6 | Data quality gate for training data |
-| 7 | Training-set formatting and chunking at scale |
-| 8 | Fine-tuning at scale with checkpointing and experiment tracking |
-| 9 | Hybrid system combining fine-tuning with retrieval |
-| 10 | Traceable, hallucination-mitigated outputs |
-| 11 | Fine-tuned model evaluation harness |
-| 12 | Model drift detector across versions |
-| 13 | Continuous fine-tuning / retraining pipeline |
+| Ch. | Status | Artifact you build |
+|---|---|---|
+| 6 | ✅ | Data quality gate for training data |
+| 7 | ✅ | Training-set formatting and chunking at scale |
+| 8 | ✅ | Fine-tuning at scale with checkpointing and experiment tracking |
+| 9 | ✅ | Hybrid system combining fine-tuning with retrieval |
+| 10 | — | Traceable, hallucination-mitigated outputs |
+| 11 | — | Fine-tuned model evaluation harness |
+| 12 | — | Model drift detector across versions |
+| 13 | — | Continuous fine-tuning / retraining pipeline |
 
-Each Part II chapter is planned to include a simplified, standalone
+Each written Part II chapter includes a simplified, standalone
 implementation in `code/chapter_NN/` (no external service required to
-follow along). Where a chapter states a specific number or result, it
-must be independently verified before being written down — this book
-does not present fabricated or borrowed results as if they came from a
-real run.
+follow along). Every specific number or result a written chapter states
+comes from an actual, independently-verified run of this book's own
+code against real training data — this book does not present
+fabricated or borrowed results as if they came from a real run. A few
+examples: Chapter 6's data quality gate found `75/76` reports pass
+extraction with `6` duplicate field-value groups; Chapter 8's "at
+scale" fine-tune measured training loss falling `2.755 → 2.164 →
+1.821` across 3 real epochs; Chapter 9 measured BM25 keyword retrieval
+finding the correct source report `4/4` times on real test queries,
+against `3/4` for dense sentence embeddings.
 
 Chapters 6, 9, and 10 in particular are informed by the author's private
 companion project [`industrial-ddr-finetuning`](https://github.com/djimrastephane/industrial-ddr-finetuning),
@@ -134,11 +143,11 @@ chapters — it is not a requirement for readers.
 
 ## Running tests
 
-Once chapter code and fixtures exist, `tests/` will exercise the real
-functions in every chapter's `code/chapter_NN/` script. CI will run the
+`tests/` exercises the real functions in every chapter's
+`code/chapter_NN/` script — 52 tests across Chapters 1–9. CI runs the
 full suite on Linux, Windows, and macOS on every push and pull request
 that touches `book/**` (see `.github/workflows/tests-linux.yml`,
-`tests-windows.yml`, `tests-macos.yml`).
+`tests-windows.yml`, `tests-macos.yml`), and all three are green.
 
 ```bash
 pip install -r requirements.txt

@@ -272,3 +272,14 @@ highlights in narrative form.
   exact-match at scale). Narrowed to what fine-tuning actually teaches
   reliably -- vocabulary, sequencing, report shape -- with a forward
   pointer to where the factual-recall distinction is actually covered.
+- Both `README.md` (root) and `book/README.md` still described Chapters
+  1–9 in future/conditional tense ("not yet written", "will be
+  tested", "Once chapter code and fixtures exist"), even though Part 0
+  and Chapters 1–9 have been fully drafted, tested, and green on CI
+  since Chapter 9 shipped. Rewrote both to present-tense, verified
+  language: a per-chapter status table with ✅/— columns, the real
+  `52`-test count across Chapters 1–9, and real numbers pulled from
+  the chapters themselves (Chapter 6's `75/76` gate pass rate and `6`
+  duplicate field-value groups, Chapter 8's `2.755 → 2.164 → 1.821`
+  training-loss curve, Chapter 9's `4/4` vs `3/4` BM25-vs-dense
+  retrieval result) in place of the old placeholder chapter map.

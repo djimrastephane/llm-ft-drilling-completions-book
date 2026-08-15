@@ -5,15 +5,16 @@
 [![Code tests Windows](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-windows.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-windows.yml)
 [![Publish book to GitHub Pages](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml)
 
-> **Status: early draft.** Part 0 and Chapters 1–3 are written; Chapters
-> 4–13 are still placeholders. This README describes the planned book so
-> the structure below makes sense as it fills in. See
-> [RELEASE.md](RELEASE.md) / [CHANGELOG.md](CHANGELOG.md) for what
-> actually exists at any point in time.
+> **Status: in progress.** Part 0 and Chapters 1–9 are written, tested,
+> and passing CI on Linux/macOS/Windows; Chapters 10–13 are still
+> placeholders. Every quoted number in Chapters 1–9 comes from a real,
+> reproducible run of this repository's own code — see
+> [RELEASE.md](RELEASE.md) / [CHANGELOG.md](CHANGELOG.md) for the full
+> history of what's landed.
 >
 > The "Publish book to GitHub Pages" workflow is manual-only
-> (`workflow_dispatch`) until more chapters are drafted — its badge
-> reflects the last manual run, not every push to `main`.
+> (`workflow_dispatch`) until the remaining chapters are drafted — its
+> badge reflects the last manual run, not every push to `main`.
 
 This repository will contain the chapters, code, and training data for
 **Fine-Tuning Local LLM for Drilling & Completions** — a hands-on,
@@ -67,23 +68,26 @@ already know how.
 
 # Start Here
 
-This README has one job: get you to successfully complete Part 0. If
-this is your first Python project, do these steps in order:
+This README has one job: get you to successfully complete Part 0 and
+into Chapter 1. If this is your first Python project, do these steps in
+order:
 
 1. Read [Part 0: Preparing Your Local LLM Workshop](book/chapters/chapter_00.qmd) — installs Python, clones this repository, and gets your environment ready. No prior experience assumed.
 2. Run `setup_check.py` — one command that confirms everything is working.
-3. Continue to Chapter 1 (not yet written) once it lands.
+3. Continue to [Chapter 1: Loading and Running Your First Local LLM](book/chapters/chapter_01.qmd) — load a real open-weight model and generate your first answer, entirely on your own machine.
+4. Keep going through Chapter 9 (see the [Table of Contents](#table-of-contents) below) — each chapter builds directly on the last one's saved output.
 
 | Step | Typical time |
 |---|---|
 | Part 0 | ~30–45 minutes |
+| Chapters 1–9, typing every example | several hours across multiple sessions — Chapters 5 and 8 each include a real fine-tuning run (~5 min and ~30 min on CPU) |
 
 You don't need to understand everything before you start — you need to
 run the first command. Everything else follows from there.
 
 ---
 
-# Your Learning Journey (planned)
+# Your Learning Journey
 
 ```
 Base Local LLM
@@ -103,20 +107,23 @@ Hybrid Fine-Tuning + Retrieval
 Traceable, Evaluated, Continuously Updated Model
 ```
 
-## What You Will Build and Learn (planned)
+## What You Will Build and Learn
 
-By the end of the book you should be able to:
+Chapters 1–9 (below) already do this, for real, against this book's own
+Utah FORGE archive — Chapters 10–13 are still planned. By the end of the
+finished book you should be able to:
 
 - Run a general-purpose local LLM and evaluate its out-of-the-box
-  answers to drilling and completions questions
-- Turn raw drilling and completions reports into a training dataset
-- Run a first parameter-efficient (LoRA) fine-tune of a local model
-- Apply data quality gates to training data before fine-tuning
-- Fine-tune at scale with checkpointing and experiment tracking
-- Combine a fine-tuned model with retrieval (hybrid RAG + fine-tuning)
+  answers to drilling and completions questions ✅
+- Turn raw drilling and completions reports into a training dataset ✅
+- Run a first parameter-efficient (LoRA) fine-tune of a local model ✅
+- Apply data quality gates to training data before fine-tuning ✅
+- Fine-tune at scale with checkpointing and experiment tracking ✅
+- Combine a fine-tuned model with retrieval (hybrid RAG + fine-tuning) ✅
 - Evaluate a fine-tuned model's quality and detect hallucinations
+  (planned — Chapters 10–11)
 - Detect drift across model versions and keep the model current as new
-  reports arrive
+  reports arrive (planned — Chapters 12–13)
 
 ## Who This Book Is For
 
@@ -162,7 +169,7 @@ elsewhere.
 - Git
 - Linux
 
-## Minimum Computer Requirements (planned)
+## Minimum Computer Requirements
 
 **Minimum:**
 
@@ -173,9 +180,10 @@ elsewhere.
 **Recommended:**
 
 - A GPU with at least 8 GB VRAM (NVIDIA/CUDA or Apple Silicon via MPS)
-  makes fine-tuning chapters dramatically faster. CPU-only readers can
-  still follow along with a very small base model, at the cost of slower
-  training runs.
+  makes fine-tuning chapters faster. Every chapter through Chapter 9 has
+  actually been run and verified CPU-only on ordinary laptop hardware —
+  Chapter 5's fine-tune takes about 5 minutes, Chapter 8's "at scale"
+  run about 30–35 minutes.
 
 **No cloud account required. No paid API required.** Everything in this
 book is designed to run locally, using small open-weight models and
@@ -198,36 +206,42 @@ mirroring the previous book.
 
 ---
 
-# Table of Contents (planned)
+# Table of Contents
 
-Part 0 is written; the chapter map below for Chapters 1–13 is still
-planned, not yet drafted. For the full repository layout (folder tree,
-part/chapter file map) see [`book/README.md`](book/README.md).
+Part 0 and Chapters 1–9 are written, tested, and passing CI; Chapters
+10–13 are still placeholders. For the full repository layout (folder
+tree, part/chapter file map) see [`book/README.md`](book/README.md).
 
 [![Publish book to GitHub Pages](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml)
 [![Code tests Linux](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-linux.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-linux.yml)
 [![Code tests Windows](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-windows.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-windows.yml)
 [![Code tests macOS](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml)
 
-| Chapter | Planned artifact |
-|---|---|
-| Part 0: Preparing Your Local LLM Workshop | environment + hardware check (`setup_check.py`) |
-| Ch 1: Loading and Running Your First Local LLM | `code/chapter_01/load_local_model.py` |
-| Ch 2: Turning Drilling & Completions Reports into Training Examples | `code/chapter_02/build_training_examples.py` |
-| Ch 3: Baseline Prompting — What the Model Gets Wrong Before Fine-Tuning | `code/chapter_03/baseline_prompting.py` |
-| Ch 4: Tokenization and Embeddings for Domain Fine-Tuning | `code/chapter_04/tokenize_and_embed.py` |
-| Ch 5: Your First LoRA Fine-Tune | `code/chapter_05/first_lora_finetune.py` |
-| Ch 6: Data Quality Gates for Training Data | `code/chapter_06/data_quality_gate.py` |
-| Ch 7: Formatting and Chunking a Training Set at Scale | `code/chapter_07/format_training_chunks.py` |
-| Ch 8: Fine-Tuning at Scale — Checkpoints and Experiment Tracking | `code/chapter_08/finetune_at_scale.py` |
-| Ch 9: Hybrid System — Combining Fine-Tuning with Retrieval | `code/chapter_09/hybrid_rag_finetune.py` |
-| Ch 10: Traceable Outputs and Hallucination Mitigation | `code/chapter_10/traceable_outputs.py` |
-| Ch 11: Evaluating a Fine-Tuned Domain Model | `code/chapter_11/eval_finetuned_model.py` |
-| Ch 12: Detecting Drift Across Model Versions | `code/chapter_12/detect_model_drift.py` |
-| Ch 13: Continuous Fine-Tuning — Keeping the Model Current | `code/chapter_13/continuous_finetune.py` |
-| Appendix A: Environment Setup | — |
-| Appendices A1–A5: Jupyter / VS Code / PyCharm / Positron / Terminal-only | — |
-| Appendix B: Drilling, Completions & Fine-Tuning Glossary | `book/appendix/appendix_b_glossary.qmd` |
+| Status | Chapter | Artifact |
+|---|---|---|
+| ✅ | [Part 0: Preparing Your Local LLM Workshop](book/chapters/chapter_00.qmd) | environment + hardware check (`setup_check.py`) |
+| ✅ | [Ch 1: Loading and Running Your First Local LLM](book/chapters/chapter_01.qmd) | `code/chapter_01/load_local_model.py` |
+| ✅ | [Ch 2: Turning Drilling & Completions Reports into Training Examples](book/chapters/chapter_02.qmd) | `code/chapter_02/build_training_examples.py` |
+| ✅ | [Ch 3: Baseline Prompting — What the Model Gets Wrong Before Fine-Tuning](book/chapters/chapter_03.qmd) | `code/chapter_03/baseline_prompting.py` |
+| ✅ | [Ch 4: Tokenization and Embeddings for Domain Fine-Tuning](book/chapters/chapter_04.qmd) | `code/chapter_04/tokenize_and_embed.py` |
+| ✅ | [Ch 5: Your First LoRA Fine-Tune](book/chapters/chapter_05.qmd) | `code/chapter_05/first_lora_finetune.py` |
+| ✅ | [Ch 6: A Data Quality Gate for Training Data](book/chapters/chapter_06.qmd) | `code/chapter_06/data_quality_gate.py` |
+| ✅ | [Ch 7: Formatting and Chunking a Training Set at Scale](book/chapters/chapter_07.qmd) | `code/chapter_07/format_training_chunks.py` |
+| ✅ | [Ch 8: Fine-Tuning at Scale — Checkpoints and Experiment Tracking](book/chapters/chapter_08.qmd) | `code/chapter_08/finetune_at_scale.py` |
+| ✅ | [Ch 9: Hybrid System — Combining Fine-Tuning with Retrieval](book/chapters/chapter_09.qmd) | `code/chapter_09/hybrid_rag_finetune.py` |
+| — | Ch 10: Traceable Outputs and Hallucination Mitigation | `code/chapter_10/traceable_outputs.py` |
+| — | Ch 11: Evaluating a Fine-Tuned Domain Model | `code/chapter_11/eval_finetuned_model.py` |
+| — | Ch 12: Detecting Drift Across Model Versions | `code/chapter_12/detect_model_drift.py` |
+| — | Ch 13: Continuous Fine-Tuning — Keeping the Model Current | `code/chapter_13/continuous_finetune.py` |
+| ✅ | Appendix A: Environment Setup | — |
+| ✅ | Appendices A1–A5: Jupyter / VS Code / PyCharm / Positron / Terminal-only | — |
+| ✅ | [Appendix B: Drilling, Completions & Fine-Tuning Glossary](book/appendix/appendix_b_glossary.qmd) | — |
+
+Every ✅ chapter ships with working, tested code and a companion
+notebook — see [Automated Tests](#automated-tests) below. Every quoted
+number in a ✅ chapter comes from an actual run of that chapter's own
+code against this repository's real Utah FORGE archive, not an
+estimate.
 
 ## Companion App (planned)
 
@@ -239,19 +253,31 @@ side-by-side by the base model and the fine-tuned model. See
 
 ## Exercises
 
-Every chapter will include a **Practical exercise** and a **Challenge
-exercise**, with reference solutions alongside each chapter's code under
-`book/code/chapter_NN/challenge/` — same convention as the previous book.
+Every drafted chapter includes a **Practical exercise** and a
+**Challenge exercise**, with reference solutions alongside each
+chapter's code under `book/code/chapter_NN/challenge/`.
 
 ## Automated Tests
 
-Every chapter's code will be tested in [`book/tests/`](book/tests) on
-Linux, Windows, and macOS. Once dependencies and code exist:
+Every drafted chapter's real code is tested in
+[`book/tests/`](book/tests) — 52 tests across Chapters 1–9 as of this
+writing, run on Linux, Windows, and macOS on every push that touches
+`book/**` (badges at the top of this README).
 
 ```bash
 cd book
 pip install -r requirements.txt
 pytest -v
+```
+
+Chapters 5, 8, and 9 include tests marked `slow` (they load and
+generate from the real base model, and Chapter 8's fine-tuning tests
+take a few minutes) or that need a checkpoint from a previous chapter's
+script to already exist on disk (skipped automatically if it doesn't —
+see each test file's own docstring). Skip the slow ones locally with:
+
+```bash
+pytest -v -m "not slow"
 ```
 
 ## Questions, Feedback, and Contributing to This Repository
