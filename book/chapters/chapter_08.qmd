@@ -70,7 +70,9 @@ disk exactly as it was.
 A **checkpoint** is a saved snapshot of the adapter's weights at one
 point in training — like a documented casing point during a long run,
 somewhere you could pick back up from if something interrupted the job,
-instead of starting over from the surface.
+instead of starting over from the surface. This chapter saves one after
+every **epoch** — Chapter 5's term for one full pass through the entire
+training set, all 669 examples once.
 :::
 
 ::: {.callout-tip title="Engineering Translation: experiment tracking"}

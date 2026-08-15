@@ -215,3 +215,13 @@ highlights in narrative form.
   Chapter 1 onward. Changed to `qwen2.5:1.5b-instruct` so an optional
   side-by-side comparison via Ollama uses the same model size, not a
   bigger one that would quietly look better for the wrong reason.
+- Chapter 5 defined what an epoch *is* ("one full pass through the
+  training data") but never explained why more than one pass is
+  needed -- a natural question for a zero-ML-background reader, and
+  the whole reason `NUM_EPOCHS=20` is set the way it is. Extended the
+  "epoch and loss" callout to explain that each pass only nudges the
+  adapter's weights a small amount, so the loss falling from `4.7173`
+  to `0.1201` over 20 epochs is that accumulation made visible. Chapter
+  8 uses "epoch" as its central organizing concept (checkpoint every
+  epoch, log every epoch) without ever restating or cross-referencing
+  Chapter 5's definition; its "checkpoint" callout now does both.

@@ -92,6 +92,14 @@ model's predictions were on that pass; it should generally fall as
 training continues, the way a golf score should generally fall as you
 improve. Chapter 11 covers proper evaluation metrics; loss here is just
 a training-time signal, not a measure of correctness by itself.
+
+Why more than one pass? Each pass only nudges the adapter's weights a
+small amount toward the correct answers — like tightening a connection
+in small, controlled turns instead of one big one, so it doesn't
+overshoot. One epoch barely moves the model; this chapter runs 20 so
+those small nudges can actually accumulate into something. The loss
+numbers in Step 3 (`4.7173` on epoch 1, falling to `0.1201` by epoch 20)
+are the visible trace of that accumulation.
 :::
 
 ::: {.callout-tip title="Engineering Translation: training recall vs. generalization"}
