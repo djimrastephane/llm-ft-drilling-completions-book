@@ -225,3 +225,17 @@ highlights in narrative form.
   8 uses "epoch" as its central organizing concept (checkpoint every
   epoch, log every epoch) without ever restating or cross-referencing
   Chapter 5's definition; its "checkpoint" callout now does both.
+- "Why fine-tune a pretrained model instead of training one from
+  scratch on our own reports" was only ever answered once, in the
+  Preface, in a single dense sentence aimed at a reader who already
+  knows what "parameter-efficient" and "foundation model" mean --
+  never in the plain-language, problem-first style the actual chapters
+  use, and never at the point (Chapter 1, right where
+  Qwen2.5-1.5B-Instruct is introduced) where a first-time reader would
+  naturally ask it. Added a new "Engineering Translation: pretraining"
+  callout and a "Why not train a model from scratch on our own
+  reports?" section there, before "Why not just use a cloud AI
+  assistant?" -- distinct from Chapter 5's separate "Why LoRA instead
+  of updating the whole model?" (that's full vs. parameter-efficient
+  fine-tuning of an already-pretrained model; this is pretrained vs.
+  from-scratch in the first place).

@@ -91,6 +91,37 @@ ordinary laptop CPU. "1.5B" means 1.5 billion parameters — small by
 current standards, which is exactly why it's usable without a GPU;
 Chapter 5 revisits this size trade-off when you fine-tune it.
 
+::: {.callout-tip title="Engineering Translation: pretraining"}
+**Pretraining** is the process that produced Qwen2.5-1.5B-Instruct in
+the first place — reading a huge amount of general text and adjusting
+every one of its 1.5 billion numbers, over and over, until it can write
+fluent, grammatical, sensibly-reasoned language and follow
+instructions. That's a separate, much bigger job than anything this
+book does. **Fine-tuning** — this book's whole subject, starting in
+Chapter 5 — takes a model that's already been through that process and
+adjusts it further, on a much smaller amount of your own text.
+:::
+
+## Why not train a model from scratch on our own reports?
+
+A reasonable question before going any further: if a general-purpose
+model doesn't know this operation's shorthand, why not just train a
+model on this archive's reports from the very start, instead of
+starting with someone else's model at all?
+
+Because "training from scratch" means teaching a model to read and
+write English — grammar, common sense, how to hold a conversation — at
+the same time as teaching it drilling and completions. Pretraining a
+model like Qwen2.5-1.5B took an enormous amount of general text and
+compute to get right; even a large company's entire report archive,
+every well, every year, is nowhere near enough text on its own to teach
+a model language itself, let alone your domain on top of it. Fine-tuning
+sidesteps that problem entirely: it starts from a model that has
+already learned to read, write, and reason, and only asks it to learn
+one more, much narrower thing — how *this* operation talks and what its
+reports actually say. That's a small enough job to do on a laptop,
+which training a model from scratch never would be.
+
 ## Why not just use a cloud AI assistant?
 
 A fair question before writing any code: ChatGPT, Claude, and similar
