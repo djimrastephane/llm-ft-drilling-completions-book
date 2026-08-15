@@ -133,7 +133,30 @@ highlights in narrative form.
   the single longest entry in the archive (report `#21`, a step-rate-test
   sub-table `pdfplumber` couldn't decode). Challenge exercise reruns
   with a smaller chunk size (150 vs. 300 chars): `855` examples, `405`
-  chunked. Chapters 8–13 remain placeholders.
+  chunked.
+- **Chapter 8: Fine-Tuning at Scale with Checkpointing and Experiment
+  Tracking** (`chapters/chapter_08.qmd`) fully drafted, with working,
+  tested code (`code/chapter_08/finetune_at_scale.py`,
+  `code/chapter_08/challenge/challenge.py`, `tests/test_chapter_08.py`).
+  Fine-tunes on Chapter 7's full 669-example training set (not Chapter
+  5's 16-example proof of concept), checkpointing every epoch and
+  logging plain CSV/JSONL metrics -- no TensorBoard/W&B/MLflow
+  dependency. Simulates a real crash by fully reloading the base model
+  and resuming purely from a saved checkpoint on disk. Real run (3
+  epochs, ~32 minutes on CPU): training loss falls `2.755` ->
+  `2.164` -> `1.821`, but exact-match recall on a fixed 50-example
+  training sample stays `0/50` throughout -- a genuinely different,
+  and equally honest, result from Chapter 5's `0/16` -> `13/16`, and
+  informative precisely because loss and exact-match don't move
+  together at this scale. Held-out generalization (Chapter 2's
+  reserved report) stays `0/8`. Field notes: at this stage the model
+  answers different, unrelated questions with nearly identical
+  domain-flavored phrases ("Production Casing... Rig up casing/cement")
+  -- evidence it has learned the archive's vocabulary and phrasing
+  before it has learned which facts belong to which report. Challenge
+  exercise: a checkpoint reloaded on a fully fresh process reproduces
+  its own logged held-out score exactly. Chapters 9–13 remain
+  placeholders.
 
 ### Changed
 
