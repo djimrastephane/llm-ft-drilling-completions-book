@@ -78,21 +78,35 @@ reads or generates text.
 ::: {.callout-tip title="Engineering Translation: LoRA adapter"}
 **LoRA** stands for **Low-Rank Adaptation**. Full fine-tuning would mean
 updating all 1.5 billion of the base model's numbers. A **LoRA adapter**
-is a small, separate set of numbers — a swappable correction sheet
-clipped to the model — that gets trained instead, while the original 1.5
-billion stay frozen, untouched. At inference time the model reads its
-usual weights *and* the correction sheet together, as if the sheet had
-been written directly into the model.
+is a small, separate set of numbers — a correction that gets trained
+instead, while the original 1.5 billion stay frozen, untouched. LoRA
+does not replace the base model's weights: at inference time the model
+reads its usual weights *and* this correction, added on top, together —
+as if the correction had been written directly into the model, without
+the original numbers ever having changed.
 
-"Low-rank" describes *how* that correction sheet stays small: instead of
-writing out one full grid of correction numbers — one for every
-connection in the layer — LoRA reconstructs that grid from two much
-shorter lists of numbers multiplied together, the way a large table can
-sometimes be rebuilt from just a row list and a column list instead of
-every cell being typed out by hand. How long those two lists are is the
-adapter's **rank** (`r=8` in Step 2 below) — short by design, and far
-shorter than the grid it reconstructs. Fewer numbers to store and train,
-at the cost of only approximating what a full-size correction could do.
+"Low-rank" describes *how* that correction stays small: instead of
+training one full table of correction numbers — one for every
+connection in the layer — LoRA trains two much smaller tables. Multiply
+those two tables together and you get a full-size correction, the same
+shape as the layer it's correcting, without ever storing that full-size
+version directly. How narrow those two tables are is the adapter's
+**rank** (`r=8` in Step 2 below) — small by design. Fewer numbers to
+store and train, at the cost of only approximating what a full-size
+correction could do.
+:::
+
+::: {.content-visible when-format="html"}
+::: {.pipeline-diagram}
+![](../figures/diagrams/lora_lowrank_ch05_light.svg){.diagram-light width="480" fig-alt="Two-row diagram. Row 1: a tall Table A multiplied by a wide Table B equals a full-size correction grid, computed rather than stored. Row 2: the frozen base weights plus that correction equal what the model reads at inference."}
+![](../figures/diagrams/lora_lowrank_ch05_dark.svg){.diagram-dark width="480"}
+
+*Figure: LoRA's correction is built from two small tables, then added on top of the frozen base weights — it never replaces them.*
+:::
+:::
+
+::: {.content-visible when-format="pdf"}
+![LoRA's correction is built from two small tables, then added on top of the frozen base weights -- it never replaces them.](../figures/diagrams/lora_lowrank_ch05.pdf){width="480" fig-align="center" #fig-lora-lowrank-pdf}
 :::
 
 ::: {.callout-tip title="Engineering Translation: epoch and loss"}

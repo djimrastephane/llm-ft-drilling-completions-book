@@ -179,6 +179,30 @@ highlights in narrative form.
   the right document and using it faithfully are measurably different
   problems, which Chapter 10 picks up directly. Chapters 10–13 remain
   placeholders.
+- **A real figure for Chapter 5's "Engineering Translation: LoRA
+  adapter" callout** (`figures/diagrams/lora_lowrank_ch05.pdf` /
+  `_light.svg` / `_dark.svg`, embedded in `chapters/chapter_05.qmd`
+  right after the callout). Reviewed as a plain-HTML sketch first
+  (light/dark tokens and a two-option comparison against the book's own
+  diagram palette) before being built for real. Two rows: Table A x
+  Table B = a full-size correction (each table drawn 2 cells thick so
+  it doesn't read as rank 1), then frozen base weights + that
+  correction = what the model reads at inference -- so the diagram
+  shows the correction being added on top, not swapping the original
+  weights out. `figures/diagrams/generate_diagrams.py` gains
+  `render_lora_diagram()` and a dedicated `LORA_TIKZ_TEMPLATE`, since
+  the existing `render_diagram()` only draws straight vertical box
+  chains and this is a two-dimensional grid layout; extends
+  `LIGHT_PALETTE`/`DARK_PALETTE` with `soft_fill`/`strong_border` for
+  the correction and "what's actually used" cell styles, ignored by the
+  existing chain renderer.
+- Revised the "Engineering Translation: LoRA adapter" callout's wording
+  a second time, per review: "two shorter lists" (rank-1 only, and
+  never actually shown being added to the base weights) became "two
+  smaller tables" -- accurate at Chapter 5's real rank 8, not just
+  rank 1 -- with an explicit new sentence that LoRA's correction is
+  added on top of the frozen weights, not swapped in for them. The new
+  figure above makes both points visually as well as in prose.
 
 ### Changed
 
