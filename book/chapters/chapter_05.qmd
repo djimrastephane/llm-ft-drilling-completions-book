@@ -366,11 +366,11 @@ After fine-tuning:
 
 ::: {.content-visible when-format="html"}
 ::: {#fig-recall-gap .pipeline-diagram}
-![](../figures/diagrams/recall_gap_ch05_light.svg){.diagram-light width="440" fig-alt="Grouped bar chart. Training set questions rise from 0 of 16 correct before fine-tuning to 13 of 16 after. Held-out report questions stay at 0 of 2 correct both before and after fine-tuning."}
+![](../figures/diagrams/recall_gap_ch05_light.svg){.diagram-light width="440" fig-alt="Grouped bar chart. Training set questions rise from an exact-match score of 0 of 16 before fine-tuning to 13 of 16 after. Held-out report questions stay flat at 0 of 2, both before and after fine-tuning."}
 
 ![](../figures/diagrams/recall_gap_ch05_dark.svg){.diagram-dark width="440"}
 
-The same fine-tune produces two very different outcomes — training recall jumps from `0/16` to `13/16`, while held-out generalization stays flat at `0/2`.
+The same fine-tune produces two very different outcomes — training recall jumps from 0/16 to 13/16, while held-out generalization stays flat at 0/2.
 :::
 :::
 

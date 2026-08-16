@@ -183,6 +183,7 @@ RECALL_GAP_TIKZ_TEMPLATE = r"""
 \begin{tikzpicture}[
     beforebar/.style={fill=frozenfill, draw=trained, line width=1pt},
     afterbar/.style={fill=trained, draw=trained},
+    zeromark/.style={draw=trained, line width=3pt, line cap=round},
     every node/.style={text=textcolor}
   ]
 
@@ -199,12 +200,12 @@ RECALL_GAP_TIKZ_TEMPLATE = r"""
 \node[font=\tiny, anchor=east] at (-0.4,2.50) {50\%%};
 \node[font=\tiny, anchor=east] at (-0.4,3.75) {75\%%};
 \node[font=\tiny, anchor=east] at (-0.4,5.00) {100\%%};
-\node[font=\tiny, rotate=90] at (-1.15,2.5) {share answered correctly};
+\node[font=\tiny, rotate=90] at (-1.15,2.5) {exact-match score};
 
-\draw[beforebar] (1.0,0) rectangle (1.9,0.04);
+\draw[zeromark] (1.05,0.02) -- (1.85,0.02);
 \draw[afterbar]  (2.2,0) rectangle (3.1,4.0625);
-\draw[beforebar] (5.0,0) rectangle (5.9,0.04);
-\draw[afterbar]  (6.2,0) rectangle (7.1,0.04);
+\draw[zeromark] (5.05,0.02) -- (5.85,0.02);
+\draw[zeromark] (6.25,0.02) -- (7.05,0.02);
 
 \node[font=\scriptsize] at (1.45,0.30) {0/16};
 \node[font=\scriptsize] at (2.65,4.40) {13/16};

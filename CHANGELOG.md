@@ -271,6 +271,19 @@ highlights in narrative form.
 
 ### Fixed
 
+- Review pass on Chapter 5's recall-gap bar chart: the y-axis said
+  "share answered correctly," broader than what the chapter actually
+  measures (the strict `matched_expected` exact-match rule from
+  Chapter 3) -- changed to "exact-match score" (and the `fig-alt` text
+  to match). The two near-zero bars (`0/16`, `0/2`, `0/2`) were drawn
+  as barely-visible slivers that risked reading as small nonzero
+  values; replaced with a distinct flat marker (a bold rounded tick at
+  the baseline) so a zero result reads unambiguously as zero, not as
+  noise. Removed the inline-code styling around `0/16`/`13/16`/`0/2` in
+  the figure caption -- code styling reads as a value to type, not a
+  measured result; left it in place in the "Be precise about what this
+  run actually shows" paragraph below, where it's consistent with the
+  rest of the chapter's prose.
 - **Chapter 5's two new figures (the LoRA diagram and the recall-gap
   bar chart) were numbered in the PDF but not in HTML.** The PDF's
   native single-image figure syntax numbered them correctly ("Figure
