@@ -38,7 +38,15 @@ pre.sourceCode {
 // <img> tags can't inherit currentColor from the page like inline SVG can,
 // so instead of one adaptive image we show/hide the light- or dark-suited
 // variant based on the same body.quarto-light / body.quarto-dark class
-// Quarto's own theme toggle already sets.
+// Quarto's own theme toggle already sets. Numbered content figures (e.g.
+// Chapter 5's LoRA diagram) put both variants inside the same #fig-...
+// div, one blank-line-separated image per variant with no per-image
+// #fig- id of their own -- Quarto then merges them into a single figure
+// with one real "Figure N.M: caption" instead of treating them as
+// separate (a)/(b) subfigures, so no extra caption-hiding rule is needed
+// here; the same .diagram-light/.diagram-dark toggle below still works
+// on the resulting <img> tags exactly as it does for the plain,
+// caption-less pipeline diagrams.
 .pipeline-diagram {
   text-align: center;
   margin: 1em 0;

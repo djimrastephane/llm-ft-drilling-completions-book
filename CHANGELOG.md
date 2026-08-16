@@ -271,6 +271,21 @@ highlights in narrative form.
 
 ### Fixed
 
+- **Chapter 5's two new figures (the LoRA diagram and the recall-gap
+  bar chart) were numbered in the PDF but not in HTML.** The PDF's
+  native single-image figure syntax numbered them correctly ("Figure
+  5.1", "Figure 5.2"), but the HTML embed's light/dark image pair broke
+  Quarto's caption/crossref detection -- `fig-cap` silently became an
+  inert `data-fig-cap` attribute, so the HTML side fell back to a
+  hand-written, unnumbered "*Figure: ...*" line instead. Fixed by
+  moving both images inside a shared `#fig-...` div (one per
+  blank-line-separated paragraph, no `#fig-` id of their own), which
+  Quarto merges into a single real numbered figure instead of treating
+  them as separate `(a)`/`(b)` subfigures -- HTML now shows the same
+  "Figure 5.1"/"Figure 5.2" as the PDF, and both formats now share the
+  same stable `#fig-lora-lowrank` / `#fig-recall-gap` ids. Checked
+  every other chapter for the same manual-caption pattern; these were
+  the only two.
 - **"LoRA" was used from Chapter 0 onward (including the book's own
   table of contents) but the acronym itself was never expanded where a
   reader would actually encounter it.** Chapter 5's "Engineering
