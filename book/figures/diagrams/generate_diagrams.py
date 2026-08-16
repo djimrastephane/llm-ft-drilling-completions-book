@@ -166,6 +166,65 @@ LORA_TIKZ_TEMPLATE = r"""
 \end{document}
 """
 
+# Chapter 5, Step 3's headline result: a grouped before/after bar chart.
+# Training-set recall 0/16 -> 13/16; held-out generalization 0/2 -> 0/2,
+# unchanged. Real counts from the chapter's own printed run -- see the
+# "Running this exact code prints" block right above where this figure
+# is embedded.
+RECALL_GAP_TIKZ_TEMPLATE = r"""
+\documentclass[tikz,border=4pt]{standalone}
+\usepackage{xcolor}
+\usepackage{sansmathfonts}
+\renewcommand{\familydefault}{\sfdefault}
+\definecolor{trained}{HTML}{%(box_border)s}
+\definecolor{frozenfill}{HTML}{%(box_fill)s}
+\definecolor{textcolor}{HTML}{%(text)s}
+\begin{document}
+\begin{tikzpicture}[
+    beforebar/.style={fill=frozenfill, draw=trained, line width=1pt},
+    afterbar/.style={fill=trained, draw=trained},
+    every node/.style={text=textcolor}
+  ]
+
+\draw[textcolor, opacity=0.15, dashed, line width=0.5pt] (-0.3,1.25) -- (9.3,1.25);
+\draw[textcolor, opacity=0.15, dashed, line width=0.5pt] (-0.3,2.50) -- (9.3,2.50);
+\draw[textcolor, opacity=0.15, dashed, line width=0.5pt] (-0.3,3.75) -- (9.3,3.75);
+\draw[textcolor, opacity=0.15, dashed, line width=0.5pt] (-0.3,5.00) -- (9.3,5.00);
+
+\draw[textcolor, line width=1pt] (0,0) -- (0,5.3);
+\draw[textcolor, line width=1pt] (-0.3,0) -- (9.3,0);
+
+\node[font=\tiny, anchor=east] at (-0.4,0)    {0\%%};
+\node[font=\tiny, anchor=east] at (-0.4,1.25) {25\%%};
+\node[font=\tiny, anchor=east] at (-0.4,2.50) {50\%%};
+\node[font=\tiny, anchor=east] at (-0.4,3.75) {75\%%};
+\node[font=\tiny, anchor=east] at (-0.4,5.00) {100\%%};
+\node[font=\tiny, rotate=90] at (-1.15,2.5) {share answered correctly};
+
+\draw[beforebar] (1.0,0) rectangle (1.9,0.04);
+\draw[afterbar]  (2.2,0) rectangle (3.1,4.0625);
+\draw[beforebar] (5.0,0) rectangle (5.9,0.04);
+\draw[afterbar]  (6.2,0) rectangle (7.1,0.04);
+
+\node[font=\scriptsize] at (1.45,0.30) {0/16};
+\node[font=\scriptsize] at (2.65,4.40) {13/16};
+\node[font=\scriptsize] at (5.45,0.30) {0/2};
+\node[font=\scriptsize] at (6.65,0.30) {0/2};
+
+\node[font=\tiny] at (1.45,-0.35) {before};
+\node[font=\tiny] at (2.65,-0.35) {after};
+\node[font=\tiny] at (5.45,-0.35) {before};
+\node[font=\tiny] at (6.65,-0.35) {after};
+
+\node[font=\scriptsize] at (2.05,-0.75) {Training set (16 questions)};
+\node[font=\scriptsize] at (6.05,-0.75) {Held-out report (2 questions)};
+
+\node[font=\bfseries\small] at (4.5,5.75) {Same fine-tune, two very different outcomes};
+
+\end{tikzpicture}
+\end{document}
+"""
+
 
 def _compile_tex_to_pdf(tex_source: str, workdir: Path, jobname: str) -> Path:
     (workdir / f"{jobname}.tex").write_text(tex_source)
@@ -209,6 +268,18 @@ def render_lora_diagram(name: str = "lora_lowrank_ch05") -> None:
         _pdf_to_svg(dark_pdf, OUTPUT_DIR / f"{name}_dark.svg")
 
 
+def render_recall_gap_diagram(name: str = "recall_gap_ch05") -> None:
+    """Render Chapter 5's Step 3 before/after bar chart to <name>.pdf, _light.svg, _dark.svg."""
+    with tempfile.TemporaryDirectory() as tmp:
+        workdir = Path(tmp)
+        light_pdf = _compile_tex_to_pdf(RECALL_GAP_TIKZ_TEMPLATE % LIGHT_PALETTE, workdir, f"{name}_light")
+        dark_pdf = _compile_tex_to_pdf(RECALL_GAP_TIKZ_TEMPLATE % DARK_PALETTE, workdir, f"{name}_dark")
+
+        shutil.copy(light_pdf, OUTPUT_DIR / f"{name}.pdf")
+        _pdf_to_svg(light_pdf, OUTPUT_DIR / f"{name}_light.svg")
+        _pdf_to_svg(dark_pdf, OUTPUT_DIR / f"{name}_dark.svg")
+
+
 def main() -> None:
     for chapter_num, labels in DIAGRAMS.items():
         name = f"pipeline_ch{chapter_num:02d}"
@@ -217,6 +288,9 @@ def main() -> None:
 
     render_lora_diagram()
     print("Rendered lora_lowrank_ch05 (.pdf, _light.svg, _dark.svg)")
+
+    render_recall_gap_diagram()
+    print("Rendered recall_gap_ch05 (.pdf, _light.svg, _dark.svg)")
 
     for chapter_num, diagrams in THEORY_DIAGRAMS.items():
         for diagram_name, labels in diagrams:

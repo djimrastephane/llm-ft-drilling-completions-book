@@ -363,6 +363,19 @@ After fine-tuning:
 
 ## What just happened?
 
+::: {.content-visible when-format="html"}
+::: {.pipeline-diagram}
+![](../figures/diagrams/recall_gap_ch05_light.svg){.diagram-light width="440" fig-alt="Grouped bar chart. Training set questions rise from 0 of 16 correct before fine-tuning to 13 of 16 after. Held-out report questions stay at 0 of 2 correct both before and after fine-tuning."}
+![](../figures/diagrams/recall_gap_ch05_dark.svg){.diagram-dark width="440"}
+
+*Figure: the same fine-tune produces two very different outcomes — training recall jumps from `0/16` to `13/16`, while held-out generalization stays flat at `0/2`.*
+:::
+:::
+
+::: {.content-visible when-format="pdf"}
+![The same fine-tune produces two very different outcomes -- training recall jumps from 0/16 to 13/16, while held-out generalization stays flat at 0/2.](../figures/diagrams/recall_gap_ch05.pdf){width="440" fig-align="center" #fig-recall-gap-pdf}
+:::
+
 Be precise about what this run actually shows: fine-tuning **changed**
 the model, not simply "improved" it. Training recall jumped from
 `0/16` to `13/16` — real, measurable learning, not a training artifact.

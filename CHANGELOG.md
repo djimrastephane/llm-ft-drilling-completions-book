@@ -217,6 +217,29 @@ highlights in narrative form.
   rewritten to: "LoRA trains two small adapter tables. Their product
   creates a full-size correction, which is added to the frozen base
   weights. The original model is not rewritten."
+- **A second figure for Chapter 5, Step 3: a grouped before/after bar
+  chart of the chapter's headline result**
+  (`figures/diagrams/recall_gap_ch05.pdf` / `_light.svg` / `_dark.svg`,
+  embedded right after "What just happened?", before the "Be precise
+  about what this run actually shows" paragraph). Reviewed first as an
+  HTML sketch alongside a loss-curve alternative; picked as higher
+  priority because it carries the chapter's actual thesis (training
+  recall moves, held-out generalization doesn't) in one glance, not
+  just "loss fell." Plots the chapter's own real counts --
+  training-set recall `0/16 -> 13/16`, held-out generalization
+  `0/2 -> 0/2`, unchanged -- as two bar pairs on a shared 0-100% axis,
+  with the real fraction labeled on every bar so the underlying counts
+  are never hidden behind a percentage. `generate_diagrams.py` gains
+  `render_recall_gap_diagram()` and `RECALL_GAP_TIKZ_TEMPLATE`, reusing
+  the LoRA figure's existing `trained`/`frozenfill` color roles (solid
+  = measured result, outline = untouched baseline) rather than
+  inventing a third color language for this chapter.
+- The loss-curve alternative (Chapter 5's `epoch and loss` callout,
+  plotting the 5 real logged loss values against epoch) was reviewed
+  and deliberately not built yet -- ranked lower because Chapter 5
+  already prints those 5 values directly and a falling number is
+  easier to accept on its own than the recall/generalization split
+  above. Left as a documented, ready-to-build option if wanted later.
 
 ### Changed
 
