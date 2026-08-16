@@ -95,8 +95,8 @@ chapters written and tested):
 | 4 | Tokenization and embedding walkthrough |
 | 5 | First LoRA fine-tune |
 
-**Part II — Industrialising the System** (✅ Chapters 6–9 written and
-tested; Chapters 10–13 still placeholders; Chapters 6, 9, and 10 in
+**Part II — Industrialising the System** (✅ Chapters 6–10 written and
+tested; Chapters 11–13 still placeholders; Chapters 6 and 9 in
 particular are informed by the author's private companion project
 **`industrial-ddr-finetuning`**, built specifically against this book's
 public archive — real per-report extraction, a real 75/76 data-quality
@@ -109,7 +109,7 @@ numbers):
 | 7 | ✅ | Training-set formatting and chunking at scale |
 | 8 | ✅ | Fine-tuning at scale with checkpointing and experiment tracking |
 | 9 | ✅ | Hybrid system combining fine-tuning with retrieval |
-| 10 | — | Traceable, hallucination-mitigated outputs |
+| 10 | ✅ | Traceable, hallucination-mitigated outputs |
 | 11 | — | Fine-tuned model evaluation harness |
 | 12 | — | Model drift detector across versions |
 | 13 | — | Continuous fine-tuning / retraining pipeline |
@@ -126,7 +126,9 @@ pass extraction with `6` duplicate field-value groups; Chapter 8's "at
 scale" fine-tune measured training loss falling `2.755 → 2.164 → 1.821`
 across 3 real epochs; Chapter 9 measured BM25 keyword retrieval finding
 the correct source report `4/4` times on real test queries, against
-`3/4` for dense sentence embeddings.
+`3/4` for dense sentence embeddings; Chapter 10's faithfulness check
+caught a real answer that cited the correct report while actually
+being grounded in a different one.
 
 ## Relationship to the companion pipeline
 
@@ -173,7 +175,7 @@ Output is written to `_book/`. No API keys or paid services are required
 ## Running tests
 
 `tests/` exercises the real functions in every chapter's
-`code/chapter_NN/` script — 52 tests across Chapters 1–9. CI runs the
+`code/chapter_NN/` script — 60 tests across Chapters 1–10. CI runs the
 full suite on Linux, Windows, and macOS on every push and pull request
 that touches `book/**` (see `.github/workflows/tests-linux.yml`,
 `tests-windows.yml`, `tests-macos.yml`), and all three are green.

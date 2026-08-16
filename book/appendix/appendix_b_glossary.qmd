@@ -87,3 +87,5 @@ usage before trusting it against your own reports.
 | Hallucination | A fluent but factually unsupported model output — Chapter 10 covers detecting and mitigating it. |
 | Drift | A model's behavior changing (often degrading on cases it used to get right) across versions or over time — Chapter 12. |
 | RAG (retrieval-augmented generation) | Combining a model with a retrieval step over external documents, instead of relying only on what's in its weights — Chapter 9. |
+| Grounded / grounding | An answer that's actually built from a real, cited source, not just retrieved alongside it — Chapter 10 checks the difference. |
+| Faithfulness | How well an answer's actual content matches what a specific source says — Chapter 10's word-overlap check is one simple way to measure it. |

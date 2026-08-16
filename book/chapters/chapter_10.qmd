@@ -1,111 +1,4 @@
-<!--
-STATUS: placeholder only -- this chapter has not been written yet.
-Draft it by filling in every TODO/comment section below, per
-templates/chapter_template.qmd and book/README.md's chapter map.
--->
-
-<!--
-CHAPTER TEMPLATE
-================
-Copy this file into chapters/chapter_NN.qmd and fill in every section.
-Do not delete a section — if it doesn't apply, write one sentence saying why.
-
-Audience: drilling/completions/intervention/production engineers and
-petroleum data scientists. Assume zero Python experience and zero software
-engineering experience. Assume strong operational experience, strong Excel
-skills, curiosity about AI, and willingness to type code manually. The
-reader should never ask "why am I learning this?" — every concept appears
-only after they've hit the problem it solves. Problem first, technology
-second. If forced to choose between technical completeness and reader
-confidence, choose reader confidence. The reader should finish saying
-"I can build this," not "I understand the theory."
-
-Style rules:
-- Problem first. Never introduce a concept (tokenization, LoRA adapters,
-  quantization, evaluation metrics, or anything else) before the reader
-  has felt the failure that makes it necessary.
-- Every chapter must produce a runnable artifact the reader can point to
-  and say "I built that."
-- Minimal mathematics. If you need an equation, put the intuition in prose
-  first and the equation second, not the other way around.
-- No chapter should run past ~20 pages without a practical exercise
-  checkpoint.
-- Code blocks must run as-is against the companion repository's sample
-  training data. Do not show elided/pseudocode as if it were runnable.
-- Avoid jargon in plain-English explanations. Bad: "This applies a
-  low-rank update to the attention projections." Good: "We taught the
-  model a small, targeted correction instead of retraining it from
-  scratch."
-- Every claimed result (a metric, an evaluation score, a before/after
-  comparison) must come from an actual run of this book's own code
-  against real training data — never invented or estimated.
-
-Required structural elements (do not skip any of these):
-1. A visual progress marker at the very top, e.g. `Base Model ↓ Fine-Tuned Model`.
-2. "## Operational Problem" as the first section after Learning objectives,
-   written in the language of a drilling morning call (a question someone
-   would actually ask out loud), never "today we will learn X."
-3. Before EVERY code block: "## What problem are we solving?", "## Inputs",
-   "## Expected Output".
-4. After EVERY code block: "## What just happened?" in plain English.
-5. An "Engineering Translation" callout for every new programming or AI
-   concept introduced (LoRA adapter -> a small swappable correction sheet
-   clipped to the model, tokenizer -> the standard word-breakdown table
-   everyone on the crew uses, checkpoint -> a saved snapshot of training
-   progress, evaluation set -> a fixed exam the model has never seen,
-   epoch -> one full pass through the training data, etc.) — invent the
-   right analogy for whatever concept the chapter actually introduces.
-6. If the chapter introduces a new AI/ML concept, include a
-   "## Why prompting alone falls short" (or equivalent "why the simpler
-   thing fails") section before introducing the new technique — show the
-   question, why the simpler approach gets it wrong or inconsistent, then
-   the fix.
-7. A "## Production Reality" section: what this chapter's examples
-   deliberately simplify away, and what a messier real training pipeline
-   looks like (inconsistent report formats, duplicate or near-duplicate
-   entries, class imbalance, limited hardware, drift between training and
-   production data, etc.).
-8. A closing "## What can you do now that you couldn't do before?" section
-   — one or two sentences of concrete new capability, not a theory recap.
-9. A ".chapter-status" div directly under the pipeline diagram: a 12-block
-   progress bar (N filled for chapter N, rest empty), an estimated time,
-   and a difficulty badge (🟢/🟠/🔴). See markup below.
-10. Exactly one named persona (Mike/completions, Sarah/intervention,
-    Sean/production, Oumy/drilling — see index.qmd's roster) appears in
-    the opening sentence(s) of "## Operational Problem", asking the
-    motivating question. Pick whichever persona the chapter's question
-    naturally belongs to. Personas may be echoed once more in "##
-    Practical exercise" for bookend effect, but never appear in Theory,
-    Production Reality, or Field notes — those sections stay factual and
-    unattributed, since their content must be independently verified
-    against a real run, not invented dialogue.
-11. A difficulty badge line under both exercise headings: "## Practical
-    exercise" gets 🟢 **Beginner** always; "## Challenge exercise" gets
-    🟠 **Intermediate** by default, escalated to 🔴 **Advanced** only when
-    the challenge is genuinely harder than a typical chapter's (a
-    judgment call, not a mechanical rule).
-12. A "CHECKPOINT" box (`callout-caution`, GFM task-list checkboxes) and a
-    "WHAT YOU BUILT" box (`callout-tip .built-box`), placed together right
-    after "## Repository files" and before the closing "## What can you do
-    now..." / "## Suggested next step" pair. CHECKPOINT is a terse,
-    checkable skills list; WHAT YOU BUILT names the concrete artifact.
-    Neither replaces "## Key takeaways" (conceptual) or "## What can you
-    do now" (prose) — each reinforces achievement from a different angle.
-13. "## Suggested next step" opens with a bolded **Coming up in Chapter
-    N+1:** line before its bridging paragraph.
--->
-
 # Traceable Outputs and Hallucination Mitigation {#sec-chapter-10}
-
-<!-- Progress marker: a small pipeline diagram showing this chapter's
-input -> output transformation (2-4 boxes, vertical flow with arrows).
-Add it to the DIAGRAMS dict in figures/diagrams/generate_diagrams.py and
-run that script -- it compiles TikZ -> PDF via pdflatex, then produces
-three files per diagram: pipeline_ch10_light.svg and _dark.svg (for
-HTML), and pipeline_ch10.pdf (for PDF output -- see the note below on
-why this can't just reuse the SVG). Do NOT use plain ASCII art here; it
-doesn't get the crisp, theme-aware rendering the rest of the book's
-diagrams have. -->
 
 ::: {.content-visible when-format="html"}
 ::: {.pipeline-diagram}
@@ -117,23 +10,6 @@ diagrams have. -->
 ::: {.content-visible when-format="pdf"}
 ![](../figures/diagrams/pipeline_ch10.pdf){width="180" fig-align="center"}
 :::
-<!-- PDF format embeds the compiled .pdf directly, not the SVG -- Quarto's
-LaTeX pipeline needs rsvg-convert to rasterize an SVG for PDF output,
-which may not be installed on the CI runner. generate_diagrams.py should
-save the compiled PDF alongside both SVG variants for exactly this
-reason -- always reference the .pdf here, never the .svg.
-
-fig-align="center" is required on this line -- a bare image (no caption)
-isn't wrapped in pandoc's usual centering figure environment, so without
-it the diagram renders flush against the left margin instead of
-centered. The HTML version doesn't need this (.pipeline-diagram's
-text-align: center in custom.scss already handles it there). -->
-
-<!-- Chapter status strip (rule 9). Progress bar is 12 characters total,
-N filled for chapter N. Estimated time is a plausible range for a reader
-typing every example. Difficulty is the chapter's overall level, usually
-🟢 for Part I and early Part II, 🟠/🔴 as fine-tuning and evaluation get
-more involved. -->
 
 ::: {.chapter-status}
 Progress `██████████░░░` **10 / 13** &nbsp;·&nbsp; **Estimated time:** 30-40 min &nbsp;·&nbsp; **Difficulty:** 🟠 Intermediate
@@ -143,195 +19,450 @@ Progress `██████████░░░` **10 / 13** &nbsp;·&nbsp; **
 
 By the end of this chapter, you will be able to:
 
-- Objective 1 (a concrete capability, not a topic — "load a local
-  open-weight model with `transformers` and generate a completion", not
-  "learn about language models")
-- Objective 2
-- Objective 3
+- Explain why a citation Chapter 9 attaches to an answer means "this is
+  what was retrieved," not "this is what the answer is actually based
+  on" — and why those two claims can silently diverge
+- Build a real, inspectable faithfulness check that scores an answer
+  against each individual source chunk it was shown
+- Run that check against Chapter 9's own 4 test cases and find a real
+  case where an answer looks grounded but is actually traceable to the
+  *wrong* report
+- Explain the limits of a word-overlap faithfulness check: what kind of
+  mistake it can and can't catch
 
 ## Operational Problem
 
-<!-- One or two paragraphs, opening with ONE named persona (rule 10)
-asking a question in the language of a drilling morning call ("Why does
-the model keep getting our sequencing wrong?", "Can we trust this answer
-enough to act on it?"). Describe the real problem this chapter solves.
-Ground it in a scenario: a specific fine-tuning attempt, a specific
-question someone needed answered correctly, a specific way the current
-(base model or manual) approach fails. Never open with "Today we will
-learn X." Example opening: "Sarah, the intervention engineer, asks:
-'...'" -->
+Oumy, the drilling engineer who built Chapter 6's quality gate to catch
+bad training data before anything gets trained on it, looks at Chapter
+9's hybrid system and asks the natural next question: *"We check the
+data going in. How do we check the answer coming out?"*
 
-## Example training excerpt
+Chapter 9's own Field Notes already found the specific problem this
+chapter has to fix: across its 4 test cases, retrieval found the
+correct report every time, but the fine-tuned model's answer was only
+actually consistent with that report's text once. A citation Chapter 9
+attaches to an answer only ever meant "this is what retrieval handed
+the model" — nothing in Chapter 9 checks whether the model's answer
+*used* it.
 
-<!-- A short, realistic (synthetic or anonymised) instruction/response
-training example that motivates the chapter's technique. Show it as a
-callout so it's visually distinct from narrative text. -->
+## Example: a citation that's true, and an answer that isn't
 
-::: {.callout-note title="Sample training example"}
-```json
-{
-  "instruction": "Summarize the operational risk in this report excerpt.",
-  "input": "0600-1130 POOH FR 9,842' TO CHANGE BHA. ERRATIC TORQUE OBSD LAST 3 STDS.",
-  "output": "Erratic torque over the last three stands before pulling out of hole suggests a developing hole-cleaning or BHA issue that should be monitored on the next run."
-}
+Ask Chapter 9's system about report `#21`'s step rate test, and it
+retrieves report `#21`'s real text in its top 3 — the actual test,
+timestamped and logged:
+
+::: {.callout-note title="Report #21, 15:30-16:00 -- the report actually asked about"}
+```
+Step Rate Test: 5K increments, 5 mins each
+set 800 gpm, 40 rotary WOB
+Depth Differential
+20K 4,946 110
+25K 4,946 130
+...
 ```
 :::
 
-## Theory
+The grounded answer that comes back is fluent and specific: *"Test
+choke manifold at 5000psi."* Every word of it is real — but it isn't
+from report `#21`. It's lifted from a different report retrieval also
+handed the model in the same prompt:
 
-<!-- The minimum theory required to understand *why* the implementation
-below works. If this section would exceed ~1.5 pages, you are including
-theory the reader doesn't need yet — cut it or defer it to a later
-chapter. Prefer diagrams and worked examples over formal definitions.
-
-If this section needs its own flow diagram (an algorithm's internal
-steps, not the chapter-opening progress marker), it follows the same
-TikZ -> PDF/SVG pattern, added to THEORY_DIAGRAMS (not DIAGRAMS) in
-figures/diagrams/generate_diagrams.py. The generator only draws a
-straight vertical chain; a diagram that branches (a yes/no decision)
-needs that support added first, or should stay as prose/ASCII for now.
-
-Add an "Engineering Translation" callout for every new concept this
-chapter introduces — see rule 5 above. Example: -->
-
-::: {.callout-tip title="Engineering Translation: <concept>"}
-<!-- One or two plain-language sentences mapping the concept onto
-something the reader already knows from field operations. -->
+::: {.callout-note title="Report #27, 06:00-11:00 -- retrieved alongside #21, and where this answer actually came from"}
+```
+PJSM, pre job safety meeting
+Production Drilling
+Test B.O.P.
+Test BOPE 250 psi low 5000 psi high, test casing 1500 psi,
+test choke manifold 5000 psi
+```
 :::
 
-<!-- If this chapter introduces a new AI/ML concept, add a
-"## Why prompting alone falls short" (or equivalent) section here, before
-the new technique, following rule 6 above. -->
+Report `#27` is a blowout-preventer pressure test — a completely
+different operation. The model didn't invent "5000psi" out of thin air,
+so this isn't the obviously-wrong-and-fluent failure Chapter 3 first
+showed. It's worse: a real number, from a real report, attached to the
+wrong question. Chapter 9's citation for this answer would have listed
+report `#21` right alongside `#27` — both were retrieved — with no way
+to tell which one the answer actually came from.
+
+## Theory
+
+::: {.callout-tip title="Engineering Translation: faithfulness / grounding"}
+An answer is **grounded** in a source if it's actually built from that
+source's content — not just handed the source alongside an unrelated
+guess. **Faithfulness** is how well an answer matches what a specific
+source actually says. A hybrid system can be grounded in general (it
+retrieved real reports) while being unfaithful in the specific answer
+it gave (it didn't actually use them) — that gap is exactly what
+report `#21`'s example above shows.
+:::
+
+::: {.callout-tip title="Engineering Translation: hallucination"}
+A **hallucination** is a fluent, confident model output that isn't
+actually supported by real evidence. Chapter 1 showed the obvious kind
+— confident nonsense with nothing behind it. Report `#21`'s example
+above is the harder kind: a hallucination made of entirely real words,
+borrowed from the wrong place. Both are hallucinations; only one of
+them is easy to spot by reading the answer alone.
+:::
+
+## Why trusting a citation isn't enough
+
+The tempting shortcut: if an answer comes with a citation — a report
+number and time window retrieval actually found — treat it as
+trustworthy. Report `#21`'s example shows exactly why that fails: the
+citation Chapter 9 would print alongside this answer is *true*
+(report `#21` really was retrieved, really is relevant to the
+question) and the *answer* is still wrong. A citation only proves
+retrieval did its job. It proves nothing about whether the generation
+step actually used the report it names, instead of a different one
+sitting in the same prompt. Catching that gap needs something that
+looks at the answer's own words, not just the list of sources it was
+handed.
 
 ## Implementation
 
-<!-- Step-by-step, runnable code, broken into named steps if more than one
-logical block is involved. For EACH code block, follow this exact pattern: -->
-
-### Step 1: <what this step accomplishes>
+### Step 1: Score an answer against a single source
 
 ## What problem are we solving?
 
-<!-- One or two sentences: what does this specific block of code solve? -->
+Turn "does this answer match this source?" into a real, checkable
+number — something simple enough to read and trust, not a second
+opaque model making an opaque judgment call.
 
 ## Inputs
 
-<!-- Bullet list: what does this code need to run? -->
+- One generated `answer` (a string)
+- One candidate `source_text` (a string) — a single retrieved chunk
 
 ## Expected Output
 
-<!-- What should the reader see when they run this? Show a concrete example. -->
+A score from 0.0 to 1.0: the fraction of the answer's meaningful words
+that also appear somewhere in the source.
 
 ```{python}
 #| eval: false
-# Minimal working example — replace with chapter-specific code.
-print("Hello, local LLM")
+import re
+
+# Words that appear in every prompt's own instruction/input template
+# ("What happened on this well during this time window?"), not because
+# the retrieved text was actually used. Counting them as "supported"
+# would make every answer look more grounded than it is.
+STOPWORDS = {
+    "a", "an", "and", "are", "as", "at", "be", "been", "but", "by", "during",
+    "for", "from", "happened", "in", "is", "it", "its", "of", "on", "or",
+    "report", "the", "this", "time", "to", "was", "well", "were", "what",
+    "which", "window", "with",
+}
+
+
+def content_words(text: str) -> set[str]:
+    words = re.findall(r"[a-z0-9']+", text.lower())
+    return {w for w in words if w not in STOPWORDS and len(w) > 2}
+
+
+def faithfulness_score(answer: str, source_text: str) -> float:
+    answer_words = content_words(answer)
+    if not answer_words:
+        return 0.0
+    return len(answer_words & content_words(source_text)) / len(answer_words)
+
+
+print(faithfulness_score("Test choke manifold at 5000psi", "test choke manifold 5000 psi"))
+print(faithfulness_score("Test choke manifold at 5000psi", "Step Rate Test: 5K increments, 5 mins each, 800 gpm, 40 rotary WOB"))
+```
+
+Running this exact code prints:
+
+```
+0.75
+0.25
 ```
 
 ## What just happened?
 
-<!-- Plain-English explanation, no unnecessary jargon. Bad: "This applies
-a low-rank update to the attention projections." Good: "We taught the
-model a small, targeted correction instead of retraining it from
-scratch." -->
+The exact same generated answer scores `0.75` against report `#27`'s
+text and only `0.25` against report `#21`'s — the report it was
+actually supposed to be about. The number alone already tells the
+story Chapter 9 could only tell by reading both answers by eye: this
+answer is faithful to *something*, just not the thing it was asked
+about.
+
+`0.75`, not `1.0`, is itself worth noticing: the answer's own
+`"5000psi"` (no space) doesn't match report `#27`'s `"5000 psi"` (two
+words) as a token, even though a person reading both would call them
+the same number. A word-overlap check is exactly this literal —
+Production Reality below has more on what that costs.
 
 ## Production Reality
 
-<!-- What does this chapter's example deliberately simplify away? What
-does a messier, real, multi-well or multi-operator training pipeline
-look like for this same problem? Follow rule 7 above. -->
+This is a plain word-overlap check, not a semantic one. It will miss a
+genuine paraphrase (an answer that says the same thing in different
+words scores low even when it's correct), and it can't detect a
+directional or factual inversion buried inside otherwise-matching
+words — Field Notes below shows a real case of exactly that. A
+production system checking higher-stakes claims would pair this with a
+real entailment or fact-verification model; this chapter's version is
+deliberately simple enough to read every line of and trust what it's
+actually measuring.
+
+### Step 2: Keep only the sources an answer is actually traceable to
+
+## What problem are we solving?
+
+Chapter 9's `answer_with_retrieval` cites every chunk retrieval handed
+the model, whether or not the answer used it. Turn that into a
+citation list that only survives if the answer is actually faithful to
+it.
+
+## Inputs
+
+- The loaded, fine-tuned `model` and `tokenizer` from Chapter 8/9
+- `instruction`, `input_context`, and a retrieval `query` (Chapter 9)
+- The retrieval `corpus` and `bm25` index (Chapter 9)
+
+## Expected Output
+
+The generated answer, every retrieved chunk's faithfulness score, and
+a `verified_sources` list containing only the chunks that actually
+cross a faithfulness threshold.
+
+```{python}
+#| eval: false
+def answer_with_traceable_sources(model, tokenizer, instruction, input_context, query, corpus, bm25, k=3, threshold=0.5) -> dict:
+    retrieved = retrieve(query, corpus, bm25, k=k)
+    prompt = build_grounded_prompt(instruction, input_context, retrieved)
+    answer = generate_reply(model, tokenizer, prompt, max_new_tokens=60)
+
+    scored = sorted(
+        ({**chunk, "faithfulness": faithfulness_score(answer, chunk["text"])} for chunk in retrieved),
+        key=lambda c: c["faithfulness"],
+        reverse=True,
+    )
+    verified_sources = [c for c in scored if c["faithfulness"] >= threshold]
+
+    return {"answer": answer, "retrieved": scored, "verified_sources": verified_sources, "grounded": len(verified_sources) > 0}
+```
+
+## What just happened?
+
+`retrieve` and `build_grounded_prompt` are Chapter 9's own functions,
+reused unchanged — this step doesn't touch how retrieval or generation
+work, only what happens to the result afterward. `threshold=0.5` is a
+plain default, not tuned to any one answer; Step 3 shows what it does
+across all 4 of Chapter 9's real test cases.
+
+## Production Reality
+
+`k` (how many chunks get retrieved and shown to the model) directly
+controls how much unrelated material sits in the same prompt as the
+right answer, and report `#21`'s example is exactly what happens when
+that goes wrong: the correct report was in the prompt, and the model
+still reached for a different one next to it. A production system
+would tune `k` against real faithfulness measurements like this one,
+not just against retrieval accuracy.
+
+### Step 3: Run the check against Chapter 9's real test cases
+
+## What problem are we solving?
+
+Apply Step 2's function to all 4 of Chapter 9's test cases and see,
+with real numbers, how often "grounded" actually means "grounded in
+the right report."
+
+## Inputs
+
+- Chapter 9's `TEST_CASES` (4 real report questions) and `INSTRUCTION`
+- The fine-tuned checkpoint, retrieval corpus, and BM25 index
+
+## Expected Output
+
+Per-case answers, faithfulness scores against every retrieved chunk,
+and which sources (if any) survive as verified citations.
+
+```{python}
+#| eval: false
+for label, input_context, query, target_report in TEST_CASES:
+    result = answer_with_traceable_sources(lora_model, tokenizer, INSTRUCTION, input_context, query, corpus, bm25)
+    print(f"{label}: {result['answer']}")
+    print(f"  grounded: {result['grounded']}")
+    for chunk in result["retrieved"]:
+        mark = "verified" if chunk["faithfulness"] >= 0.5 else "not used"
+        print(f"    [{mark:>8}] Report #{chunk['report_num']} (faithfulness {chunk['faithfulness']:.2f})")
+```
+
+Running this exact code prints:
+
+```
+Report #37 (held-out): Trip out of hole with BHA #18. Stop at 5,800' and circulate to cool hole and tools.
+  grounded: True
+    [verified] Report #37 (faithfulness 1.00)
+    [verified] Report #28 (faithfulness 0.78)
+    [not used] Report #39 (faithfulness 0.44)
+
+Report #38 (stuck pipe): Production Drilling Trips Trip in hole with drill pipe from 10,490' to surface
+  grounded: False
+    [not used] Report #38 (faithfulness 0.44)
+    [not used] Report #60 (faithfulness 0.22)
+    [not used] Report #61 (faithfulness 0.11)
+
+Report #21 (step rate test): Test choke manifold at 5000psi
+  grounded: True
+    [verified] Report #27 (faithfulness 0.75)
+    [not used] Report #21 (faithfulness 0.25)
+    [not used] Report #17 (faithfulness 0.25)
+
+Report #49 (fishing): Trip out of hole with fishing bha
+  grounded: True
+    [verified] Report #49 (faithfulness 0.80)
+    [not used] Report #49 (faithfulness 0.40)
+    [not used] Report #50 (faithfulness 0.20)
+```
+
+## What just happened?
+
+Four answers, three different real outcomes:
+
+- **`#37`** is genuinely faithful, and correctly verified against the
+  right report — the check confirms what Chapter 9 already showed.
+- **`#38`** is correctly flagged `grounded: False`. No retrieved chunk
+  crosses the threshold, matching Chapter 9's own human judgment that
+  this answer ignores the retrieved text entirely — automated now,
+  not eyeballed.
+- **`#21`** is the case a plain `grounded: True`/`False` flag would
+  have gotten wrong. It reads as grounded — and it is, just not in the
+  report the question was actually about. Only checking `verified_sources`
+  against the *target* report catches this; the boolean alone would
+  have silently counted it as a success.
+
+`#49` is worth a closer look too — see Field Notes.
 
 ## Practical exercise
 
 🟢 **Beginner**
 
-<!-- A guided exercise using the sample training data, with a clear,
-checkable "you'll know you got it right when..." condition. This is not
-optional — every chapter has one. -->
+**Try it yourself:** run
+`python code/chapter_10/traceable_outputs.py` from inside `book/` and
+compare its printed output to the transcript above.
 
-**Try it yourself:** ...
-
-**You'll know it worked when:** ...
+**You'll know it worked when:** you see `grounded: False` for report
+`#38` and `grounded: True` for report `#37`, and you can explain in one
+sentence why report `#21`'s case is more concerning than `#38`'s, even
+though both were flagged by Chapter 9 as failures.
 
 ## Field notes
 
-<!-- Optional but encouraged, and should recur often across the book: a
-short, real, independently-verified vignette showing where the tool this
-chapter just built actually breaks (or, in a later chapter, where a
-previous chapter's tool breaks and this chapter's technique fixes it).
-Every number and quote here must be checked against a real run before
-writing it down -- run the code, don't estimate the outcome. The payoff
-is a moment where the reader sees, concretely, why the next chapter's
-added complexity is earning its keep, not complexity for its own sake.
+::: {.callout-warning title="Field notes: right words, wrong direction"}
+**Query:** report `#49`'s fishing-operation answer, checked word by
+word against its own correctly-verified source.
 
-Format:
-  Query/Action -> the (surprising) result -> the real training/eval data
-  that explains why -> the one-sentence lesson. -->
+**Result:** the grounded answer says *"Trip out of hole with fishing
+bha"* — faithfulness `0.80` against report `#49`'s actual text, well
+above threshold, correctly verified. Report `#49`'s real text says:
 
-::: {.callout-warning title="Field notes: <short description>"}
-**Query:** `"..."`
+```
+Production Drilling Trips
+Pick up Fishing BHA # 33 and trip in hole to 7,996'
+```
 
-**Result:** ...
+The report says **trip in hole**. The answer says **trip out of
+hole** — the opposite direction — and drops the specific depth,
+`7,996'`, entirely.
 
-**Why:** the training/eval data shows:
+**Why:** `"out"` and `"in"` are both short, common words. This
+chapter's check only tests whether an answer's words appear *somewhere*
+in the source; it has no notion of which words modify which, so
+`"trip"`, `"fishing"`, and `"bha"` all matching is enough to score high
+even though the one word that actually changes the meaning of the
+sentence flipped.
 
-- "..."
-- "..."
-
-but never shows "...".
-
-**Lesson:** ...
+**Lesson:** a high faithfulness score means an answer's vocabulary
+came from the right place — not that every claim in it is correct.
+`#21`'s wrong-report case and `#49`'s flipped-direction case are two
+different failure modes this simple check catches differently: one it
+flags correctly by score alone, the other it verifies with a score
+that's honestly still too high. Both are worth knowing about; only one
+is currently caught automatically.
 :::
 
 ## Challenge exercise
 
-🟠 **Intermediate** <!-- escalate to 🔴 Advanced per rule 11 if warranted -->
+🟠 **Intermediate**
 
-<!-- A harder, more open-ended extension for readers who want to go
-further. No solution is provided in the main text; a reference solution
-lives in the companion repository under `code/chapter_NN/challenge/`. -->
-
-**Challenge:** ...
+**Challenge:** does this chapter's check also catch hallucination when
+there's no retrieval context at all — Chapter 9's original,
+un-grounded baseline answers? Regenerate each of the 4 test cases
+*without* retrieval, then score each answer against its own target
+report's real text using this chapter's `faithfulness_score`. A
+reference solution is at `code/chapter_10/challenge/challenge.py` — on
+a real run, every un-grounded answer scores at or below `0.17` against
+its own target report (one scores `0.00`), well under the `0.5`
+threshold this chapter uses, confirming the check generalizes: it
+isn't just tuned to Chapter 9's specific retrieval setup, it correctly
+flags "no real evidence used" as unfaithful in general.
 
 ## Key takeaways
 
-- Takeaway 1
-- Takeaway 2
-- Takeaway 3
+- A citation only proves retrieval did its job — it proves nothing
+  about whether generation actually used the report it names. Report
+  `#21`'s example is a true citation attached to a wrong answer.
+- A plain `grounded: True`/`False` flag would have missed report
+  `#21`'s failure entirely. Checking *which* source an answer verifies
+  against, not just whether one does, is what actually catches it.
+- This chapter's faithfulness check is lexical, not semantic — it
+  reliably catches "used the wrong evidence" (`#21`) but can miss a
+  factual inversion hiding inside otherwise-matching words (`#49`).
+  Knowing which failure mode a check does and doesn't catch matters as
+  much as having the check.
+- The same check that catches a wrong-source hallucination also
+  correctly flags a fully un-grounded answer as unfaithful — it isn't
+  narrowly tuned to one failure mode.
 
 ## Repository files
 
-<!-- Exact paths in the companion repo relevant to this chapter. -->
-
 | File | Purpose |
 |---|---|
-| `code/chapter_10/traceable_outputs.py` | ... |
-| `datasets/...` | ... |
+| `code/chapter_10/traceable_outputs.py` | Faithfulness scoring and traceable-source verification over Chapter 9's hybrid system |
+| `code/chapter_10/challenge/challenge.py` | Reference solution: faithfulness-checking Chapter 9's un-grounded baseline answers |
 | `notebooks/chapter_10_explore.ipynb` | Interactive companion notebook |
 
-<!-- Rule 12: CHECKPOINT + WHAT YOU BUILT, together, here. -->
-
 ::: {.callout-caution title="CHECKPOINT — Chapter 10"}
-- [x] Skill 1 gained this chapter, phrased as something done, not learned
-- [x] Skill 2
-- [x] Skill 3
+- [x] Built a real, inspectable faithfulness score between an answer
+      and a source, with no opaque second model involved
+- [x] Found a real case where a true citation was attached to an
+      answer that actually came from a different report
+- [x] Ran the check against all 4 of Chapter 9's test cases and
+      confirmed it flags exactly the failure Chapter 9's Field Notes
+      found, plus one Chapter 9 couldn't distinguish from a success
+- [x] Named a concrete limitation of the check (a factual inversion
+      inside otherwise-matching words) instead of overselling it
 :::
 
 ::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}
-**`artifact_name.py`** — one or two sentences naming the concrete artifact
-and what it hands off to the next chapter.
+**`traceable_outputs.py`** — a faithfulness check that scores a
+generated answer against each source chunk it was shown, and a
+`verified_sources` list that only keeps the citations an answer is
+actually traceable to. Applied to Chapter 9's hybrid system, it turns
+"here's what was retrieved" into "here's what the answer is actually
+based on" — catching a real, fluent, source-backed-sounding answer
+that was grounded in the wrong report.
 :::
 
 ## What can you do now that you couldn't do before?
 
-<!-- One or two sentences of concrete new capability, following rule 8
-above. Not a theory recap — a plain statement of what the reader can now
-do that they couldn't before this chapter. -->
+You can tell the difference between an answer that cites a real source
+and an answer that's actually faithful to it — and you have a concrete,
+inspectable number to point to instead of reading every answer by eye
+the way Chapter 9 had to.
 
 ## Suggested next step
 
-<!-- Rule 13: open with a bolded "Coming up in Chapter N+1:" line, then
-one paragraph bridging to the next chapter: what limitation of today's
-artifact motivates tomorrow's work? -->
-
-**Coming up in Chapter N+1:** ...
+**Coming up in Chapter 11:** this chapter checked faithfulness one
+hand-picked test case at a time — exactly 4 of them, chosen because
+Chapter 9 already knew what to look for in each. That doesn't scale,
+and it doesn't produce the kind of summary metric a real evaluation
+needs. Chapter 11 builds a proper evaluation harness: a fixed set of
+questions with known-correct answers, run automatically, scored
+consistently, so a change to the model or the retrieval setup can be
+judged by a number instead of a handful of examples someone happened
+to check by hand.

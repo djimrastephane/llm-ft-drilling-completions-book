@@ -240,6 +240,42 @@ highlights in narrative form.
   already prints those 5 values directly and a falling number is
   easier to accept on its own than the recall/generalization split
   above. Left as a documented, ready-to-build option if wanted later.
+- **Chapter 10: Traceable Outputs and Hallucination Mitigation**
+  (`chapters/chapter_10.qmd`) fully drafted, with working, tested code
+  (`code/chapter_10/traceable_outputs.py`,
+  `code/chapter_10/challenge/challenge.py`, `tests/test_chapter_10.py`,
+  `notebooks/chapter_10_explore.ipynb`). Builds a plain word-overlap
+  faithfulness check -- `content_words()` strips stopwords and the
+  instruction template's own boilerplate, `faithfulness_score()` scores
+  an answer against a single source chunk -- and applies it to Chapter
+  9's real hybrid system, keeping only the citations an answer is
+  actually traceable to (`verified_sources`) instead of everything
+  retrieval handed the model. Real run against Chapter 9's exact 4 test
+  cases: report `#37` correctly verified faithful (`1.00`) against its
+  own report; report `#38` correctly flagged `grounded: False`, no
+  chunk crosses threshold, matching Chapter 9's own human judgment;
+  report `#49` verified against its real target but the check can't
+  catch a genuine "trip in" vs. "trip out" direction inversion buried
+  in otherwise-matching words (Field Notes). Report `#21` is the
+  headline finding: the grounded answer *"Test choke manifold at
+  5000psi"* is real, fluent, and verified faithful -- against report
+  `#27` (`0.75`), a blowout-preventer test also retrieved alongside the
+  actual target, report `#21` (`0.25`). A plain `grounded: True`/`False`
+  flag would have silently counted this as a success; only checking
+  which specific source an answer verifies against catches it. Caught
+  and fixed a transcription error while verifying: an early draft
+  claimed the `#27` comparison scored `1.0`; the real run returns
+  `0.75`, because the answer's own `"5000psi"` (no space) doesn't token-match
+  the source's `"5000 psi"` (two words) -- corrected in the chapter
+  text, and used as an additional real illustration of the check's
+  lexical limits. Challenge exercise: Chapter 9's un-grounded baseline
+  answers (no retrieval at all) score `0.17`, `0.17`, `0.00`, `0.17`
+  against their own target reports -- all well under the `0.5`
+  threshold, confirming the check generalizes as a real hallucination
+  detector, not something narrowly tuned to Chapter 9's specific setup.
+  Glossary gains "Grounded / grounding" and "Faithfulness" entries.
+  Both READMEs, the chapter table, and test counts (52 -> 60 across
+  Chapters 1-10) updated to match.
 
 ### Changed
 
