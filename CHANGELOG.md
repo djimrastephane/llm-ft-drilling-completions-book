@@ -276,6 +276,35 @@ highlights in narrative form.
   Glossary gains "Grounded / grounding" and "Faithfulness" entries.
   Both READMEs, the chapter table, and test counts (52 -> 60 across
   Chapters 1-10) updated to match.
+- **Chapter 11: Evaluating a Fine-Tuned Domain Model**
+  (`chapters/chapter_11.qmd`) fully drafted, with working, tested code
+  (`code/chapter_11/eval_finetuned_model.py`,
+  `code/chapter_11/challenge/challenge.py`, `tests/test_chapter_11.py`,
+  `notebooks/chapter_11_explore.ipynb`). Builds a real, 8-example
+  held-out evaluation set by calling Chapter 7's own
+  `build_timeline_examples_for_report` directly on the held-out report
+  -- the exact same 8 examples Chapter 8's training script already
+  built internally for its own `held_out_exact_match` logging, never
+  looked at past that one column until now. Scores it three ways:
+  exact-match (reused from Chapter 3), a partial-credit overlap score
+  (Chapter 10's `faithfulness_score`, reused unchanged but applied to a
+  different comparison -- answer vs. known-correct output, not answer
+  vs. retrieved source), and perplexity (new). Real run: exact-match
+  `0/8`, average overlap `0.17` -- every generated answer collapses to
+  one of two near-identical generic phrases regardless of the actual
+  question, the same "shape, not judgment" pattern Chapter 3/9 already
+  found. Headline finding: perplexity on the identical held-out text
+  falls from `159.91` (base model) to `25.03` (fine-tuned) -- a real,
+  substantial change the exact-match number completely hides. Field
+  Notes reads Chapter 8's own `metrics.csv` all the way across:
+  `held_out_exact_match` stayed `0/8` at every one of its 3 logged
+  epochs, while perplexity on the same text fell at every epoch
+  (`27.99 -> 25.40 -> 25.03`), tracking the falling training loss
+  almost exactly. Challenge exercise reproduces that exact table by
+  running perplexity against all 3 of Chapter 8's real checkpoints.
+  Glossary gains an "Evaluation set" entry. Both READMEs, the chapter
+  table, and test counts (60 -> 64 across Chapters 1-11) updated to
+  match.
 
 ### Changed
 
