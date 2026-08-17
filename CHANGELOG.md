@@ -305,6 +305,32 @@ highlights in narrative form.
   Glossary gains an "Evaluation set" entry. Both READMEs, the chapter
   table, and test counts (60 -> 64 across Chapters 1-11) updated to
   match.
+- **Chapter 12: Detecting Drift Across Model Versions**
+  (`chapters/chapter_12.qmd`) fully drafted, with working, tested code
+  (`code/chapter_12/detect_model_drift.py`,
+  `code/chapter_12/challenge/challenge.py`, `tests/test_chapter_12.py`,
+  `notebooks/chapter_12_explore.ipynb`). `summarize_version()` collapses
+  Chapter 11's three metrics into one comparable summary per model
+  version; `compare_versions()` reports a direction
+  (improved/regressed/unchanged) per metric between two versions,
+  deliberately without collapsing disagreement into a single verdict.
+  Real run across Chapter 8's 3 epoch checkpoints found a genuine
+  disagreement: `checkpoint_1 -> checkpoint_2` shows `avg_overlap`
+  regressing (`0.354 -> 0.167`) while `perplexity` improves (`27.99 ->
+  25.40`), on the same 8 held-out questions. Field Notes investigates
+  by reading the actual generated text: both checkpoints still produce
+  one memorized-sounding template regardless of the question (the same
+  "shape, not judgment" pattern from Chapters 3/9/11) -- the template
+  itself just changed between epochs, and the new one happens to share
+  less vocabulary with the real answers, which is what the overlap
+  score is actually measuring. Challenge exercise confirms the same
+  disagreement pattern holds comparing two entirely different training
+  regimes (Chapter 5's 16-example fine-tune vs. Chapter 8's "at scale"
+  checkpoint: `avg_overlap` `0.5625 -> 0.167`, `perplexity` `112.28 ->
+  25.03`), not just adjacent epochs of one run. Glossary's "Drift"
+  entry extended to define "regression" alongside it. Both READMEs, the
+  chapter table, and test counts (64 -> 69 across Chapters 1-12)
+  updated to match.
 
 ### Changed
 

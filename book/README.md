@@ -95,8 +95,8 @@ chapters written and tested):
 | 4 | Tokenization and embedding walkthrough |
 | 5 | First LoRA fine-tune |
 
-**Part II — Industrialising the System** (✅ Chapters 6–11 written and
-tested; Chapters 12–13 still placeholders; Chapters 6 and 9 in
+**Part II — Industrialising the System** (✅ Chapters 6–12 written and
+tested; Chapter 13 still a placeholder; Chapters 6 and 9 in
 particular are informed by the author's private companion project
 **`industrial-ddr-finetuning`**, built specifically against this book's
 public archive — real per-report extraction, a real 75/76 data-quality
@@ -111,7 +111,7 @@ numbers):
 | 9 | ✅ | Hybrid system combining fine-tuning with retrieval |
 | 10 | ✅ | Traceable, hallucination-mitigated outputs |
 | 11 | ✅ | Fine-tuned model evaluation harness |
-| 12 | — | Model drift detector across versions |
+| 12 | ✅ | Model drift detector across versions |
 | 13 | — | Continuous fine-tuning / retraining pipeline |
 
 Each written Part II chapter includes a simplified, standalone
@@ -131,7 +131,9 @@ caught a real answer that cited the correct report while actually
 being grounded in a different one; Chapter 11 measured perplexity on
 real held-out text falling from `159.91` (base model) to `25.03`
 (fine-tuned) even though exact-match on the same 8 questions stayed
-`0/8` at every training epoch.
+`0/8` at every training epoch; Chapter 12 found `avg_overlap` and
+`perplexity` disagreeing on direction between two real checkpoints of
+the same training run.
 
 ## Relationship to the companion pipeline
 
@@ -178,7 +180,7 @@ Output is written to `_book/`. No API keys or paid services are required
 ## Running tests
 
 `tests/` exercises the real functions in every chapter's
-`code/chapter_NN/` script — 64 tests across Chapters 1–11. CI runs the
+`code/chapter_NN/` script — 69 tests across Chapters 1–12. CI runs the
 full suite on Linux, Windows, and macOS on every push and pull request
 that touches `book/**` (see `.github/workflows/tests-linux.yml`,
 `tests-windows.yml`, `tests-macos.yml`), and all three are green.

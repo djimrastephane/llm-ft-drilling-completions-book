@@ -1,111 +1,4 @@
-<!--
-STATUS: placeholder only -- this chapter has not been written yet.
-Draft it by filling in every TODO/comment section below, per
-templates/chapter_template.qmd and book/README.md's chapter map.
--->
-
-<!--
-CHAPTER TEMPLATE
-================
-Copy this file into chapters/chapter_NN.qmd and fill in every section.
-Do not delete a section — if it doesn't apply, write one sentence saying why.
-
-Audience: drilling/completions/intervention/production engineers and
-petroleum data scientists. Assume zero Python experience and zero software
-engineering experience. Assume strong operational experience, strong Excel
-skills, curiosity about AI, and willingness to type code manually. The
-reader should never ask "why am I learning this?" — every concept appears
-only after they've hit the problem it solves. Problem first, technology
-second. If forced to choose between technical completeness and reader
-confidence, choose reader confidence. The reader should finish saying
-"I can build this," not "I understand the theory."
-
-Style rules:
-- Problem first. Never introduce a concept (tokenization, LoRA adapters,
-  quantization, evaluation metrics, or anything else) before the reader
-  has felt the failure that makes it necessary.
-- Every chapter must produce a runnable artifact the reader can point to
-  and say "I built that."
-- Minimal mathematics. If you need an equation, put the intuition in prose
-  first and the equation second, not the other way around.
-- No chapter should run past ~20 pages without a practical exercise
-  checkpoint.
-- Code blocks must run as-is against the companion repository's sample
-  training data. Do not show elided/pseudocode as if it were runnable.
-- Avoid jargon in plain-English explanations. Bad: "This applies a
-  low-rank update to the attention projections." Good: "We taught the
-  model a small, targeted correction instead of retraining it from
-  scratch."
-- Every claimed result (a metric, an evaluation score, a before/after
-  comparison) must come from an actual run of this book's own code
-  against real training data — never invented or estimated.
-
-Required structural elements (do not skip any of these):
-1. A visual progress marker at the very top, e.g. `Base Model ↓ Fine-Tuned Model`.
-2. "## Operational Problem" as the first section after Learning objectives,
-   written in the language of a drilling morning call (a question someone
-   would actually ask out loud), never "today we will learn X."
-3. Before EVERY code block: "## What problem are we solving?", "## Inputs",
-   "## Expected Output".
-4. After EVERY code block: "## What just happened?" in plain English.
-5. An "Engineering Translation" callout for every new programming or AI
-   concept introduced (LoRA adapter -> a small swappable correction sheet
-   clipped to the model, tokenizer -> the standard word-breakdown table
-   everyone on the crew uses, checkpoint -> a saved snapshot of training
-   progress, evaluation set -> a fixed exam the model has never seen,
-   epoch -> one full pass through the training data, etc.) — invent the
-   right analogy for whatever concept the chapter actually introduces.
-6. If the chapter introduces a new AI/ML concept, include a
-   "## Why prompting alone falls short" (or equivalent "why the simpler
-   thing fails") section before introducing the new technique — show the
-   question, why the simpler approach gets it wrong or inconsistent, then
-   the fix.
-7. A "## Production Reality" section: what this chapter's examples
-   deliberately simplify away, and what a messier real training pipeline
-   looks like (inconsistent report formats, duplicate or near-duplicate
-   entries, class imbalance, limited hardware, drift between training and
-   production data, etc.).
-8. A closing "## What can you do now that you couldn't do before?" section
-   — one or two sentences of concrete new capability, not a theory recap.
-9. A ".chapter-status" div directly under the pipeline diagram: a 12-block
-   progress bar (N filled for chapter N, rest empty), an estimated time,
-   and a difficulty badge (🟢/🟠/🔴). See markup below.
-10. Exactly one named persona (Mike/completions, Sarah/intervention,
-    Sean/production, Oumy/drilling — see index.qmd's roster) appears in
-    the opening sentence(s) of "## Operational Problem", asking the
-    motivating question. Pick whichever persona the chapter's question
-    naturally belongs to. Personas may be echoed once more in "##
-    Practical exercise" for bookend effect, but never appear in Theory,
-    Production Reality, or Field notes — those sections stay factual and
-    unattributed, since their content must be independently verified
-    against a real run, not invented dialogue.
-11. A difficulty badge line under both exercise headings: "## Practical
-    exercise" gets 🟢 **Beginner** always; "## Challenge exercise" gets
-    🟠 **Intermediate** by default, escalated to 🔴 **Advanced** only when
-    the challenge is genuinely harder than a typical chapter's (a
-    judgment call, not a mechanical rule).
-12. A "CHECKPOINT" box (`callout-caution`, GFM task-list checkboxes) and a
-    "WHAT YOU BUILT" box (`callout-tip .built-box`), placed together right
-    after "## Repository files" and before the closing "## What can you do
-    now..." / "## Suggested next step" pair. CHECKPOINT is a terse,
-    checkable skills list; WHAT YOU BUILT names the concrete artifact.
-    Neither replaces "## Key takeaways" (conceptual) or "## What can you
-    do now" (prose) — each reinforces achievement from a different angle.
-13. "## Suggested next step" opens with a bolded **Coming up in Chapter
-    N+1:** line before its bridging paragraph.
--->
-
 # Detecting Drift Across Model Versions {#sec-chapter-12}
-
-<!-- Progress marker: a small pipeline diagram showing this chapter's
-input -> output transformation (2-4 boxes, vertical flow with arrows).
-Add it to the DIAGRAMS dict in figures/diagrams/generate_diagrams.py and
-run that script -- it compiles TikZ -> PDF via pdflatex, then produces
-three files per diagram: pipeline_ch12_light.svg and _dark.svg (for
-HTML), and pipeline_ch12.pdf (for PDF output -- see the note below on
-why this can't just reuse the SVG). Do NOT use plain ASCII art here; it
-doesn't get the crisp, theme-aware rendering the rest of the book's
-diagrams have. -->
 
 ::: {.content-visible when-format="html"}
 ::: {.pipeline-diagram}
@@ -117,23 +10,6 @@ diagrams have. -->
 ::: {.content-visible when-format="pdf"}
 ![](../figures/diagrams/pipeline_ch12.pdf){width="180" fig-align="center"}
 :::
-<!-- PDF format embeds the compiled .pdf directly, not the SVG -- Quarto's
-LaTeX pipeline needs rsvg-convert to rasterize an SVG for PDF output,
-which may not be installed on the CI runner. generate_diagrams.py should
-save the compiled PDF alongside both SVG variants for exactly this
-reason -- always reference the .pdf here, never the .svg.
-
-fig-align="center" is required on this line -- a bare image (no caption)
-isn't wrapped in pandoc's usual centering figure environment, so without
-it the diagram renders flush against the left margin instead of
-centered. The HTML version doesn't need this (.pipeline-diagram's
-text-align: center in custom.scss already handles it there). -->
-
-<!-- Chapter status strip (rule 9). Progress bar is 12 characters total,
-N filled for chapter N. Estimated time is a plausible range for a reader
-typing every example. Difficulty is the chapter's overall level, usually
-🟢 for Part I and early Part II, 🟠/🔴 as fine-tuning and evaluation get
-more involved. -->
 
 ::: {.chapter-status}
 Progress `████████████░` **12 / 13** &nbsp;·&nbsp; **Estimated time:** 30-40 min &nbsp;·&nbsp; **Difficulty:** 🟠 Intermediate
@@ -143,195 +19,323 @@ Progress `████████████░` **12 / 13** &nbsp;·&nbsp; **
 
 By the end of this chapter, you will be able to:
 
-- Objective 1 (a concrete capability, not a topic — "load a local
-  open-weight model with `transformers` and generate a completion", not
-  "learn about language models")
-- Objective 2
-- Objective 3
+- Run Chapter 11's evaluation harness across more than one real model
+  version and compare them directly, instead of judging each version
+  in isolation
+- Find a real case where two of Chapter 11's own metrics disagree
+  about whether a newer model version is better or worse
+- Investigate a metric disagreement by reading the model's actual
+  generated text, instead of trusting either number alone
+- Explain why a metric that stays flat across versions can hide a real
+  change underneath it, and why a metric that moves needs a reason,
+  not just a direction
 
 ## Operational Problem
 
-<!-- One or two paragraphs, opening with ONE named persona (rule 10)
-asking a question in the language of a drilling morning call ("Why does
-the model keep getting our sequencing wrong?", "Can we trust this answer
-enough to act on it?"). Describe the real problem this chapter solves.
-Ground it in a scenario: a specific fine-tuning attempt, a specific
-question someone needed answered correctly, a specific way the current
-(base model or manual) approach fails. Never open with "Today we will
-learn X." Example opening: "Sarah, the intervention engineer, asks:
-'...'" -->
+Sean, the production engineer who worried back in Chapter 7 about
+losing information by throwing away most of a shift's log, has a new
+worry now that Chapter 11 gave the book a real evaluation harness:
+*"We're not going to fine-tune once and stop — we'll retrain as new
+reports come in. How do I know a new version isn't secretly worse than
+the one it's replacing?"*
 
-## Example training excerpt
+## Example: two checkpoints, two different verdicts
 
-<!-- A short, realistic (synthetic or anonymised) instruction/response
-training example that motivates the chapter's technique. Show it as a
-callout so it's visually distinct from narrative text. -->
+Run Chapter 11's evaluation harness against Chapter 8's first two real
+checkpoints — epoch 1 and epoch 2 of the exact same training run — and
+compare them directly:
 
-::: {.callout-note title="Sample training example"}
-```json
-{
-  "instruction": "Summarize the operational risk in this report excerpt.",
-  "input": "0600-1130 POOH FR 9,842' TO CHANGE BHA. ERRATIC TORQUE OBSD LAST 3 STDS.",
-  "output": "Erratic torque over the last three stands before pulling out of hole suggests a developing hole-cleaning or BHA issue that should be monitored on the next run."
-}
+::: {.callout-note title="checkpoint_1 -> checkpoint_2, the same held-out set both times"}
+```
+checkpoint_1: exact_match=0  avg_overlap=0.354  perplexity=27.99
+checkpoint_2: exact_match=0  avg_overlap=0.167  perplexity=25.40
+
+checkpoint_1 -> checkpoint_2: exact_match=unchanged  avg_overlap=regressed  perplexity=improved
 ```
 :::
 
+Perplexity says checkpoint_2 is a real improvement. The overlap score
+says it's a real regression — average overlap dropped by more than
+half. Both numbers come from the exact same two checkpoints, the exact
+same 8 held-out questions, run the same way Chapter 11 already
+verified. Neither one is wrong. Neither one is the whole answer either.
+
 ## Theory
 
-<!-- The minimum theory required to understand *why* the implementation
-below works. If this section would exceed ~1.5 pages, you are including
-theory the reader doesn't need yet — cut it or defer it to a later
-chapter. Prefer diagrams and worked examples over formal definitions.
-
-If this section needs its own flow diagram (an algorithm's internal
-steps, not the chapter-opening progress marker), it follows the same
-TikZ -> PDF/SVG pattern, added to THEORY_DIAGRAMS (not DIAGRAMS) in
-figures/diagrams/generate_diagrams.py. The generator only draws a
-straight vertical chain; a diagram that branches (a yes/no decision)
-needs that support added first, or should stay as prose/ASCII for now.
-
-Add an "Engineering Translation" callout for every new concept this
-chapter introduces — see rule 5 above. Example: -->
-
-::: {.callout-tip title="Engineering Translation: <concept>"}
-<!-- One or two plain-language sentences mapping the concept onto
-something the reader already knows from field operations. -->
+::: {.callout-tip title="Engineering Translation: drift / regression"}
+**Drift** is a model's behavior changing across versions or over time
+— often, but not always, for the worse. A **regression** is a specific
+kind of drift: something that used to work (or score well) stops
+working, in a version that's supposed to be an improvement. Neither
+term says *why* — only that something changed and is worth a second
+look.
 :::
 
-<!-- If this chapter introduces a new AI/ML concept, add a
-"## Why prompting alone falls short" (or equivalent) section here, before
-the new technique, following rule 6 above. -->
+## Why comparing one metric isn't enough
+
+The tempting shortcut: pick one metric, watch it across versions, and
+trust whatever it says. Chapter 11 already showed the risk of that
+with a single version's evaluation; the checkpoint_1 → checkpoint_2
+comparison above shows the same risk across versions, more sharply.
+Trusting perplexity alone here says "ship checkpoint_2, it's better."
+Trusting overlap alone says "checkpoint_2 is a regression, investigate
+before shipping it." A real drift check needs more than one metric, and
+when they disagree, it needs a way to actually look at what changed —
+not just declare one metric the tiebreaker.
 
 ## Implementation
 
-<!-- Step-by-step, runnable code, broken into named steps if more than one
-logical block is involved. For EACH code block, follow this exact pattern: -->
-
-### Step 1: <what this step accomplishes>
+### Step 1: Summarize one model version across all three metrics
 
 ## What problem are we solving?
 
-<!-- One or two sentences: what does this specific block of code solve? -->
+Turn Chapter 11's three separate metrics into a single, comparable
+summary per model version.
 
 ## Inputs
 
-<!-- Bullet list: what does this code need to run? -->
+- A loaded model version (a `PeftModel` wrapping the base model)
+- The held-out evaluation set from Chapter 11
 
 ## Expected Output
 
-<!-- What should the reader see when they run this? Show a concrete example. -->
+One dictionary per version: exact-match count, average overlap score,
+and perplexity.
 
 ```{python}
 #| eval: false
-# Minimal working example — replace with chapter-specific code.
-print("Hello, local LLM")
+def summarize_version(model, tokenizer, eval_set: list[dict]) -> dict:
+    results = evaluate(model, tokenizer, eval_set)
+    texts = [e["output"] for e in eval_set]
+    return {
+        "exact_match": sum(r["exact_match"] for r in results),
+        "avg_overlap": sum(r["overlap_score"] for r in results) / len(results),
+        "perplexity": perplexity(model, tokenizer, texts),
+    }
 ```
 
 ## What just happened?
 
-<!-- Plain-English explanation, no unnecessary jargon. Bad: "This applies
-a low-rank update to the attention projections." Good: "We taught the
-model a small, targeted correction instead of retraining it from
-scratch." -->
+`evaluate` and `perplexity` are Chapter 11's own functions, reused
+unchanged. This step doesn't add a new metric — it packages the three
+that already exist into a shape that's easy to compare, version to
+version.
 
 ## Production Reality
 
-<!-- What does this chapter's example deliberately simplify away? What
-does a messier, real, multi-well or multi-operator training pipeline
-look like for this same problem? Follow rule 7 above. -->
+Real deployments version far more than a LoRA checkpoint — the
+retrieval index, the prompt template, even the base model itself can
+change between versions, and each is its own source of drift. This
+chapter only compares the fine-tuned adapter, holding everything else
+fixed, so a real difference is guaranteed to come from the adapter and
+nothing else.
+
+### Step 2: Compare two version summaries
+
+## What problem are we solving?
+
+Turn two summaries into a per-metric verdict: did this metric improve,
+regress, or stay the same between versions?
+
+## Inputs
+
+- Two `summarize_version` outputs, one "before" and one "after"
+
+## Expected Output
+
+A direction per metric — `improved`, `regressed`, or `unchanged`.
+
+```{python}
+#| eval: false
+def compare_versions(before: dict, after: dict) -> dict:
+    def direction(before_value, after_value, lower_is_better=False):
+        if after_value == before_value:
+            return "unchanged"
+        improved = after_value < before_value if lower_is_better else after_value > before_value
+        return "improved" if improved else "regressed"
+
+    return {
+        "exact_match": direction(before["exact_match"], after["exact_match"]),
+        "avg_overlap": direction(before["avg_overlap"], after["avg_overlap"]),
+        "perplexity": direction(before["perplexity"], after["perplexity"], lower_is_better=True),
+    }
+```
+
+## What just happened?
+
+`compare_versions` reports direction, not a verdict — it doesn't decide
+whether checkpoint_2 is "good enough to ship." That's deliberate:
+collapsing three metrics into one automatic pass/fail would hide
+exactly the kind of disagreement Field Notes below investigates.
+
+## Production Reality
+
+This function has no numeric threshold — any change in direction
+counts, even a tiny one. A production system would need a real
+threshold per metric (how much perplexity change is noise vs. signal),
+tuned against many more than 8 examples. This chapter keeps it simple
+enough to read every line of, at the cost of being oversensitive to
+small, possibly meaningless fluctuations.
+
+### Step 3: Run it across all 3 real checkpoints
+
+## What problem are we solving?
+
+Apply Steps 1 and 2 to every checkpoint from Chapter 8's real training
+run, not just two hand-picked ones.
+
+## Inputs
+
+- Chapter 8's 3 real checkpoints (`checkpoint_1`, `checkpoint_2`, `checkpoint_3`)
+- The held-out evaluation set
+
+## Expected Output
+
+A summary per checkpoint, and a direction comparison for every
+consecutive pair.
+
+```{python}
+#| eval: false
+summaries = {}
+for checkpoint_dir in checkpoints:
+    model, tokenizer = load_version(checkpoint_dir)
+    summaries[checkpoint_dir.name] = summarize_version(model, tokenizer, eval_set)
+
+for before_name, after_name in zip(list(summaries), list(summaries)[1:]):
+    print(f"{before_name} -> {after_name}: {compare_versions(summaries[before_name], summaries[after_name])}")
+```
+
+Running this exact code prints:
+
+```
+checkpoint_1 -> checkpoint_2: {'exact_match': 'unchanged', 'avg_overlap': 'regressed', 'perplexity': 'improved'}
+checkpoint_2 -> checkpoint_3: {'exact_match': 'unchanged', 'avg_overlap': 'unchanged', 'perplexity': 'improved'}
+```
+
+## What just happened?
+
+Two consecutive comparisons, two different outcomes. `checkpoint_2 ->
+checkpoint_3` is the boring, healthy case: perplexity keeps improving,
+nothing regresses. `checkpoint_1 -> checkpoint_2` is the one worth
+stopping for — a real metric disagreement, on real checkpoints, that
+Field Notes below investigates by reading what the model actually
+generated.
 
 ## Practical exercise
 
 🟢 **Beginner**
 
-<!-- A guided exercise using the sample training data, with a clear,
-checkable "you'll know you got it right when..." condition. This is not
-optional — every chapter has one. -->
+**Try it yourself:** run
+`python code/chapter_12/detect_model_drift.py` from inside `book/` and
+compare its printed output to the transcripts above.
 
-**Try it yourself:** ...
-
-**You'll know it worked when:** ...
+**You'll know it worked when:** you see `avg_overlap: regressed`
+between `checkpoint_1` and `checkpoint_2`, and you can explain in one
+sentence why that doesn't automatically mean checkpoint_2 is a worse
+model.
 
 ## Field notes
 
-<!-- Optional but encouraged, and should recur often across the book: a
-short, real, independently-verified vignette showing where the tool this
-chapter just built actually breaks (or, in a later chapter, where a
-previous chapter's tool breaks and this chapter's technique fixes it).
-Every number and quote here must be checked against a real run before
-writing it down -- run the code, don't estimate the outcome. The payoff
-is a moment where the reader sees, concretely, why the next chapter's
-added complexity is earning its keep, not complexity for its own sake.
+::: {.callout-warning title="Field notes: same template, different template"}
+**Query:** what `checkpoint_1` and `checkpoint_2` actually generated
+for the same 8 held-out questions, side by side.
 
-Format:
-  Query/Action -> the (surprising) result -> the real training/eval data
-  that explains why -> the one-sentence lesson. -->
+**Result:** `checkpoint_1` answers nearly every question with some
+version of *"Production Casing Run down hole to 9,400'."*
+`checkpoint_2` answers nearly every question with some version of
+*"Production Casing Run Csg & Cement Rig up cement."* Neither
+checkpoint is actually answering the specific question asked — both
+fall back to one memorized-sounding template, the same "shape, not
+judgment" pattern Chapter 3, 9, and 11 already found.
 
-::: {.callout-warning title="Field notes: <short description>"}
-**Query:** `"..."`
+**Why:** `checkpoint_1`'s template happens to share more real words
+("down hole," "run," numbers matching some of the true answers) with
+this specific 8-question held-out set than `checkpoint_2`'s template
+does — not because `checkpoint_1` understands the questions better,
+but because of which arbitrary generic phrase each epoch happened to
+settle into. The overlap score is measuring that coincidence, not a
+real improvement or decline in understanding.
 
-**Result:** ...
-
-**Why:** the training/eval data shows:
-
-- "..."
-- "..."
-
-but never shows "...".
-
-**Lesson:** ...
+**Lesson:** a regressing metric is a reason to look, not a verdict on
+its own. Here, looking revealed the "regression" wasn't really about
+`checkpoint_2` getting worse at the task — it was two different
+flavors of the same underlying limitation, one of which happened to
+score better against this particular held-out set by chance. A real
+production drift check would need to tell those two situations apart
+before deciding whether to roll a version back.
 :::
 
 ## Challenge exercise
 
-🟠 **Intermediate** <!-- escalate to 🔴 Advanced per rule 11 if warranted -->
+🟠 **Intermediate**
 
-<!-- A harder, more open-ended extension for readers who want to go
-further. No solution is provided in the main text; a reference solution
-lives in the companion repository under `code/chapter_NN/challenge/`. -->
-
-**Challenge:** ...
+**Challenge:** does the same kind of metric disagreement show up
+comparing two completely different training regimes, not just
+adjacent epochs of one run? Compare Chapter 5's 16-example fine-tune
+against Chapter 8's "at scale" checkpoint using this chapter's own
+`compare_versions`. A reference solution is at
+`code/chapter_12/challenge/challenge.py` — on a real run: Chapter 5
+scores `avg_overlap=0.5625`, `perplexity=112.28`; Chapter 8 scores
+`avg_overlap=0.167`, `perplexity=25.03` — the exact same disagreement
+pattern (`avg_overlap: regressed`, `perplexity: improved`) holds even
+across two entirely different fine-tunes, not just two epochs of the
+same one.
 
 ## Key takeaways
 
-- Takeaway 1
-- Takeaway 2
-- Takeaway 3
+- Two of Chapter 11's own metrics can disagree about whether a newer
+  model version is better — `checkpoint_2` looked worse by overlap
+  score and better by perplexity than `checkpoint_1`, on the same
+  held-out set.
+- A regressing metric is a signal to investigate, not a verdict. The
+  real cause here was two different memorized templates, not a genuine
+  loss of understanding between epochs.
+- `compare_versions` reports direction, deliberately not a pass/fail
+  verdict — collapsing a disagreement into one automatic answer would
+  have hidden exactly the thing worth catching.
+- The same disagreement pattern (`avg_overlap` regressed, perplexity
+  improved) showed up comparing two completely different training
+  regimes, not just two epochs of one run — this isn't a one-off
+  coincidence of this specific training run.
 
 ## Repository files
 
-<!-- Exact paths in the companion repo relevant to this chapter. -->
-
 | File | Purpose |
 |---|---|
-| `code/chapter_12/detect_model_drift.py` | ... |
-| `datasets/...` | ... |
+| `code/chapter_12/detect_model_drift.py` | Summarizes and compares model versions across Chapter 11's three metrics |
+| `code/chapter_12/challenge/challenge.py` | Reference solution: comparing Chapter 5's and Chapter 8's checkpoints as two real versions |
 | `notebooks/chapter_12_explore.ipynb` | Interactive companion notebook |
 
-<!-- Rule 12: CHECKPOINT + WHAT YOU BUILT, together, here. -->
-
 ::: {.callout-caution title="CHECKPOINT — Chapter 12"}
-- [x] Skill 1 gained this chapter, phrased as something done, not learned
-- [x] Skill 2
-- [x] Skill 3
+- [x] Ran Chapter 11's evaluation harness across more than one real
+      model version instead of judging each in isolation
+- [x] Found a real case where two metrics disagree about whether a
+      newer version is an improvement
+- [x] Investigated the disagreement by reading the model's actual
+      generated text, and found a real, specific explanation
+- [x] Confirmed the same pattern holds comparing two entirely
+      different training regimes, not just adjacent epochs
 :::
 
 ::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}
-**`artifact_name.py`** — one or two sentences naming the concrete artifact
-and what it hands off to the next chapter.
+**`detect_model_drift.py`** — `summarize_version()` collapses Chapter
+11's three metrics into one comparable summary per model version;
+`compare_versions()` reports which metrics improved, regressed, or
+stayed flat between two versions, without collapsing a disagreement
+into a false single verdict.
 :::
 
 ## What can you do now that you couldn't do before?
 
-<!-- One or two sentences of concrete new capability, following rule 8
-above. Not a theory recap — a plain statement of what the reader can now
-do that they couldn't before this chapter. -->
+You can compare two real model versions on more than one metric at
+once, catch the case where they disagree, and investigate why instead
+of trusting whichever number happens to look best.
 
 ## Suggested next step
 
-<!-- Rule 13: open with a bolded "Coming up in Chapter N+1:" line, then
-one paragraph bridging to the next chapter: what limitation of today's
-artifact motivates tomorrow's work? -->
-
-**Coming up in Chapter N+1:** ...
+**Coming up in Chapter 13:** this chapter compares model versions that
+already exist — it doesn't decide when a new one should get trained in
+the first place, or what to do when this chapter's own comparison
+flags a disagreement. Chapter 13 closes that loop: retraining as new
+reports arrive, and running this exact comparison before deciding
+whether a new version actually replaces the one currently in use.

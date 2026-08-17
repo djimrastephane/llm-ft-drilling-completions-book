@@ -102,8 +102,8 @@ next chapter — not a happy path with the failures edited out.
 
 - Link to the [official source code repository](https://github.com/djimrastephane/llm-ft-drilling-completions-book)
 - License: code is [MIT](LICENSE); the book's text is [CC BY 4.0](LICENSE-CONTENT.md)
-- Progress: Part 0 and Chapters 1–11 are written, tested, and passing CI;
-  Chapters 12–13 are still placeholders. See
+- Progress: Part 0 and Chapters 1–12 are written, tested, and passing CI;
+  Chapter 13 is still a placeholder. See
   [CHANGELOG.md](CHANGELOG.md) for the full history of what's landed and
   why, and [RELEASE.md](RELEASE.md) for per-release highlights — there's
   no tagged release yet.
@@ -155,8 +155,8 @@ If this is your first Python project, do these steps in order:
 1. Read [Part 0: Preparing Your Local LLM Workshop](book/chapters/chapter_00.qmd) — installs Python, clones this repository, and gets your environment ready. No prior experience assumed.
 2. Run `setup_check.py` — one command that confirms everything is working before you touch a real model.
 3. Work through [Chapter 1: Loading and Running Your First Local LLM](book/chapters/chapter_01.qmd) — load a real open-weight model on your own machine, and watch it get real oilfield shorthand wrong (see "Why Not Just Prompt a Cloud AI Assistant?" above).
-4. Continue sequentially through Chapter 11 — each chapter builds on the last one's saved output: a training example, a baseline result, a checkpoint, or a retrieval index.
-5. Chapters 12–13 aren't written yet — [CHANGELOG.md](CHANGELOG.md) and the [Table of Contents](#table-of-contents) below track progress.
+4. Continue sequentially through Chapter 12 — each chapter builds on the last one's saved output: a training example, a baseline result, a checkpoint, or a retrieval index.
+5. Chapter 13 isn't written yet — [CHANGELOG.md](CHANGELOG.md) and the [Table of Contents](#table-of-contents) below track progress.
 
 | Step | Typical time |
 |---|---|
@@ -200,8 +200,8 @@ working system yourself, and you understand every piece of it.
 
 ## What You Will Build and Learn
 
-By the end of Chapters 1–11 you will have built nine real, working
-artifacts — not nine topics you read about:
+By the end of Chapters 1–12 you will have built ten real, working
+artifacts — not ten topics you read about:
 
 - ✓ **Local model loading and inference script** — run a general-purpose local LLM and evaluate its out-of-the-box answers to drilling and completions questions
 - ✓ **Domain training-example builder** — turn raw drilling and completions reports into a training dataset
@@ -212,10 +212,11 @@ artifacts — not nine topics you read about:
 - ✓ **Hybrid fine-tuning + retrieval system** — grounded, citable answers, demonstrated above
 - ✓ **Faithfulness checker** — catches a real, fluent answer that cited the right report but was actually grounded in the wrong one
 - ✓ **Evaluation harness** — a real 8-example held-out set scored three ways, showing that a single metric can make real training progress look like nothing happened
+- ✓ **Model-version drift detector** — caught two of the book's own metrics disagreeing about whether a newer checkpoint is actually an improvement
 
 By the end of the finished book you'll also be able to:
 
-- Detect drift across model versions and keep the model current as new reports arrive (planned — Chapters 12–13)
+- Keep the model current as new reports arrive, retraining and re-checking before a new version replaces the one in use (planned — Chapter 13)
 
 ## Who This Book Is For
 
@@ -294,11 +295,11 @@ elsewhere.
 | Chapter 9 | 45–60 min |
 | Chapter 10 | 30–40 min |
 | Chapter 11 | 30–40 min |
-| Chapter 12* | 30–40 min |
+| Chapter 12 | 30–40 min |
 | Chapter 13* | 45–60 min |
 
-\* Chapters 12–13 aren't written yet — these are provisional estimates
-from the repository scaffold, not a written chapter's own measurement.
+\* Chapter 13 isn't written yet — this is a provisional estimate from
+the repository scaffold, not a written chapter's own measurement.
 
 There's no need to do this in one sitting — most readers spread it
 across several days, a chapter or two at a time.
@@ -378,8 +379,8 @@ covered.
 
 # Table of Contents
 
-Part 0 and Chapters 1–11 are written, tested, and passing CI; Chapters
-12–13 are still placeholders. This repository's `.qmd` chapter files are
+Part 0 and Chapters 1–12 are written, tested, and passing CI; Chapter
+13 is still a placeholder. This repository's `.qmd` chapter files are
 Quarto Markdown — GitHub's file viewer shows them as plain unformatted
 source, since there's no published GitHub Pages site yet (see
 "Progress" above). For the full repository layout (folder tree,
@@ -408,7 +409,7 @@ badge reflects the last manual run, not every push to `main`.
 | ✅ | [Ch 9: Hybrid System — Combining Fine-Tuning with Retrieval](book/chapters/chapter_09.qmd) | - [hybrid_rag_finetune.py](book/code/chapter_09/hybrid_rag_finetune.py)<br/>- [chapter_09_explore.ipynb](book/notebooks/chapter_09_explore.ipynb) | [./book/code/chapter_09](book/code/chapter_09) |
 | ✅ | [Ch 10: Traceable Outputs and Hallucination Mitigation](book/chapters/chapter_10.qmd) | - [traceable_outputs.py](book/code/chapter_10/traceable_outputs.py)<br/>- [chapter_10_explore.ipynb](book/notebooks/chapter_10_explore.ipynb) | [./book/code/chapter_10](book/code/chapter_10) |
 | ✅ | [Ch 11: Evaluating a Fine-Tuned Domain Model](book/chapters/chapter_11.qmd) | - [eval_finetuned_model.py](book/code/chapter_11/eval_finetuned_model.py)<br/>- [chapter_11_explore.ipynb](book/notebooks/chapter_11_explore.ipynb) | [./book/code/chapter_11](book/code/chapter_11) |
-| — | Ch 12: Detecting Drift Across Model Versions | [detect_model_drift.py](book/code/chapter_12/detect_model_drift.py) | [./book/code/chapter_12](book/code/chapter_12) |
+| ✅ | [Ch 12: Detecting Drift Across Model Versions](book/chapters/chapter_12.qmd) | - [detect_model_drift.py](book/code/chapter_12/detect_model_drift.py)<br/>- [chapter_12_explore.ipynb](book/notebooks/chapter_12_explore.ipynb) | [./book/code/chapter_12](book/code/chapter_12) |
 | — | Ch 13: Continuous Fine-Tuning — Keeping the Model Current | [continuous_finetune.py](book/code/chapter_13/continuous_finetune.py) | [./book/code/chapter_13](book/code/chapter_13) |
 | ✅ | Appendix A: Environment Setup | — | [./book/appendix](book/appendix) |
 | ✅ | Appendices A1–A5: Jupyter / VS Code / PyCharm / Positron / Terminal-only | — | [./book/appendix](book/appendix) |
@@ -428,7 +429,10 @@ check caught a real answer that cited the correct report alongside the
 wrong one, and was actually grounded in the wrong one; Chapter 11
 measured perplexity on real held-out text falling from `159.91`
 (base model) to `25.03` (fine-tuned) even though exact-match on the
-same 8 questions stayed `0/8` at every epoch.
+same 8 questions stayed `0/8` at every epoch; Chapter 12 found two of
+those same metrics disagreeing between two real checkpoints —
+`avg_overlap` regressed while `perplexity` improved between epoch 1
+and epoch 2 of the same training run.
 
 ## Companion Pipeline
 
@@ -469,7 +473,7 @@ chapter's code under `book/code/chapter_NN/challenge/`.
 ## Automated Tests
 
 Every drafted chapter's real code is tested in
-[`book/tests/`](book/tests) — 64 tests across Chapters 1–11 as of this
+[`book/tests/`](book/tests) — 69 tests across Chapters 1–12 as of this
 writing, run on Linux, Windows, and macOS on every push that touches
 `book/**` (badges above). Run them yourself from the `book/` directory:
 
@@ -478,11 +482,12 @@ pip install -r requirements.txt
 pytest -v
 ```
 
-Chapters 5, 8, 9, 10, and 11 include tests marked `slow` (they load and
-generate from the real base model, and Chapter 8's fine-tuning tests
-take a few minutes) or that need a checkpoint from a previous chapter's
-script to already exist on disk (skipped automatically if it doesn't —
-see each test file's own docstring). Skip the slow ones locally with:
+Chapters 5, 8, 9, 10, 11, and 12 include tests marked `slow` (they load
+and generate from the real base model, and Chapter 8's fine-tuning
+tests take a few minutes) or that need a checkpoint from a previous
+chapter's script to already exist on disk (skipped automatically if it
+doesn't — see each test file's own docstring). Skip the slow ones
+locally with:
 
 ```bash
 pytest -v -m "not slow"
