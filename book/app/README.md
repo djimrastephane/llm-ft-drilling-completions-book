@@ -1,13 +1,35 @@
 # Companion App: Model Comparison Laboratory
 
-**Status: V1 implemented** -- two of six planned pages are real and
-working: **Model Playground** (base vs. fine-tuned vs. optional
-retrieval, on the same real prompt) and **Before vs. After Evaluation**
-(the book's own metrics run live across the full held-out set, not one
-cherry-picked example). **Dataset Explorer, Experiment Explorer, Failure
-Analysis, and a "Fine-Tuning or RAG?" page are planned but not built
-yet** -- same honesty convention the book itself uses for chapter
-status, applied to this app.
+**Status: V1 and V2 frozen, V3 planned** -- three of six planned pages
+are real and working. Neither V1 nor V2 is revisited for new features;
+new pages ship as their own labeled version, the same one-piece-at-a-time
+cadence the book's own chapters use.
+
+- **V1 — "What changed after fine-tuning?"** -- **Model Playground**
+  (base vs. fine-tuned vs. optional retrieval, on the same real prompt)
+  and **Before vs. After Evaluation** (the book's own metrics run live
+  across the full held-out set, not one cherry-picked example).
+- **V2 — "What data produced that change?"** -- **Dataset Explorer**
+  (browse the real training examples Chapter 2/7 actually build, with
+  real Chapter 6 quality-gate flags and provenance, not invented
+  metadata).
+- **V3 (planned) — "Where does it fail?"** -- **Failure Analysis**:
+  curated real wrong-answer cases already documented in the book's own
+  Field Notes (e.g. Chapter 10's report #21 wrong-source case), plus live
+  comparison for new prompts. Chosen deliberately over adding more
+  general UI features, so the app completes one coherent evidence chain
+  -- training data -> model behavior -> failures -- rather than growing
+  into a generic fine-tuning platform.
+- **Planned, further out** -- Experiment Explorer and a "Fine-Tuning or
+  RAG?" page -- same honesty convention the book itself uses for chapter
+  status, applied to this app.
+
+This progression -- book chapters -> real training code -> locally
+generated checkpoints -> companion app -> live comparison -> reproduced
+evaluation results -- makes the app part of the book's reproducibility
+story, not a separate demo built beside it. Every page reads real,
+locally generated artifacts (or generates straight from the real
+archive) and never a pre-recorded number.
 
 This is an educational companion, not a production system, mirroring
 the author's previous book's companion app.
@@ -46,6 +68,9 @@ code:
 | Step | Comes from |
 |---|---|
 | Base model loading, generation | `code/chapter_01/load_local_model.py` |
+| Sample-set training examples | `code/chapter_02/build_training_examples.py` |
+| Quality-gate status, duplicate flags | `code/chapter_06/data_quality_gate.py` |
+| Full-archive timeline training examples | `code/chapter_07/format_training_chunks.py` |
 | Retrieval corpus, BM25 index | `code/chapter_09/hybrid_rag_finetune.py` |
 | Grounded, traceable answers | `code/chapter_10/traceable_outputs.py` |
 | Held-out eval set, exact-match | `code/chapter_11/eval_finetuned_model.py` |
@@ -79,20 +104,17 @@ the chapters do: never invent a number.
 |---|---|
 | `streamlit_app.py` | Model Playground (landing page): checkpoint picker, prompt source, base vs. fine-tuned vs. optional retrieval |
 | `pages/1_Before_After_Evaluation.py` | Live before/after evaluation across the real held-out set, for every checkpoint present |
-| `helpers.py` | All model-loading, generation, retrieval, and scoring glue (no Streamlit; unit-testable) |
+| `pages/2_Dataset_Explorer.py` | Browse the real training examples Chapter 2/7 build, filterable by report number, date, time window, and Chapter 6's real quality-gate flags |
+| `helpers.py` | All model-loading, generation, retrieval, dataset, and scoring glue (no Streamlit; unit-testable) |
 
 ## Planned, not yet built
 
-- **Dataset Explorer** -- browse the real `{instruction, input, output}`
-  training examples, filterable by real, derivable fields (report
-  number, date, time window, quality-gate status) -- not by invented
-  domain/topic/difficulty labels, since those don't exist in this
-  book's real data.
+- **V3 -- Failure Analysis** -- curated real wrong-answer cases already
+  documented in the book's own Field Notes (e.g. Chapter 10's report
+  #21 wrong-source case), plus live comparison for new prompts. See
+  "Status" above for why this is next.
 - **Experiment Explorer** -- read-only inspection of real checkpoint
   configs and logged metrics (no in-app training).
-- **Failure Analysis** -- curated real wrong-answer cases already
-  documented in the book's own Field Notes (e.g. Chapter 10's report
-  #21 wrong-source case), plus live comparison for new prompts.
 - **Fine-Tuning or RAG?** -- a decision-guide page cross-referencing
   Chapter 3's "when fine-tuning is, and is not, the right tool" section
   with the author's companion RAG book.

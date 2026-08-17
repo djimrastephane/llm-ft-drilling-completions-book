@@ -412,6 +412,32 @@ highlights in narrative form.
   table/chart. Dataset Explorer, Experiment Explorer, Failure Analysis,
   and a "Fine-Tuning or RAG?" page remain planned, not built -- see
   `book/app/README.md`.
+- **Companion app V2: Dataset Explorer** (`book/app/pages/2_Dataset_Explorer.py`).
+  V1 is now frozen -- no further features land on it; new app work ships
+  as V2 and beyond, the same one-piece-at-a-time cadence the book's own
+  chapters use. Browses three real example sets, generated live from the
+  real archive rather than read from a pre-generated file (none of
+  `datasets/training_examples/*.jsonl` are committed -- they're
+  gitignored, generated artifacts): Chapter 2's 16-example sample-set
+  summaries, Chapter 7's 669-example full-archive timeline set (the real
+  training set), and report #37's own 8 held-out examples. A new
+  `helpers.parse_input_context()` regex-parses each example's own
+  `input` string back into its real, already-present fields (report
+  number, date, time window, chunk part) -- no domain/topic/difficulty
+  label is added, because this book's real training data
+  (`{instruction, input, output}` only) has no such field. Cross-
+  references Chapter 6's real `run_quality_gate()` duplicate-detection
+  to flag which examples belong to a report whose fields non-
+  consecutively duplicate another report's, surfacing the same "decision
+  still owed to a human" framing Chapter 6 itself uses. Verified live:
+  filtering the full 669-example set to "flagged for review only" lands
+  on exactly `38` examples across `4` unique report numbers (`47, 49,
+  59, 70`) -- consistent with Chapter 6's own published `2` non-
+  consecutive duplicate groups (2 groups × 2 reports each). New tests in
+  `tests/test_app.py` for `parse_input_context()` and `dataset_examples()`
+  (fast -- PDF extraction only, no model, matching the existing
+  chapter-6/7 test convention of not marking extraction-only tests
+  `slow`). Both READMEs updated to describe the V1/V2 split.
 
 ### Changed
 

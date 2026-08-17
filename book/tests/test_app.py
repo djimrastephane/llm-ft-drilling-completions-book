@@ -58,6 +58,49 @@ def test_available_checkpoints_finds_the_newest_run_and_highest_checkpoint(tmp_p
     assert checkpoints[label] == ch8 / "run_20260201_000000" / "checkpoint_1"
 
 
+def test_parse_input_context_extracts_report_date_and_time_window():
+    parsed = helpers.parse_input_context(
+        "Well: FORGE 16A [78]-32 | Report #76 | Date: 2021-01-03 | Time: 16:00-21:30 (part 1 of 2)"
+    )
+
+    assert parsed == {
+        "well_name": "FORGE 16A [78]-32",
+        "report_num": 76,
+        "date": "2021-01-03",
+        "time_window": "16:00-21:30",
+        "chunk_part": "1/2",
+    }
+
+
+def test_parse_input_context_handles_the_chapter_2_style_with_no_time_window():
+    parsed = helpers.parse_input_context("Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22")
+
+    assert parsed["report_num"] == 3
+    assert parsed["time_window"] is None
+    assert parsed["chunk_part"] is None
+
+
+def test_parse_input_context_returns_all_none_for_unrecognized_text():
+    parsed = helpers.parse_input_context("not a real input string")
+
+    assert parsed == {"well_name": None, "report_num": None, "date": None, "time_window": None, "chunk_part": None}
+
+
+def test_dataset_examples_sample_bucket_matches_chapter_2s_real_count():
+    examples = helpers.dataset_examples("sample")
+
+    assert len(examples) == 16
+    assert all(e["report_num"] is not None for e in examples)
+    assert not any(e["held_out"] for e in examples)  # Chapter 2 never includes report #37
+
+
+def test_dataset_examples_held_out_bucket_is_all_report_37():
+    examples = helpers.dataset_examples("held_out")
+
+    assert len(examples) == 8
+    assert all(e["report_num"] == 37 and e["held_out"] for e in examples)
+
+
 def test_score_against_reference_matches_chapter_11s_own_scoring():
     from eval_finetuned_model import exact_match
     from traceable_outputs import faithfulness_score

@@ -15,6 +15,7 @@ non-deterministic -- a real bug Chapter 13's own CHANGELOG entry
 documents catching and fixing. This app must not reintroduce it.
 """
 
+import re
 import sys
 from pathlib import Path
 
@@ -31,8 +32,11 @@ for _n in range(1, 14):
 # touches peft/sentence_transformers imports it before anything else.
 from load_local_model import MODEL_NAME, generate_reply, load_model_and_tokenizer  # noqa: E402
 
+from build_training_examples import HELD_OUT_REPORT, build_training_examples  # noqa: E402
+from data_quality_gate import run_quality_gate  # noqa: E402
 from detect_model_drift import compare_versions, load_version, summarize_version  # noqa: E402
 from eval_finetuned_model import build_held_out_eval_set, exact_match, perplexity  # noqa: E402
+from format_training_chunks import build_training_set_at_scale  # noqa: E402
 from hybrid_rag_finetune import (  # noqa: E402
     INSTRUCTION as RETRIEVAL_INSTRUCTION,
     TEST_CASES as RETRIEVAL_TEST_CASES,
@@ -116,7 +120,81 @@ def evaluate_checkpoint(checkpoint_label: str, checkpoint_dir: Path | None, eval
     return summarize_version(model, tokenizer, eval_set)
 
 
+_INPUT_PATTERN = re.compile(
+    r"Well: (?P<well_name>.+?) \| Report #(?P<report_num>\d+) \| Date: (?P<date>[\d-]+)"
+    r"(?: \| Time: (?P<time_from>[\d:]+)-(?P<time_to>[\d:]+)(?: \(part (?P<part_i>\d+) of (?P<part_n>\d+)\))?)?$"
+)
+
+DATASET_BUCKETS = {
+    "Chapter 2 -- sample set summaries (16 examples)": "sample",
+    "Chapter 7 -- full-archive timeline examples (669 examples, the real training set)": "full",
+    "Report #37 -- held out, never in any training set (8 examples)": "held_out",
+}
+
+
+def parse_input_context(input_context: str) -> dict:
+    """Pull the real, structured fields back out of an example's `input`
+    string -- the exact "Well: X | Report #N | Date: D[ | Time: HH:MM-HH:MM[
+    (part i of n)]]" template Chapter 2 and Chapter 7 both build it from.
+    Nothing here is invented: every field returned either came straight out
+    of the string or is None because that example's template doesn't carry it.
+    """
+    match = _INPUT_PATTERN.match(input_context)
+    if not match:
+        return {"well_name": None, "report_num": None, "date": None, "time_window": None, "chunk_part": None}
+    g = match.groupdict()
+    time_window = f"{g['time_from']}-{g['time_to']}" if g["time_from"] else None
+    chunk_part = f"{g['part_i']}/{g['part_n']}" if g["part_i"] else None
+    return {
+        "well_name": g["well_name"],
+        "report_num": int(g["report_num"]),
+        "date": g["date"],
+        "time_window": time_window,
+        "chunk_part": chunk_part,
+    }
+
+
+def dataset_examples(bucket: str) -> list[dict]:
+    """Real training examples for one of the book's three real example
+    sources (`DATASET_BUCKETS` values), each annotated with fields parsed
+    straight out of its own `input` string plus whether Chapter 6's real
+    quality gate flagged that report's fields as a non-consecutive
+    duplicate. Extraction runs live against the same PDFs Chapter 2/6/7/11
+    use -- nothing here is pre-generated or invented.
+    """
+    if bucket == "sample":
+        examples = build_training_examples()
+    elif bucket == "full":
+        examples, _skipped, _filtered = build_training_set_at_scale()
+    elif bucket == "held_out":
+        examples = build_held_out_eval_set()
+    else:
+        raise ValueError(f"Unknown dataset bucket: {bucket!r}")
+
+    gate = run_quality_gate()
+    needs_review_reports = {
+        num
+        for (_field, _value), (classification, nums) in gate["duplicates"].items()
+        if classification == "needs_review"
+        for num in nums
+    }
+
+    annotated = []
+    for example in examples:
+        parsed = parse_input_context(example["input"])
+        annotated.append(
+            {
+                **example,
+                **parsed,
+                "held_out": parsed["report_num"] == 37,  # report #37 == HELD_OUT_REPORT
+                "flagged_for_review": parsed["report_num"] in needs_review_reports,
+            }
+        )
+    return annotated
+
+
 __all__ = [
+    "DATASET_BUCKETS",
     "MODEL_NAME",
     "RETRIEVAL_INSTRUCTION",
     "RETRIEVAL_TEST_CASES",
@@ -126,10 +204,12 @@ __all__ = [
     "build_held_out_eval_set",
     "build_retrieval_corpus",
     "compare_versions",
+    "dataset_examples",
     "evaluate_checkpoint",
     "generate_answer",
     "load_base_model",
     "load_finetuned_model",
+    "parse_input_context",
     "perplexity",
     "score_against_reference",
 ]
