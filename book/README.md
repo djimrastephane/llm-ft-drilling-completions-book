@@ -121,21 +121,31 @@ companion-project number it cites. Where a chapter states a specific
 number or result, it was independently verified against this book's own
 code and real training data before being written down — this book does
 not present fabricated or borrowed results as if they came from a real
-run. A few examples: Chapter 6's data quality gate found `75/76` reports
-pass extraction with `6` duplicate field-value groups; Chapter 8's "at
-scale" fine-tune measured training loss falling `2.755 → 2.164 → 1.821`
-across 3 real epochs; Chapter 9 measured BM25 keyword retrieval finding
-the correct source report `4/4` times on real test queries, against
-`3/4` for dense sentence embeddings; Chapter 10's faithfulness check
-caught a real answer that cited the correct report while actually
-being grounded in a different one; Chapter 11 measured perplexity on
-real held-out text falling from `159.91` (base model) to `25.03`
-(fine-tuned) even though exact-match on the same 8 questions stayed
-`0/8` at every training epoch; Chapter 12 found `avg_overlap` and
-`perplexity` disagreeing on direction between two real checkpoints of
-the same training run; Chapter 13 simulated new reports arriving and
-retrained on them, and the same disagreement showed up a third time on
-a real continuous-fine-tuning run.
+run. A few examples (see the root [README.md](../README.md)'s "Table of
+Contents" section for the same list with each metric explained in plain
+language):
+
+- Chapter 6's data quality gate found `75/76` reports pass extraction
+  with `6` duplicate field-value groups.
+- Chapter 8's "at scale" fine-tune measured training loss falling
+  `2.755 → 2.164 → 1.821` across 3 real epochs.
+- Chapter 9 measured BM25 keyword retrieval (ranking reports by shared
+  words with the question) finding the correct source report `4/4`
+  times on real test queries, against `3/4` for dense sentence
+  embeddings (matching by meaning instead of exact wording).
+- Chapter 10's faithfulness check caught a real answer that cited the
+  correct report while actually being grounded in a different one.
+- Chapter 11 measured perplexity (how "surprised" the model is by real
+  text it never trained on — lower is better) on real held-out text
+  falling from `159.91` (base model) to `25.03` (fine-tuned), even
+  though exact-match on the same 8 questions stayed `0/8` at every
+  training epoch.
+- Chapter 12 found `avg_overlap` (how much of the model's wording
+  overlaps with the known-correct answer) and `perplexity` disagreeing
+  on direction between two real checkpoints of the same training run.
+- Chapter 13 simulated new reports arriving and retrained on them, and
+  the same disagreement showed up a third time on a real
+  continuous-fine-tuning run.
 
 ## Relationship to the companion pipeline
 

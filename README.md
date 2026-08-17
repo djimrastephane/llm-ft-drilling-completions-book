@@ -11,24 +11,33 @@ experience.
 
 In *Fine-Tuning Local LLM for Drilling & Completions*, you build a
 working, fine-tuned local model from scratch, one chapter at a time:
-loading a general-purpose open-weight model, turning real reports into
-training data, measuring exactly what the base model gets wrong, running
-your first LoRA fine-tune, then hardening that prototype at scale —
-checkpointing, data quality gates, and pairing it with retrieval for
-grounded, citable answers — no cloud training service, no black-box
-trainer, no data leaving your machine.
+loading a general-purpose **open-weight** model (one you download and
+keep on your own machine, not just borrowed access to someone else's),
+turning real reports into training data, measuring exactly what the base
+model gets wrong, running your first **LoRA** fine-tune (a lightweight
+way to teach it your operation's own wording without retraining the
+whole model from scratch), then hardening that prototype at scale —
+saving your progress as you go so a long training run doesn't have to
+start over from zero, catching bad training data before it ever reaches
+fine-tuning, and pairing it with a real search step so the final answer
+comes back backed by real evidence, and traceable to the actual report
+it came from — no cloud training service, no black-box trainer, no data
+leaving your machine.
 
 Every example uses real, publicly available Daily Drilling Reports from
 **Utah FORGE** — a Department of Energy-funded geothermal research well —
 not synthetic stand-ins. A real stuck-pipe event, a real report the
-fine-tuned model never trained on, and a real held-out generalization
-result all appear exactly as they came out of this book's own code.
+fine-tuned model never trained on, and a real test of whether it learned
+anything transferable, rather than just memorizing what it was shown, all
+appear exactly as they came out of this book's own code.
 
 ### Why Not Just Prompt a Cloud AI Assistant?
 
 A fair question before installing anything: ChatGPT, Claude, and similar
-hosted assistants already run instruction-tuned models capable of a
-fluent conversation. Why bother loading, and then fine-tuning, your own?
+hosted assistants already run large models that have been specifically
+trained to hold a fluent conversation and follow instructions, not just
+predict the next word. Why bother loading, and then fine-tuning, your
+own?
 
 Because a hosted assistant never actually learns your operation. Ask
 `Qwen2.5-1.5B-Instruct` — the small, general-purpose model this book
@@ -50,23 +59,32 @@ descent of the drill string...
    improper configuration of the drill string...
 ```
 
-"Trip out of hole" — basic, everyday oilfield terminology — is treated
-like an English idiom the model has to guess at, because its general
-training data apparently didn't include enough real oilfield operational
-text to have learned it. A hosted API can't fix that either: you're
-given access to someone else's model, not the weights themselves, so
-there's nothing to fine-tune (Chapter 1 covers this in more depth).
-There's also a data question a hosted assistant forces on you that a
-local model doesn't — every prompt, and every report excerpt you paste
-into it, leaves your machine, and real drilling and completions reports
-are usually confidential.
+This fluent, confident, wrong answer is what the AI field calls a
+**hallucination** — a model output that sounds right but isn't actually
+supported by real evidence. Chapter 10 covers detecting and mitigating
+it directly. Here, the underlying problem is simpler: "Trip out of hole"
+— basic, everyday oilfield terminology — is treated like an English
+idiom the model has to guess at, because its general training data
+apparently didn't include enough real oilfield operational text to have
+learned it. A hosted, pay-per-use connection to someone else's model
+can't fix that either: you're given access to run the model, not the
+**weights** themselves — the actual, millions-of-numbers-deep "knowledge"
+stored inside it — so there's nothing to fine-tune (Chapter 1 covers this
+in more depth). There's also a data question a hosted assistant forces on
+you that a local model doesn't — every prompt, and every report excerpt
+you paste into it, leaves your machine, and real drilling and completions
+reports are usually confidential.
 
 This book fixes both problems: it fine-tunes a small local model
 directly on your own reports, chapter by chapter (Chapter 5 onward). And
-because fine-tuning alone is a weak tool for citing an exact source —
-Chapter 8 measured that weakness directly, `0/50` exact-match on its own
-training sample — Chapter 9 pairs it with real retrieval so the final
-answer comes back grounded and traceable to the report it came from.
+because fine-tuning alone is a weak tool for citing an exact source,
+Chapter 8 measured exactly how weak: `0/50` on a strict **exact-match**
+test, where the model's answer had to match the report's exact wording,
+word for word, to count. Chapter 9 pairs it with a real search step over
+the report archive (**retrieval**, like a well-indexed filing cabinet)
+so the final answer comes back **grounded** (actually built from a real,
+cited report, not just a plausible guess) and traceable to the report it
+came from.
 
 ### What You're Building
 
@@ -95,16 +113,22 @@ data; only the retrieval step was.
 
 That's the destination — and, just as importantly, this book doesn't
 stop at the win. Chapter 5 shows the same honest picture when the fix
-*isn't* in place yet: fine-tuning alone lifted training-set recall from
-`0/16` to `13/16`, while held-out generalization stayed exactly at
-`0/2`. Real, working code, and the real limitations that motivate the
-next chapter — not a happy path with the failures edited out.
+*isn't* in place yet: on the 16 examples it actually trained on — an
+open-book test, where it already saw the answer key — fine-tuning alone
+raised the model's score from `0/16` to `13/16`. But on report `#37`,
+which it never saw during training, that same fine-tuned model still
+scored `0/2` — the real test of whether it learned anything
+transferable, not just memorized what it was shown. Real, working code,
+and the real limitations that motivate the next chapter — not a happy
+path with the failures edited out.
 
 - Link to the [official source code repository](https://github.com/djimrastephane/llm-ft-drilling-completions-book)
 - License: code is [MIT](LICENSE); the book's text is [CC BY 4.0](LICENSE-CONTENT.md)
 - Progress: Part 0 and all 13 chapters are written, tested, and passing
-  CI. See [CHANGELOG.md](CHANGELOG.md) for the full history of what's
-  landed and why, and [RELEASE.md](RELEASE.md) for per-release
+  CI (short for continuous integration — the project's automated tests,
+  which re-run on every change to catch a broken example before you ever
+  see it). See [CHANGELOG.md](CHANGELOG.md) for the full history of
+  what's landed and why, and [RELEASE.md](RELEASE.md) for per-release
   highlights — there's no tagged release yet.
 - The book isn't published to GitHub Pages yet — the "Publish book to
   GitHub Pages" workflow (badge below) is still manual-only
@@ -216,14 +240,13 @@ artifacts — not eleven topics you read about:
 
 ## Who This Book Is For
 
-This book is written for:
-
-- Drilling Engineers
-- Completion Engineers
-- Intervention Engineers
-- Production Engineers
-- Digital Oilfield Professionals
-- Energy Data Scientists
+This book is written for drilling, completions, intervention, and
+production engineers — and for the digital oilfield professionals and
+energy data scientists who support them. You'll recognize the fit
+quickly: every chapter opens with one of four recurring engineers (Oumy,
+Mike, Sarah, Sean — you'll meet all four) asking the kind of question
+you'd actually ask before trusting a model with your own reports, then
+answers it with real code and a real result, not a hypothetical.
 
 If you've ever wanted a model that actually understands your rig-floor
 shorthand and your operator's reporting style — instead of a generic
@@ -307,16 +330,19 @@ across several days, a chapter or two at a time.
 
 **Recommended:**
 
-- A GPU with at least 8 GB VRAM (NVIDIA/CUDA or Apple Silicon via MPS)
-  makes fine-tuning chapters faster. Every chapter through Chapter 9 has
-  actually been run and verified CPU-only on ordinary laptop hardware —
-  Chapter 5's fine-tune takes about 5 minutes, Chapter 8's "at scale"
-  run about 30–35 minutes.
+- A graphics card (GPU) with at least 8 GB of its own memory (VRAM) —
+  either NVIDIA or an Apple Silicon Mac (M1/M2/M3/M4) — makes fine-tuning
+  chapters faster, though none of it is required. Every chapter through
+  Chapter 9 has actually been run and verified CPU-only (no graphics card
+  at all, just the computer's regular processor) on ordinary laptop
+  hardware — Chapter 5's fine-tune takes about 5 minutes that way,
+  Chapter 8's "at scale" run about 30–35 minutes.
 
-**No cloud account required. No paid API required.** Everything in this
-book is designed to run locally, using small open-weight models and
-parameter-efficient fine-tuning (LoRA/QLoRA) so a single consumer GPU —
-or patience, on CPU — is enough.
+**No cloud account required. No paid, metered connection to someone
+else's hosted model required.** Everything in this book is designed to
+run locally, using small open-weight models and the same lightweight,
+parameter-efficient fine-tuning (LoRA) introduced above, so a single
+consumer GPU — or patience, on CPU — is enough.
 
 ## Choose Your Workshop
 
@@ -361,12 +387,21 @@ covered.
 
 ## What Makes This Book Different
 
-- Uses real drilling and completions reports rather than synthetic examples
-- Uses public, DOE-funded operational data — no confidentiality concerns, nothing invented
-- Assumes zero programming or machine-learning experience
-- Trains with a manual PyTorch loop, not a black-box trainer, so every step is inspectable
-- Reports honest negative results (`0/50` exact-match, `0/2` held-out generalization) instead of only showing successes
-- Teaches industrial constraints (data quality gating, checkpointing at scale, hybrid retrieval, traceability) rather than a toy happy path
+- **Real reports, not synthetic stand-ins.** Every example traces back to
+  an actual Utah FORGE Daily Drilling Report — public, DOE-funded data,
+  so there's nothing confidential and nothing invented to work through.
+- **Zero programming or machine-learning background assumed.** The first
+  script you ever run is also the first Python you'll ever touch.
+- **A training loop you can read line by line**, not a black-box
+  trainer — every step is right there in front of you, not hidden inside
+  someone else's library call.
+- **Honest negative results, left in.** Chapter 8's `0/50` exact-match
+  and Chapter 5's `0/2` held-out score are both still here, not edited
+  out to make the book look cleaner than the real run was.
+- **Industrial constraints taught for real** — data quality gating,
+  checkpointing at scale, hybrid retrieval, traceability — not a toy
+  happy path that stops working the moment you point it at your own
+  archive.
 
 ---
 
@@ -413,36 +448,51 @@ Every ✅ chapter ships with working, tested code and a companion
 notebook — see [Automated Tests](#automated-tests) below. Every quoted
 number in a ✅ chapter comes from an actual run of that chapter's own
 code against this repository's real Utah FORGE archive, not an
-estimate. A few examples: Chapter 6's data quality gate found `75/76`
-reports pass extraction with `6` duplicate field-value groups; Chapter
-8's "at scale" fine-tune measured training loss falling `2.755 → 2.164 →
-1.821` across 3 real epochs; Chapter 9 measured BM25 keyword retrieval
-finding the correct source report `4/4` times on real test queries,
-against `3/4` for dense sentence embeddings; Chapter 10's faithfulness
-check caught a real answer that cited the correct report alongside the
-wrong one, and was actually grounded in the wrong one; Chapter 11
-measured perplexity on real held-out text falling from `159.91`
-(base model) to `25.03` (fine-tuned) even though exact-match on the
-same 8 questions stayed `0/8` at every epoch; Chapter 12 found two of
-those same metrics disagreeing between two real checkpoints —
-`avg_overlap` regressed while `perplexity` improved between epoch 1
-and epoch 2 of the same training run; Chapter 13 simulated new reports
-arriving, retrained on them, and found the same disagreement a third
-time on a real continuous-fine-tuning run — a real update that trained
-cleanly and still regressed on `avg_overlap`.
+estimate. A few examples:
+
+- Chapter 6's data quality gate found `75/76` reports pass extraction,
+  with `6` duplicate field-value groups.
+- Chapter 8's "at scale" fine-tune measured **training loss** (a single
+  number scoring how wrong the model's predictions were, which should
+  generally fall as training continues, the way a golf score should
+  generally fall as you improve) falling `2.755 → 2.164 → 1.821` across
+  3 real epochs.
+- Chapter 9 measured two different ways of searching the report archive
+  for the right source: **BM25 keyword retrieval** (ranking reports by
+  how many of the question's own words they contain, like a smarter
+  Ctrl+F) found the correct source report `4/4` times on real test
+  queries, against `3/4` for **dense sentence embeddings** (matching by
+  meaning instead of exact wording).
+- Chapter 10's faithfulness check caught a real answer that cited the
+  correct report alongside the wrong one, and was actually grounded in
+  the wrong one.
+- Chapter 11 measured **perplexity** (a score for how "surprised" the
+  model is by real text it never trained on — lower means it found the
+  wording more expected) on real held-out text falling from `159.91`
+  (base model) to `25.03` (fine-tuned) — even though exact-match on the
+  same 8 questions stayed `0/8` at every epoch.
+- Chapter 12 found two of those same metrics disagreeing between two
+  real checkpoints — `avg_overlap` (how much of the model's wording
+  overlaps with the known-correct answer) got worse while `perplexity`
+  improved between epoch 1 and epoch 2 of the same training run.
+- Chapter 13 simulated new reports arriving, retrained on them, and
+  found the same disagreement a third time on a real
+  continuous-fine-tuning run — a real update that trained cleanly and
+  still regressed on `avg_overlap`.
 
 ## Companion Pipeline
 
 [`industrial-ddr-finetuning`](https://github.com/djimrastephane/industrial-ddr-finetuning)
-is a separate, private repository: a real, working schema-v2 extraction
-pipeline (per-field status, verbatim evidence spans, automated
-validation, review workflow) built against this book's same public Utah
-FORGE archive, which Chapters 6 and 9 in particular reference for
-verified real-world numbers and technique. This book's own code never
-depends on it — every chapter's script in `book/code/chapter_NN/` runs
-standalone against the committed sample or full archive under
-`book/datasets/`. The book's own implementations are written from
-scratch for teaching purposes, not copied from it.
+is a separate, private repository: a real, working pipeline that pulls
+structured field values out of each report (with a record of exactly
+which sentence each value came from, an automated check on the result,
+and a human review step for anything uncertain), built against this
+book's same public Utah FORGE archive. Chapters 6 and 9 in particular
+reference it for verified real-world numbers and technique. This book's
+own code never depends on it — every chapter's script in
+`book/code/chapter_NN/` runs standalone against the committed sample or
+full archive under `book/datasets/`. The book's own implementations are
+written from scratch for teaching purposes, not copied from it.
 
 ### What this becomes
 
@@ -454,12 +504,13 @@ machine.
 
 ## Companion App (planned)
 
-An optional Streamlit companion app is planned under
-[`book/app/`](book/app), reusing the book's own chapter code (base model
-loading, fine-tuning, and evaluation), to show a question answered
-side-by-side by the base model and the fine-tuned model. Not implemented
-yet — see [`book/app/README.md`](book/app/README.md) for current status
-and the exact files it plans to reuse.
+An optional small web app (built with a Python tool called Streamlit) is
+planned under [`book/app/`](book/app), reusing the book's own chapter
+code (base model loading, fine-tuning, and evaluation), to show a
+question answered side-by-side by the base model and the fine-tuned
+model. Not implemented yet — see
+[`book/app/README.md`](book/app/README.md) for current status and the
+exact files it plans to reuse.
 
 ## Exercises
 

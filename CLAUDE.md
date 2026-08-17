@@ -12,12 +12,12 @@ the full folder layout and `README.md` (root) for the reader-facing
 front door and chapter status table — keep both in sync when a
 chapter's status changes.
 
-**Status**: Part 0 and Chapters 1–10 are written, tested, and passing
-CI. Chapters 11–13 are still placeholder scaffolding
-(`templates/chapter_template.qmd` copied in, unfilled). Always check
-`CHANGELOG.md`'s `## [Unreleased]` section and `git log` for the
-current real state — don't trust a stale memory of "which chapters are
-done."
+**Status**: Part 0 and all 13 chapters are written, tested, and passing
+CI. Always check `CHANGELOG.md`'s `## [Unreleased]` section and
+`git log` for the current real state — don't trust a stale memory of
+"which chapters are done" (this file's own status line has gone stale
+before; re-verify against `git log` rather than assuming this note is
+current).
 
 This project's sibling/predecessor is
 [`ddr-rag-book`](https://github.com/djimrastephane/ddr-rag-book) (same
@@ -88,6 +88,45 @@ What that means concretely:
   code block self-explanatory by piling comments into it; make sure
   the prose around it actually does that job, and keep the code itself
   clean.
+
+## README maintenance
+
+`README.md` (root) and `book/README.md` are not exempt from "the other
+non-negotiable rule" above — the root README in particular is the
+reader's first contact with the book, before Part 0 has taught them
+anything, so it can't lean on a concept a later chapter defines. Whenever
+either README is edited, re-read the full diff for:
+
+- **Jargon defined before use, every time, including acronyms.** LoRA,
+  QLoRA, RAG, BM25, perplexity, weights, checkpoint, hallucination,
+  grounded/grounding, faithfulness, exact-match, held-out,
+  generalization, open-weight, instruction-tuned, API, CI, VRAM — none
+  of these get to appear bare on first use. Reuse the exact
+  plain-language phrasing already established in
+  `appendix/appendix_b_glossary.qmd` and each chapter's own Engineering
+  Translation callouts (e.g. Chapter 9's BM25 callout, Chapter 11's
+  perplexity callout) rather than inventing new wording — that's also
+  what keeps the README and the chapters saying the same thing about the
+  same concept.
+- **Technique claims match what the code actually does, not what's
+  aspirationally installed.** E.g. `requirements.txt` installs
+  `bitsandbytes` for optional QLoRA support, but no chapter script
+  actually loads a quantized model — a README line claiming
+  "LoRA/QLoRA" is inaccurate; say "LoRA" (caught and fixed 2026-08-17).
+- **Name/terminology consistency** between the two READMEs, the
+  glossary, and the chapters themselves — same spelling of "Utah FORGE,"
+  the same model name (`Qwen2.5-1.5B-Instruct`), the same companion
+  project name (`industrial-ddr-finetuning`), the same chapter titles as
+  the actual `.qmd` headings.
+- **Natural flow, read start to finish as prose**, not just checked
+  clause by clause — a parenthetical gloss on every third word reads
+  worse than the jargon it's fixing. Prefer rephrasing a sentence to
+  avoid the term entirely (e.g. "no paid, metered connection to someone
+  else's hosted model" instead of "no paid API") over piling on
+  parentheticals, and only add an explicit `**term** (meaning)` gloss
+  where the term itself needs to stay visible (it's reused later, or
+  it's the name of something the reader will see elsewhere, like a
+  chapter title or a printed metric name).
 
 ## Chapter-writing conventions
 
