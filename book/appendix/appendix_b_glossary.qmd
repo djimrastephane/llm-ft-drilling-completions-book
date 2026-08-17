@@ -90,3 +90,4 @@ usage before trusting it against your own reports.
 | Grounded / grounding | An answer that's actually built from a real, cited source, not just retrieved alongside it — Chapter 10 checks the difference. |
 | Faithfulness | How well an answer's actual content matches what a specific source says — Chapter 10's word-overlap check is one simple way to measure it. |
 | Evaluation set | A fixed, reusable list of questions with known-correct answers, held back from training — Chapter 11 builds a real one from the report Chapter 2 reserved. |
+| Continuous fine-tuning | Updating a model again as new data becomes available, instead of training it once and leaving it fixed — Chapter 13. Answers *how* to incorporate new data, not *whether* the result should replace what's currently deployed; that's still Chapter 12's comparison, run again. |

@@ -331,6 +331,47 @@ highlights in narrative form.
   entry extended to define "regression" alongside it. Both READMEs, the
   chapter table, and test counts (64 -> 69 across Chapters 1-12)
   updated to match.
+- **Chapter 13: Continuous Fine-Tuning -- Keeping the Model Current**
+  (`chapters/chapter_13.qmd`) fully drafted, with working, tested code
+  (`code/chapter_13/continuous_finetune.py`,
+  `code/chapter_13/challenge/challenge.py`, `tests/test_chapter_13.py`,
+  `notebooks/chapter_13_explore.ipynb`) -- **the book's final chapter;
+  Part 0 and all 13 chapters are now written, tested, and passing CI.**
+  Simulates new reports arriving with a real chronological split of
+  this book's own 74 non-held-out reports (`57` "currently in
+  production" before report `#60`, `17` "just arrived" at/after it,
+  `490` and `179` real training examples respectively -- `669` total,
+  matching Chapter 7/8's own count exactly). Trains a "current" model
+  on the first half, continues training it on the new batch using
+  Chapter 8's exact checkpoint-and-resume mechanism unchanged, then
+  runs Chapter 12's comparison to decide whether the result is worth
+  deploying. Real run: training completed cleanly, loss falling at
+  every epoch (`3.03 -> 2.37 -> 1.87 -> 1.51`), and the result still
+  regressed on `avg_overlap` (`0.464 -> 0.125`) while perplexity
+  improved only marginally (`25.92 -> 25.73`, under `1%`) -- the same
+  metric-disagreement pattern Chapter 12 found, now confirmed a third
+  time on a genuinely new, real scenario. Field Notes traces the
+  regression to a real cause: `20` of the new batch's `179` examples
+  mention casing/cement, concentrated at the archive's end as the well
+  nears total depth -- a real, sensible operational-phase shift, not
+  an unexplainable artifact. Challenge exercise builds a second
+  held-out check from the new batch's own report `#65` (`20` examples)
+  and finds its perplexity (`16.56`) notably lower than either model
+  scored against report `#37` (`~25.8`), showing operational-phase
+  match matters more than training recency alone.
+  **Caught and fixed a real bug while verifying:** the comparison
+  step's first draft reused Chapter 8's `load_checkpoint` (which sets
+  `is_trainable=True`) to load checkpoints for pure evaluation, leaving
+  the model in train mode with dropout active -- `model.training`
+  printed `True` where it should have printed `False`, and perplexity
+  varied slightly (`~25.79-25.86`) from run to run as a result. Fixed
+  by using Chapter 12's `load_version` (no `is_trainable`) for
+  evaluation-only loads instead, confirmed fully deterministic across
+  repeated runs afterward; Chapters 9-12's own code never had this bug
+  (none of them pass `is_trainable=True`). Both READMEs, `RELEASE.md`,
+  the chapter table, and test counts (69 -> 74 across all 13 chapters)
+  updated to reflect the book's completion. Glossary gains a
+  "Continuous fine-tuning" entry.
 
 ### Changed
 

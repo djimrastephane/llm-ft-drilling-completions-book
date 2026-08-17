@@ -5,18 +5,40 @@ Completions*. See [CHANGELOG.md](CHANGELOG.md) for the full history.
 
 ## Unreleased
 
-Repository scaffold only -- no chapter content has been written yet.
+Part 0 and all 13 chapters are written, tested, and passing CI on
+Linux, macOS, and Windows -- the book's full content arc, start to
+finish, is complete. No tagged release yet; this section tracks what
+would ship in the first one.
 
-### Added
+### Highlights
 
-- Quarto book project structure mirroring the author's previous book,
-  [`ddr-rag-book`](https://github.com/djimrastephane/ddr-rag-book):
-  `book/chapters/`, `book/code/`, `book/tests/`, `book/notebooks/`,
-  `book/appendix/`, `book/templates/`, `book/datasets/`, `book/figures/`,
-  and `book/app/`.
-- Placeholder files for Part 0 (Chapter 0) and all 13 chapters of Part I
-  and Part II, each with a matching `code/chapter_NN/` folder, challenge
-  solution stub, and `tests/test_chapter_NN.py`.
-- CI workflows for Linux/macOS/Windows test runs and GitHub Pages
-  publishing (`.github/workflows/`).
+Readers start with a general-purpose local model that gets real
+oilfield shorthand wrong (Chapter 1), and finish with a fine-tuned
+model wired into a continuous retraining loop that catches its own
+regressions (Chapter 13) -- every number along the way independently
+verified against this book's own code and the real, public Utah FORGE
+archive, never invented.
+
+- **Part 0 & Part I (Chapters 1-5)** build the first working
+  prototype: load a local model, turn real reports into training
+  data, measure what the base model gets wrong, and run a first LoRA
+  fine-tune -- with an honest result (`0/16 -> 13/16` training recall,
+  held-out generalization staying at `0/2`) rather than a happy path.
+- **Part II (Chapters 6-13)** hardens that prototype: a data quality
+  gate (`75/76` reports pass, `6` duplicate groups caught), formatting
+  and chunking at scale, checkpointed fine-tuning with real experiment
+  tracking, a hybrid fine-tuning + retrieval system (`4/4` BM25
+  retrieval accuracy), a faithfulness checker that catches a real
+  answer grounded in the wrong report, a proper evaluation harness
+  (perplexity falling `159.91 -> 25.03` while exact-match stays
+  `0/8`), a drift detector that catches two of its own metrics
+  disagreeing between model versions, and a continuous fine-tuning
+  loop that simulates new reports arriving and catches a real
+  regression before it would have shipped.
 - Dual licensing: MIT for code, CC BY 4.0 for book text.
+- CI workflows for Linux/macOS/Windows test runs and GitHub Pages
+  publishing (`.github/workflows/`) -- publishing is still
+  manual-only, not yet triggered.
+
+See [CHANGELOG.md](CHANGELOG.md) for the detailed, chapter-by-chapter
+history, including every bug caught and fixed along the way.

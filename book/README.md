@@ -95,8 +95,8 @@ chapters written and tested):
 | 4 | Tokenization and embedding walkthrough |
 | 5 | First LoRA fine-tune |
 
-**Part II — Industrialising the System** (✅ Chapters 6–12 written and
-tested; Chapter 13 still a placeholder; Chapters 6 and 9 in
+**Part II — Industrialising the System** (✅ all 8 chapters written and
+tested; Chapters 6 and 9 in
 particular are informed by the author's private companion project
 **`industrial-ddr-finetuning`**, built specifically against this book's
 public archive — real per-report extraction, a real 75/76 data-quality
@@ -112,7 +112,7 @@ numbers):
 | 10 | ✅ | Traceable, hallucination-mitigated outputs |
 | 11 | ✅ | Fine-tuned model evaluation harness |
 | 12 | ✅ | Model drift detector across versions |
-| 13 | — | Continuous fine-tuning / retraining pipeline |
+| 13 | ✅ | Continuous fine-tuning / retraining pipeline |
 
 Each written Part II chapter includes a simplified, standalone
 implementation in `code/chapter_NN/` (no external service required to
@@ -133,7 +133,9 @@ real held-out text falling from `159.91` (base model) to `25.03`
 (fine-tuned) even though exact-match on the same 8 questions stayed
 `0/8` at every training epoch; Chapter 12 found `avg_overlap` and
 `perplexity` disagreeing on direction between two real checkpoints of
-the same training run.
+the same training run; Chapter 13 simulated new reports arriving and
+retrained on them, and the same disagreement showed up a third time on
+a real continuous-fine-tuning run.
 
 ## Relationship to the companion pipeline
 
@@ -180,7 +182,7 @@ Output is written to `_book/`. No API keys or paid services are required
 ## Running tests
 
 `tests/` exercises the real functions in every chapter's
-`code/chapter_NN/` script — 69 tests across Chapters 1–12. CI runs the
+`code/chapter_NN/` script — 74 tests across all 13 chapters. CI runs the
 full suite on Linux, Windows, and macOS on every push and pull request
 that touches `book/**` (see `.github/workflows/tests-linux.yml`,
 `tests-windows.yml`, `tests-macos.yml`), and all three are green.
