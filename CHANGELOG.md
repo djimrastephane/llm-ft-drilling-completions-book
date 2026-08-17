@@ -525,6 +525,23 @@ highlights in narrative form.
   location. `book/README.md` had no badges at all; added the same four
   (Linux/Windows/macOS tests + publish), in the same order, for
   consistency between the two.
+- **Connected the companion app to the book's own reader-facing text**,
+  not just repo-level READMEs. `index.qmd`'s "What this becomes" section
+  described the app as "planned" and pointed to Appendix A "once it
+  exists" -- both stale (the app is real, and Appendix A never actually
+  had app setup content); rewrote to describe what V1/V2/V3 actually do
+  and point to `app/README.md` instead. Chapter 1's Production Reality
+  aside grouped "the companion app in `app/`" in with systems that
+  handle multi-request concurrency and hot-swapping checkpoints without
+  a restart -- inaccurate now that the app is real and known not to do
+  either (it's explicitly a single-reader local tool); reworded so the
+  app is named as an example of what *isn't* solved, not what is. Added
+  a new "See it side by side" section to Chapter 13 (the last chapter,
+  positioned before the existing "Suggested next step" so that closing
+  message stays last) pointing to the app now that a reader has a real
+  checkpoint from every chapter to load into it. Verified both edits
+  with a real `quarto render` of the affected pages (not just the
+  `.qmd` source) before committing.
 
 ### Fixed
 

@@ -205,13 +205,15 @@ for this book's purposes.)
 ## Production Reality
 
 This loads one model into memory and keeps it there for the life of the
-script. A real deployment (the companion app in `app/`, or Chapter 13's
-continuous fine-tuning pipeline) has to think about things this chapter
-skips: what happens if the download is interrupted, whether multiple
-requests share one loaded model or each gets its own, and how to swap
-in a newer fine-tuned checkpoint without restarting everything. None of
-that changes how loading itself works — it's what you build *around*
-this step once it's not just you at a keyboard.
+script. A real multi-user deployment has to think about things this
+chapter skips: what happens if the download is interrupted, whether
+multiple requests share one loaded model or each gets its own, and how
+to swap in a newer fine-tuned checkpoint without restarting everything.
+The book's own companion app (`app/`) doesn't solve any of that either
+— it's a single-reader local tool, not a production service, and reuses
+this exact loading step directly. None of this changes how loading
+itself works — it's what you'd build *around* this step for multiple
+concurrent users, which this book doesn't attempt.
 
 ### Step 2: Build a chat-formatted prompt and generate a reply
 

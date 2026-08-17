@@ -393,6 +393,22 @@ built Chapter 12's comparison first — you can tell the difference
 between "we retrained" and "we improved," instead of deploying
 whatever a clean training run happens to produce.
 
+## See it side by side
+
+Every real checkpoint sitting in `checkpoints/` right now — from
+Chapter 5's first fine-tune through this chapter's continuously-updated
+one — is something the book's companion app (`app/`) can load directly,
+not a separate demo built beside this book. Its Model Playground puts
+the base and fine-tuned answers side by side on the same real prompt;
+Before vs. After Evaluation runs this book's own metrics live across
+the full held-out set; Dataset Explorer browses the real training
+examples behind them; and Failure Analysis reruns the book's own
+documented failure cases — including a real regression like the one
+this chapter just found — against whichever checkpoint you actually
+have. See `app/README.md` to run it; nothing in it is pre-recorded, so
+your own checkpoint may not reproduce this book's exact numbers, and
+that difference is itself real information.
+
 ## Suggested next step
 
 This is the last chapter. Every tool in it runs on your own data, not

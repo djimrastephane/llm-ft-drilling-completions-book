@@ -40,11 +40,17 @@ arrive.
 
 ## What this becomes
 
-The scripts in this book are the engine. The book's optional companion
-app (`book/app/`) is planned to put the same comparison on one screen — a
-question, the base model's answer, and the fine-tuned model's answer,
-side by side. See [Appendix A](appendix/appendix_a_environment_setup.qmd)
-for setup details once it exists.
+The scripts in this book are the engine. Its optional companion app
+(`book/app/`) puts the same evidence on one screen, reading whatever
+real checkpoint you've actually trained: a Model Playground for the
+same base-vs-fine-tuned comparison side by side, a Before vs. After
+Evaluation page that runs this book's own metrics live across the full
+held-out set, a Dataset Explorer for the real training examples behind
+the result, and a Failure Analysis page that reruns the book's own
+documented failure cases — including a fluent, confident wrong answer —
+against your checkpoint. Nothing in it is pre-recorded; see
+`app/README.md` once you're ready to run it, after Chapter 5 gives you
+a first real checkpoint to load.
 
 ## Who this book is for
 
