@@ -70,6 +70,10 @@ book/
 │
 ├── notebooks/                 Interactive Jupyter/Quarto companion notebooks
 ├── figures/                   Book figures and diagrams
+├── app/                       Streamlit companion app -- model comparison lab (see app/README.md)
+│   ├── streamlit_app.py       Model Playground (landing page)
+│   ├── pages/                 Additional pages, e.g. Before/After Evaluation
+│   └── helpers.py             App glue logic, no Streamlit import -- unit-testable
 └── appendix/
     ├── appendix_a_environment_setup.qmd    Dataset, rendering, hardware notes
     ├── appendix_a1_jupyter.qmd             Jupyter Notebook guide

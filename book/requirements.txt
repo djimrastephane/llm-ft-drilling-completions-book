@@ -31,6 +31,7 @@ scikit-learn==1.5.2
 # Companion app (book/app/streamlit_app.py) -- optional, only needed to run
 # the interactive base-vs-fine-tuned comparison app.
 streamlit==1.59.0
+pandas==2.2.3
 
 # Notebooks and book authoring
 jupyter==1.0.0

@@ -372,6 +372,46 @@ highlights in narrative form.
   the chapter table, and test counts (69 -> 74 across all 13 chapters)
   updated to reflect the book's completion. Glossary gains a
   "Continuous fine-tuning" entry.
+- **Companion app V1** (`book/app/`): the previous three-file placeholder
+  ("not implemented yet") is now a real, working Streamlit app with two
+  pages -- a **Model Playground** (landing page) and a **Before vs.
+  After Evaluation** page. Nothing here reimplements the book's
+  pipeline: every model load, generation, retrieval, and score is
+  imported directly from the chapter code that already exists (Chapters
+  1, 9, 10, 11, 12), the same way `tests/conftest.py` makes it
+  importable for the test suite. Checkpoint loading for
+  inference/evaluation always goes through Chapter 12's `load_version()`,
+  never Chapter 8's `load_checkpoint()` (which sets `is_trainable=True`
+  and leaves dropout active) -- the exact bug Chapter 13's own entry
+  above documents catching and fixing; the app doesn't reintroduce it.
+  Model Playground offers three real prompt sources -- Chapter 11's
+  8-question held-out set (with real exact-match/overlap scoring),
+  Chapter 9/10's 4 curated retrieval test cases (with a real
+  `grounded` flag and per-source faithfulness scores), and a free-text
+  question (explicitly labeled "no ground truth available," not scored)
+  -- and a checkpoint selector that only lists what actually exists on
+  this machine (`checkpoints/` is gitignored). Verified live in the
+  browser against this machine's real checkpoints: selecting the
+  retrieval demo case for report #37 reproduced the exact transcript
+  already published in both READMEs ("Trip out of hole with BHA #18.
+  Stop at 5,800' and circulate to cool hole and tools.", `grounded:
+  True`); the Before/After Evaluation page's live-computed perplexity
+  for Chapter 8's checkpoint came back `159.91` (base) `-> 25.03`
+  (fine-tuned) -- the same numbers already published from a direct run
+  of `eval_finetuned_model.py` -- and surfaced the same
+  `avg_overlap`-regressed/`perplexity`-improved disagreement between
+  Chapter 5 and Chapter 8 that Chapter 12's own chapter text describes.
+  Caught and fixed one real bug while verifying: `st.bar_chart`'s
+  Vega-Lite backend sorts its x-axis alphabetically by label text, not
+  by row order, so "Chapter 13" was rendering before "Chapter 5" and
+  "Chapter 8" as a string; fixed with an explicit numeric sort prefix on
+  the chart labels only, table and comparison text unaffected. New
+  `tests/test_app.py` (fast checkpoint-discovery/scoring tests, plus
+  `slow`-marked generation/evaluation tests that skip cleanly if no
+  checkpoint exists), and a new `pandas` dependency for the evaluation
+  table/chart. Dataset Explorer, Experiment Explorer, Failure Analysis,
+  and a "Fine-Tuning or RAG?" page remain planned, not built -- see
+  `book/app/README.md`.
 
 ### Changed
 
