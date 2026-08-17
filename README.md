@@ -1,5 +1,10 @@
 # Fine-Tuning Local LLM for Drilling & Completions
 
+[![Code tests Linux](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-linux.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-linux.yml)
+[![Code tests Windows](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-windows.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-windows.yml)
+[![Code tests macOS](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml)
+[![Publish book to GitHub Pages](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml)
+
 **First time here? Jump straight to [Start Here](#start-here).**
 
 This repository contains the chapters, code, and training data for
@@ -131,8 +136,9 @@ path with the failures edited out.
   what's landed and why, and [RELEASE.md](RELEASE.md) for per-release
   highlights — there's no tagged release yet.
 - The book isn't published to GitHub Pages yet — the "Publish book to
-  GitHub Pages" workflow (badge below) is still manual-only
-  (`workflow_dispatch`), even though every chapter is now drafted.
+  GitHub Pages" workflow (badge at the top of this file) is still
+  manual-only (`workflow_dispatch`), even though every chapter is now
+  drafted.
   Read chapters directly as `.qmd` source under
   [`book/chapters/`](book/chapters), or render the whole book locally
   with `quarto render` (see Quickstart in
@@ -413,11 +419,6 @@ viewer shows them as plain unformatted source, since there's no
 published GitHub Pages site yet (see "Progress" above). For the full
 repository layout (folder tree, part/chapter file map) see
 [`book/README.md`](book/README.md).
-
-[![Publish book to GitHub Pages](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml)
-[![Code tests Linux](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-linux.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-linux.yml)
-[![Code tests Windows](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-windows.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-windows.yml)
-[![Code tests macOS](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml)
 
 The "Publish book to GitHub Pages" workflow is still manual-only
 (`workflow_dispatch`) — its badge reflects the last manual run, not
