@@ -400,6 +400,38 @@ highlights in narrative form.
   Pipeline section, and a Bonus Material section -- none of it invented,
   every quoted number and transcript pulled from this book's own
   already-shipped chapter content.
+- Root README's wording audited against the same zero-programming-
+  experience bar CLAUDE.md holds chapter prose to, since it's a reader's
+  first contact with the book, before Part 0 has taught them anything to
+  lean on. Glossed every previously-bare acronym/term on first use
+  (`LoRA`, weights, hallucination, retrieval, grounded, exact-match,
+  held-out/generalization, CI, VRAM, perplexity, BM25, dense sentence
+  embeddings, `avg_overlap`), reusing the exact plain-language phrasing
+  already established in `appendix_b_glossary.qmd` and each chapter's
+  own Engineering Translation callouts rather than inventing new
+  wording. Caught and fixed a real accuracy issue along the way: the
+  README claimed the book fine-tunes with "LoRA/QLoRA," but no chapter
+  script actually loads a quantized model -- `bitsandbytes`/QLoRA is
+  only an optional, unused install path (Chapter 0 says as much) --
+  corrected to "LoRA." Also reworded flatter, spec-sheet-style sections
+  ("Who This Book Is For," "What Makes This Book Different") to match
+  the book's own direct, evidence-first voice instead of reading like
+  generic project-README copy -- "Who This Book Is For" now ties into
+  the book's recurring four-engineer cast (Oumy, Mike, Sarah, Sean)
+  instead of a generic job-title list. Brought `book/README.md`'s
+  duplicate "chapter map" evidence paragraph in sync with the same
+  glosses. Added a "README maintenance" section to `CLAUDE.md`
+  codifying this accessibility/accuracy/consistency check for future
+  README edits, and fixed `CLAUDE.md`'s own stale "Chapters 11-13 are
+  placeholder" status line in the process (all 13 chapters are actually
+  drafted, tested, and passing CI per `git log`).
+- Moved the CI/publish badges in the root README from ~420 lines down
+  (under "Table of Contents," past every section a first-time visitor
+  actually reads) to directly under the title, the standard GitHub spot
+  -- and fixed the one cross-reference that pointed at their old
+  location. `book/README.md` had no badges at all; added the same four
+  (Linux/Windows/macOS tests + publish), in the same order, for
+  consistency between the two.
 
 ### Fixed
 
