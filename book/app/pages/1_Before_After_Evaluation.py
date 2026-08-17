@@ -5,7 +5,7 @@ Instead of one cherry-picked prompt, this page runs Chapter 11's real
 set) against the base model and every fine-tuned checkpoint that
 actually exists on this machine, and shows Chapter 12's own real
 metric-disagreement finding rather than collapsing everything into one
-score.
+score -- including when the latest checkpoint isn't the best one.
 """
 
 import sys
@@ -72,10 +72,28 @@ if run:
 
 summaries = st.session_state.get("before_after_summaries")
 if summaries:
+    n_questions = len(_cached_eval_set())
+    labels = list(summaries)
+    short = {label: helpers.short_version_label(label) for label in labels}
+
+    # --- Evaluation snapshot -------------------------------------------------
+    st.subheader("Evaluation snapshot")
+    snapshot = helpers.evaluation_snapshot(summaries)
+    cols = st.columns(4)
+    ppx_labels, ppx_value = snapshot["best_perplexity"]
+    ov_labels, ov_value = snapshot["best_overlap"]
+    em_labels, em_value = snapshot["best_exact_match"]
+    cols[0].metric("Best perplexity", f"{ppx_value:.2f}", ", ".join(short[l] for l in ppx_labels))
+    cols[1].metric("Best overlap", f"{ov_value:.3f}", ", ".join(short[l] for l in ov_labels))
+    em_winner_text = "Tie" if len(em_labels) > 1 else short[em_labels[0]]
+    cols[2].metric("Best exact-match", f"{em_value}/{n_questions}", em_winner_text)
+    cols[3].metric("Latest checkpoint", short[snapshot["latest"]])
+
+    # --- Results table ---------------------------------------------------
     rows = [
         {
             "Version": label,
-            "Exact-match": f"{s['exact_match']}/{len(_cached_eval_set())}",
+            "Exact-match": f"{s['exact_match']}/{n_questions}",
             "Avg. overlap score": round(s["avg_overlap"], 3),
             "Perplexity": round(s["perplexity"], 2),
         }
@@ -83,32 +101,78 @@ if summaries:
     ]
     df = pd.DataFrame(rows).set_index("Version")
     st.dataframe(df, use_container_width=True)
+    st.caption(
+        "Exact-match is intentionally strict (Chapter 3's rule): the "
+        "generated answer has to contain the reference answer's exact "
+        "wording, word for word, to count -- getting the substance right "
+        "in different words still scores 0. That's why every version can "
+        "show `0` here despite real, measurable differences in overlap "
+        "and perplexity below."
+    )
 
-    # st.bar_chart's Vega-Lite backend sorts the x-axis alphabetically by
-    # label text, not by row order -- "Chapter 13" would otherwise sort
-    # before "Chapter 5" as a string. A numeric prefix keeps the chart in
-    # the same chronological order as the table above.
-    ordered_labels = {label: f"{i}. {label}" for i, label in enumerate(summaries)}
-    chart_df = pd.DataFrame(
-        {
-            "Avg. overlap score": {ordered_labels[label]: s["avg_overlap"] for label, s in summaries.items()},
-            "Perplexity": {ordered_labels[label]: s["perplexity"] for label, s in summaries.items()},
-        }
-    ).reindex(list(ordered_labels.values()))
-    st.bar_chart(chart_df)
-    st.caption("Lower perplexity is better; higher overlap score is better.")
-
-    labels = list(summaries)
+    # --- What changed between versions (moved up: this is the interpretation) --
     if len(labels) > 1:
         st.subheader("What changed between versions")
         st.caption(
             "Chapter 12's own finding, preserved here rather than collapsed "
-            "into one number: these three metrics do not always agree on "
+            "into one number: these metrics do not always agree on "
             "direction between two real versions."
         )
+
+        if helpers.latest_regressed_on_both(summaries):
+            prev_label, latest_label = labels[-2], labels[-1]
+            prev, latest = summaries[prev_label], summaries[latest_label]
+            st.warning(
+                f"**Latest does not mean best.** {short[latest_label]} regressed "
+                f"on both average overlap ({prev['avg_overlap']:.3f} → "
+                f"{latest['avg_overlap']:.3f}) and perplexity "
+                f"({prev['perplexity']:.2f} → {latest['perplexity']:.2f}) "
+                f"compared to {short[prev_label]} -- continued fine-tuning "
+                "did not automatically improve this checkpoint on this "
+                "held-out set."
+            )
+
         for before_label, after_label in zip(labels, labels[1:]):
-            directions = helpers.compare_versions(summaries[before_label], summaries[after_label])
-            st.write(f"**{before_label} → {after_label}**")
+            before, after = summaries[before_label], summaries[after_label]
+            directions = helpers.compare_versions(before, after)
+            st.write(f"**{short[before_label]} → {short[after_label]}**")
+
+            ppx_change = helpers.relative_change(before["perplexity"], after["perplexity"])
+            ov_change = helpers.relative_change(before["avg_overlap"], after["avg_overlap"])
+
             cols = st.columns(3)
-            for col, (metric, direction) in zip(cols, directions.items()):
-                col.metric(metric.replace("_", " "), direction)
+            ppx_arrow = "↓" if directions["perplexity"] == "improved" else "↑" if directions["perplexity"] == "regressed" else "="
+            cols[0].metric(
+                "Perplexity",
+                f"{ppx_arrow} {abs(ppx_change) * 100:.1f}%" if ppx_change is not None else f"{after['perplexity']:.2f}",
+                directions["perplexity"],
+            )
+            if ov_change is None:
+                cols[1].metric("Avg. overlap", f"{before['avg_overlap']:.3f} → {after['avg_overlap']:.3f}", directions["avg_overlap"])
+            else:
+                ov_arrow = "↑" if directions["avg_overlap"] == "improved" else "↓" if directions["avg_overlap"] == "regressed" else "="
+                cols[1].metric("Avg. overlap", f"{ov_arrow} {abs(ov_change) * 100:.1f}%", directions["avg_overlap"])
+            cols[2].metric("Exact-match", f"{after['exact_match']}/{n_questions}", directions["exact_match"])
+
+    # --- Charts: split, not overlaid (perplexity and overlap have very ---
+    # --- different scales -- on one shared axis overlap is invisible) ----
+    # st.bar_chart's Vega-Lite backend sorts the x-axis alphabetically by
+    # label text, not by row order -- "Ch13" would otherwise sort before
+    # "Ch5"/"Ch8" as a string. A short numeric prefix keeps the chart in
+    # the same chronological order as the table, while staying far
+    # shorter than the old full descriptive labels.
+    chart_order = {label: f"{i}. {short[label]}" for i, label in enumerate(labels)}
+
+    st.subheader("Perplexity by version")
+    st.caption("Lower is better.")
+    ppx_df = pd.DataFrame(
+        {"Perplexity": {chart_order[label]: s["perplexity"] for label, s in summaries.items()}}
+    ).reindex(list(chart_order.values()))
+    st.bar_chart(ppx_df)
+
+    st.subheader("Average overlap by version")
+    st.caption("Higher is better.")
+    ov_df = pd.DataFrame(
+        {"Avg. overlap score": {chart_order[label]: s["avg_overlap"] for label, s in summaries.items()}}
+    ).reindex(list(chart_order.values()))
+    st.bar_chart(ov_df)

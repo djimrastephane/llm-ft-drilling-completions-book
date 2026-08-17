@@ -525,9 +525,12 @@ flags, never by an invented domain/topic/difficulty label; and a
 test cases live — including report #21, the book's headline case of a
 fluent, verified-faithful answer grounded in the wrong report — paired
 with what the book itself found, plus a live "shape, not judgment"
-detector across the held-out set. An Experiment Explorer and a
-"Fine-Tuning or RAG?" page remain planned, further out, deliberately
-kept out of scope rather than growing this into a generic fine-tuning
+detector across the held-out set. A "Fine-Tuning or RAG?" page remains
+planned, further out; an Experiment Explorer was considered and
+deliberately dropped, since Before vs. After Evaluation already has the
+necessary evidence once polished — this stays a three-question
+companion (What did we train on? What changed as we fine-tuned? Where
+and how does it fail?) rather than growing into a generic fine-tuning
 platform. Nothing here reimplements the pipeline or invents a metric
 that doesn't already exist in the book's own code — see
 [`book/app/README.md`](book/app/README.md) for exactly what it reuses

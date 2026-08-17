@@ -542,6 +542,43 @@ highlights in narrative form.
   checkpoint from every chapter to load into it. Verified both edits
   with a real `quarto render` of the affected pages (not just the
   `.qmd` source) before committing.
+- **Reworked Before vs. After Evaluation (V1) into the definitive
+  model-evolution page**, per real usability feedback after checking it
+  in the browser. The single combined bar chart made overlap
+  effectively invisible -- perplexity ranges roughly `25` to `160`,
+  average overlap `0` to `0.562`, one shared axis flattens the smaller
+  series to nothing -- split into two separate charts, each with its
+  own scale. Added `helpers.relative_change()` (percent change between
+  consecutive versions, `None` when the baseline is `0` rather than
+  dividing by zero) so each version transition reads as "perplexity
+  improved 77.7%, overlap regressed 70.3%" instead of just a direction
+  word. Added `helpers.evaluation_snapshot()` (best perplexity/overlap/
+  exact-match, ties included, plus which version is chronologically
+  latest) as a summary block at the top. Added
+  `helpers.latest_regressed_on_both()` and a matching UI callout: on
+  this machine's real checkpoints, Chapter 13 regresses on both average
+  overlap (`0.167` -> `0.125`) and perplexity (`25.03` -> `25.73`)
+  compared to Chapter 8 -- continued fine-tuning did not automatically
+  improve the model, and the page now says so explicitly ("latest does
+  not mean best") instead of leaving the reader to notice it in a
+  table. Moved "What changed between versions" to immediately after the
+  results table, since it's the interpretation that matters, not an
+  afterthought below two charts. Added an explanatory caption for why
+  every version can show `0/8` exact-match despite real, measurable
+  differences elsewhere -- Chapter 3's exact-match rule requires the
+  reference answer's exact wording as a substring, so being right in
+  different words still scores 0. Added `helpers.short_version_label()`
+  ("Base"/"Ch5"/"Ch8"/"Ch13") for chart axes -- the old full descriptive
+  labels were truncating -- full descriptions stay in the results
+  table. Re-caught the same `st.bar_chart` alphabetical-x-axis bug
+  fixed once already for this page (see above): short labels alone
+  sort "Ch13" before "Ch5"/"Ch8" as a string, so the same numeric-prefix
+  fix had to be reapplied on top of the short labels. An Experiment
+  Explorer was considered for a V4 and deliberately dropped -- this
+  page already has the necessary evidence once polished; both READMEs
+  updated to describe the finished three-page evidence chain (Dataset
+  Explorer / Before vs. After Evaluation / Failure Analysis) instead.
+  New tests for all four new pure functions.
 
 ### Fixed
 

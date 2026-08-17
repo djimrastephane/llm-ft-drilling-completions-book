@@ -120,6 +120,70 @@ def evaluate_checkpoint(checkpoint_label: str, checkpoint_dir: Path | None, eval
     return summarize_version(model, tokenizer, eval_set)
 
 
+_SHORT_LABEL_PATTERN = re.compile(r"Chapter (\d+)")
+
+
+def short_version_label(label: str) -> str:
+    """Compact, chart-axis-safe version label ("Base", "Ch5", "Ch8",
+    "Ch13") derived from the full descriptive label -- full descriptions
+    stay in the results table, only the chart axes get the short form.
+    """
+    if label.startswith("Base model"):
+        return "Base"
+    match = _SHORT_LABEL_PATTERN.match(label)
+    return f"Ch{match.group(1)}" if match else label
+
+
+def relative_change(before: float, after: float) -> float | None:
+    """Fractional change from `before` to `after` (0.298 means +29.8%),
+    or None when `before` is 0 -- percent change is undefined starting
+    from zero, e.g. the base model's `0.0` overlap score. Callers should
+    show the raw before/after values instead in that case.
+    """
+    if before == 0:
+        return None
+    return (after - before) / before
+
+
+def evaluation_snapshot(summaries: dict[str, dict]) -> dict:
+    """Which version wins each metric (ties included, since Chapter 11's
+    exact-match is strict enough that every version can genuinely tie at
+    `0`), plus which version is chronologically latest -- so "latest
+    checkpoint" and "best checkpoint" can be compared directly instead of
+    left for the reader to work out from a table.
+    """
+
+    def winners(metric: str, minimize: bool) -> tuple[list[str], float]:
+        values = {label: s[metric] for label, s in summaries.items()}
+        target = min(values.values()) if minimize else max(values.values())
+        return [label for label, v in values.items() if v == target], target
+
+    best_perplexity_labels, best_perplexity_value = winners("perplexity", minimize=True)
+    best_overlap_labels, best_overlap_value = winners("avg_overlap", minimize=False)
+    best_exact_match_labels, best_exact_match_value = winners("exact_match", minimize=False)
+
+    return {
+        "best_perplexity": (best_perplexity_labels, best_perplexity_value),
+        "best_overlap": (best_overlap_labels, best_overlap_value),
+        "best_exact_match": (best_exact_match_labels, best_exact_match_value),
+        "latest": list(summaries)[-1],
+    }
+
+
+def latest_regressed_on_both(summaries: dict[str, dict]) -> bool:
+    """True only if the chronologically latest version is strictly worse
+    than the immediately preceding one on BOTH avg_overlap and perplexity
+    -- the real "continued fine-tuning didn't automatically improve the
+    model" finding this page surfaces rather than hides. False whenever
+    fewer than two versions exist, so nothing is claimed without evidence.
+    """
+    labels = list(summaries)
+    if len(labels) < 2:
+        return False
+    directions = compare_versions(summaries[labels[-2]], summaries[labels[-1]])
+    return directions["avg_overlap"] == "regressed" and directions["perplexity"] == "regressed"
+
+
 _INPUT_PATTERN = re.compile(
     r"Well: (?P<well_name>.+?) \| Report #(?P<report_num>\d+) \| Date: (?P<date>[\d-]+)"
     r"(?: \| Time: (?P<time_from>[\d:]+)-(?P<time_to>[\d:]+)(?: \(part (?P<part_i>\d+) of (?P<part_n>\d+)\))?)?$"
@@ -264,12 +328,16 @@ __all__ = [
     "compare_versions",
     "dataset_examples",
     "evaluate_checkpoint",
+    "evaluation_snapshot",
     "faithfulness_score",
     "generate_answer",
+    "latest_regressed_on_both",
     "load_base_model",
     "load_finetuned_model",
     "pairwise_answer_similarity",
     "parse_input_context",
     "perplexity",
+    "relative_change",
     "score_against_reference",
+    "short_version_label",
 ]

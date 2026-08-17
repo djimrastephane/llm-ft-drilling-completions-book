@@ -1,30 +1,42 @@
 # Companion App: Model Comparison Laboratory
 
-**Status: V1, V2, and V3 frozen** -- four of six planned pages are real
-and working, completing one coherent evidence chain: training data ->
-model behavior -> failures. None of V1/V2/V3 is revisited for new
-features; new pages ship as their own labeled version, the same
-one-piece-at-a-time cadence the book's own chapters use.
+**Status: V1, V2, and V3 frozen** -- three real, working pages complete
+one coherent evidence chain: training data -> model behavior ->
+failures. None of V1/V2/V3 is revisited for new *pages*; the freeze is
+about scope (no Experiment Explorer, no generic fine-tuning platform),
+not about polish -- V1's Before vs. After Evaluation was reworked after
+shipping, per real usability feedback, into the definitive
+model-evolution page described below.
 
-- **V1 — "What changed after fine-tuning?"** -- **Model Playground**
-  (base vs. fine-tuned vs. optional retrieval, on the same real prompt)
-  and **Before vs. After Evaluation** (the book's own metrics run live
-  across the full held-out set, not one cherry-picked example).
-- **V2 — "What data produced that change?"** -- **Dataset Explorer**
-  (browse the real training examples Chapter 2/7 actually build, with
-  real Chapter 6 quality-gate flags and provenance, not invented
-  metadata).
-- **V3 — "Where does it fail?"** -- **Failure Analysis**: the same 4 real
-  Chapter 9/10 retrieval test cases run live -- including report #21,
-  the book's headline case of a fluent, verified-faithful answer
+The app now answers three clear questions, an unusually coherent
+structure for a book companion:
+
+- **Dataset Explorer (V2) — "What did we train on?"** Browse the real
+  training examples Chapter 2/7 actually build, with real Chapter 6
+  quality-gate flags and provenance, not invented metadata.
+- **Before vs. After Evaluation (V1) — "What changed as we fine-tuned?"**
+  Polished into the definitive model-evolution page rather than
+  building a separate Experiment Explorer: an evaluation snapshot up
+  top (best perplexity/overlap/exact-match and the latest checkpoint,
+  side by side, so disagreement between them is impossible to miss),
+  perplexity and average overlap charted separately (their scales are
+  roughly 25-160 vs. 0-0.6 -- one shared axis makes overlap effectively
+  invisible), relative change between consecutive versions, and an
+  explicit callout whenever the latest checkpoint regresses on both
+  continuous metrics compared to the one before it -- latest doesn't
+  automatically mean best, and this page says so rather than hiding it.
+- **Failure Analysis (V3) — "Where and how does it fail?"** The same 4
+  real Chapter 9/10 retrieval test cases run live -- including report
+  #21, the book's headline case of a fluent, verified-faithful answer
   grounded in the wrong report -- each paired with what the book itself
   found running that case, plus a live "shape, not judgment" detector
-  across Chapter 11's held-out set. Chosen deliberately over adding more
-  general UI features, so the app completes the evidence chain rather
-  than growing into a generic fine-tuning platform.
-- **Planned, further out** -- Experiment Explorer and a "Fine-Tuning or
-  RAG?" page -- same honesty convention the book itself uses for chapter
-  status, applied to this app.
+  across Chapter 11's held-out set.
+
+An Experiment Explorer was considered for V4 and deliberately dropped:
+Before vs. After Evaluation already has the necessary evidence once
+polished, and a separate read-only checkpoint-config page would have
+added a fourth "clear question" without adding a new one. A
+"Fine-Tuning or RAG?" page remains planned, further out.
 
 This progression -- book chapters -> real training code -> locally
 generated checkpoints -> companion app -> live comparison -> reproduced
@@ -113,15 +125,14 @@ the chapters do: never invent a number.
 | File | Purpose |
 |---|---|
 | `streamlit_app.py` | Model Playground (landing page): checkpoint picker, prompt source, base vs. fine-tuned vs. optional retrieval |
-| `pages/1_Before_After_Evaluation.py` | Live before/after evaluation across the real held-out set, for every checkpoint present |
+| `pages/1_Before_After_Evaluation.py` | The definitive model-evolution page: live evaluation snapshot, split perplexity/overlap charts, relative change between versions, and an explicit "latest doesn't mean best" callout when it applies |
 | `pages/2_Dataset_Explorer.py` | Browse the real training examples Chapter 2/7 build, filterable by report number, date, time window, and Chapter 6's real quality-gate flags |
 | `pages/3_Failure_Analysis.py` | Live rerun of Chapter 9/10's 4 real retrieval test cases against your checkpoint, paired with the book's documented finding for each, plus a live shape-not-judgment detector |
 | `helpers.py` | All model-loading, generation, retrieval, dataset, and scoring glue (no Streamlit; unit-testable) |
 
 ## Planned, not yet built
 
-- **Experiment Explorer** -- read-only inspection of real checkpoint
-  configs and logged metrics (no in-app training).
 - **Fine-Tuning or RAG?** -- a decision-guide page cross-referencing
   Chapter 3's "when fine-tuning is, and is not, the right tool" section
-  with the author's companion RAG book.
+  with the author's companion RAG book. An Experiment Explorer was
+  considered and deliberately dropped -- see "Status" above.

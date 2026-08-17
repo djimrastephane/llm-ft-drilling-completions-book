@@ -132,6 +132,51 @@ def test_pairwise_answer_similarity_is_symmetric_regardless_of_input_order():
     assert forward[0]["similarity"] == backward[0]["similarity"]
 
 
+def test_short_version_label_shortens_base_and_chapter_labels():
+    assert helpers.short_version_label("Base model (no fine-tuning)") == "Base"
+    assert helpers.short_version_label("Chapter 5 -- first LoRA fine-tune (16 examples)") == "Ch5"
+    assert helpers.short_version_label("Chapter 13 -- continuous fine-tune (latest)") == "Ch13"
+
+
+def test_relative_change_matches_hand_computed_percentages():
+    assert helpers.relative_change(159.91, 112.28) == pytest.approx(-0.2979, abs=1e-3)
+    assert helpers.relative_change(112.28, 25.03) == pytest.approx(-0.7771, abs=1e-3)
+    assert helpers.relative_change(25.03, 25.73) == pytest.approx(0.0280, abs=1e-3)
+
+
+def test_relative_change_is_none_when_starting_from_zero():
+    assert helpers.relative_change(0.0, 0.562) is None
+
+
+def test_evaluation_snapshot_finds_the_real_best_version_per_metric():
+    summaries = {
+        "Base model (no fine-tuning)": {"exact_match": 0, "avg_overlap": 0.0, "perplexity": 159.91},
+        "Chapter 5 -- first LoRA fine-tune (16 examples)": {"exact_match": 0, "avg_overlap": 0.562, "perplexity": 112.28},
+        "Chapter 8 -- fine-tuned at scale (669 examples)": {"exact_match": 0, "avg_overlap": 0.167, "perplexity": 25.03},
+        "Chapter 13 -- continuous fine-tune (latest)": {"exact_match": 0, "avg_overlap": 0.125, "perplexity": 25.73},
+    }
+
+    snapshot = helpers.evaluation_snapshot(summaries)
+
+    assert snapshot["best_perplexity"] == (["Chapter 8 -- fine-tuned at scale (669 examples)"], 25.03)
+    assert snapshot["best_overlap"] == (["Chapter 5 -- first LoRA fine-tune (16 examples)"], 0.562)
+    assert len(snapshot["best_exact_match"][0]) == 4  # a real tie -- every version scored 0
+    assert snapshot["latest"] == "Chapter 13 -- continuous fine-tune (latest)"
+
+
+def test_latest_regressed_on_both_is_true_for_the_books_own_ch8_to_ch13_transition():
+    summaries = {
+        "Chapter 8 -- fine-tuned at scale (669 examples)": {"exact_match": 0, "avg_overlap": 0.167, "perplexity": 25.03},
+        "Chapter 13 -- continuous fine-tune (latest)": {"exact_match": 0, "avg_overlap": 0.125, "perplexity": 25.73},
+    }
+
+    assert helpers.latest_regressed_on_both(summaries) is True
+
+
+def test_latest_regressed_on_both_is_false_when_only_one_version_exists():
+    assert helpers.latest_regressed_on_both({"Base model (no fine-tuning)": {"exact_match": 0, "avg_overlap": 0.0, "perplexity": 100.0}}) is False
+
+
 def test_score_against_reference_matches_chapter_11s_own_scoring():
     from eval_finetuned_model import exact_match
     from traceable_outputs import faithfulness_score
