@@ -154,6 +154,63 @@ def parse_input_context(input_context: str) -> dict:
     }
 
 
+DOCUMENTED_FINDINGS = {
+    "Report #37 (held-out)": (
+        "success",
+        "Chapter 9/10's baseline case: retrieval correctly grounds the "
+        "answer in report #37 itself, the one report never in any "
+        "training set in this book.",
+    ),
+    "Report #38 (stuck pipe)": (
+        "success",
+        "Chapter 10's real finding: no retrieved chunk crosses the "
+        "faithfulness threshold here -- correctly flagged ungrounded "
+        "rather than silently accepted as a citation.",
+    ),
+    "Report #21 (step rate test)": (
+        "failure",
+        "Chapter 10's headline finding: a fluent, real-sounding answer "
+        "can verify faithful against the WRONG retrieved chunk (report "
+        "#27, a blowout-preventer test retrieved alongside the real "
+        "target) instead of the actual target, report #21. A plain "
+        "grounded: True/False flag would have silently counted this as "
+        "a success -- only checking which specific source an answer "
+        "verifies against catches it.",
+    ),
+    "Report #49 (fishing)": (
+        "blind spot",
+        "Chapter 10's Field Notes: the faithfulness check can verify "
+        "against the right report's text while still missing a genuine "
+        "'trip in' vs. 'trip out' direction inversion buried in "
+        "otherwise-matching words -- a known blind spot of word-overlap "
+        "scoring. This page can't catch that either; only reading the "
+        "actual answer text can.",
+    ),
+}
+
+
+def pairwise_answer_similarity(labeled_answers: dict[str, str]) -> list[dict]:
+    """How much each pair of generated answers overlaps with each other --
+    Chapter 10's own word-overlap check (`faithfulness_score`), applied to
+    a new pairing (answer vs. answer, not answer vs. source), the same
+    kind of reuse Chapter 11 already does applying it to answer vs.
+    expected-output instead. A high score between two DIFFERENT
+    questions' answers is evidence of the "shape, not judgment" pattern
+    Chapters 3/8/9/11/12 document: the model reproducing a memorized
+    template regardless of what was actually asked. Symmetrized (scored
+    both directions and averaged) since `faithfulness_score` itself isn't.
+    """
+    labels = list(labeled_answers)
+    pairs = []
+    for i in range(len(labels)):
+        for j in range(i + 1, len(labels)):
+            a, b = labels[i], labels[j]
+            text_a, text_b = labeled_answers[a], labeled_answers[b]
+            similarity = (faithfulness_score(text_a, text_b) + faithfulness_score(text_b, text_a)) / 2
+            pairs.append({"question_a": a, "question_b": b, "similarity": round(similarity, 3)})
+    return sorted(pairs, key=lambda p: p["similarity"], reverse=True)
+
+
 def dataset_examples(bucket: str) -> list[dict]:
     """Real training examples for one of the book's three real example
     sources (`DATASET_BUCKETS` values), each annotated with fields parsed
@@ -195,6 +252,7 @@ def dataset_examples(bucket: str) -> list[dict]:
 
 __all__ = [
     "DATASET_BUCKETS",
+    "DOCUMENTED_FINDINGS",
     "MODEL_NAME",
     "RETRIEVAL_INSTRUCTION",
     "RETRIEVAL_TEST_CASES",
@@ -206,9 +264,11 @@ __all__ = [
     "compare_versions",
     "dataset_examples",
     "evaluate_checkpoint",
+    "faithfulness_score",
     "generate_answer",
     "load_base_model",
     "load_finetuned_model",
+    "pairwise_answer_similarity",
     "parse_input_context",
     "perplexity",
     "score_against_reference",

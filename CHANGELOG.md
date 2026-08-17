@@ -438,6 +438,33 @@ highlights in narrative form.
   (fast -- PDF extraction only, no model, matching the existing
   chapter-6/7 test convention of not marking extraction-only tests
   `slow`). Both READMEs updated to describe the V1/V2 split.
+- **Companion app V3: Failure Analysis** (`book/app/pages/3_Failure_Analysis.py`).
+  V2 is now frozen alongside V1. This completes the app's evidence
+  chain -- training data (V2) -> model behavior (V1) -> failures (V3) --
+  chosen deliberately over adding more general UI features. Two live
+  sections, both run against whichever real checkpoint the reader
+  selects, never a fixed screenshot: (1) the same 4 real Chapter 9/10
+  retrieval test cases already wired into the V1 Playground, each paired
+  with a new `helpers.DOCUMENTED_FINDINGS` entry quoting what the book
+  itself found running that exact case; (2) a new
+  `helpers.pairwise_answer_similarity()` -- Chapter 10's own
+  `faithfulness_score()` reused on a new pairing (generated answer vs.
+  generated answer, not answer vs. source, the same kind of reuse
+  Chapter 11 already does applying it to answer vs. expected-output) --
+  run across Chapter 11's real 8-question held-out set to detect the
+  "shape, not judgment" pattern Chapters 3/8/9/11/12 all document.
+  Verified live in the browser against Chapter 8's real checkpoint: the
+  report #21 case reproduced the book's exact documented result --
+  "Test choke manifold at 5000psi," `grounded: True`, verified against
+  report #27 at faithfulness `0.75`, not the real target -- and the
+  shape detector's top-ranked pair reproduced the exact "Production
+  Casing Run Csg & Cement Rig up casing" answer already quoted as the
+  headline example in this repo's own root README, this time surfaced
+  as evidence of memorization rather than as a win. New tests for
+  `DOCUMENTED_FINDINGS` (covers every real test case) and
+  `pairwise_answer_similarity()` (ranks near-identical answers highest,
+  symmetric regardless of input order). Both READMEs updated to
+  describe the finished V1/V2/V3 progression.
 
 ### Changed
 

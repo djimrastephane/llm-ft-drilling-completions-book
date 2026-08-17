@@ -101,6 +101,37 @@ def test_dataset_examples_held_out_bucket_is_all_report_37():
     assert all(e["report_num"] == 37 and e["held_out"] for e in examples)
 
 
+def test_documented_findings_cover_every_real_retrieval_test_case():
+    test_case_labels = {label for label, *_ in helpers.RETRIEVAL_TEST_CASES}
+
+    assert set(helpers.DOCUMENTED_FINDINGS) == test_case_labels
+    for kind, finding in helpers.DOCUMENTED_FINDINGS.values():
+        assert kind in {"success", "failure", "blind spot"}
+        assert finding.strip()
+
+
+def test_pairwise_answer_similarity_ranks_near_identical_answers_highest():
+    pairs = helpers.pairwise_answer_similarity(
+        {
+            "q1": "Trip out of hole with BHA #18.",
+            "q2": "Trip out of hole with BHA #19.",
+            "q3": "Rig up Schlumberger to run logs.",
+        }
+    )
+
+    assert len(pairs) == 3
+    top = pairs[0]
+    assert {top["question_a"], top["question_b"]} == {"q1", "q2"}
+    assert top["similarity"] > 0.5
+
+
+def test_pairwise_answer_similarity_is_symmetric_regardless_of_input_order():
+    forward = helpers.pairwise_answer_similarity({"a": "trip out of hole", "b": "trip out of hole again"})
+    backward = helpers.pairwise_answer_similarity({"b": "trip out of hole again", "a": "trip out of hole"})
+
+    assert forward[0]["similarity"] == backward[0]["similarity"]
+
+
 def test_score_against_reference_matches_chapter_11s_own_scoring():
     from eval_finetuned_model import exact_match
     from traceable_outputs import faithfulness_score

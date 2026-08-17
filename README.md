@@ -510,22 +510,26 @@ lives under [`book/app/`](book/app) — a model comparison laboratory, not
 just a single side-by-side demo. It's part of the book's reproducibility
 story, not a separate demo built beside it: book chapters → real
 training code → locally generated checkpoints → this app → live
-comparison → reproduced evaluation results. Three pages are real and
-working: a **Model Playground** that runs the same real prompt against
-the base model and a real fine-tuned checkpoint (with an optional
-retrieval-grounded third answer), a **Before vs. After Evaluation** page
-that runs the book's own real metrics live across the full held-out set
-for every checkpoint you've actually trained (not one cherry-picked
-example), and a **Dataset Explorer** that browses the real training
-examples Chapter 2 and Chapter 7 actually build, filterable by report
-number, date, time window, and Chapter 6's real quality-gate flags —
-never by an invented domain/topic/difficulty label, since this book's
-real data doesn't have one. Next up is a Failure Analysis page (V3),
-followed by an Experiment Explorer and a "Fine-Tuning or RAG?" page —
-completing training data → model behavior → failures as one coherent
-evidence chain rather than growing into a generic fine-tuning platform.
-Nothing here reimplements the pipeline or invents a metric that doesn't already exist
-in the book's own code — see
+comparison → reproduced evaluation results. Four pages are real and
+working, completing one coherent evidence chain — training data → model
+behavior → failures: a **Model Playground** that runs the same real
+prompt against the base model and a real fine-tuned checkpoint (with an
+optional retrieval-grounded third answer); a **Before vs. After
+Evaluation** page that runs the book's own real metrics live across the
+full held-out set for every checkpoint you've actually trained, not one
+cherry-picked example; a **Dataset Explorer** that browses the real
+training examples Chapter 2 and Chapter 7 actually build, filterable by
+report number, date, time window, and Chapter 6's real quality-gate
+flags, never by an invented domain/topic/difficulty label; and a
+**Failure Analysis** page that reruns Chapter 9/10's 4 real retrieval
+test cases live — including report #21, the book's headline case of a
+fluent, verified-faithful answer grounded in the wrong report — paired
+with what the book itself found, plus a live "shape, not judgment"
+detector across the held-out set. An Experiment Explorer and a
+"Fine-Tuning or RAG?" page remain planned, further out, deliberately
+kept out of scope rather than growing this into a generic fine-tuning
+platform. Nothing here reimplements the pipeline or invents a metric
+that doesn't already exist in the book's own code — see
 [`book/app/README.md`](book/app/README.md) for exactly what it reuses
 and how to run it.
 
