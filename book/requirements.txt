@@ -32,6 +32,7 @@ scikit-learn==1.5.2
 # the interactive base-vs-fine-tuned comparison app.
 streamlit==1.59.0
 pandas==2.2.3
+altair==6.0.0
 
 # Notebooks and book authoring
 jupyter==1.0.0

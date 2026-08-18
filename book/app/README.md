@@ -16,15 +16,24 @@ structure for a book companion:
   quality-gate flags and provenance, not invented metadata.
 - **Before vs. After Evaluation (V1) — "What changed as we fine-tuned?"**
   Polished into the definitive model-evolution page rather than
-  building a separate Experiment Explorer: an evaluation snapshot up
-  top (best perplexity/overlap/exact-match and the latest checkpoint,
-  side by side, so disagreement between them is impossible to miss),
-  perplexity and average overlap charted separately (their scales are
-  roughly 25-160 vs. 0-0.6 -- one shared axis makes overlap effectively
-  invisible), relative change between consecutive versions, and an
-  explicit callout whenever the latest checkpoint regresses on both
-  continuous metrics compared to the one before it -- latest doesn't
-  automatically mean best, and this page says so rather than hiding it.
+  building a separate Experiment Explorer, and written for a reader
+  with no AI/programming background: a plain-English glossary up top
+  defines every metric before it's used (Perplexity, Overlap score,
+  Exact-match, Held-out set), a real held-out example is generated live
+  and shown side by side (base vs. latest fine-tuned answer, with the
+  real correct answer alongside) so the numbers have something concrete
+  to anchor to, and a `0/8` exact-match score is explicitly explained as
+  not a failure verdict. An evaluation snapshot up top shows best
+  perplexity/overlap/exact-match and the latest checkpoint side by side
+  so disagreement between them is impossible to miss. Perplexity and
+  average overlap are charted separately with a forced zero-baseline
+  y-axis (their scales are roughly 25-160 vs. 0-0.6 -- one shared axis,
+  or a non-zero baseline, both make overlap effectively invisible or
+  make an improvement look like missing data), with relative change
+  shown between consecutive versions, and an explicit callout whenever
+  the latest checkpoint regresses on both continuous metrics compared
+  to the one before it -- latest doesn't automatically mean best, and
+  this page says so rather than hiding it.
 - **Failure Analysis (V3) — "Where and how does it fail?"** The same 4
   real Chapter 9/10 retrieval test cases run live -- including report
   #21, the book's headline case of a fluent, verified-faithful answer

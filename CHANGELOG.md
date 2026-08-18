@@ -579,6 +579,37 @@ highlights in narrative form.
   updated to describe the finished three-page evidence chain (Dataset
   Explorer / Before vs. After Evaluation / Failure Analysis) instead.
   New tests for all four new pure functions.
+- **Made Before vs. After Evaluation understandable without an AI/
+  programming background**, per real feedback from checking the page as
+  a non-technical oil & gas reader. Added a plain-English glossary at
+  the top defining Held-out set, Perplexity, Overlap score, and
+  Exact-match before any of them are used, in operational-analogy terms
+  (e.g. perplexity described the way a driller who's read years of tour
+  sheets from the same rig can predict how the next line will read, not
+  in NLP terms). Added a live "real example, side by side" section --
+  the same report #37, 20:30-21:30 question already quoted in this
+  repo's own root README, generated fresh by the base model and the
+  latest fine-tuned checkpoint, with the real correct answer alongside
+  -- so a reader can judge the qualitative difference immediately
+  instead of only looking at abstract scores. Reworded the exact-match
+  caption to lead with "a `0/8` here is not a failure verdict" instead
+  of explaining the strict rule first. De-emphasized code/chapter
+  references (function names, "Chapter 12's own finding") from the
+  primary captions into smaller secondary notes, leading with plain
+  business language instead. Caught and fixed two real chart bugs while
+  verifying this in the browser: (1) the average-overlap chart rendered
+  completely empty because its column name, `"Avg. overlap score"`,
+  contained a period -- Altair/Vega-Lite's shorthand field syntax reads
+  a `.` as nested-property notation, so the field silently resolved to
+  nothing; renamed the column to drop the period. (2) Chart x-axis
+  labels were truncating to a single trailing character (`"Ch13"`
+  rendering as just `"3"`) under Vega-Lite's default rotated-label
+  layout; fixed by forcing horizontal labels (`labelAngle=0`), which
+  also reads more naturally for a reader unfamiliar with rotated chart
+  axes. New dependency: `altair` (already an implicit Streamlit
+  dependency, now imported and pinned directly since the charts are
+  built with explicit Altair specs instead of `st.bar_chart`, needed for
+  the guaranteed-zero-baseline y-axis and explicit label-order control).
 
 ### Fixed
 
