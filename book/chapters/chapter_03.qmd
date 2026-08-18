@@ -148,6 +148,21 @@ It is a weaker tool for:
   its own — that claim needs a held-out check, not just a lower loss
   number
 
+At a glance, the two lists above come down to this:
+
+| Question | Fine-tuning | Retrieval |
+|---|:---:|:---:|
+| Teach the model your shorthand and vocabulary? | ✓ | ✗ |
+| Match your reports' own writing style? | ✓ | ✗ |
+| Recall one specific fact from one specific report? | ✗ | ✓ |
+| Cite which source document an answer came from? | ✗ | ✓ |
+| Answer questions about reports it never trained on? | ✗ | ✓ |
+| Prove it generalizes, on its own? | ✗ | n/a |
+
+That's a table worth being able to redraw from memory — it's the
+argument for why this book eventually uses both together (Chapter 9),
+not a case for picking one and discarding the other.
+
 This book starts with fine-tuning anyway, because *teaching the model
 your domain* is a real, necessary step even for a system that will
 later add retrieval on top of it. Chapter 9 is where those two

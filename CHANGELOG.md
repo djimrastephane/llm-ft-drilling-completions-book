@@ -535,6 +535,29 @@ highlights in narrative form.
   fine-tuning with retrieval. Written after Chapter 5 shipped, so it
   can point at that chapter's real held-out result as concrete
   evidence rather than a promise.
+- **Chapter 3's fine-tuning-vs-retrieval section gains a summary
+  comparison table** ("Teach the model your shorthand?", "Recall one
+  specific fact?", "Cite a source?", etc., each scored fine-tuning vs.
+  retrieval), placed right after the existing two bullet lists as a
+  scannable recap of what those lists already established -- not new
+  claims, just a version compact enough to redraw from memory.
+- **Part 0 gains a new "AI terms you'll meet in this book" quick-
+  reference table**, placed right after Learning Objectives and before
+  the numbered setup steps begin. Scoped to the 15 terms that actually
+  accumulate across Chapters 1-11 (model, base model, fine-tuning,
+  weights, token, embedding, LoRA adapter, rank, training example,
+  epoch, loss, checkpoint, held-out data, inference, quantization,
+  perplexity), with phrasing pulled from each concept's existing
+  Engineering Translation callout or Appendix B's glossary rather than
+  reworded from scratch -- a one-page reference to glance back at, not
+  a replacement for the full glossary or the in-chapter explanations.
+  Prompted by reader feedback that cognitive load climbs fastest across
+  Chapters 4-8 as unfamiliar terms accumulate faster than a reader can
+  be expected to hold onto them. A companion audit of all 13 chapters'
+  Operational-Problem-before-Theory ordering (the same feedback's
+  "problem before technique" principle) found no drift -- every chapter
+  already introduces its core concept as the answer to a question the
+  chapter poses first, not as a topic announcement.
 - Both `README.md` (root) and `book/README.md` restructured to follow
   the same section design as the author's previous book,
   [`ddr-rag-book`](https://github.com/djimrastephane/ddr-rag-book):

@@ -16,6 +16,35 @@ By the end of this chapter, you will be able to:
   what to expect if it doesn't
 - Run `setup_check.py` and get a clean bill of health before Chapter 1
 
+## AI terms you'll meet in this book
+
+New vocabulary shows up gradually, one or two terms per chapter, each
+explained with an "Engineering Translation" callout the first time it
+matters. This page isn't a substitute for those — it's a quick-reference
+sheet to glance back at when a term from an earlier chapter resurfaces
+and you just want the short version, not the full explanation again.
+(Appendix B has the complete glossary, oilfield abbreviations included,
+if you need more than this.)
+
+| Term | What it means here |
+|---|---|
+| Model | The software that generates an answer from a question. |
+| Base model | The general-purpose model before any domain fine-tuning — Chapter 1's starting point. |
+| Fine-tuning | Updating a model's weights on your own examples so it performs better on your specific task. |
+| Weights | The model's internal numbers that determine its behavior — what fine-tuning actually changes. |
+| Token | One piece of text after the model's tokenizer cuts it up — sometimes a whole word, sometimes a fragment — Chapter 4. |
+| Embedding | A list of numbers standing in for a token or phrase, so the model can do math with meaning instead of letters — Chapter 4. |
+| LoRA adapter | A small, separate set of numbers trained instead of the full model, added on top of the frozen base weights — Chapter 5. |
+| Rank | How narrow LoRA's two small adapter tables are — smaller is cheaper to train, at the cost of a rougher approximation — Chapter 5. |
+| Training example | One input and the answer you want the model to learn from — Chapter 2. |
+| Epoch | One full pass through the training data. |
+| Loss | A number measuring how wrong the model's predictions were on one pass — should fall as training continues. |
+| Checkpoint | A saved snapshot of the model's weights at one point in training — something to resume from if a run is interrupted — Chapter 8. |
+| Held-out data | Reports deliberately kept out of training so you have something honest to test on afterward — Chapter 2. |
+| Inference | Asking the trained model a question and getting an answer back, as opposed to training it. |
+| Quantization | Storing a model's weights at lower numerical precision to shrink memory and speed up inference, at some accuracy cost. |
+| Perplexity | A numeric measure of how well a model predicts held-out text; lower is generally better — Chapter 11. |
+
 ## 0.1 Why this chapter exists
 
 Every chapter from here on assumes four things are already true: Python
