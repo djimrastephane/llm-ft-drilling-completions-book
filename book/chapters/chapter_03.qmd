@@ -152,12 +152,12 @@ At a glance, the two lists above come down to this:
 
 | Question | Fine-tuning | Retrieval |
 |---|:---:|:---:|
-| Teach the model your shorthand and vocabulary? | ✓ | ✗ |
-| Match your reports' own writing style? | ✓ | ✗ |
-| Recall one specific fact from one specific report? | ✗ | ✓ |
-| Cite which source document an answer came from? | ✗ | ✓ |
-| Answer questions about reports it never trained on? | ✗ | ✓ |
-| Prove it generalizes, on its own? | ✗ | n/a |
+| Teach the model your shorthand and vocabulary? | Yes | No |
+| Match your reports' own writing style? | Yes | No |
+| Recall one specific fact from one specific report? | No | Yes |
+| Cite which source document an answer came from? | No | Yes |
+| Answer questions about reports it never trained on? | No | Yes |
+| Prove it generalizes, on its own? | No | n/a |
 
 That's a table worth being able to redraw from memory — it's the
 argument for why this book eventually uses both together (Chapter 9),
