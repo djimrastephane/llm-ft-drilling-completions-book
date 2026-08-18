@@ -137,6 +137,24 @@ format:
         % Redefine it to route through fvextra's Verbatim instead.
         \renewenvironment{verbatim}{\VerbatimEnvironment\begin{Verbatim}[breaklines,breakanywhere]}{\end{Verbatim}}
 
+        % Quarto's `cover-image` field only reaches HTML/EPUB output --
+        % the PDF title page is plain text (title/subtitle/author) with
+        % no image regardless of that setting. Pandoc's own title block
+        % (\maketitle) runs immediately at \begin{document}, before any
+        % include-before-body content, so inserting the cover there
+        % would put it *after* the title page instead of before it.
+        % \AtBeginDocument runs at the same point \maketitle does, so
+        % hooking the cover page there wins the race and puts it first.
+        \AtBeginDocument{%
+          \begin{titlepage}
+          \thispagestyle{empty}
+          \centering
+          \vspace*{\fill}
+          \includegraphics[width=0.85\textwidth]{figures/cover.jpg}
+          \vspace*{\fill}
+          \end{titlepage}
+        }
+
 execute:
   freeze: auto
   echo: true

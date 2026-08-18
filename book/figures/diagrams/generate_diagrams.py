@@ -227,6 +227,58 @@ RECALL_GAP_TIKZ_TEMPLATE = r"""
 """
 
 
+# Book cover (figures/cover.jpg, referenced by _quarto.yml's cover-image).
+# Reuses the exact box/arrow style every chapter's own pipeline diagram
+# uses, scaled up, so the cover visually rhymes with the diagrams a reader
+# sees inside the book instead of introducing a new illustration style.
+# The three stages compress the book's real arc using vocabulary already
+# used by DIAGRAMS above (Ch1/2's "Raw Reports", Ch5's "LoRA Fine-Tune",
+# Ch10's "Traceable Answer") rather than inventing new claims. No fixed
+# canvas size is forced -- like every other diagram here, `standalone`
+# auto-sizes to content, which naturally yields a tall, portrait,
+# book-cover-like proportion from the stacked title/subtitle/chain/author.
+COVER_TIKZ_TEMPLATE = r"""
+\documentclass[tikz,border=12pt]{standalone}
+\usepackage{xcolor}
+\usepackage{sansmathfonts}
+\usepackage[none]{hyphenat}
+\sloppy
+\renewcommand{\familydefault}{\sfdefault}
+\definecolor{boxfill}{HTML}{%(box_fill)s}
+\definecolor{boxborder}{HTML}{%(box_border)s}
+\definecolor{textcolor}{HTML}{%(text)s}
+\definecolor{arrowcolor}{HTML}{%(arrow)s}
+\usetikzlibrary{arrows.meta, positioning}
+\begin{document}
+\begin{tikzpicture}[
+    box/.style={
+      rectangle, rounded corners=3pt, draw=boxborder, fill=boxfill,
+      line width=1pt, minimum width=5.2cm, text width=4.6cm,
+      minimum height=1.3cm, text=textcolor, font=\small, align=center,
+      inner sep=8pt
+    },
+    arr/.style={-{Stealth[length=2.8mm]}, arrowcolor, line width=1pt}
+  ]
+
+\node[align=center, text width=9.5cm, font=\bfseries\LARGE, text=boxborder] (title)
+  {Fine-Tuning Local LLM for Drilling \& Completions};
+\node[align=center, text width=9cm, font=\small, text=textcolor, below=0.6cm of title] (subtitle)
+  {A hands-on guide to fine-tuning and deploying local language models for drilling and completions engineering};
+
+\node[box, below=1.1cm of subtitle] (n0) {Raw Field Reports};
+\node[box, below=0.8cm of n0] (n1) {Local LLM + LoRA Fine-Tuning};
+\node[box, below=0.8cm of n1] (n2) {Traceable, Deployed Answers};
+\draw[arr] (n0) -- (n1);
+\draw[arr] (n1) -- (n2);
+
+\node[align=center, font=\small\itshape, text=textcolor, below=1.1cm of n2] (author)
+  {Djimra Stephane Soulanoudjingar};
+
+\end{tikzpicture}
+\end{document}
+"""
+
+
 def _compile_tex_to_pdf(tex_source: str, workdir: Path, jobname: str) -> Path:
     (workdir / f"{jobname}.tex").write_text(tex_source)
     result = subprocess.run(
@@ -281,6 +333,19 @@ def render_recall_gap_diagram(name: str = "recall_gap_ch05") -> None:
         _pdf_to_svg(dark_pdf, OUTPUT_DIR / f"{name}_dark.svg")
 
 
+def render_cover(name: str = "cover") -> None:
+    """Render the book cover to figures/cover.jpg (one file, no light/dark pair --
+    a physical book cover doesn't need a dark-mode variant)."""
+    with tempfile.TemporaryDirectory() as tmp:
+        workdir = Path(tmp)
+        pdf_path = _compile_tex_to_pdf(COVER_TIKZ_TEMPLATE % LIGHT_PALETTE, workdir, name)
+        jpg_base = OUTPUT_DIR.parent / name
+        subprocess.run(
+            ["pdftocairo", "-jpeg", "-r", "300", "-singlefile", str(pdf_path), str(jpg_base)],
+            check=True,
+        )
+
+
 def main() -> None:
     for chapter_num, labels in DIAGRAMS.items():
         name = f"pipeline_ch{chapter_num:02d}"
@@ -292,6 +357,9 @@ def main() -> None:
 
     render_recall_gap_diagram()
     print("Rendered recall_gap_ch05 (.pdf, _light.svg, _dark.svg)")
+
+    render_cover()
+    print("Rendered cover (../cover.jpg)")
 
     for chapter_num, diagrams in THEORY_DIAGRAMS.items():
         for diagram_name, labels in diagrams:

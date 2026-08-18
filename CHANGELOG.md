@@ -465,6 +465,37 @@ highlights in narrative form.
   `pairwise_answer_similarity()` (ranks near-identical answers highest,
   symmetric regardless of input order). Both READMEs updated to
   describe the finished V1/V2/V3 progression.
+- **Book cover** (`figures/cover.jpg`, `_quarto.yml`'s `cover-image`).
+  Generated via a new `render_cover()` in
+  `figures/diagrams/generate_diagrams.py`, reusing the exact box/arrow
+  TikZ style every chapter's own pipeline diagram already uses (scaled
+  up) instead of introducing a new illustration style: title and
+  subtitle taken verbatim from `_quarto.yml`, and a 3-stage vertical
+  chain -- "Raw Field Reports" -> "Local LLM + LoRA Fine-Tuning" ->
+  "Traceable, Deployed Answers" -- built from vocabulary already used by
+  this book's own per-chapter diagrams (Ch1/2's "Raw Reports", Ch5's
+  "LoRA Fine-Tune", Ch10's "Traceable Answer"), not invented copy.
+  `standalone` auto-sizes to content like every other diagram here,
+  landing at a natural 1250x1446px portrait ratio. Verified in a real
+  `quarto render`: the image shows correctly on the HTML welcome page
+  (`class="quarto-cover-image"`). Discovered along the way that Quarto's
+  `cover-image` field only reaches HTML/EPUB output for book projects --
+  it has no effect on the PDF, whose title page is plain text
+  (title/subtitle/author) regardless of the setting. Added a PDF-only
+  cover page via `_quarto.yml`'s `format.pdf.include-in-header`, hooked
+  through `\AtBeginDocument` rather than `include-before-body` --
+  pandoc's own `\maketitle` fires at `\begin{document}`, before any
+  `include-before-body` content, so a naive `include-before-body`
+  attempt put the cover *after* the text title page instead of before
+  it (verified via a temporary `keep-tex: true` render and direct
+  `xelatex` inspection); `\AtBeginDocument` fires at the same point
+  `\maketitle` does and wins the race. Verified in the rendered PDF:
+  page 1 is the cover, page 2 a blank verso (the twoside `scrbook`
+  class's standard recto/verso front-matter convention, not a bug), page
+  3 the existing text title page -- both formats now share the same
+  cover, `pytest -m "not slow"` still passes (67 tests), and the full
+  book still renders in one `quarto render` pass (both formats, no
+  wiped output).
 
 ### Changed
 
