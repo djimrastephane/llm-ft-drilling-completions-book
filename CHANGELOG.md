@@ -867,3 +867,17 @@ highlights in narrative form.
   every number shown is still correct, just missing that one
   annotation, and the fix (add it to the book, or drop it from the
   script) is a design choice rather than a correctness bug.
+- **Chapter 4's `BOP`-occurrence count had no reproducible code behind
+  it at all.** Investigating why the original "38" figure (corrected to
+  36 above) didn't match, `git log -S"38 times"` showed it was hand-typed
+  into the chapter's Field Notes callout in the original drafting
+  commit -- no script anywhere in the repo ever counted the term, so
+  there was nothing to audit against. Added
+  `count_term_occurrences()` to `code/chapter_04/challenge/challenge.py`
+  (reusing Chapter 2's existing `extract_text()` instead of duplicating
+  PDF-parsing logic), which now prints real `BOP`/`TVD` counts as part
+  of that script's output. Updated the Challenge exercise's "dozens of
+  times" language to the exact counts (`36`/`32`) now that they're
+  real, code-backed numbers, and pointed the Field Notes callout at the
+  same reference solution for both the similarity scores and the
+  occurrence count.

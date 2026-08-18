@@ -11,12 +11,15 @@ Usage:
     python code/chapter_04/challenge/challenge.py
 """
 
+import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "code" / "chapter_01"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "code" / "chapter_02"))
 
+from build_training_examples import SAMPLE_SET_DIR, extract_text  # noqa: E402
 from load_local_model import MODEL_NAME, load_model_and_tokenizer  # noqa: E402
 from tokenize_and_embed import (  # noqa: E402
     raw_embedding_similarities,
@@ -29,6 +32,10 @@ ARCHIVE_PAIRS = [
     ("BOP", "birthday party"),  # see this chapter's Field notes
     ("TVD", "true vertical depth"),
 ]
+
+
+def count_term_occurrences(term: str, sample_dir: Path = SAMPLE_SET_DIR) -> int:
+    return sum(len(re.findall(term, extract_text(pdf_path))) for pdf_path in sorted(sample_dir.glob("*Drilling_*.pdf")))
 
 
 def main() -> None:
@@ -46,6 +53,10 @@ def main() -> None:
     print("\nSentence-embedding cosine similarity:")
     for result in sentence_embedding_similarities(ARCHIVE_PAIRS):
         print(f"  {result['term_a']!r:8} vs {result['term_b']!r:22} -> {result['cosine_similarity']:.3f}")
+
+    print("\nOccurrences across the 9 drilling reports:")
+    for term in seen_terms:
+        print(f"  {term!r:6} -> {count_term_occurrences(term)}")
 
 
 if __name__ == "__main__":

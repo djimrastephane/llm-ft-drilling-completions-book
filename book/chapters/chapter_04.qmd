@@ -385,10 +385,13 @@ yourself with `code/chapter_04/challenge/challenge.py`, below.)
 **Challenge:** extend the comparison to real acronyms pulled from this
 book's own archive instead of hand-picked examples — `BOP` (blowout
 preventer) and `TVD` (true vertical depth), both genuinely present
-dozens of times across the 9 drilling reports. A reference solution is
-at `code/chapter_04/challenge/challenge.py` — on a real run, `TVD` vs.
+across the 9 drilling reports (`36` and `32` times respectively, on a
+real count). A reference solution is at
+`code/chapter_04/challenge/challenge.py` — on a real run, `TVD` vs.
 `"true vertical depth"` scores `0.024` raw / `0.118` sentence-embedding,
-in the same range as this chapter's other acronym pairs.
+in the same range as this chapter's other acronym pairs, and the same
+run's `count_term_occurrences()` reproduces both counts above (and the
+Field Notes' `36` for `BOP`) directly from the archive.
 
 ## Key takeaways
 
