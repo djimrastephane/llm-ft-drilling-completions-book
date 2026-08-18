@@ -409,6 +409,12 @@ have. See `app/README.md` to run it; nothing in it is pre-recorded, so
 your own checkpoint may not reproduce this book's exact numbers, and
 that difference is itself real information.
 
+![Before vs. After Evaluation, screenshotted from a real local run
+across this book's own checkpoints -- the exact "latest doesn't mean
+best" regression this chapter's own version-comparison run found above,
+surfaced automatically by the
+app.](../figures/app_screenshot_evaluation.jpg){#fig-app-evaluation fig-alt="Screenshot of the companion app's Before vs. After Evaluation page, showing a results table for the base model and three fine-tuned checkpoints, a callout stating the latest checkpoint regressed on both average overlap and perplexity compared to the previous one, and per-transition percentage changes for each metric."}
+
 ## Suggested next step
 
 This is the last chapter. Every tool in it runs on your own data, not

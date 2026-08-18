@@ -496,6 +496,31 @@ highlights in narrative form.
   cover, `pytest -m "not slow"` still passes (67 tests), and the full
   book still renders in one `quarto render` pass (both formats, no
   wiped output).
+- **Companion app screenshots** (`figures/app_screenshot_playground.jpg`,
+  `figures/app_screenshot_evaluation.jpg`), captured live from the
+  actual running app against real checkpoints, not staged or invented --
+  the same "never fabricate a result" rule the chapters follow. Model
+  Playground's screenshot shows the real report #37 held-out question
+  answered by both the base model and Chapter 5's checkpoint, with real
+  exact-match/overlap scores; embedded in `index.qmd`'s "What this
+  becomes" section, right where the app is first introduced. Before vs.
+  After Evaluation's screenshot captures the exact "latest does not mean
+  best" regression callout and per-transition percentage changes across
+  Base/Ch5/Ch8/Ch13 -- the same real regression Chapter 13's own
+  version-comparison already found in that chapter's own code output;
+  embedded in Chapter 13's "See it side by side" section right after the
+  paragraph that references it. Caught a real LaTeX bug while verifying
+  the PDF render: an inline code span (`` `compare_versions()` ``) in
+  the Chapter 13 figure's caption crashed `xelatex` with "Undefined
+  control sequence `\SQSPL@scan`" -- `_quarto.yml`'s `seqsplit`-based
+  `\texttt` redefinition (added for wrapping long inline code in body
+  text) isn't `\protect`-safe inside a LaTeX caption's moving argument;
+  reworded the caption to avoid inline code formatting rather than
+  touching the global macro. Verified both figures render as proper
+  numbered Quarto figures in HTML (`Figure 1`, `Figure 13.1`) and in the
+  PDF at the correct pages (18, 171), `pytest -m "not slow"` still
+  passes (67 tests), and the full book still renders in one
+  `quarto render` pass.
 
 ### Changed
 

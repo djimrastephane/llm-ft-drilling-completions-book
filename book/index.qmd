@@ -52,6 +52,11 @@ against your checkpoint. Nothing in it is pre-recorded; see
 `app/README.md` once you're ready to run it, after Chapter 5 gives you
 a first real checkpoint to load.
 
+![Model Playground, screenshotted from a real local run: report #37's
+held-out question, answered live by both the base model and Chapter
+5's first fine-tuned checkpoint, with the real exact-match and overlap
+scores for each.](figures/app_screenshot_playground.jpg){#fig-app-playground fig-alt="Screenshot of the companion app's Model Playground page, showing a base model answer and a fine-tuned model answer side by side for the same held-out question, each scored for exact-match and overlap against the real reference answer."}
+
 ## Who this book is for
 
 You should read this book if you are a drilling engineer, completions
