@@ -78,7 +78,7 @@ the problem it solves, never before. The goal of this book isn't to turn
 you into a machine learning researcher. It's to make you capable of
 building and trusting a private, local, domain-specific model.
 
-## What you will build (planned)
+## What you will build
 
 | Chapter | You will be able to... |
 |---|---|
@@ -163,15 +163,15 @@ invented on their behalf.
 
 ## Companion repository
 
-All code, training data, and notebooks referenced in this book will live
-in the companion repository. Every chapter will list exactly which files
-you need under **Repository files**.
+All code, training data, and notebooks referenced in this book live in
+the companion repository. Every chapter lists exactly which files you
+need under **Repository files**.
 
 If you've never installed Python or don't know which editor to use, start
-with **Part 0 — Preparing Your Local LLM Workshop**: it will work with any
+with **Part 0 — Preparing Your Local LLM Workshop**: it works with any
 of five common setups (Jupyter Notebook, VS Code, PyCharm Community,
-Positron, or a terminal alone) and end with your first script actually
+Positron, or a terminal alone) and ends with your first script actually
 running. If you already have Python and a working setup, jump straight to
-Chapter 1 once it exists.
+Chapter 1.
 
 Let's load our first local model.

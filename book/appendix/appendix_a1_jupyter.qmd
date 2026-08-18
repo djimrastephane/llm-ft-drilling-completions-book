@@ -38,10 +38,9 @@ your browser.
 
 ## Open a chapter notebook
 
-Every chapter of Part I is planned to have an interactive companion
-notebook. In the browser tab Jupyter opened, click into the `notebooks/`
-folder, then open `chapter_01_explore.ipynb` (or whichever chapter
-you're on).
+Every chapter has an interactive companion notebook. In the browser tab
+Jupyter opened, click into the `notebooks/` folder, then open
+`chapter_01_explore.ipynb` (or whichever chapter you're on).
 
 ## Run a cell
 

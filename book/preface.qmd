@@ -98,4 +98,4 @@ training data is messier and more sensitive than this public one. If you
 point this book's code at your own organisation's reports instead, do
 not commit them to a public repository, and see
 [Appendix A](appendix/appendix_a_environment_setup.qmd) for a
-data-handling checklist once it is written.
+data-handling checklist.
