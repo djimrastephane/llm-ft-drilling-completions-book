@@ -350,7 +350,7 @@ necessarily "safe" from being split, even though it's already short.
 ::: {.callout-warning title="Field notes: a blowout preventer scores lower than a birthday party"}
 **Query:** how closely does each embedding approach place `BOP` (the
 industry-standard abbreviation for **blowout preventer**, a critical
-well-control safety device, appearing 38 times across this book's 9
+well-control safety device, appearing 36 times across this book's 9
 drilling reports) next to its own meaning — compared to an unrelated
 phrase, `"birthday party"`?
 

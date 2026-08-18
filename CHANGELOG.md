@@ -819,3 +819,51 @@ highlights in narrative form.
   are referenced from any chapter -- so 2 issues (`#1` book cover,
   `#80` companion app screenshots) were left open as genuinely
   unfinished work, not closed along with the rest.
+- **Full-book verification pass**: re-ran every chapter's code for real
+  (Chapters 5 and 8's LoRA checkpoints were regenerated from scratch --
+  none existed locally -- including Chapter 8's full 3-epoch,
+  checkpoint-and-resume training run) and diffed the output against
+  every number, quote, and result stated in Chapters 1-13 and all
+  appendices. Found and fixed four real discrepancies:
+  - `chapters/chapter_04.qmd`'s Field Notes claimed `BOP` appears "38
+    times across this book's 9 drilling reports"; extracting and
+    counting the literal string across all 9 `Drilling_*.pdf` reports
+    gives 36 (a consistent 4 per report). Corrected to 36.
+  - `chapters/chapter_09.qmd` claimed report `#38`'s real chunk "ranks
+    340th out of 677 chunks" against dense sentence embeddings (used to
+    motivate choosing BM25 over embeddings for retrieval). Reproducing
+    the exact `all-MiniLM-L6-v2` pipeline from
+    `code/chapter_09/challenge/challenge.py` against the real 677-chunk
+    corpus puts that same chunk at rank 8, not 340 (BM25's claimed
+    rank-1 for the same chunk did reproduce exactly). Corrected both
+    occurrences (the main claim and the challenge-exercise
+    cross-reference) to 8th.
+  - `README.md`'s chapter status table listed Chapter 8 as "Fine-Tuning
+    at Scale -- Checkpoints and Experiment Tracking," which had drifted
+    from the chapter's actual heading, "Fine-Tuning at Scale with
+    Checkpointing and Experiment Tracking" (dropped "with," changed
+    "Checkpointing" to "Checkpoints" -- a real wording drift, not the
+    book's usual colon-to-em-dash style substitution). Corrected to
+    match the real heading.
+  - `appendix/appendix_a_environment_setup.qmd`'s hardware-notes section
+    (itself edited earlier this session) claimed `bitsandbytes`
+    "installs on Linux+NVIDIA," overstating `requirements.txt`'s actual
+    install condition (`sys_platform == "linux"` only -- pip can't
+    detect a GPU at install time, and the package installs on any Linux
+    system regardless of GPU). Corrected to "installs on Linux
+    regardless of GPU," consistent with the file's own Troubleshooting
+    table entry for the same package.
+  Everything else -- every quoted transcript, score, count, and cross-
+  reference in Chapters 1-13, both appendices' glossary/environment-
+  setup content, the front matter, and cross-book terminology (model
+  name, companion project name, "Utah FORGE" spelling, chapter titles,
+  jargon-before-use ordering) -- reproduced exactly against real code
+  runs and real files. Two informational (non-blocking) notes recorded
+  but not acted on: Chapter 1's "roughly 10-15 seconds" CPU generation
+  timing ran 34.3s on this run (already caveated in-chapter as
+  hardware-variable, so not treated as a defect); Chapter 8's shown
+  code block and output transcripts omit a `(Xs)` timing suffix that
+  the real `finetune_at_scale.py` script prints on each epoch line --
+  every number shown is still correct, just missing that one
+  annotation, and the fix (add it to the book, or drop it from the
+  script) is a design choice rather than a correctness bug.

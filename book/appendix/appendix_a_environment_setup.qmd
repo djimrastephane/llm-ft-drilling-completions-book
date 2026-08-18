@@ -68,8 +68,9 @@ retrieval:
 - **GPU (NVIDIA/CUDA or Apple Silicon/MPS):** the comfortable path from
   Chapter 5 onward, turning training runs that take minutes on a GPU
   into ones that take hours on CPU. `bitsandbytes` (used for 4-/8-bit
-  QLoRA fine-tuning) installs on Linux+NVIDIA, but no chapter in this
-  book actually loads a quantized model — every chapter fine-tunes with
+  QLoRA fine-tuning) installs on Linux regardless of GPU, but no
+  chapter in this book actually loads a quantized model — every
+  chapter fine-tunes with
   full-precision LoRA, the path Chapter 5 walks you through, so a GPU
   here just makes that same LoRA fine-tune faster, not a different
   technique.

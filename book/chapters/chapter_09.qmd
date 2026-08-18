@@ -99,7 +99,7 @@ The same problem shows up again here, at the whole-sentence level. The
 query `"lost tool face and became stuck during the slide"` — close to a
 direct paraphrase of report `#38`'s actual text — should retrieve that
 report immediately. With `sentence-transformers`, it doesn't: report
-`#38`'s real entry ranks **340th** out of 677 chunks. With BM25, the
+`#38`'s real entry ranks **8th** out of 677 chunks. With BM25, the
 same query ranks it **1st**, by a wide margin over every other chunk in
 the archive. For text this dense with exact technical phrasing, keyword
 overlap turns out to be a stronger signal than semantic similarity from
@@ -385,7 +385,7 @@ sentence-transformer embeddings (Chapter 4's tool) instead of BM25, and
 compare retrieval accuracy directly. A reference solution is at
 `code/chapter_09/challenge/challenge.py` — on a real run, it scores
 `3/4` (missing exactly the `#38` stuck-pipe query, the same one that
-ranked `340th` in this chapter's "Why not dense embeddings?" section),
+ranked `8th` in this chapter's "Why not dense embeddings?" section),
 against BM25's `4/4` on the same queries.
 
 ## Key takeaways
