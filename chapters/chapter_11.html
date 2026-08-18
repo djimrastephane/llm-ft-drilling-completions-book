@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>11&nbsp; Evaluating a Fine-Tuned Domain Model – Fine-Tuning Local LLM for Drilling &amp; Completions</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/chapter_12.html" rel="next">
+<link href="../chapters/chapter_10.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-5a1953863e1f72ef3b996ef827f01ca7.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-f352355e9c4cf757a45f4f8798595620.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/chapter_06.html">Part II — Industrialising the System</a></li><li class="breadcrumb-item"><a href="../chapters/chapter_11.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Evaluating a Fine-Tuned Domain Model</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Fine-Tuning Local LLM for Drilling &amp; Completions</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/djimrastephane/llm-ft-drilling-completions-book" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="../Fine-Tuning-Local-LLM-for-Drilling---Completions.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../preface.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../acknowledgements.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Acknowledgements</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 0 — Preparing Your Local LLM Workshop</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_00.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Part 0: Preparing Your Local LLM Workshop</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_01.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Loading and Running Your First Local LLM</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Turning Drilling &amp; Completions Reports into Training Examples</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Baseline Prompting: What the Model Gets Wrong Before Fine-Tuning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_04.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Tokenization and Embeddings for Domain Fine-Tuning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_05.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Your First LoRA Fine-Tune</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Industrialising the System</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_06.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">A Data Quality Gate for Training Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_07.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Formatting and Chunking a Training Set at Scale</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_08.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Fine-Tuning at Scale with Checkpointing and Experiment Tracking</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_09.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Hybrid System: Combining Fine-Tuning with Retrieval</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Traceable Outputs and Hallucination Mitigation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_11.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Evaluating a Fine-Tuned Domain Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Detecting Drift Across Model Versions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_13.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Continuous Fine-Tuning: Keeping the Model Current</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a_environment_setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A: Environment Setup</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a1_jupyter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A1: Using Jupyter Notebook</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a2_vscode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A2: Using VS Code</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a3_pycharm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A3: Using PyCharm Community</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a4_positron.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A4: Using Positron</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a5_terminal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A5: Terminal Only</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_b_glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix B: Drilling, Completions &amp; Fine-Tuning Glossary</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">11.1</span> Learning objectives</a></li>
+  <li><a href="#operational-problem" id="toc-operational-problem" class="nav-link" data-scroll-target="#operational-problem"><span class="header-section-number">11.2</span> Operational Problem</a></li>
+  <li><a href="#example-one-answer-asked-eight-different-questions" id="toc-example-one-answer-asked-eight-different-questions" class="nav-link" data-scroll-target="#example-one-answer-asked-eight-different-questions"><span class="header-section-number">11.3</span> Example: one answer, asked eight different questions</a></li>
+  <li><a href="#theory" id="toc-theory" class="nav-link" data-scroll-target="#theory"><span class="header-section-number">11.4</span> Theory</a></li>
+  <li><a href="#why-one-number-isnt-enough" id="toc-why-one-number-isnt-enough" class="nav-link" data-scroll-target="#why-one-number-isnt-enough"><span class="header-section-number">11.5</span> Why one number isn’t enough</a></li>
+  <li><a href="#implementation" id="toc-implementation" class="nav-link" data-scroll-target="#implementation"><span class="header-section-number">11.6</span> Implementation</a>
+  <ul class="collapse">
+  <li><a href="#step-1-build-a-real-held-out-evaluation-set" id="toc-step-1-build-a-real-held-out-evaluation-set" class="nav-link" data-scroll-target="#step-1-build-a-real-held-out-evaluation-set"><span class="header-section-number">11.6.1</span> Step 1: Build a real, held-out evaluation set</a></li>
+  </ul></li>
+  <li><a href="#what-problem-are-we-solving" id="toc-what-problem-are-we-solving" class="nav-link" data-scroll-target="#what-problem-are-we-solving"><span class="header-section-number">11.7</span> What problem are we solving?</a></li>
+  <li><a href="#inputs" id="toc-inputs" class="nav-link" data-scroll-target="#inputs"><span class="header-section-number">11.8</span> Inputs</a></li>
+  <li><a href="#expected-output" id="toc-expected-output" class="nav-link" data-scroll-target="#expected-output"><span class="header-section-number">11.9</span> Expected Output</a></li>
+  <li><a href="#what-just-happened" id="toc-what-just-happened" class="nav-link" data-scroll-target="#what-just-happened"><span class="header-section-number">11.10</span> What just happened?</a></li>
+  <li><a href="#production-reality" id="toc-production-reality" class="nav-link" data-scroll-target="#production-reality"><span class="header-section-number">11.11</span> Production Reality</a>
+  <ul class="collapse">
+  <li><a href="#step-2-score-two-ways-exact-match-and-partial-credit" id="toc-step-2-score-two-ways-exact-match-and-partial-credit" class="nav-link" data-scroll-target="#step-2-score-two-ways-exact-match-and-partial-credit"><span class="header-section-number">11.11.1</span> Step 2: Score two ways — exact-match and partial credit</a></li>
+  </ul></li>
+  <li><a href="#what-problem-are-we-solving-1" id="toc-what-problem-are-we-solving-1" class="nav-link" data-scroll-target="#what-problem-are-we-solving-1"><span class="header-section-number">11.12</span> What problem are we solving?</a></li>
+  <li><a href="#inputs-1" id="toc-inputs-1" class="nav-link" data-scroll-target="#inputs-1"><span class="header-section-number">11.13</span> Inputs</a></li>
+  <li><a href="#expected-output-1" id="toc-expected-output-1" class="nav-link" data-scroll-target="#expected-output-1"><span class="header-section-number">11.14</span> Expected Output</a></li>
+  <li><a href="#what-just-happened-1" id="toc-what-just-happened-1" class="nav-link" data-scroll-target="#what-just-happened-1"><span class="header-section-number">11.15</span> What just happened?</a></li>
+  <li><a href="#production-reality-1" id="toc-production-reality-1" class="nav-link" data-scroll-target="#production-reality-1"><span class="header-section-number">11.16</span> Production Reality</a>
+  <ul class="collapse">
+  <li><a href="#step-3-perplexity-a-metric-that-doesnt-need-a-correct-answer" id="toc-step-3-perplexity-a-metric-that-doesnt-need-a-correct-answer" class="nav-link" data-scroll-target="#step-3-perplexity-a-metric-that-doesnt-need-a-correct-answer"><span class="header-section-number">11.16.1</span> Step 3: Perplexity — a metric that doesn’t need a correct answer</a></li>
+  </ul></li>
+  <li><a href="#what-problem-are-we-solving-2" id="toc-what-problem-are-we-solving-2" class="nav-link" data-scroll-target="#what-problem-are-we-solving-2"><span class="header-section-number">11.17</span> What problem are we solving?</a></li>
+  <li><a href="#inputs-2" id="toc-inputs-2" class="nav-link" data-scroll-target="#inputs-2"><span class="header-section-number">11.18</span> Inputs</a></li>
+  <li><a href="#expected-output-2" id="toc-expected-output-2" class="nav-link" data-scroll-target="#expected-output-2"><span class="header-section-number">11.19</span> Expected Output</a></li>
+  <li><a href="#what-just-happened-2" id="toc-what-just-happened-2" class="nav-link" data-scroll-target="#what-just-happened-2"><span class="header-section-number">11.20</span> What just happened?</a></li>
+  <li><a href="#practical-exercise" id="toc-practical-exercise" class="nav-link" data-scroll-target="#practical-exercise"><span class="header-section-number">11.21</span> Practical exercise</a></li>
+  <li><a href="#field-notes" id="toc-field-notes" class="nav-link" data-scroll-target="#field-notes"><span class="header-section-number">11.22</span> Field notes</a></li>
+  <li><a href="#challenge-exercise" id="toc-challenge-exercise" class="nav-link" data-scroll-target="#challenge-exercise"><span class="header-section-number">11.23</span> Challenge exercise</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">11.24</span> Key takeaways</a></li>
+  <li><a href="#repository-files" id="toc-repository-files" class="nav-link" data-scroll-target="#repository-files"><span class="header-section-number">11.25</span> Repository files</a></li>
+  <li><a href="#what-can-you-do-now-that-you-couldnt-do-before" id="toc-what-can-you-do-now-that-you-couldnt-do-before" class="nav-link" data-scroll-target="#what-can-you-do-now-that-you-couldnt-do-before"><span class="header-section-number">11.26</span> What can you do now that you couldn’t do before?</a></li>
+  <li><a href="#suggested-next-step" id="toc-suggested-next-step" class="nav-link" data-scroll-target="#suggested-next-step"><span class="header-section-number">11.27</span> Suggested next step</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/djimrastephane/llm-ft-drilling-completions-book/edit/main/chapters/chapter_11.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/djimrastephane/llm-ft-drilling-completions-book/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/chapter_06.html">Part II — Industrialising the System</a></li><li class="breadcrumb-item"><a href="../chapters/chapter_11.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Evaluating a Fine-Tuned Domain Model</span></a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span id="sec-chapter-11" class="quarto-section-identifier"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Evaluating a Fine-Tuned Domain Model</span></span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="pipeline-diagram">
+<p><img src="../figures/diagrams/pipeline_ch11_light.svg" class="diagram-light img-fluid" width="180"> <img src="../figures/diagrams/pipeline_ch11_dark.svg" class="diagram-dark img-fluid" width="180"></p>
+</div>
+<div class="chapter-status">
+<p>Progress <code>███████████░░</code> <strong>11 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 30-40 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🟠 Intermediate</p>
+</div>
+<section id="learning-objectives" class="level2" data-number="11.1">
+<h2 data-number="11.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">11.1</span> Learning objectives</h2>
+<p>By the end of this chapter, you will be able to:</p>
+<ul>
+<li>Build a real, held-out evaluation set from a report that has never been in any training set in this book — not two hand-picked questions, eight real ones</li>
+<li>Explain why a single metric can make fine-tuning look like it did nothing, and why a second metric can prove that’s wrong</li>
+<li>Compute perplexity — a metric that needs real held-out text, not a known-correct answer — and use it to measure something exact-match can’t see at all</li>
+<li>Read Chapter 8’s own <code>metrics.csv</code> for what it’s been quietly tracking every epoch, and turn one column of it into a real evaluation harness</li>
+</ul>
+</section>
+<section id="operational-problem" class="level2" data-number="11.2">
+<h2 data-number="11.2" class="anchored" data-anchor-id="operational-problem"><span class="header-section-number">11.2</span> Operational Problem</h2>
+<p>Mike, the completions engineer who asked back in Chapter 5 whether fine-tuning teaches the operation or just memorizes flashcards, has a sharper version of the same question now that Chapters 9 and 10 added retrieval and faithfulness-checking on top: <em>“We’ve been checking all of this on a handful of questions I picked myself, because I already knew what I was looking for in each one. How do I know any of it holds up on a question I didn’t pick?”</em></p>
+<p>Chapter 5 answered a narrower version of this with <code>0/16</code> and <code>0/2</code>. Chapter 9 and 10 each checked exactly 4 hand-picked cases. None of that is a real evaluation — it’s a handful of examples someone happened to check by hand, exactly what Chapter 10 ended by admitting doesn’t scale. This chapter builds a real evaluation set — 8 real questions from a report that has never been in any training set in this book — and scores it more than one way, because a single number turns out not to be enough to answer Mike’s question honestly.</p>
+</section>
+<section id="example-one-answer-asked-eight-different-questions" class="level2" data-number="11.3">
+<h2 data-number="11.3" class="anchored" data-anchor-id="example-one-answer-asked-eight-different-questions"><span class="header-section-number">11.3</span> Example: one answer, asked eight different questions</h2>
+<p>Run Chapter 8’s fine-tuned model against all 8 real held-out questions this chapter builds — no retrieval, no grounding context, exactly the same setup Chapter 5’s original held-out check used — and something worth noticing happens before any scoring at all:</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Eight different questions, from a report the model never trained on">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Eight different questions, from a report the model never trained on
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<pre><code>Time: 06:00-18:30 (part 1 of 2) -&gt; Production Casing Run Csg &amp; Cement Rig up casing
+Time: 18:30-20:30               -&gt; Production Casing Run Csg &amp; Cement Rig up cement
+Time: 20:30-21:30               -&gt; Production Casing Run Csg &amp; Cement Rig up cement
+Time: 21:30-00:30               -&gt; Production Casing Run Csg &amp; Cement Rig up casing
+Time: 00:30-02:30               -&gt; Production Casing Run Csg &amp; Cement Rig up casing
+Time: 02:30-03:30               -&gt; Production Casing Run Csg &amp; Cement Rig up cement
+Time: 03:30-06:00               -&gt; Production Casing Run Csg &amp; Cement Rig up casing</code></pre>
+</div>
+</div>
+<p>Eight different time windows, seven near-identical answers. Whatever Chapter 8’s fine-tune actually learned, it isn’t “what happened at each of these specific times” — it’s something closer to a single memorized-sounding template the model reaches for regardless of the question. Scoring that against a known-correct answer is one useful number. It is not the only useful number.</p>
+</section>
+<section id="theory" class="level2" data-number="11.4">
+<h2 data-number="11.4" class="anchored" data-anchor-id="theory"><span class="header-section-number">11.4</span> Theory</h2>
+<div class="callout callout-style-default callout-tip callout-titled" title="Engineering Translation: evaluation set">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Engineering Translation: evaluation set
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>An <strong>evaluation set</strong> is a fixed, reusable list of questions with known-correct answers, held back from training the same way Chapter 2’s held-out report always has been — the difference this chapter makes is <em>size</em>. Chapter 3’s held-out check used 2 questions from that report; this chapter uses all 8 real ones the report actually contains, built with Chapter 7’s own chunker.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Engineering Translation: perplexity">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Engineering Translation: perplexity
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Perplexity</strong> measures how surprised a model is by a piece of real text — lower means the model found the actual words more expected, higher means it found them more surprising. Unlike exact-match or overlap scoring, perplexity doesn’t need a “correct answer” to compare against at all — just real text the model never trained on. That makes it a useful second opinion when the first metric says “no progress.”</p>
+</div>
+</div>
+</section>
+<section id="why-one-number-isnt-enough" class="level2" data-number="11.5">
+<h2 data-number="11.5" class="anchored" data-anchor-id="why-one-number-isnt-enough"><span class="header-section-number">11.5</span> Why one number isn’t enough</h2>
+<p>The tempting shortcut: run the held-out set once, get an exact-match score, and treat that as the verdict on whether fine-tuning worked. Chapter 8 has quietly been logging exactly that number every epoch, in its own <code>metrics.csv</code> — a <code>held_out_exact_match</code> column that reads <code>0/8</code> at epoch 1, <code>0/8</code> at epoch 2, <code>0/8</code> at epoch 3. Read on its own, that number says fine-tuning made zero progress on anything it hadn’t already memorized. Field Notes below shows a second, real metric that says something very different about the exact same three checkpoints — both numbers are true, and neither one alone tells Mike what he actually asked.</p>
+</section>
+<section id="implementation" class="level2" data-number="11.6">
+<h2 data-number="11.6" class="anchored" data-anchor-id="implementation"><span class="header-section-number">11.6</span> Implementation</h2>
+<section id="step-1-build-a-real-held-out-evaluation-set" class="level3" data-number="11.6.1">
+<h3 data-number="11.6.1" class="anchored" data-anchor-id="step-1-build-a-real-held-out-evaluation-set"><span class="header-section-number">11.6.1</span> Step 1: Build a real, held-out evaluation set</h3>
+</section>
+</section>
+<section id="what-problem-are-we-solving" class="level2" data-number="11.7">
+<h2 data-number="11.7" class="anchored" data-anchor-id="what-problem-are-we-solving"><span class="header-section-number">11.7</span> What problem are we solving?</h2>
+<p>Chapter 3’s held-out check used exactly 2 examples — the report’s two coarse summary fields. Build a real evaluation set from the same never-trained-on report, at the same granularity Chapter 7 used for training at scale.</p>
+</section>
+<section id="inputs" class="level2" data-number="11.8">
+<h2 data-number="11.8" class="anchored" data-anchor-id="inputs"><span class="header-section-number">11.8</span> Inputs</h2>
+<ul>
+<li><code>HELD_OUT_REPORT</code> (Chapter 2) and <code>FULL_SET_DIR</code> (Chapter 6)</li>
+<li><code>build_timeline_examples_for_report</code> (Chapter 7), reused unchanged</li>
+</ul>
+</section>
+<section id="expected-output" class="level2" data-number="11.9">
+<h2 data-number="11.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">11.9</span> Expected Output</h2>
+<p>A list of real instruction/input/output examples, one per timeline entry the held-out report actually contains.</p>
+<div id="81aad9b1" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_held_out_eval_set() <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">dict</span>]:</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    examples, _artifacts_filtered <span class="op">=</span> build_timeline_examples_for_report(FULL_SET_DIR <span class="op">/</span> HELD_OUT_REPORT)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> examples</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>eval_set <span class="op">=</span> build_held_out_eval_set()</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(eval_set)<span class="sc">}</span><span class="ss"> held-out examples, report never used in any training set"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Running this exact code prints:</p>
+<pre><code>8 held-out examples, report never used in any training set</code></pre>
+</section>
+<section id="what-just-happened" class="level2" data-number="11.10">
+<h2 data-number="11.10" class="anchored" data-anchor-id="what-just-happened"><span class="header-section-number">11.10</span> What just happened?</h2>
+<p><code>build_timeline_examples_for_report</code> is Chapter 7’s own function, called directly on the one report Chapter 2 reserved and Chapter 5 and 8 both excluded from training. This isn’t new held-out data — it’s the exact same 8 examples Chapter 8’s training script already builds internally for its own <code>held_out_exact_match</code> logging. This chapter is the first time this book actually looks past that one column.</p>
+</section>
+<section id="production-reality" class="level2" data-number="11.11">
+<h2 data-number="11.11" class="anchored" data-anchor-id="production-reality"><span class="header-section-number">11.11</span> Production Reality</h2>
+<p>Eight examples is still small by production standards — a real evaluation set for a deployed system would hold back dozens of reports, not one, to make the score statistically meaningful rather than a single report’s quirks. This chapter’s version stays honest about that limit rather than implying 8 examples settles the question; see Key takeaways.</p>
+<section id="step-2-score-two-ways-exact-match-and-partial-credit" class="level3" data-number="11.11.1">
+<h3 data-number="11.11.1" class="anchored" data-anchor-id="step-2-score-two-ways-exact-match-and-partial-credit"><span class="header-section-number">11.11.1</span> Step 2: Score two ways — exact-match and partial credit</h3>
+</section>
+</section>
+<section id="what-problem-are-we-solving-1" class="level2" data-number="11.12">
+<h2 data-number="11.12" class="anchored" data-anchor-id="what-problem-are-we-solving-1"><span class="header-section-number">11.12</span> What problem are we solving?</h2>
+<p>Reuse Chapter 3’s strict exact-match check, and pair it with Chapter 10’s word-overlap scoring (originally built to check an answer against a <em>retrieved source</em>) applied to a different comparison: an answer against its <em>known-correct output</em>.</p>
+</section>
+<section id="inputs-1" class="level2" data-number="11.13">
+<h2 data-number="11.13" class="anchored" data-anchor-id="inputs-1"><span class="header-section-number">11.13</span> Inputs</h2>
+<ul>
+<li>The fine-tuned model and tokenizer (Chapter 8’s checkpoint)</li>
+<li>The held-out evaluation set from Step 1</li>
+<li><code>faithfulness_score</code> (Chapter 10), reused unchanged</li>
+</ul>
+</section>
+<section id="expected-output-1" class="level2" data-number="11.14">
+<h2 data-number="11.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">11.14</span> Expected Output</h2>
+<p>Every example scored both ways: a strict pass/fail and a 0–1 partial credit score.</p>
+<div id="d97cdb36" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> exact_match(generated: <span class="bu">str</span>, expected: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> expected.strip().lower() <span class="kw">in</span> generated.strip().lower()</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> evaluate(model, tokenizer, eval_set: <span class="bu">list</span>[<span class="bu">dict</span>]) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">dict</span>]:</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    results <span class="op">=</span> []</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> example <span class="kw">in</span> eval_set:</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        prompt <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>example[<span class="st">'instruction'</span>]<span class="sc">}</span><span class="ch">\n</span><span class="sc">{</span>example[<span class="st">'input'</span>]<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        generated <span class="op">=</span> generate_reply(model, tokenizer, prompt, max_new_tokens<span class="op">=</span><span class="dv">60</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        results.append({</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">"input"</span>: example[<span class="st">"input"</span>],</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"expected"</span>: example[<span class="st">"output"</span>],</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"generated"</span>: generated,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">"exact_match"</span>: exact_match(generated, example[<span class="st">"output"</span>]),</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">"overlap_score"</span>: faithfulness_score(generated, example[<span class="st">"output"</span>]),</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        })</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> results</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> evaluate(lora_model, tokenizer, eval_set)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>matches <span class="op">=</span> <span class="bu">sum</span>(r[<span class="st">"exact_match"</span>] <span class="cf">for</span> r <span class="kw">in</span> results)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>avg_overlap <span class="op">=</span> <span class="bu">sum</span>(r[<span class="st">"overlap_score"</span>] <span class="cf">for</span> r <span class="kw">in</span> results) <span class="op">/</span> <span class="bu">len</span>(results)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Exact-match: </span><span class="sc">{</span>matches<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span><span class="bu">len</span>(results)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Average overlap score: </span><span class="sc">{</span>avg_overlap<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Running this exact code prints:</p>
+<pre><code>Exact-match: 0/8
+Average overlap score: 0.17</code></pre>
+</section>
+<section id="what-just-happened-1" class="level2" data-number="11.15">
+<h2 data-number="11.15" class="anchored" data-anchor-id="what-just-happened-1"><span class="header-section-number">11.15</span> What just happened?</h2>
+<p><code>0/8</code> on its own reads like total failure. <code>0.17</code> average overlap tells a more precise story: not zero, but low — the generated answers share some vocabulary with the real ones (mostly the archive’s own recurring category words, “Production,” “Drilling”) without capturing the specific content each question actually asked about. Reusing Chapter 10’s exact scoring function for a different comparison is deliberate: the same simple technique generalizes to a second real problem without needing to be reinvented.</p>
+</section>
+<section id="production-reality-1" class="level2" data-number="11.16">
+<h2 data-number="11.16" class="anchored" data-anchor-id="production-reality-1"><span class="header-section-number">11.16</span> Production Reality</h2>
+<p><code>faithfulness_score</code> is still the same plain word-overlap check Chapter 10 named the limits of — it can’t detect a paraphrase that uses different words correctly, and it can’t detect a subtle inversion hiding inside otherwise-matching words. Those limits carry over here unchanged; a <code>0.17</code> average is a real, low signal, not a precise one.</p>
+<section id="step-3-perplexity-a-metric-that-doesnt-need-a-correct-answer" class="level3" data-number="11.16.1">
+<h3 data-number="11.16.1" class="anchored" data-anchor-id="step-3-perplexity-a-metric-that-doesnt-need-a-correct-answer"><span class="header-section-number">11.16.1</span> Step 3: Perplexity — a metric that doesn’t need a correct answer</h3>
+</section>
+</section>
+<section id="what-problem-are-we-solving-2" class="level2" data-number="11.17">
+<h2 data-number="11.17" class="anchored" data-anchor-id="what-problem-are-we-solving-2"><span class="header-section-number">11.17</span> What problem are we solving?</h2>
+<p>Measure whether fine-tuning changed how surprised the model is by real held-out text, independent of whether it can reproduce that text exactly.</p>
+</section>
+<section id="inputs-2" class="level2" data-number="11.18">
+<h2 data-number="11.18" class="anchored" data-anchor-id="inputs-2"><span class="header-section-number">11.18</span> Inputs</h2>
+<ul>
+<li>A base (pre-fine-tuning) model and Chapter 8’s fine-tuned checkpoint</li>
+<li>The same held-out text from Step 1</li>
+</ul>
+</section>
+<section id="expected-output-2" class="level2" data-number="11.19">
+<h2 data-number="11.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">11.19</span> Expected Output</h2>
+<p>A perplexity score for each model on the same real text.</p>
+<div id="6d9d6cd7" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> perplexity(model, tokenizer, texts: <span class="bu">list</span>[<span class="bu">str</span>]) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    total_loss, total_examples <span class="op">=</span> <span class="fl">0.0</span>, <span class="dv">0</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> text <span class="kw">in</span> texts:</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        input_ids <span class="op">=</span> tokenizer(text, return_tensors<span class="op">=</span><span class="st">"pt"</span>)[<span class="st">"input_ids"</span>]</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>            loss <span class="op">=</span> model(input_ids<span class="op">=</span>input_ids, labels<span class="op">=</span>input_ids).loss</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        total_loss <span class="op">+=</span> loss.item()</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        total_examples <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> math.exp(total_loss <span class="op">/</span> total_examples)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>held_out_texts <span class="op">=</span> [e[<span class="st">"output"</span>] <span class="cf">for</span> e <span class="kw">in</span> eval_set]</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Base model:   </span><span class="sc">{</span>perplexity(base_model, tokenizer, held_out_texts)<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Fine-tuned:   </span><span class="sc">{</span>perplexity(lora_model, tokenizer, held_out_texts)<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Running this exact code prints:</p>
+<pre><code>Base model:   159.91
+Fine-tuned:   25.03</code></pre>
+</section>
+<section id="what-just-happened-2" class="level2" data-number="11.20">
+<h2 data-number="11.20" class="anchored" data-anchor-id="what-just-happened-2"><span class="header-section-number">11.20</span> What just happened?</h2>
+<p>The fine-tuned model found this exact-same real, never-trained-on text about <code>6.4×</code> less surprising than the base model did — a real, substantial change, on the exact same 8 examples that just scored <code>0/8</code> exact-match. Fine-tuning taught the model this archive’s vocabulary and phrasing well enough to make genuinely unseen report text far more expected, even though it still can’t reliably reproduce the <em>specific</em> content of a report it hasn’t seen. Chapter 5 called this “shape, not judgment” from a handful of wrong answers; this is the same finding, quantified.</p>
+</section>
+<section id="practical-exercise" class="level2" data-number="11.21">
+<h2 data-number="11.21" class="anchored" data-anchor-id="practical-exercise"><span class="header-section-number">11.21</span> Practical exercise</h2>
+<p>🟢 <strong>Beginner</strong></p>
+<p><strong>Try it yourself:</strong> run <code>python code/chapter_11/eval_finetuned_model.py</code> from inside <code>book/</code> and compare its printed output to the transcript above.</p>
+<p><strong>You’ll know it worked when:</strong> you see <code>Exact-match: 0/8</code> and a fine-tuned perplexity noticeably lower than the base model’s, and you can explain in one sentence why both numbers are true at the same time.</p>
+</section>
+<section id="field-notes" class="level2" data-number="11.22">
+<h2 data-number="11.22" class="anchored" data-anchor-id="field-notes"><span class="header-section-number">11.22</span> Field notes</h2>
+<div class="callout callout-style-default callout-warning callout-titled" title="Field notes: the number Chapter 8 already had, and never looked at twice">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Field notes: the number Chapter 8 already had, and never looked at twice
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Query:</strong> Chapter 8’s own <code>checkpoints/chapter_08/*/metrics.csv</code>, read all the way across instead of just its <code>held_out_exact_match</code> column.</p>
+<p><strong>Result:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Epoch</th>
+<th>Train loss</th>
+<th>Held-out exact-match</th>
+<th>Held-out perplexity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td><code>2.755</code></td>
+<td><code>0/8</code></td>
+<td><code>27.99</code></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td><code>2.164</code></td>
+<td><code>0/8</code></td>
+<td><code>25.40</code></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td><code>1.821</code></td>
+<td><code>0/8</code></td>
+<td><code>25.03</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why:</strong> <code>held_out_exact_match</code> was <code>0/8</code> at every single checkpoint — by that column alone, epochs 2 and 3 look like wasted training time. Perplexity on the exact same held-out text tells a different, consistent story: it falls at every checkpoint, tracking the falling training loss almost exactly, even while exact-match never moves.</p>
+<p><strong>Lesson:</strong> a metric that never changes isn’t proof that nothing is changing — it can just be measuring something training isn’t currently improving. Chapter 8 logged the ingredients for this table from its first real run; this chapter is what it took to actually read them together.</p>
+</div>
+</div>
+</section>
+<section id="challenge-exercise" class="level2" data-number="11.23">
+<h2 data-number="11.23" class="anchored" data-anchor-id="challenge-exercise"><span class="header-section-number">11.23</span> Challenge exercise</h2>
+<p>🟠 <strong>Intermediate</strong></p>
+<p><strong>Challenge:</strong> Chapter 8 saved a checkpoint after every epoch. Compute this chapter’s perplexity metric against all 3 of them and see whether it falls monotonically, the way Field Notes above suggests. A reference solution is at <code>code/chapter_11/challenge/challenge.py</code> — on a real run: <code>checkpoint_1: perplexity 27.99</code>, <code>checkpoint_2: perplexity 25.40</code>, <code>checkpoint_3: perplexity 25.03</code> — the exact numbers behind Field Notes’ table, falling at every epoch.</p>
+</section>
+<section id="key-takeaways" class="level2" data-number="11.24">
+<h2 data-number="11.24" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">11.24</span> Key takeaways</h2>
+<ul>
+<li>A single evaluation metric can make real training progress look like nothing happened. <code>held_out_exact_match</code> stayed <code>0/8</code> for all 3 of Chapter 8’s epochs; perplexity on the identical text fell at every one of them.</li>
+<li>Perplexity’s advantage is exactly that it doesn’t need a known-correct answer — it only needs real, unseen text, which makes it usable even when you don’t have (or trust) a labeled evaluation set.</li>
+<li>Reusing Chapter 10’s <code>faithfulness_score</code> for a completely different comparison (answer vs.&nbsp;known-correct output, not answer vs.&nbsp;source) worked without modification — the same simple technique generalized to a second real problem.</li>
+<li>Eight examples is a real evaluation set, not a toy one — but it’s still one report’s worth of questions. Don’t read <code>0.17</code> average overlap or <code>25.03</code> perplexity as more statistically solid than they are.</li>
+</ul>
+</section>
+<section id="repository-files" class="level2" data-number="11.25">
+<h2 data-number="11.25" class="anchored" data-anchor-id="repository-files"><span class="header-section-number">11.25</span> Repository files</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>code/chapter_11/eval_finetuned_model.py</code></td>
+<td>Builds the held-out evaluation set and scores exact-match, overlap, and perplexity</td>
+</tr>
+<tr class="even">
+<td><code>code/chapter_11/challenge/challenge.py</code></td>
+<td>Reference solution: perplexity across all 3 of Chapter 8’s checkpoints</td>
+</tr>
+<tr class="odd">
+<td><code>notebooks/chapter_11_explore.ipynb</code></td>
+<td>Interactive companion notebook</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-caution callout-titled" title="CHECKPOINT — Chapter 11">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Caution</span>CHECKPOINT — Chapter 11
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Built a real, 8-example held-out evaluation set from a report never used in any training set in this book</label></li>
+<li><label><input type="checkbox" checked="">Scored it two ways — strict exact-match and partial-credit overlap — instead of trusting one number</label></li>
+<li><label><input type="checkbox" checked="">Computed perplexity, a metric that needs no known-correct answer, and found it tells a different story than exact-match on the identical text</label></li>
+<li><label><input type="checkbox" checked="">Read Chapter 8’s own logged metrics all the way across instead of only its headline column</label></li>
+</ul>
+</div>
+</div>
+<div class="built-box callout callout-style-default callout-tip callout-titled" title="✓ WHAT YOU BUILT">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>✓ WHAT YOU BUILT
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong><code>eval_finetuned_model.py</code></strong> — a real evaluation harness: an 8-example held-out set, scored by exact-match, word-overlap partial credit, and perplexity. Applied to Chapter 8’s checkpoints, it shows training progress a single exact-match number completely hides.</p>
+</div>
+</div>
+</section>
+<section id="what-can-you-do-now-that-you-couldnt-do-before" class="level2" data-number="11.26">
+<h2 data-number="11.26" class="anchored" data-anchor-id="what-can-you-do-now-that-you-couldnt-do-before"><span class="header-section-number">11.26</span> What can you do now that you couldn’t do before?</h2>
+<p>You can evaluate a fine-tuned model against a real, fixed, held-out question set instead of a handful of examples you happened to check by hand — and you know why a single metric isn’t enough to trust the answer.</p>
+</section>
+<section id="suggested-next-step" class="level2" data-number="11.27">
+<h2 data-number="11.27" class="anchored" data-anchor-id="suggested-next-step"><span class="header-section-number">11.27</span> Suggested next step</h2>
+<p><strong>Coming up in Chapter 12:</strong> this chapter evaluated one model version against a fixed held-out set, one snapshot in time. A real deployment doesn’t stay still — new reports arrive, and eventually someone retrains. Chapter 12 takes this exact evaluation harness and runs it across multiple model versions, to catch the case this chapter can’t: a model that used to score well on this held-out set and quietly stops doing so.</p>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/chapter_10.html" class="pagination-link" aria-label="Traceable Outputs and Hallucination Mitigation">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Traceable Outputs and Hallucination Mitigation</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/chapter_12.html" class="pagination-link" aria-label="Detecting Drift Across Model Versions">
+        <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Detecting Drift Across Model Versions</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Evaluating a Fine-Tuned Domain Model {#sec-chapter-11}</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>::: {.content-visible when-format="html"}</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>::: {.pipeline-diagram}</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="al">![](../figures/diagrams/pipeline_ch11_light.svg)</span>{.diagram-light width="180"}</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="al">![](../figures/diagrams/pipeline_ch11_dark.svg)</span>{.diagram-dark width="180"}</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>::: {.content-visible when-format="pdf"}</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="al">![](../figures/diagrams/pipeline_ch11.pdf)</span>{width="180" fig-align="center"}</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>::: {.chapter-status}</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`███████████░░`</span> **11 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 30-40 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🟠 Intermediate</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learning objectives</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>By the end of this chapter, you will be able to:</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Build a real, held-out evaluation set from a report that has never</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  been in any training set in this book — not two hand-picked</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  questions, eight real ones</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Explain why a single metric can make fine-tuning look like it did</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  nothing, and why a second metric can prove that's wrong</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Compute perplexity — a metric that needs real held-out text, not a</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>  known-correct answer — and use it to measure something exact-match</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>  can't see at all</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Read Chapter 8's own <span class="in">`metrics.csv`</span> for what it's been quietly</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>  tracking every epoch, and turn one column of it into a real</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>  evaluation harness</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="fu">## Operational Problem</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>Mike, the completions engineer who asked back in Chapter 5 whether</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>fine-tuning teaches the operation or just memorizes flashcards, has a</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>sharper version of the same question now that Chapters 9 and 10 added</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>retrieval and faithfulness-checking on top: *"We've been checking all</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>of this on a handful of questions I picked myself, because I already</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>knew what I was looking for in each one. How do I know any of it holds</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>up on a question I didn't pick?"*</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>Chapter 5 answered a narrower version of this with <span class="in">`0/16`</span> and <span class="in">`0/2`</span>.</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>Chapter 9 and 10 each checked exactly 4 hand-picked cases. None of that</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>is a real evaluation — it's a handful of examples someone happened to</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>check by hand, exactly what Chapter 10 ended by admitting doesn't</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>scale. This chapter builds a real evaluation set — 8 real questions</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>from a report that has never been in any training set in this book —</span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>and scores it more than one way, because a single number turns out not</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>to be enough to answer Mike's question honestly.</span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="fu">## Example: one answer, asked eight different questions</span></span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>Run Chapter 8's fine-tuned model against all 8 real held-out questions</span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>this chapter builds — no retrieval, no grounding context, exactly the</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>same setup Chapter 5's original held-out check used — and something</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>worth noticing happens before any scoring at all:</span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="Eight different questions, from a report the model never trained on"}</span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a><span class="in">Time: 06:00-18:30 (part 1 of 2) -&gt; Production Casing Run Csg &amp; Cement Rig up casing</span></span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a><span class="in">Time: 18:30-20:30               -&gt; Production Casing Run Csg &amp; Cement Rig up cement</span></span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a><span class="in">Time: 20:30-21:30               -&gt; Production Casing Run Csg &amp; Cement Rig up cement</span></span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a><span class="in">Time: 21:30-00:30               -&gt; Production Casing Run Csg &amp; Cement Rig up casing</span></span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a><span class="in">Time: 00:30-02:30               -&gt; Production Casing Run Csg &amp; Cement Rig up casing</span></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a><span class="in">Time: 02:30-03:30               -&gt; Production Casing Run Csg &amp; Cement Rig up cement</span></span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a><span class="in">Time: 03:30-06:00               -&gt; Production Casing Run Csg &amp; Cement Rig up casing</span></span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>Eight different time windows, seven near-identical answers. Whatever</span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>Chapter 8's fine-tune actually learned, it isn't "what happened at</span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>each of these specific times" — it's something closer to a single</span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>memorized-sounding template the model reaches for regardless of the</span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>question. Scoring that against a known-correct answer is one useful</span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>number. It is not the only useful number.</span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a><span class="fu">## Theory</span></span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Engineering Translation: evaluation set"}</span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a>An **evaluation set** is a fixed, reusable list of questions with</span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a>known-correct answers, held back from training the same way Chapter</span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a>2's held-out report always has been — the difference this chapter</span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a>makes is *size*. Chapter 3's held-out check used 2 questions from that</span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a>report; this chapter uses all 8 real ones the report actually</span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a>contains, built with Chapter 7's own chunker.</span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Engineering Translation: perplexity"}</span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a>**Perplexity** measures how surprised a model is by a piece of real</span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a>text — lower means the model found the actual words more expected,</span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a>higher means it found them more surprising. Unlike exact-match or</span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a>overlap scoring, perplexity doesn't need a "correct answer" to compare</span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a>against at all — just real text the model never trained on. That</span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a>makes it a useful second opinion when the first metric says "no</span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a>progress."</span>
+<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why one number isn't enough</span></span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a>The tempting shortcut: run the held-out set once, get an exact-match</span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a>score, and treat that as the verdict on whether fine-tuning worked.</span>
+<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a>Chapter 8 has quietly been logging exactly that number every epoch, in</span>
+<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a>its own <span class="in">`metrics.csv`</span> — a <span class="in">`held_out_exact_match`</span> column that reads</span>
+<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a><span class="in">`0/8`</span> at epoch 1, <span class="in">`0/8`</span> at epoch 2, <span class="in">`0/8`</span> at epoch 3. Read on its own,</span>
+<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a>that number says fine-tuning made zero progress on anything it hadn't</span>
+<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a>already memorized. Field Notes below shows a second, real metric that</span>
+<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a>says something very different about the exact same three checkpoints</span>
+<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a>— both numbers are true, and neither one alone tells Mike what he</span>
+<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a>actually asked.</span>
+<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a><span class="fu">## Implementation</span></span>
+<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 1: Build a real, held-out evaluation set</span></span>
+<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a>Chapter 3's held-out check used exactly 2 examples — the report's two</span>
+<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a>coarse summary fields. Build a real evaluation set from the same</span>
+<span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a>never-trained-on report, at the same granularity Chapter 7 used for</span>
+<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a>training at scale.</span>
+<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`HELD_OUT_REPORT`</span> (Chapter 2) and <span class="in">`FULL_SET_DIR`</span> (Chapter 6)</span>
+<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`build_timeline_examples_for_report`</span> (Chapter 7), reused unchanged</span>
+<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a>A list of real instruction/input/output examples, one per timeline</span>
+<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a>entry the held-out report actually contains.</span>
+<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-137"><a href="#cb8-137" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-138"><a href="#cb8-138" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_held_out_eval_set() <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">dict</span>]:</span>
+<span id="cb8-139"><a href="#cb8-139" aria-hidden="true" tabindex="-1"></a>    examples, _artifacts_filtered <span class="op">=</span> build_timeline_examples_for_report(FULL_SET_DIR <span class="op">/</span> HELD_OUT_REPORT)</span>
+<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> examples</span>
+<span id="cb8-141"><a href="#cb8-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-142"><a href="#cb8-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-143"><a href="#cb8-143" aria-hidden="true" tabindex="-1"></a>eval_set <span class="op">=</span> build_held_out_eval_set()</span>
+<span id="cb8-144"><a href="#cb8-144" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(eval_set)<span class="sc">}</span><span class="ss"> held-out examples, report never used in any training set"</span>)</span>
+<span id="cb8-145"><a href="#cb8-145" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-146"><a href="#cb8-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-147"><a href="#cb8-147" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-148"><a href="#cb8-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-149"><a href="#cb8-149" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-150"><a href="#cb8-150" aria-hidden="true" tabindex="-1"></a><span class="in">8 held-out examples, report never used in any training set</span></span>
+<span id="cb8-151"><a href="#cb8-151" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-152"><a href="#cb8-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-153"><a href="#cb8-153" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-154"><a href="#cb8-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a><span class="in">`build_timeline_examples_for_report`</span> is Chapter 7's own function,</span>
+<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a>called directly on the one report Chapter 2 reserved and Chapter 5 and</span>
+<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a>8 both excluded from training. This isn't new held-out data — it's the</span>
+<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a>exact same 8 examples Chapter 8's training script already builds</span>
+<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a>internally for its own <span class="in">`held_out_exact_match`</span> logging. This chapter is</span>
+<span id="cb8-160"><a href="#cb8-160" aria-hidden="true" tabindex="-1"></a>the first time this book actually looks past that one column.</span>
+<span id="cb8-161"><a href="#cb8-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-162"><a href="#cb8-162" aria-hidden="true" tabindex="-1"></a><span class="fu">## Production Reality</span></span>
+<span id="cb8-163"><a href="#cb8-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-164"><a href="#cb8-164" aria-hidden="true" tabindex="-1"></a>Eight examples is still small by production standards — a real</span>
+<span id="cb8-165"><a href="#cb8-165" aria-hidden="true" tabindex="-1"></a>evaluation set for a deployed system would hold back dozens of</span>
+<span id="cb8-166"><a href="#cb8-166" aria-hidden="true" tabindex="-1"></a>reports, not one, to make the score statistically meaningful rather</span>
+<span id="cb8-167"><a href="#cb8-167" aria-hidden="true" tabindex="-1"></a>than a single report's quirks. This chapter's version stays honest</span>
+<span id="cb8-168"><a href="#cb8-168" aria-hidden="true" tabindex="-1"></a>about that limit rather than implying 8 examples settles the question;</span>
+<span id="cb8-169"><a href="#cb8-169" aria-hidden="true" tabindex="-1"></a>see Key takeaways.</span>
+<span id="cb8-170"><a href="#cb8-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-171"><a href="#cb8-171" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 2: Score two ways — exact-match and partial credit</span></span>
+<span id="cb8-172"><a href="#cb8-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-173"><a href="#cb8-173" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-174"><a href="#cb8-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-175"><a href="#cb8-175" aria-hidden="true" tabindex="-1"></a>Reuse Chapter 3's strict exact-match check, and pair it with Chapter</span>
+<span id="cb8-176"><a href="#cb8-176" aria-hidden="true" tabindex="-1"></a>10's word-overlap scoring (originally built to check an answer against</span>
+<span id="cb8-177"><a href="#cb8-177" aria-hidden="true" tabindex="-1"></a>a *retrieved source*) applied to a different comparison: an answer</span>
+<span id="cb8-178"><a href="#cb8-178" aria-hidden="true" tabindex="-1"></a>against its *known-correct output*.</span>
+<span id="cb8-179"><a href="#cb8-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-180"><a href="#cb8-180" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-181"><a href="#cb8-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-182"><a href="#cb8-182" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The fine-tuned model and tokenizer (Chapter 8's checkpoint)</span>
+<span id="cb8-183"><a href="#cb8-183" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The held-out evaluation set from Step 1</span>
+<span id="cb8-184"><a href="#cb8-184" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`faithfulness_score`</span> (Chapter 10), reused unchanged</span>
+<span id="cb8-185"><a href="#cb8-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-186"><a href="#cb8-186" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-187"><a href="#cb8-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-188"><a href="#cb8-188" aria-hidden="true" tabindex="-1"></a>Every example scored both ways: a strict pass/fail and a 0–1 partial</span>
+<span id="cb8-189"><a href="#cb8-189" aria-hidden="true" tabindex="-1"></a>credit score.</span>
+<span id="cb8-190"><a href="#cb8-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-193"><a href="#cb8-193" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-194"><a href="#cb8-194" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-195"><a href="#cb8-195" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> exact_match(generated: <span class="bu">str</span>, expected: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
+<span id="cb8-196"><a href="#cb8-196" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> expected.strip().lower() <span class="kw">in</span> generated.strip().lower()</span>
+<span id="cb8-197"><a href="#cb8-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-198"><a href="#cb8-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-199"><a href="#cb8-199" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> evaluate(model, tokenizer, eval_set: <span class="bu">list</span>[<span class="bu">dict</span>]) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">dict</span>]:</span>
+<span id="cb8-200"><a href="#cb8-200" aria-hidden="true" tabindex="-1"></a>    results <span class="op">=</span> []</span>
+<span id="cb8-201"><a href="#cb8-201" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> example <span class="kw">in</span> eval_set:</span>
+<span id="cb8-202"><a href="#cb8-202" aria-hidden="true" tabindex="-1"></a>        prompt <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>example[<span class="st">'instruction'</span>]<span class="sc">}</span><span class="ch">\n</span><span class="sc">{</span>example[<span class="st">'input'</span>]<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb8-203"><a href="#cb8-203" aria-hidden="true" tabindex="-1"></a>        generated <span class="op">=</span> generate_reply(model, tokenizer, prompt, max_new_tokens<span class="op">=</span><span class="dv">60</span>)</span>
+<span id="cb8-204"><a href="#cb8-204" aria-hidden="true" tabindex="-1"></a>        results.append({</span>
+<span id="cb8-205"><a href="#cb8-205" aria-hidden="true" tabindex="-1"></a>            <span class="st">"input"</span>: example[<span class="st">"input"</span>],</span>
+<span id="cb8-206"><a href="#cb8-206" aria-hidden="true" tabindex="-1"></a>            <span class="st">"expected"</span>: example[<span class="st">"output"</span>],</span>
+<span id="cb8-207"><a href="#cb8-207" aria-hidden="true" tabindex="-1"></a>            <span class="st">"generated"</span>: generated,</span>
+<span id="cb8-208"><a href="#cb8-208" aria-hidden="true" tabindex="-1"></a>            <span class="st">"exact_match"</span>: exact_match(generated, example[<span class="st">"output"</span>]),</span>
+<span id="cb8-209"><a href="#cb8-209" aria-hidden="true" tabindex="-1"></a>            <span class="st">"overlap_score"</span>: faithfulness_score(generated, example[<span class="st">"output"</span>]),</span>
+<span id="cb8-210"><a href="#cb8-210" aria-hidden="true" tabindex="-1"></a>        })</span>
+<span id="cb8-211"><a href="#cb8-211" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> results</span>
+<span id="cb8-212"><a href="#cb8-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-213"><a href="#cb8-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-214"><a href="#cb8-214" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> evaluate(lora_model, tokenizer, eval_set)</span>
+<span id="cb8-215"><a href="#cb8-215" aria-hidden="true" tabindex="-1"></a>matches <span class="op">=</span> <span class="bu">sum</span>(r[<span class="st">"exact_match"</span>] <span class="cf">for</span> r <span class="kw">in</span> results)</span>
+<span id="cb8-216"><a href="#cb8-216" aria-hidden="true" tabindex="-1"></a>avg_overlap <span class="op">=</span> <span class="bu">sum</span>(r[<span class="st">"overlap_score"</span>] <span class="cf">for</span> r <span class="kw">in</span> results) <span class="op">/</span> <span class="bu">len</span>(results)</span>
+<span id="cb8-217"><a href="#cb8-217" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Exact-match: </span><span class="sc">{</span>matches<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span><span class="bu">len</span>(results)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-218"><a href="#cb8-218" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Average overlap score: </span><span class="sc">{</span>avg_overlap<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb8-219"><a href="#cb8-219" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-220"><a href="#cb8-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-221"><a href="#cb8-221" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-222"><a href="#cb8-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-223"><a href="#cb8-223" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-224"><a href="#cb8-224" aria-hidden="true" tabindex="-1"></a><span class="in">Exact-match: 0/8</span></span>
+<span id="cb8-225"><a href="#cb8-225" aria-hidden="true" tabindex="-1"></a><span class="in">Average overlap score: 0.17</span></span>
+<span id="cb8-226"><a href="#cb8-226" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-227"><a href="#cb8-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-228"><a href="#cb8-228" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-229"><a href="#cb8-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-230"><a href="#cb8-230" aria-hidden="true" tabindex="-1"></a><span class="in">`0/8`</span> on its own reads like total failure. <span class="in">`0.17`</span> average overlap</span>
+<span id="cb8-231"><a href="#cb8-231" aria-hidden="true" tabindex="-1"></a>tells a more precise story: not zero, but low — the generated answers</span>
+<span id="cb8-232"><a href="#cb8-232" aria-hidden="true" tabindex="-1"></a>share some vocabulary with the real ones (mostly the archive's own</span>
+<span id="cb8-233"><a href="#cb8-233" aria-hidden="true" tabindex="-1"></a>recurring category words, "Production," "Drilling") without capturing</span>
+<span id="cb8-234"><a href="#cb8-234" aria-hidden="true" tabindex="-1"></a>the specific content each question actually asked about. Reusing</span>
+<span id="cb8-235"><a href="#cb8-235" aria-hidden="true" tabindex="-1"></a>Chapter 10's exact scoring function for a different comparison is</span>
+<span id="cb8-236"><a href="#cb8-236" aria-hidden="true" tabindex="-1"></a>deliberate: the same simple technique generalizes to a second real</span>
+<span id="cb8-237"><a href="#cb8-237" aria-hidden="true" tabindex="-1"></a>problem without needing to be reinvented.</span>
+<span id="cb8-238"><a href="#cb8-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-239"><a href="#cb8-239" aria-hidden="true" tabindex="-1"></a><span class="fu">## Production Reality</span></span>
+<span id="cb8-240"><a href="#cb8-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-241"><a href="#cb8-241" aria-hidden="true" tabindex="-1"></a><span class="in">`faithfulness_score`</span> is still the same plain word-overlap check</span>
+<span id="cb8-242"><a href="#cb8-242" aria-hidden="true" tabindex="-1"></a>Chapter 10 named the limits of — it can't detect a paraphrase that</span>
+<span id="cb8-243"><a href="#cb8-243" aria-hidden="true" tabindex="-1"></a>uses different words correctly, and it can't detect a subtle inversion</span>
+<span id="cb8-244"><a href="#cb8-244" aria-hidden="true" tabindex="-1"></a>hiding inside otherwise-matching words. Those limits carry over here</span>
+<span id="cb8-245"><a href="#cb8-245" aria-hidden="true" tabindex="-1"></a>unchanged; a <span class="in">`0.17`</span> average is a real, low signal, not a precise one.</span>
+<span id="cb8-246"><a href="#cb8-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-247"><a href="#cb8-247" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 3: Perplexity — a metric that doesn't need a correct answer</span></span>
+<span id="cb8-248"><a href="#cb8-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-249"><a href="#cb8-249" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-250"><a href="#cb8-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-251"><a href="#cb8-251" aria-hidden="true" tabindex="-1"></a>Measure whether fine-tuning changed how surprised the model is by real</span>
+<span id="cb8-252"><a href="#cb8-252" aria-hidden="true" tabindex="-1"></a>held-out text, independent of whether it can reproduce that text</span>
+<span id="cb8-253"><a href="#cb8-253" aria-hidden="true" tabindex="-1"></a>exactly.</span>
+<span id="cb8-254"><a href="#cb8-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-255"><a href="#cb8-255" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-256"><a href="#cb8-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-257"><a href="#cb8-257" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A base (pre-fine-tuning) model and Chapter 8's fine-tuned checkpoint</span>
+<span id="cb8-258"><a href="#cb8-258" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The same held-out text from Step 1</span>
+<span id="cb8-259"><a href="#cb8-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-260"><a href="#cb8-260" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-261"><a href="#cb8-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-262"><a href="#cb8-262" aria-hidden="true" tabindex="-1"></a>A perplexity score for each model on the same real text.</span>
+<span id="cb8-263"><a href="#cb8-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-266"><a href="#cb8-266" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-267"><a href="#cb8-267" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-268"><a href="#cb8-268" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb8-269"><a href="#cb8-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-270"><a href="#cb8-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-271"><a href="#cb8-271" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> perplexity(model, tokenizer, texts: <span class="bu">list</span>[<span class="bu">str</span>]) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
+<span id="cb8-272"><a href="#cb8-272" aria-hidden="true" tabindex="-1"></a>    total_loss, total_examples <span class="op">=</span> <span class="fl">0.0</span>, <span class="dv">0</span></span>
+<span id="cb8-273"><a href="#cb8-273" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> text <span class="kw">in</span> texts:</span>
+<span id="cb8-274"><a href="#cb8-274" aria-hidden="true" tabindex="-1"></a>        input_ids <span class="op">=</span> tokenizer(text, return_tensors<span class="op">=</span><span class="st">"pt"</span>)[<span class="st">"input_ids"</span>]</span>
+<span id="cb8-275"><a href="#cb8-275" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb8-276"><a href="#cb8-276" aria-hidden="true" tabindex="-1"></a>            loss <span class="op">=</span> model(input_ids<span class="op">=</span>input_ids, labels<span class="op">=</span>input_ids).loss</span>
+<span id="cb8-277"><a href="#cb8-277" aria-hidden="true" tabindex="-1"></a>        total_loss <span class="op">+=</span> loss.item()</span>
+<span id="cb8-278"><a href="#cb8-278" aria-hidden="true" tabindex="-1"></a>        total_examples <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb8-279"><a href="#cb8-279" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> math.exp(total_loss <span class="op">/</span> total_examples)</span>
+<span id="cb8-280"><a href="#cb8-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-281"><a href="#cb8-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-282"><a href="#cb8-282" aria-hidden="true" tabindex="-1"></a>held_out_texts <span class="op">=</span> [e[<span class="st">"output"</span>] <span class="cf">for</span> e <span class="kw">in</span> eval_set]</span>
+<span id="cb8-283"><a href="#cb8-283" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Base model:   </span><span class="sc">{</span>perplexity(base_model, tokenizer, held_out_texts)<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb8-284"><a href="#cb8-284" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Fine-tuned:   </span><span class="sc">{</span>perplexity(lora_model, tokenizer, held_out_texts)<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb8-285"><a href="#cb8-285" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-286"><a href="#cb8-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-287"><a href="#cb8-287" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-288"><a href="#cb8-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-289"><a href="#cb8-289" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-290"><a href="#cb8-290" aria-hidden="true" tabindex="-1"></a><span class="in">Base model:   159.91</span></span>
+<span id="cb8-291"><a href="#cb8-291" aria-hidden="true" tabindex="-1"></a><span class="in">Fine-tuned:   25.03</span></span>
+<span id="cb8-292"><a href="#cb8-292" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-293"><a href="#cb8-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-294"><a href="#cb8-294" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-295"><a href="#cb8-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-296"><a href="#cb8-296" aria-hidden="true" tabindex="-1"></a>The fine-tuned model found this exact-same real, never-trained-on text</span>
+<span id="cb8-297"><a href="#cb8-297" aria-hidden="true" tabindex="-1"></a>about <span class="in">`6.4×`</span> less surprising than the base model did — a real,</span>
+<span id="cb8-298"><a href="#cb8-298" aria-hidden="true" tabindex="-1"></a>substantial change, on the exact same 8 examples that just scored</span>
+<span id="cb8-299"><a href="#cb8-299" aria-hidden="true" tabindex="-1"></a><span class="in">`0/8`</span> exact-match. Fine-tuning taught the model this archive's</span>
+<span id="cb8-300"><a href="#cb8-300" aria-hidden="true" tabindex="-1"></a>vocabulary and phrasing well enough to make genuinely unseen report</span>
+<span id="cb8-301"><a href="#cb8-301" aria-hidden="true" tabindex="-1"></a>text far more expected, even though it still can't reliably reproduce</span>
+<span id="cb8-302"><a href="#cb8-302" aria-hidden="true" tabindex="-1"></a>the *specific* content of a report it hasn't seen. Chapter 5 called</span>
+<span id="cb8-303"><a href="#cb8-303" aria-hidden="true" tabindex="-1"></a>this "shape, not judgment" from a handful of wrong answers; this is</span>
+<span id="cb8-304"><a href="#cb8-304" aria-hidden="true" tabindex="-1"></a>the same finding, quantified.</span>
+<span id="cb8-305"><a href="#cb8-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-306"><a href="#cb8-306" aria-hidden="true" tabindex="-1"></a><span class="fu">## Practical exercise</span></span>
+<span id="cb8-307"><a href="#cb8-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-308"><a href="#cb8-308" aria-hidden="true" tabindex="-1"></a>🟢 **Beginner**</span>
+<span id="cb8-309"><a href="#cb8-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-310"><a href="#cb8-310" aria-hidden="true" tabindex="-1"></a>**Try it yourself:** run</span>
+<span id="cb8-311"><a href="#cb8-311" aria-hidden="true" tabindex="-1"></a><span class="in">`python code/chapter_11/eval_finetuned_model.py`</span> from inside <span class="in">`book/`</span></span>
+<span id="cb8-312"><a href="#cb8-312" aria-hidden="true" tabindex="-1"></a>and compare its printed output to the transcript above.</span>
+<span id="cb8-313"><a href="#cb8-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-314"><a href="#cb8-314" aria-hidden="true" tabindex="-1"></a>**You'll know it worked when:** you see <span class="in">`Exact-match: 0/8`</span> and a</span>
+<span id="cb8-315"><a href="#cb8-315" aria-hidden="true" tabindex="-1"></a>fine-tuned perplexity noticeably lower than the base model's, and you</span>
+<span id="cb8-316"><a href="#cb8-316" aria-hidden="true" tabindex="-1"></a>can explain in one sentence why both numbers are true at the same</span>
+<span id="cb8-317"><a href="#cb8-317" aria-hidden="true" tabindex="-1"></a>time.</span>
+<span id="cb8-318"><a href="#cb8-318" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-319"><a href="#cb8-319" aria-hidden="true" tabindex="-1"></a><span class="fu">## Field notes</span></span>
+<span id="cb8-320"><a href="#cb8-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-321"><a href="#cb8-321" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="Field notes: the number Chapter 8 already had, and never looked at twice"}</span>
+<span id="cb8-322"><a href="#cb8-322" aria-hidden="true" tabindex="-1"></a>**Query:** Chapter 8's own <span class="in">`checkpoints/chapter_08/*/metrics.csv`</span>,</span>
+<span id="cb8-323"><a href="#cb8-323" aria-hidden="true" tabindex="-1"></a>read all the way across instead of just its <span class="in">`held_out_exact_match`</span></span>
+<span id="cb8-324"><a href="#cb8-324" aria-hidden="true" tabindex="-1"></a>column.</span>
+<span id="cb8-325"><a href="#cb8-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-326"><a href="#cb8-326" aria-hidden="true" tabindex="-1"></a>**Result:**</span>
+<span id="cb8-327"><a href="#cb8-327" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-328"><a href="#cb8-328" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Epoch <span class="pp">|</span> Train loss <span class="pp">|</span> Held-out exact-match <span class="pp">|</span> Held-out perplexity <span class="pp">|</span></span>
+<span id="cb8-329"><a href="#cb8-329" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb8-330"><a href="#cb8-330" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 1 <span class="pp">|</span> <span class="in">`2.755`</span> <span class="pp">|</span> <span class="in">`0/8`</span> <span class="pp">|</span> <span class="in">`27.99`</span> <span class="pp">|</span></span>
+<span id="cb8-331"><a href="#cb8-331" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 2 <span class="pp">|</span> <span class="in">`2.164`</span> <span class="pp">|</span> <span class="in">`0/8`</span> <span class="pp">|</span> <span class="in">`25.40`</span> <span class="pp">|</span></span>
+<span id="cb8-332"><a href="#cb8-332" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 3 <span class="pp">|</span> <span class="in">`1.821`</span> <span class="pp">|</span> <span class="in">`0/8`</span> <span class="pp">|</span> <span class="in">`25.03`</span> <span class="pp">|</span></span>
+<span id="cb8-333"><a href="#cb8-333" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-334"><a href="#cb8-334" aria-hidden="true" tabindex="-1"></a>**Why:** <span class="in">`held_out_exact_match`</span> was <span class="in">`0/8`</span> at every single checkpoint —</span>
+<span id="cb8-335"><a href="#cb8-335" aria-hidden="true" tabindex="-1"></a>by that column alone, epochs 2 and 3 look like wasted training time.</span>
+<span id="cb8-336"><a href="#cb8-336" aria-hidden="true" tabindex="-1"></a>Perplexity on the exact same held-out text tells a different,</span>
+<span id="cb8-337"><a href="#cb8-337" aria-hidden="true" tabindex="-1"></a>consistent story: it falls at every checkpoint, tracking the falling</span>
+<span id="cb8-338"><a href="#cb8-338" aria-hidden="true" tabindex="-1"></a>training loss almost exactly, even while exact-match never moves.</span>
+<span id="cb8-339"><a href="#cb8-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-340"><a href="#cb8-340" aria-hidden="true" tabindex="-1"></a>**Lesson:** a metric that never changes isn't proof that nothing is</span>
+<span id="cb8-341"><a href="#cb8-341" aria-hidden="true" tabindex="-1"></a>changing — it can just be measuring something training isn't currently</span>
+<span id="cb8-342"><a href="#cb8-342" aria-hidden="true" tabindex="-1"></a>improving. Chapter 8 logged the ingredients for this table from its</span>
+<span id="cb8-343"><a href="#cb8-343" aria-hidden="true" tabindex="-1"></a>first real run; this chapter is what it took to actually read them</span>
+<span id="cb8-344"><a href="#cb8-344" aria-hidden="true" tabindex="-1"></a>together.</span>
+<span id="cb8-345"><a href="#cb8-345" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-346"><a href="#cb8-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-347"><a href="#cb8-347" aria-hidden="true" tabindex="-1"></a><span class="fu">## Challenge exercise</span></span>
+<span id="cb8-348"><a href="#cb8-348" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-349"><a href="#cb8-349" aria-hidden="true" tabindex="-1"></a>🟠 **Intermediate**</span>
+<span id="cb8-350"><a href="#cb8-350" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-351"><a href="#cb8-351" aria-hidden="true" tabindex="-1"></a>**Challenge:** Chapter 8 saved a checkpoint after every epoch. Compute</span>
+<span id="cb8-352"><a href="#cb8-352" aria-hidden="true" tabindex="-1"></a>this chapter's perplexity metric against all 3 of them and see whether</span>
+<span id="cb8-353"><a href="#cb8-353" aria-hidden="true" tabindex="-1"></a>it falls monotonically, the way Field Notes above suggests. A</span>
+<span id="cb8-354"><a href="#cb8-354" aria-hidden="true" tabindex="-1"></a>reference solution is at <span class="in">`code/chapter_11/challenge/challenge.py`</span> — on</span>
+<span id="cb8-355"><a href="#cb8-355" aria-hidden="true" tabindex="-1"></a>a real run: <span class="in">`checkpoint_1: perplexity 27.99`</span>, `checkpoint_2: perplexity</span>
+<span id="cb8-356"><a href="#cb8-356" aria-hidden="true" tabindex="-1"></a>25.40<span class="in">`, `</span>checkpoint_3: perplexity 25.03` — the exact numbers behind</span>
+<span id="cb8-357"><a href="#cb8-357" aria-hidden="true" tabindex="-1"></a>Field Notes' table, falling at every epoch.</span>
+<span id="cb8-358"><a href="#cb8-358" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-359"><a href="#cb8-359" aria-hidden="true" tabindex="-1"></a><span class="fu">## Key takeaways</span></span>
+<span id="cb8-360"><a href="#cb8-360" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-361"><a href="#cb8-361" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A single evaluation metric can make real training progress look like</span>
+<span id="cb8-362"><a href="#cb8-362" aria-hidden="true" tabindex="-1"></a>  nothing happened. <span class="in">`held_out_exact_match`</span> stayed <span class="in">`0/8`</span> for all 3 of</span>
+<span id="cb8-363"><a href="#cb8-363" aria-hidden="true" tabindex="-1"></a>  Chapter 8's epochs; perplexity on the identical text fell at every</span>
+<span id="cb8-364"><a href="#cb8-364" aria-hidden="true" tabindex="-1"></a>  one of them.</span>
+<span id="cb8-365"><a href="#cb8-365" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Perplexity's advantage is exactly that it doesn't need a</span>
+<span id="cb8-366"><a href="#cb8-366" aria-hidden="true" tabindex="-1"></a>  known-correct answer — it only needs real, unseen text, which makes</span>
+<span id="cb8-367"><a href="#cb8-367" aria-hidden="true" tabindex="-1"></a>  it usable even when you don't have (or trust) a labeled evaluation</span>
+<span id="cb8-368"><a href="#cb8-368" aria-hidden="true" tabindex="-1"></a>  set.</span>
+<span id="cb8-369"><a href="#cb8-369" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Reusing Chapter 10's <span class="in">`faithfulness_score`</span> for a completely different</span>
+<span id="cb8-370"><a href="#cb8-370" aria-hidden="true" tabindex="-1"></a>  comparison (answer vs. known-correct output, not answer vs. source)</span>
+<span id="cb8-371"><a href="#cb8-371" aria-hidden="true" tabindex="-1"></a>  worked without modification — the same simple technique generalized</span>
+<span id="cb8-372"><a href="#cb8-372" aria-hidden="true" tabindex="-1"></a>  to a second real problem.</span>
+<span id="cb8-373"><a href="#cb8-373" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Eight examples is a real evaluation set, not a toy one — but it's</span>
+<span id="cb8-374"><a href="#cb8-374" aria-hidden="true" tabindex="-1"></a>  still one report's worth of questions. Don't read <span class="in">`0.17`</span> average</span>
+<span id="cb8-375"><a href="#cb8-375" aria-hidden="true" tabindex="-1"></a>  overlap or <span class="in">`25.03`</span> perplexity as more statistically solid than they</span>
+<span id="cb8-376"><a href="#cb8-376" aria-hidden="true" tabindex="-1"></a>  are.</span>
+<span id="cb8-377"><a href="#cb8-377" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-378"><a href="#cb8-378" aria-hidden="true" tabindex="-1"></a><span class="fu">## Repository files</span></span>
+<span id="cb8-379"><a href="#cb8-379" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-380"><a href="#cb8-380" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> File <span class="pp">|</span> Purpose <span class="pp">|</span></span>
+<span id="cb8-381"><a href="#cb8-381" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb8-382"><a href="#cb8-382" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_11/eval_finetuned_model.py`</span> <span class="pp">|</span> Builds the held-out evaluation set and scores exact-match, overlap, and perplexity <span class="pp">|</span></span>
+<span id="cb8-383"><a href="#cb8-383" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_11/challenge/challenge.py`</span> <span class="pp">|</span> Reference solution: perplexity across all 3 of Chapter 8's checkpoints <span class="pp">|</span></span>
+<span id="cb8-384"><a href="#cb8-384" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`notebooks/chapter_11_explore.ipynb`</span> <span class="pp">|</span> Interactive companion notebook <span class="pp">|</span></span>
+<span id="cb8-385"><a href="#cb8-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-386"><a href="#cb8-386" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution title="CHECKPOINT — Chapter 11"}</span>
+<span id="cb8-387"><a href="#cb8-387" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Built a real, 8-example held-out evaluation set from a report</span>
+<span id="cb8-388"><a href="#cb8-388" aria-hidden="true" tabindex="-1"></a>      never used in any training set in this book</span>
+<span id="cb8-389"><a href="#cb8-389" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Scored it two ways — strict exact-match and partial-credit</span>
+<span id="cb8-390"><a href="#cb8-390" aria-hidden="true" tabindex="-1"></a>      overlap — instead of trusting one number</span>
+<span id="cb8-391"><a href="#cb8-391" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Computed perplexity, a metric that needs no known-correct</span>
+<span id="cb8-392"><a href="#cb8-392" aria-hidden="true" tabindex="-1"></a>      answer, and found it tells a different story than exact-match on</span>
+<span id="cb8-393"><a href="#cb8-393" aria-hidden="true" tabindex="-1"></a>      the identical text</span>
+<span id="cb8-394"><a href="#cb8-394" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Read Chapter 8's own logged metrics all the way across instead</span>
+<span id="cb8-395"><a href="#cb8-395" aria-hidden="true" tabindex="-1"></a>      of only its headline column</span>
+<span id="cb8-396"><a href="#cb8-396" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-397"><a href="#cb8-397" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-398"><a href="#cb8-398" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}</span>
+<span id="cb8-399"><a href="#cb8-399" aria-hidden="true" tabindex="-1"></a>**`eval_finetuned_model.py`** — a real evaluation harness: an 8-example</span>
+<span id="cb8-400"><a href="#cb8-400" aria-hidden="true" tabindex="-1"></a>held-out set, scored by exact-match, word-overlap partial credit, and</span>
+<span id="cb8-401"><a href="#cb8-401" aria-hidden="true" tabindex="-1"></a>perplexity. Applied to Chapter 8's checkpoints, it shows training</span>
+<span id="cb8-402"><a href="#cb8-402" aria-hidden="true" tabindex="-1"></a>progress a single exact-match number completely hides.</span>
+<span id="cb8-403"><a href="#cb8-403" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-404"><a href="#cb8-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-405"><a href="#cb8-405" aria-hidden="true" tabindex="-1"></a><span class="fu">## What can you do now that you couldn't do before?</span></span>
+<span id="cb8-406"><a href="#cb8-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-407"><a href="#cb8-407" aria-hidden="true" tabindex="-1"></a>You can evaluate a fine-tuned model against a real, fixed, held-out</span>
+<span id="cb8-408"><a href="#cb8-408" aria-hidden="true" tabindex="-1"></a>question set instead of a handful of examples you happened to check by</span>
+<span id="cb8-409"><a href="#cb8-409" aria-hidden="true" tabindex="-1"></a>hand — and you know why a single metric isn't enough to trust the</span>
+<span id="cb8-410"><a href="#cb8-410" aria-hidden="true" tabindex="-1"></a>answer.</span>
+<span id="cb8-411"><a href="#cb8-411" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-412"><a href="#cb8-412" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suggested next step</span></span>
+<span id="cb8-413"><a href="#cb8-413" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-414"><a href="#cb8-414" aria-hidden="true" tabindex="-1"></a>**Coming up in Chapter 12:** this chapter evaluated one model version</span>
+<span id="cb8-415"><a href="#cb8-415" aria-hidden="true" tabindex="-1"></a>against a fixed held-out set, one snapshot in time. A real deployment</span>
+<span id="cb8-416"><a href="#cb8-416" aria-hidden="true" tabindex="-1"></a>doesn't stay still — new reports arrive, and eventually someone</span>
+<span id="cb8-417"><a href="#cb8-417" aria-hidden="true" tabindex="-1"></a>retrains. Chapter 12 takes this exact evaluation harness and runs it</span>
+<span id="cb8-418"><a href="#cb8-418" aria-hidden="true" tabindex="-1"></a>across multiple model versions, to catch the case this chapter can't:</span>
+<span id="cb8-419"><a href="#cb8-419" aria-hidden="true" tabindex="-1"></a>a model that used to score well on this held-out set and quietly stops</span>
+<span id="cb8-420"><a href="#cb8-420" aria-hidden="true" tabindex="-1"></a>doing so.</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Fine-Tuning Local LLM for Drilling &amp; Completions</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/djimrastephane/llm-ft-drilling-completions-book/edit/main/chapters/chapter_11.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/djimrastephane/llm-ft-drilling-completions-book/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

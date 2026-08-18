@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>2&nbsp; Turning Drilling &amp; Completions Reports into Training Examples – Fine-Tuning Local LLM for Drilling &amp; Completions</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/chapter_03.html" rel="next">
+<link href="../chapters/chapter_01.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-5a1953863e1f72ef3b996ef827f01ca7.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-f352355e9c4cf757a45f4f8798595620.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/chapter_01.html">Part I — Foundations</a></li><li class="breadcrumb-item"><a href="../chapters/chapter_02.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Turning Drilling &amp; Completions Reports into Training Examples</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Fine-Tuning Local LLM for Drilling &amp; Completions</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/djimrastephane/llm-ft-drilling-completions-book" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="../Fine-Tuning-Local-LLM-for-Drilling---Completions.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../preface.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../acknowledgements.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Acknowledgements</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 0 — Preparing Your Local LLM Workshop</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_00.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Part 0: Preparing Your Local LLM Workshop</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_01.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Loading and Running Your First Local LLM</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_02.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Turning Drilling &amp; Completions Reports into Training Examples</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Baseline Prompting: What the Model Gets Wrong Before Fine-Tuning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_04.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Tokenization and Embeddings for Domain Fine-Tuning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_05.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Your First LoRA Fine-Tune</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Industrialising the System</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_06.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">A Data Quality Gate for Training Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_07.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Formatting and Chunking a Training Set at Scale</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_08.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Fine-Tuning at Scale with Checkpointing and Experiment Tracking</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_09.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Hybrid System: Combining Fine-Tuning with Retrieval</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Traceable Outputs and Hallucination Mitigation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_11.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Evaluating a Fine-Tuned Domain Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Detecting Drift Across Model Versions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_13.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Continuous Fine-Tuning: Keeping the Model Current</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a_environment_setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A: Environment Setup</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a1_jupyter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A1: Using Jupyter Notebook</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a2_vscode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A2: Using VS Code</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a3_pycharm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A3: Using PyCharm Community</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a4_positron.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A4: Using Positron</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a5_terminal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A5: Terminal Only</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_b_glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix B: Drilling, Completions &amp; Fine-Tuning Glossary</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">2.1</span> Learning objectives</a></li>
+  <li><a href="#operational-problem" id="toc-operational-problem" class="nav-link" data-scroll-target="#operational-problem"><span class="header-section-number">2.2</span> Operational Problem</a></li>
+  <li><a href="#example-report-excerpt" id="toc-example-report-excerpt" class="nav-link" data-scroll-target="#example-report-excerpt"><span class="header-section-number">2.3</span> Example report excerpt</a></li>
+  <li><a href="#theory" id="toc-theory" class="nav-link" data-scroll-target="#theory"><span class="header-section-number">2.4</span> Theory</a></li>
+  <li><a href="#why-not-just-write-our-own-summaries" id="toc-why-not-just-write-our-own-summaries" class="nav-link" data-scroll-target="#why-not-just-write-our-own-summaries"><span class="header-section-number">2.5</span> Why not just write our own summaries?</a></li>
+  <li><a href="#implementation" id="toc-implementation" class="nav-link" data-scroll-target="#implementation"><span class="header-section-number">2.6</span> Implementation</a>
+  <ul class="collapse">
+  <li><a href="#step-1-extract-structured-fields-from-one-report" id="toc-step-1-extract-structured-fields-from-one-report" class="nav-link" data-scroll-target="#step-1-extract-structured-fields-from-one-report"><span class="header-section-number">2.6.1</span> Step 1: Extract structured fields from one report</a></li>
+  </ul></li>
+  <li><a href="#what-problem-are-we-solving" id="toc-what-problem-are-we-solving" class="nav-link" data-scroll-target="#what-problem-are-we-solving"><span class="header-section-number">2.7</span> What problem are we solving?</a></li>
+  <li><a href="#inputs" id="toc-inputs" class="nav-link" data-scroll-target="#inputs"><span class="header-section-number">2.8</span> Inputs</a></li>
+  <li><a href="#expected-output" id="toc-expected-output" class="nav-link" data-scroll-target="#expected-output"><span class="header-section-number">2.9</span> Expected Output</a></li>
+  <li><a href="#what-just-happened" id="toc-what-just-happened" class="nav-link" data-scroll-target="#what-just-happened"><span class="header-section-number">2.10</span> What just happened?</a></li>
+  <li><a href="#production-reality" id="toc-production-reality" class="nav-link" data-scroll-target="#production-reality"><span class="header-section-number">2.11</span> Production Reality</a>
+  <ul class="collapse">
+  <li><a href="#step-2-turn-one-reports-fields-into-training-examples" id="toc-step-2-turn-one-reports-fields-into-training-examples" class="nav-link" data-scroll-target="#step-2-turn-one-reports-fields-into-training-examples"><span class="header-section-number">2.11.1</span> Step 2: Turn one report’s fields into training examples</a></li>
+  </ul></li>
+  <li><a href="#what-problem-are-we-solving-1" id="toc-what-problem-are-we-solving-1" class="nav-link" data-scroll-target="#what-problem-are-we-solving-1"><span class="header-section-number">2.12</span> What problem are we solving?</a></li>
+  <li><a href="#inputs-1" id="toc-inputs-1" class="nav-link" data-scroll-target="#inputs-1"><span class="header-section-number">2.13</span> Inputs</a></li>
+  <li><a href="#expected-output-1" id="toc-expected-output-1" class="nav-link" data-scroll-target="#expected-output-1"><span class="header-section-number">2.14</span> Expected Output</a></li>
+  <li><a href="#what-just-happened-1" id="toc-what-just-happened-1" class="nav-link" data-scroll-target="#what-just-happened-1"><span class="header-section-number">2.15</span> What just happened?</a>
+  <ul class="collapse">
+  <li><a href="#step-3-build-and-save-the-full-training-set-minus-one-report-on-purpose" id="toc-step-3-build-and-save-the-full-training-set-minus-one-report-on-purpose" class="nav-link" data-scroll-target="#step-3-build-and-save-the-full-training-set-minus-one-report-on-purpose"><span class="header-section-number">2.15.1</span> Step 3: Build and save the full training set — minus one report, on purpose</a></li>
+  </ul></li>
+  <li><a href="#what-problem-are-we-solving-2" id="toc-what-problem-are-we-solving-2" class="nav-link" data-scroll-target="#what-problem-are-we-solving-2"><span class="header-section-number">2.16</span> What problem are we solving?</a></li>
+  <li><a href="#inputs-2" id="toc-inputs-2" class="nav-link" data-scroll-target="#inputs-2"><span class="header-section-number">2.17</span> Inputs</a></li>
+  <li><a href="#expected-output-2" id="toc-expected-output-2" class="nav-link" data-scroll-target="#expected-output-2"><span class="header-section-number">2.18</span> Expected Output</a></li>
+  <li><a href="#what-just-happened-2" id="toc-what-just-happened-2" class="nav-link" data-scroll-target="#what-just-happened-2"><span class="header-section-number">2.19</span> What just happened?</a></li>
+  <li><a href="#practical-exercise" id="toc-practical-exercise" class="nav-link" data-scroll-target="#practical-exercise"><span class="header-section-number">2.20</span> Practical exercise</a></li>
+  <li><a href="#field-notes" id="toc-field-notes" class="nav-link" data-scroll-target="#field-notes"><span class="header-section-number">2.21</span> Field notes</a></li>
+  <li><a href="#challenge-exercise" id="toc-challenge-exercise" class="nav-link" data-scroll-target="#challenge-exercise"><span class="header-section-number">2.22</span> Challenge exercise</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">2.23</span> Key takeaways</a></li>
+  <li><a href="#repository-files" id="toc-repository-files" class="nav-link" data-scroll-target="#repository-files"><span class="header-section-number">2.24</span> Repository files</a></li>
+  <li><a href="#what-can-you-do-now-that-you-couldnt-do-before" id="toc-what-can-you-do-now-that-you-couldnt-do-before" class="nav-link" data-scroll-target="#what-can-you-do-now-that-you-couldnt-do-before"><span class="header-section-number">2.25</span> What can you do now that you couldn’t do before?</a></li>
+  <li><a href="#suggested-next-step" id="toc-suggested-next-step" class="nav-link" data-scroll-target="#suggested-next-step"><span class="header-section-number">2.26</span> Suggested next step</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/djimrastephane/llm-ft-drilling-completions-book/edit/main/chapters/chapter_02.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/djimrastephane/llm-ft-drilling-completions-book/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/chapter_01.html">Part I — Foundations</a></li><li class="breadcrumb-item"><a href="../chapters/chapter_02.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Turning Drilling &amp; Completions Reports into Training Examples</span></a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span id="sec-chapter-02" class="quarto-section-identifier"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Turning Drilling &amp; Completions Reports into Training Examples</span></span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="pipeline-diagram">
+<p><img src="../figures/diagrams/pipeline_ch02_light.svg" class="diagram-light img-fluid" width="180"> <img src="../figures/diagrams/pipeline_ch02_dark.svg" class="diagram-dark img-fluid" width="180"></p>
+</div>
+<div class="chapter-status">
+<p>Progress <code>██░░░░░░░░░░░</code> <strong>2 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 30–40 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🟢 Beginner</p>
+</div>
+<section id="learning-objectives" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">2.1</span> Learning objectives</h2>
+<p>By the end of this chapter, you will be able to:</p>
+<ul>
+<li>Extract structured fields from a real report PDF with <code>pdfplumber</code></li>
+<li>Explain what an instruction/response training example is, and why its <code>output</code> should come from the report itself rather than a written summary</li>
+<li>Turn a folder of reports into a training-ready <code>.jsonl</code> file</li>
+<li>Recognize when a report doesn’t match your extractor’s assumptions, and handle that case instead of silently getting it wrong</li>
+<li>Explain why one recognized, well-formed report should still be deliberately held out of training, before fine-tuning ever enters the picture</li>
+</ul>
+</section>
+<section id="operational-problem" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="operational-problem"><span class="header-section-number">2.2</span> Operational Problem</h2>
+<p>Oumy, still turning over what Chapter 1 showed her, asks the obvious next question: <em>“The report file itself already says what happened, plainly — ‘Present Operations,’ ‘Activity Planned.’ Why can’t we just point the model at that?”</em></p>
+<p>Because a model doesn’t learn from being pointed at a folder of PDFs. It learns from <em>training examples</em> — a specific, structured shape a fine-tuning process (Chapter 5) can actually consume. This chapter turns that folder of PDFs into exactly that shape, using nothing but the reports’ own words.</p>
+</section>
+<section id="example-report-excerpt" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="example-report-excerpt"><span class="header-section-number">2.3</span> Example report excerpt</h2>
+<p>The same real report from Chapter 1, <code>Drilling_038</code> (2020-11-26), has two short, plain-language fields sitting right at the top of the form, before any of the technical tables:</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Sample report excerpt -- FORGE-16A-78-32_Drilling_038_2020-11-26.pdf">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Sample report excerpt – FORGE-16A-78-32_Drilling_038_2020-11-26.pdf
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<pre><code>PRESENT OPERATIONS: PIPE FREE, TRIP OUT OF HOLE FOR BHA INSPECTION
+ACTIVITY PLANNED: INSPECT BHA, TRIP IN HOLE DRILL CURVE</code></pre>
+</div>
+</div>
+<p>These two fields — a snapshot of “what’s happening right now” and “what’s planned next” — exist on every drilling report in this book’s archive. They’re the raw material this chapter turns into training examples.</p>
+</section>
+<section id="theory" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="theory"><span class="header-section-number">2.4</span> Theory</h2>
+<div class="callout callout-style-default callout-tip callout-titled" title="Engineering Translation: instruction/response pair">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Engineering Translation: instruction/response pair
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A <strong>training example</strong> is like a single flashcard: the question you’d ask (the <em>instruction</em>, plus optional <em>input</em> context), and the correct answer (the <em>output</em>), written down together so a model can study from it later. This book uses that three-part shape — <code>instruction</code>, <code>input</code>, <code>output</code> — throughout.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Engineering Translation: field extraction">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Engineering Translation: field extraction
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Field extraction</strong> means finding one specific labeled piece of information inside a big block of text — the way you’d scan a paper form for the line that starts with “Total:” rather than reading the whole page. This chapter does it with regular expressions (<em>regex</em>): a compact pattern-matching syntax for “find text that looks like this.”</p>
+</div>
+</div>
+</section>
+<section id="why-not-just-write-our-own-summaries" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="why-not-just-write-our-own-summaries"><span class="header-section-number">2.5</span> Why not just write our own summaries?</h2>
+<p>A tempting shortcut: read each report and write a one-sentence summary by hand (or ask another AI to write one), and use that as the training <code>output</code>. Resist it. The moment a summary is written by anyone other than the report itself, it can be subtly wrong — a detail dropped, a number transposed, a plausible-sounding guess where the report was actually ambiguous — and that error becomes permanent, invisible ground truth. Later chapters build a data quality gate (Chapter 6) and an evaluation harness (Chapter 11) that both assume your labels are trustworthy; if the labels themselves are fabricated, everything built on top of them inherits the mistake.</p>
+<p>This chapter’s technique sidesteps the problem entirely: every <code>output</code> below is the report’s own field value, extracted verbatim. Nothing is summarized, paraphrased, or invented. It’s a narrower kind of training example than a rich free-text summary would be — Chapter 7 builds richer ones — but every word of it is real.</p>
+</section>
+<section id="implementation" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="implementation"><span class="header-section-number">2.6</span> Implementation</h2>
+<section id="step-1-extract-structured-fields-from-one-report" class="level3" data-number="2.6.1">
+<h3 data-number="2.6.1" class="anchored" data-anchor-id="step-1-extract-structured-fields-from-one-report"><span class="header-section-number">2.6.1</span> Step 1: Extract structured fields from one report</h3>
+</section>
+</section>
+<section id="what-problem-are-we-solving" class="level2" data-number="2.7">
+<h2 data-number="2.7" class="anchored" data-anchor-id="what-problem-are-we-solving"><span class="header-section-number">2.7</span> What problem are we solving?</h2>
+<p>Before anything can become a training example, you need the report’s raw text, and then the two specific fields inside it — <code>PRESENT OPERATIONS</code> and <code>ACTIVITY PLANNED</code> — pulled out from everything else on the form (casing tables, mud properties, survey data) that isn’t relevant here.</p>
+</section>
+<section id="inputs" class="level2" data-number="2.8">
+<h2 data-number="2.8" class="anchored" data-anchor-id="inputs"><span class="header-section-number">2.8</span> Inputs</h2>
+<ul>
+<li>One report PDF, e.g.&nbsp;<code>datasets/sample_training_set/FORGE-16A-78-32_Drilling_038_2020-11-26.pdf</code></li>
+</ul>
+</section>
+<section id="expected-output" class="level2" data-number="2.9">
+<h2 data-number="2.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">2.9</span> Expected Output</h2>
+<p>A dictionary of the fields this report actually contains.</p>
+<div id="9ea725ec" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pdfplumber</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>FIELD_PATTERNS <span class="op">=</span> {</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"well_name"</span>: <span class="vs">r"WELL NAME:</span><span class="dv">\s</span><span class="op">*</span><span class="kw">(</span><span class="dv">.</span><span class="op">+?</span><span class="kw">)</span><span class="dv">\s</span><span class="op">+</span><span class="vs">JOB:"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rpt_date"</span>: <span class="vs">r"RPT DATE:</span><span class="dv">\s</span><span class="op">*</span><span class="kw">(</span><span class="pp">[</span><span class="dv">\d</span><span class="pp">/]</span><span class="op">+</span><span class="kw">)</span><span class="vs">"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rpt_num"</span>: <span class="vs">r"RPT NUM</span><span class="ch">\.</span><span class="op">?</span><span class="vs">:</span><span class="dv">\s</span><span class="op">*</span><span class="kw">(</span><span class="dv">\d</span><span class="op">+</span><span class="kw">)</span><span class="vs">"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"present_operations"</span>: <span class="vs">r"PRESENT OPERATIONS:</span><span class="dv">\s</span><span class="op">*</span><span class="kw">(</span><span class="dv">.</span><span class="op">+?</span><span class="kw">)</span><span class="ch">\n</span><span class="vs">ACTIVITY PLANNED"</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"activity_planned"</span>: <span class="vs">r"ACTIVITY PLANNED:</span><span class="dv">\s</span><span class="op">*</span><span class="kw">(</span><span class="dv">.</span><span class="op">+?</span><span class="kw">)</span><span class="ch">\n</span><span class="vs">"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extract_text(pdf_path):</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> pdfplumber.<span class="bu">open</span>(pdf_path) <span class="im">as</span> pdf:</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> pdf.pages[<span class="dv">0</span>].extract_text()</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extract_fields(text):</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    fields <span class="op">=</span> {}</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name, pattern <span class="kw">in</span> FIELD_PATTERNS.items():</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        match <span class="op">=</span> re.search(pattern, text)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        fields[name] <span class="op">=</span> match.group(<span class="dv">1</span>).strip() <span class="cf">if</span> match <span class="cf">else</span> <span class="va">None</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fields</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>text <span class="op">=</span> extract_text(<span class="st">"datasets/sample_training_set/FORGE-16A-78-32_Drilling_038_2020-11-26.pdf"</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(extract_fields(text))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Running this exact code prints:</p>
+<pre><code>{'well_name': 'FORGE 16A [78]-32', 'rpt_date': '11/26/2020', 'rpt_num': '38',
+ 'present_operations': 'PIPE FREE, TRIP OUT OF HOLE FOR BHA INSPECTION',
+ 'activity_planned': 'INSPECT BHA, TRIP IN HOLE DRILL CURVE'}</code></pre>
+</section>
+<section id="what-just-happened" class="level2" data-number="2.10">
+<h2 data-number="2.10" class="anchored" data-anchor-id="what-just-happened"><span class="header-section-number">2.10</span> What just happened?</h2>
+<p><code>pdfplumber</code> read the PDF and returned its text as one long string — column layout flattened, so lines that appear side by side on the page (like a table’s column headers and a row of values) can end up on separate lines here. <code>extract_fields</code> then used regex to find each labeled field regardless of exactly where it landed in that string.</p>
+</section>
+<section id="production-reality" class="level2" data-number="2.11">
+<h2 data-number="2.11" class="anchored" data-anchor-id="production-reality"><span class="header-section-number">2.11</span> Production Reality</h2>
+<p>This regex assumes a specific, fixed field layout — the one every <code>Drilling_NNN</code> report in this archive happens to share. <code>pdfplumber</code> itself doesn’t get everything right either: scanned or handwritten reports don’t have extractable text at all (Chapter 6 covers detecting that). And even for a clean, digital report, a different operator’s form, or even this same operator’s <em>completion</em> reports, can use different field labels entirely — which is exactly what you’ll run into next.</p>
+<section id="step-2-turn-one-reports-fields-into-training-examples" class="level3" data-number="2.11.1">
+<h3 data-number="2.11.1" class="anchored" data-anchor-id="step-2-turn-one-reports-fields-into-training-examples"><span class="header-section-number">2.11.1</span> Step 2: Turn one report’s fields into training examples</h3>
+</section>
+</section>
+<section id="what-problem-are-we-solving-1" class="level2" data-number="2.12">
+<h2 data-number="2.12" class="anchored" data-anchor-id="what-problem-are-we-solving-1"><span class="header-section-number">2.12</span> What problem are we solving?</h2>
+<p>Extracted fields aren’t training examples yet — they need to be reshaped into the <code>instruction</code> / <code>input</code> / <code>output</code> triples a fine-tuning process expects, and a report that doesn’t have both fields needs to be skipped rather than silently producing a broken example.</p>
+</section>
+<section id="inputs-1" class="level2" data-number="2.13">
+<h2 data-number="2.13" class="anchored" data-anchor-id="inputs-1"><span class="header-section-number">2.13</span> Inputs</h2>
+<ul>
+<li>The <code>extract_fields()</code> dictionary from Step 1, for every report in <code>datasets/sample_training_set/</code></li>
+</ul>
+</section>
+<section id="expected-output-1" class="level2" data-number="2.14">
+<h2 data-number="2.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">2.14</span> Expected Output</h2>
+<p>Two training examples per successfully-parsed report; a printed notice naming any report that was skipped.</p>
+<div id="09c27c6d" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> normalize_date(raw_date):</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> datetime.strptime(raw_date, <span class="st">"%m/</span><span class="sc">%d</span><span class="st">/%Y"</span>).strftime(<span class="st">"%Y-%m-</span><span class="sc">%d</span><span class="st">"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_examples_for_report(pdf_path):</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    text <span class="op">=</span> extract_text(pdf_path)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    fields <span class="op">=</span> extract_fields(text)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> fields[<span class="st">"present_operations"</span>] <span class="kw">or</span> <span class="kw">not</span> fields[<span class="st">"activity_planned"</span>]:</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> []  <span class="co"># unrecognized field layout -- see Production Reality above</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    context <span class="op">=</span> (</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Well: </span><span class="sc">{</span>fields[<span class="st">'well_name'</span>]<span class="sc">}</span><span class="ss"> | Report #</span><span class="sc">{</span>fields[<span class="st">'rpt_num'</span>]<span class="sc">}</span><span class="ss"> | "</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Date: </span><span class="sc">{</span>normalize_date(fields[<span class="st">'rpt_date'</span>])<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">"instruction"</span>: <span class="st">"What are the present operations reported on this well?"</span>,</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">"input"</span>: context,</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">"output"</span>: fields[<span class="st">"present_operations"</span>],</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>            <span class="st">"instruction"</span>: <span class="st">"What activity is planned next?"</span>,</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>            <span class="st">"input"</span>: context,</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>            <span class="st">"output"</span>: fields[<span class="st">"activity_planned"</span>],</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    ]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Running <code>build_examples_for_report()</code> on <code>Drilling_038</code> prints:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">[</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"instruction"</span><span class="fu">:</span> <span class="st">"What are the present operations reported on this well?"</span><span class="fu">,</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"input"</span><span class="fu">:</span> <span class="st">"Well: FORGE 16A [78]-32 | Report #38 | Date: 2020-11-26"</span><span class="fu">,</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"output"</span><span class="fu">:</span> <span class="st">"PIPE FREE, TRIP OUT OF HOLE FOR BHA INSPECTION"</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"instruction"</span><span class="fu">:</span> <span class="st">"What activity is planned next?"</span><span class="fu">,</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"input"</span><span class="fu">:</span> <span class="st">"Well: FORGE 16A [78]-32 | Report #38 | Date: 2020-11-26"</span><span class="fu">,</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"output"</span><span class="fu">:</span> <span class="st">"INSPECT BHA, TRIP IN HOLE DRILL CURVE"</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="ot">]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="what-just-happened-1" class="level2" data-number="2.15">
+<h2 data-number="2.15" class="anchored" data-anchor-id="what-just-happened-1"><span class="header-section-number">2.15</span> What just happened?</h2>
+<p>Each report becomes two training examples, one per field, sharing the same <code>input</code> context (well, report number, date) so the model can learn to condition its answer on which report is being asked about. <code>normalize_date</code> just makes every date consistently <code>YYYY-MM-DD</code>, since this archive’s own reports don’t all format dates the same way.</p>
+<section id="step-3-build-and-save-the-full-training-set-minus-one-report-on-purpose" class="level3" data-number="2.15.1">
+<h3 data-number="2.15.1" class="anchored" data-anchor-id="step-3-build-and-save-the-full-training-set-minus-one-report-on-purpose"><span class="header-section-number">2.15.1</span> Step 3: Build and save the full training set — minus one report, on purpose</h3>
+</section>
+</section>
+<section id="what-problem-are-we-solving-2" class="level2" data-number="2.16">
+<h2 data-number="2.16" class="anchored" data-anchor-id="what-problem-are-we-solving-2"><span class="header-section-number">2.16</span> What problem are we solving?</h2>
+<p>One report is a proof of concept; Chapter 5’s fine-tune needs the whole sample archive, saved to a file the next chapters can load without re-running PDF extraction every time. But if Chapter 5 trains on every report and then tests on those same reports, a good score would only prove the model <em>memorized</em> 18 flashcards — not that fine-tuning taught it anything that generalizes. This step reserves one drilling report, <code>Drilling_037</code> (2020-11-25), out of the training set entirely, so Chapter 5 has a report the model has genuinely never seen to test against.</p>
+</section>
+<section id="inputs-2" class="level2" data-number="2.17">
+<h2 data-number="2.17" class="anchored" data-anchor-id="inputs-2"><span class="header-section-number">2.17</span> Inputs</h2>
+<ul>
+<li>Every PDF in <code>datasets/sample_training_set/</code></li>
+</ul>
+</section>
+<section id="expected-output-2" class="level2" data-number="2.18">
+<h2 data-number="2.18" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">2.18</span> Expected Output</h2>
+<p>A <code>.jsonl</code> file (one JSON object per line — the standard format this book uses for training data) plus summary lines reporting the held-out report, how many examples were built, and how many reports were skipped.</p>
+<div id="40135e35" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>SAMPLE_SET_DIR <span class="op">=</span> Path(<span class="st">"datasets/sample_training_set"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>OUTPUT_PATH <span class="op">=</span> Path(<span class="st">"datasets/training_examples/sample_training_examples.jsonl"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>HELD_OUT_REPORT <span class="op">=</span> <span class="st">"FORGE-16A-78-32_Drilling_037_2020-11-25.pdf"</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_training_examples(sample_dir<span class="op">=</span>SAMPLE_SET_DIR):</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    examples, skipped, held_out <span class="op">=</span> [], [], []</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> pdf_path <span class="kw">in</span> <span class="bu">sorted</span>(sample_dir.glob(<span class="st">"*.pdf"</span>)):</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> pdf_path.name <span class="op">==</span> HELD_OUT_REPORT:</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>            held_out.append(pdf_path.name)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>        report_examples <span class="op">=</span> build_examples_for_report(pdf_path)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> report_examples:</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>            examples.extend(report_examples)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>            skipped.append(pdf_path.name)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> held_out:</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Reserved </span><span class="sc">{</span><span class="bu">len</span>(held_out)<span class="sc">}</span><span class="ss"> held-out report(s) for Chapter 5's generalization check: </span><span class="sc">{</span>held_out<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> skipped:</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Skipped </span><span class="sc">{</span><span class="bu">len</span>(skipped)<span class="sc">}</span><span class="ss"> report(s) with an unrecognized field layout: </span><span class="sc">{</span>skipped<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> examples</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_examples_jsonl(examples, output_path<span class="op">=</span>OUTPUT_PATH):</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    output_path.parent.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> output_path.<span class="bu">open</span>(<span class="st">"w"</span>, encoding<span class="op">=</span><span class="st">"utf-8"</span>) <span class="im">as</span> f:</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> example <span class="kw">in</span> examples:</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>            f.write(json.dumps(example) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>examples <span class="op">=</span> build_training_examples()</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>save_examples_jsonl(examples)</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Built </span><span class="sc">{</span><span class="bu">len</span>(examples)<span class="sc">}</span><span class="ss"> training examples -&gt; </span><span class="sc">{</span>OUTPUT_PATH<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Running this exact code prints:</p>
+<pre><code>Reserved 1 held-out report(s) for Chapter 5's generalization check: ['FORGE-16A-78-32_Drilling_037_2020-11-25.pdf']
+Skipped 1 report(s) with an unrecognized field layout: ['FORGE-16A-78-32_Completion_003_2021-01-06.pdf']
+Built 16 training examples -&gt; datasets/training_examples/sample_training_examples.jsonl</code></pre>
+</section>
+<section id="what-just-happened-2" class="level2" data-number="2.19">
+<h2 data-number="2.19" class="anchored" data-anchor-id="what-just-happened-2"><span class="header-section-number">2.19</span> What just happened?</h2>
+<p>Of the ten sample reports, one (<code>Completion_003</code>) is a <em>completion</em> report using different field labels (<code>Present Ops:</code> / <code>Next 24 Hours:</code> instead of <code>PRESENT OPERATIONS:</code> / <code>ACTIVITY PLANNED:</code>) and gets correctly skipped rather than silently producing a garbage example. A second, <code>Drilling_037</code>, is a perfectly normal, recognized drilling report — it isn’t skipped for a data-quality reason, it’s <em>deliberately withheld</em> from training. That leaves eight reports, each contributing two examples — 16 total. <code>datasets/training_examples/</code> is generated, not committed to this repository — regenerate it any time by re-running this script (see <code>book/.gitignore</code>).</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Engineering Translation: held-out data">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Engineering Translation: held-out data
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Held-out data</strong> is data you deliberately keep out of training so you have something honest to test on afterward — like a well test string never touched during a workover, kept clean specifically so its before/after readings mean something. A model tested only on the exact data it trained on can’t tell you whether it learned anything general; it can only tell you whether it memorized.</p>
+</div>
+</div>
+<p>This is a deliberately simple first training set — every <code>output</code> is a single field value copied verbatim from a report, not a rich summary or judgment call. That’s on purpose (see “Why not just write our own summaries?” above), but it also means this training set mostly teaches field recall, not operational reasoning. Later chapters build richer training examples (Chapter 7) and a proper evaluation harness beyond one held-out report (Chapter 11); this chapter’s job is just to get a first, honest training/held-out split in place before fine-tuning ever starts.</p>
+</section>
+<section id="practical-exercise" class="level2" data-number="2.20">
+<h2 data-number="2.20" class="anchored" data-anchor-id="practical-exercise"><span class="header-section-number">2.20</span> Practical exercise</h2>
+<p>🟢 <strong>Beginner</strong></p>
+<p><strong>Try it yourself:</strong> run <code>python code/chapter_02/build_training_examples.py</code> from inside <code>book/</code>, then open the generated <code>datasets/training_examples/sample_training_examples.jsonl</code> in a text editor.</p>
+<p><strong>You’ll know it worked when:</strong> the script prints <code>Built 16 training examples</code>, the file has exactly 16 lines, the first one matches report <code>#3</code> (<code>Drilling_003</code>, 2020-10-22) — the earliest report in the sample set — and no line anywhere in the file mentions <code>Report #37</code>.</p>
+</section>
+<section id="field-notes" class="level2" data-number="2.21">
+<h2 data-number="2.21" class="anchored" data-anchor-id="field-notes"><span class="header-section-number">2.21</span> Field notes</h2>
+<div class="callout callout-style-default callout-warning callout-titled" title="Field notes: one field, not the whole story">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Field notes: one field, not the whole story
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Query/Action:</strong> extracting fields for reports <code>#49</code> and <code>#50</code> — the same packers-fail-to-fishing sequence referenced in the author’s previous book.</p>
+<p><strong>Result:</strong> report <code>#49</code>’s <code>activity_planned</code> is literally <code>"FISHING OPERATIONS"</code> — confirming that real event directly from this archive. Report <code>#50</code>’s <code>present_operations</code>, the very next day, is <code>"TRIP IN HOLE WITH DIRECTIONAL BHA"</code> — not a restatement of “fishing” at all, even though report <code>#49</code> had just announced it as the plan.</p>
+<p><strong>Why:</strong> the reports say (report <code>#49</code>, activity planned): <code>"FISHING OPERATIONS"</code>; (report <code>#50</code>, present operations): <code>"TRIP IN HOLE WITH DIRECTIONAL BHA"</code>. Each field is a narrow, honest snapshot of <em>one</em> report at <em>one</em> moment — it was never written to also summarize what happened the next day.</p>
+<p><strong>Lesson:</strong> even perfectly clean, extractive ground truth like this only answers questions about a single report in isolation. Connecting the story across reports — the plan in <code>#49</code> to the actual outcome by <code>#50</code> — needs more than two fields from one PDF. That’s exactly why Part II exists: Chapter 9’s hybrid retrieval is what eventually lets a question span more than one report.</p>
+</div>
+</div>
+</section>
+<section id="challenge-exercise" class="level2" data-number="2.22">
+<h2 data-number="2.22" class="anchored" data-anchor-id="challenge-exercise"><span class="header-section-number">2.22</span> Challenge exercise</h2>
+<p>🟠 <strong>Intermediate</strong></p>
+<p><strong>Challenge:</strong> extend <code>build_examples_for_report()</code> to also handle the completion report’s different field layout (<code>Present Ops:</code> / <code>Next 24 Hours:</code>, and a two-digit-year date format), so 9 of the 10 sample reports contribute examples instead of 8 (<code>Drilling_037</code> stays reserved either way — see Step 3). A reference solution is at <code>code/chapter_02/challenge/challenge.py</code> — it produces 18 training examples total, 0 reports skipped.</p>
+</section>
+<section id="key-takeaways" class="level2" data-number="2.23">
+<h2 data-number="2.23" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">2.23</span> Key takeaways</h2>
+<ul>
+<li>A training example in this book is an <code>instruction</code> / <code>input</code> / <code>output</code> triple — a single flashcard the model can study from.</li>
+<li>Using a report’s own self-reported fields as the <code>output</code> avoids fabricating ground truth; the label is never anyone’s guess.</li>
+<li><code>pdfplumber</code> plus a handful of regex patterns reliably extracts structured fields from a fixed-form report — but only the form layout it was written for.</li>
+<li>Different report types (drilling vs.&nbsp;completion) can use different field labels even within the same archive. Detect and skip what your extractor doesn’t recognize, rather than silently producing a bad example.</li>
+<li>Skipping and holding out are different things done for different reasons: a report gets <em>skipped</em> because your extractor can’t parse it; a report gets <em>held out</em> on purpose, even though it parses fine, so there’s an honest, unseen test left once fine-tuning starts.</li>
+</ul>
+</section>
+<section id="repository-files" class="level2" data-number="2.24">
+<h2 data-number="2.24" class="anchored" data-anchor-id="repository-files"><span class="header-section-number">2.24</span> Repository files</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>code/chapter_02/build_training_examples.py</code></td>
+<td>Extracts fields and builds instruction/response training examples</td>
+</tr>
+<tr class="even">
+<td><code>code/chapter_02/challenge/challenge.py</code></td>
+<td>Reference solution: also handles the completion report’s field layout</td>
+</tr>
+<tr class="odd">
+<td><code>datasets/sample_training_set/</code></td>
+<td>The 10 source report PDFs this chapter reads</td>
+</tr>
+<tr class="even">
+<td><code>datasets/training_examples/sample_training_examples.jsonl</code></td>
+<td>Generated output (not committed — regenerate by running the script)</td>
+</tr>
+<tr class="odd">
+<td><code>notebooks/chapter_02_explore.ipynb</code></td>
+<td>Interactive companion notebook</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-caution callout-titled" title="CHECKPOINT — Chapter 2">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Caution</span>CHECKPOINT — Chapter 2
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Extracted structured fields from a real report PDF with <code>pdfplumber</code></label></li>
+<li><label><input type="checkbox" checked="">Built instruction/response training examples using a report’s own words as ground truth</label></li>
+<li><label><input type="checkbox" checked="">Detected and skipped a report with an unrecognized field layout, instead of silently mishandling it</label></li>
+<li><label><input type="checkbox" checked="">Reserved one recognized, well-formed report as held-out data, instead of training on everything available</label></li>
+</ul>
+</div>
+</div>
+<div class="built-box callout callout-style-default callout-tip callout-titled" title="✓ WHAT YOU BUILT">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>✓ WHAT YOU BUILT
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong><code>build_training_examples.py</code></strong> — turns 8 of the 9 drilling-format reports in <code>datasets/sample_training_set/</code> into 16 real training examples, saved to <code>datasets/training_examples/sample_training_examples.jsonl</code>. The 9th, <code>Drilling_037</code>, is reserved untouched for Chapter 5’s held-out generalization check. Chapter 5 fine-tunes on data built exactly this way, at a larger scale.</p>
+</div>
+</div>
+</section>
+<section id="what-can-you-do-now-that-you-couldnt-do-before" class="level2" data-number="2.25">
+<h2 data-number="2.25" class="anchored" data-anchor-id="what-can-you-do-now-that-you-couldnt-do-before"><span class="header-section-number">2.25</span> What can you do now that you couldn’t do before?</h2>
+<p>You can turn a folder of real, inconsistently-formatted report PDFs into a training-ready dataset without inventing a single label — and you know precisely which reports your extractor handles and which it doesn’t, instead of hoping.</p>
+</section>
+<section id="suggested-next-step" class="level2" data-number="2.26">
+<h2 data-number="2.26" class="anchored" data-anchor-id="suggested-next-step"><span class="header-section-number">2.26</span> Suggested next step</h2>
+<p><strong>Coming up in Chapter 3:</strong> before spending any time actually fine-tuning, Chapter 3 runs a proper baseline test — the base model against a batch of real questions drawn from the 16 training examples you just built — so you have hard, reproducible evidence of exactly what it gets wrong, and something concrete to compare Chapter 5’s fine-tuned model against afterward. <code>Drilling_037</code>, held out here, stays untouched until Chapter 5.</p>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/chapter_01.html" class="pagination-link" aria-label="Loading and Running Your First Local LLM">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Loading and Running Your First Local LLM</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/chapter_03.html" class="pagination-link" aria-label="Baseline Prompting: What the Model Gets Wrong Before Fine-Tuning">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Baseline Prompting: What the Model Gets Wrong Before Fine-Tuning</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Turning Drilling &amp; Completions Reports into Training Examples {#sec-chapter-02}</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>::: {.content-visible when-format="html"}</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>::: {.pipeline-diagram}</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="al">![](../figures/diagrams/pipeline_ch02_light.svg)</span>{.diagram-light width="180"}</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="al">![](../figures/diagrams/pipeline_ch02_dark.svg)</span>{.diagram-dark width="180"}</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>::: {.content-visible when-format="pdf"}</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="al">![](../figures/diagrams/pipeline_ch02.pdf)</span>{width="180" fig-align="center"}</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>::: {.chapter-status}</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`██░░░░░░░░░░░`</span> **2 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 30–40 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🟢 Beginner</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learning objectives</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>By the end of this chapter, you will be able to:</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Extract structured fields from a real report PDF with <span class="in">`pdfplumber`</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Explain what an instruction/response training example is, and why its</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  <span class="in">`output`</span> should come from the report itself rather than a written</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  summary</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Turn a folder of reports into a training-ready <span class="in">`.jsonl`</span> file</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Recognize when a report doesn't match your extractor's assumptions,</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>  and handle that case instead of silently getting it wrong</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Explain why one recognized, well-formed report should still be</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>  deliberately held out of training, before fine-tuning ever enters</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>  the picture</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="fu">## Operational Problem</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>Oumy, still turning over what Chapter 1 showed her, asks the obvious</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>next question: *"The report file itself already says what happened,</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>plainly — 'Present Operations,' 'Activity Planned.' Why can't we just</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>point the model at that?"*</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>Because a model doesn't learn from being pointed at a folder of PDFs. It</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>learns from *training examples* — a specific, structured shape a</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>fine-tuning process (Chapter 5) can actually consume. This chapter turns</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>that folder of PDFs into exactly that shape, using nothing but the</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>reports' own words.</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a><span class="fu">## Example report excerpt</span></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>The same real report from Chapter 1, <span class="in">`Drilling_038`</span> (2020-11-26), has</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>two short, plain-language fields sitting right at the top of the form,</span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>before any of the technical tables:</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="Sample report excerpt -- FORGE-16A-78-32_Drilling_038_2020-11-26.pdf"}</span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a><span class="in">PRESENT OPERATIONS: PIPE FREE, TRIP OUT OF HOLE FOR BHA INSPECTION</span></span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a><span class="in">ACTIVITY PLANNED: INSPECT BHA, TRIP IN HOLE DRILL CURVE</span></span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>These two fields — a snapshot of "what's happening right now" and</span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>"what's planned next" — exist on every drilling report in this book's</span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>archive. They're the raw material this chapter turns into training</span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>examples.</span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a><span class="fu">## Theory</span></span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Engineering Translation: instruction/response pair"}</span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>A **training example** is like a single flashcard: the question you'd</span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>ask (the *instruction*, plus optional *input* context), and the correct</span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>answer (the *output*), written down together so a model can study from</span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>it later. This book uses that three-part shape — <span class="in">`instruction`</span>,</span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a><span class="in">`input`</span>, <span class="in">`output`</span> — throughout.</span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Engineering Translation: field extraction"}</span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>**Field extraction** means finding one specific labeled piece of</span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>information inside a big block of text — the way you'd scan a paper</span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>form for the line that starts with "Total:" rather than reading the</span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>whole page. This chapter does it with regular expressions (*regex*): a</span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>compact pattern-matching syntax for "find text that looks like this."</span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why not just write our own summaries?</span></span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a>A tempting shortcut: read each report and write a one-sentence summary</span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a>by hand (or ask another AI to write one), and use that as the training</span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a><span class="in">`output`</span>. Resist it. The moment a summary is written by anyone other</span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a>than the report itself, it can be subtly wrong — a detail dropped, a</span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a>number transposed, a plausible-sounding guess where the report was</span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a>actually ambiguous — and that error becomes permanent, invisible ground</span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a>truth. Later chapters build a data quality gate (Chapter 6) and an</span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a>evaluation harness (Chapter 11) that both assume your labels are</span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a>trustworthy; if the labels themselves are fabricated, everything built</span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a>on top of them inherits the mistake.</span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a>This chapter's technique sidesteps the problem entirely: every <span class="in">`output`</span></span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a>below is the report's own field value, extracted verbatim. Nothing is</span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a>summarized, paraphrased, or invented. It's a narrower kind of training</span>
+<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a>example than a rich free-text summary would be — Chapter 7 builds</span>
+<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a>richer ones — but every word of it is real.</span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a><span class="fu">## Implementation</span></span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 1: Extract structured fields from one report</span></span>
+<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a>Before anything can become a training example, you need the report's</span>
+<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a>raw text, and then the two specific fields inside it — `PRESENT</span>
+<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a>OPERATIONS<span class="in">` and `</span>ACTIVITY PLANNED` — pulled out from everything else on</span>
+<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a>the form (casing tables, mud properties, survey data) that isn't</span>
+<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a>relevant here.</span>
+<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>One report PDF, e.g. <span class="in">`datasets/sample_training_set/FORGE-16A-78-32_Drilling_038_2020-11-26.pdf`</span></span>
+<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a>A dictionary of the fields this report actually contains.</span>
+<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pdfplumber</span>
+<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a>FIELD_PATTERNS <span class="op">=</span> {</span>
+<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a>    <span class="st">"well_name"</span>: <span class="vs">r"WELL NAME:</span><span class="dv">\s</span><span class="op">*</span><span class="kw">(</span><span class="dv">.</span><span class="op">+?</span><span class="kw">)</span><span class="dv">\s</span><span class="op">+</span><span class="vs">JOB:"</span>,</span>
+<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rpt_date"</span>: <span class="vs">r"RPT DATE:</span><span class="dv">\s</span><span class="op">*</span><span class="kw">(</span><span class="pp">[</span><span class="dv">\d</span><span class="pp">/]</span><span class="op">+</span><span class="kw">)</span><span class="vs">"</span>,</span>
+<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rpt_num"</span>: <span class="vs">r"RPT NUM</span><span class="ch">\.</span><span class="op">?</span><span class="vs">:</span><span class="dv">\s</span><span class="op">*</span><span class="kw">(</span><span class="dv">\d</span><span class="op">+</span><span class="kw">)</span><span class="vs">"</span>,</span>
+<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a>    <span class="st">"present_operations"</span>: <span class="vs">r"PRESENT OPERATIONS:</span><span class="dv">\s</span><span class="op">*</span><span class="kw">(</span><span class="dv">.</span><span class="op">+?</span><span class="kw">)</span><span class="ch">\n</span><span class="vs">ACTIVITY PLANNED"</span>,</span>
+<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a>    <span class="st">"activity_planned"</span>: <span class="vs">r"ACTIVITY PLANNED:</span><span class="dv">\s</span><span class="op">*</span><span class="kw">(</span><span class="dv">.</span><span class="op">+?</span><span class="kw">)</span><span class="ch">\n</span><span class="vs">"</span>,</span>
+<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extract_text(pdf_path):</span>
+<span id="cb8-137"><a href="#cb8-137" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> pdfplumber.<span class="bu">open</span>(pdf_path) <span class="im">as</span> pdf:</span>
+<span id="cb8-138"><a href="#cb8-138" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> pdf.pages[<span class="dv">0</span>].extract_text()</span>
+<span id="cb8-139"><a href="#cb8-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extract_fields(text):</span>
+<span id="cb8-141"><a href="#cb8-141" aria-hidden="true" tabindex="-1"></a>    fields <span class="op">=</span> {}</span>
+<span id="cb8-142"><a href="#cb8-142" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name, pattern <span class="kw">in</span> FIELD_PATTERNS.items():</span>
+<span id="cb8-143"><a href="#cb8-143" aria-hidden="true" tabindex="-1"></a>        match <span class="op">=</span> re.search(pattern, text)</span>
+<span id="cb8-144"><a href="#cb8-144" aria-hidden="true" tabindex="-1"></a>        fields[name] <span class="op">=</span> match.group(<span class="dv">1</span>).strip() <span class="cf">if</span> match <span class="cf">else</span> <span class="va">None</span></span>
+<span id="cb8-145"><a href="#cb8-145" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fields</span>
+<span id="cb8-146"><a href="#cb8-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-147"><a href="#cb8-147" aria-hidden="true" tabindex="-1"></a>text <span class="op">=</span> extract_text(<span class="st">"datasets/sample_training_set/FORGE-16A-78-32_Drilling_038_2020-11-26.pdf"</span>)</span>
+<span id="cb8-148"><a href="#cb8-148" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(extract_fields(text))</span>
+<span id="cb8-149"><a href="#cb8-149" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-150"><a href="#cb8-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-151"><a href="#cb8-151" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-152"><a href="#cb8-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-153"><a href="#cb8-153" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-154"><a href="#cb8-154" aria-hidden="true" tabindex="-1"></a><span class="in">{'well_name': 'FORGE 16A [78]-32', 'rpt_date': '11/26/2020', 'rpt_num': '38',</span></span>
+<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a><span class="in"> 'present_operations': 'PIPE FREE, TRIP OUT OF HOLE FOR BHA INSPECTION',</span></span>
+<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a><span class="in"> 'activity_planned': 'INSPECT BHA, TRIP IN HOLE DRILL CURVE'}</span></span>
+<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-160"><a href="#cb8-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-161"><a href="#cb8-161" aria-hidden="true" tabindex="-1"></a><span class="in">`pdfplumber`</span> read the PDF and returned its text as one long string —</span>
+<span id="cb8-162"><a href="#cb8-162" aria-hidden="true" tabindex="-1"></a>column layout flattened, so lines that appear side by side on the page</span>
+<span id="cb8-163"><a href="#cb8-163" aria-hidden="true" tabindex="-1"></a>(like a table's column headers and a row of values) can end up on</span>
+<span id="cb8-164"><a href="#cb8-164" aria-hidden="true" tabindex="-1"></a>separate lines here. <span class="in">`extract_fields`</span> then used regex to find each</span>
+<span id="cb8-165"><a href="#cb8-165" aria-hidden="true" tabindex="-1"></a>labeled field regardless of exactly where it landed in that string.</span>
+<span id="cb8-166"><a href="#cb8-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-167"><a href="#cb8-167" aria-hidden="true" tabindex="-1"></a><span class="fu">## Production Reality</span></span>
+<span id="cb8-168"><a href="#cb8-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-169"><a href="#cb8-169" aria-hidden="true" tabindex="-1"></a>This regex assumes a specific, fixed field layout — the one every</span>
+<span id="cb8-170"><a href="#cb8-170" aria-hidden="true" tabindex="-1"></a><span class="in">`Drilling_NNN`</span> report in this archive happens to share. <span class="in">`pdfplumber`</span></span>
+<span id="cb8-171"><a href="#cb8-171" aria-hidden="true" tabindex="-1"></a>itself doesn't get everything right either: scanned or handwritten</span>
+<span id="cb8-172"><a href="#cb8-172" aria-hidden="true" tabindex="-1"></a>reports don't have extractable text at all (Chapter 6 covers detecting</span>
+<span id="cb8-173"><a href="#cb8-173" aria-hidden="true" tabindex="-1"></a>that). And even for a clean, digital report, a different operator's</span>
+<span id="cb8-174"><a href="#cb8-174" aria-hidden="true" tabindex="-1"></a>form, or even this same operator's *completion* reports, can use</span>
+<span id="cb8-175"><a href="#cb8-175" aria-hidden="true" tabindex="-1"></a>different field labels entirely — which is exactly what you'll run into</span>
+<span id="cb8-176"><a href="#cb8-176" aria-hidden="true" tabindex="-1"></a>next.</span>
+<span id="cb8-177"><a href="#cb8-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-178"><a href="#cb8-178" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 2: Turn one report's fields into training examples</span></span>
+<span id="cb8-179"><a href="#cb8-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-180"><a href="#cb8-180" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-181"><a href="#cb8-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-182"><a href="#cb8-182" aria-hidden="true" tabindex="-1"></a>Extracted fields aren't training examples yet — they need to be</span>
+<span id="cb8-183"><a href="#cb8-183" aria-hidden="true" tabindex="-1"></a>reshaped into the <span class="in">`instruction`</span> / <span class="in">`input`</span> / <span class="in">`output`</span> triples a</span>
+<span id="cb8-184"><a href="#cb8-184" aria-hidden="true" tabindex="-1"></a>fine-tuning process expects, and a report that doesn't have both fields</span>
+<span id="cb8-185"><a href="#cb8-185" aria-hidden="true" tabindex="-1"></a>needs to be skipped rather than silently producing a broken example.</span>
+<span id="cb8-186"><a href="#cb8-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-187"><a href="#cb8-187" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-188"><a href="#cb8-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-189"><a href="#cb8-189" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The <span class="in">`extract_fields()`</span> dictionary from Step 1, for every report in</span>
+<span id="cb8-190"><a href="#cb8-190" aria-hidden="true" tabindex="-1"></a>  <span class="in">`datasets/sample_training_set/`</span></span>
+<span id="cb8-191"><a href="#cb8-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-192"><a href="#cb8-192" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-193"><a href="#cb8-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-194"><a href="#cb8-194" aria-hidden="true" tabindex="-1"></a>Two training examples per successfully-parsed report; a printed notice</span>
+<span id="cb8-195"><a href="#cb8-195" aria-hidden="true" tabindex="-1"></a>naming any report that was skipped.</span>
+<span id="cb8-196"><a href="#cb8-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-199"><a href="#cb8-199" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-200"><a href="#cb8-200" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-201"><a href="#cb8-201" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
+<span id="cb8-202"><a href="#cb8-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-203"><a href="#cb8-203" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> normalize_date(raw_date):</span>
+<span id="cb8-204"><a href="#cb8-204" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> datetime.strptime(raw_date, <span class="st">"%m/</span><span class="sc">%d</span><span class="st">/%Y"</span>).strftime(<span class="st">"%Y-%m-</span><span class="sc">%d</span><span class="st">"</span>)</span>
+<span id="cb8-205"><a href="#cb8-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-206"><a href="#cb8-206" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_examples_for_report(pdf_path):</span>
+<span id="cb8-207"><a href="#cb8-207" aria-hidden="true" tabindex="-1"></a>    text <span class="op">=</span> extract_text(pdf_path)</span>
+<span id="cb8-208"><a href="#cb8-208" aria-hidden="true" tabindex="-1"></a>    fields <span class="op">=</span> extract_fields(text)</span>
+<span id="cb8-209"><a href="#cb8-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-210"><a href="#cb8-210" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> fields[<span class="st">"present_operations"</span>] <span class="kw">or</span> <span class="kw">not</span> fields[<span class="st">"activity_planned"</span>]:</span>
+<span id="cb8-211"><a href="#cb8-211" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> []  <span class="co"># unrecognized field layout -- see Production Reality above</span></span>
+<span id="cb8-212"><a href="#cb8-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-213"><a href="#cb8-213" aria-hidden="true" tabindex="-1"></a>    context <span class="op">=</span> (</span>
+<span id="cb8-214"><a href="#cb8-214" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Well: </span><span class="sc">{</span>fields[<span class="st">'well_name'</span>]<span class="sc">}</span><span class="ss"> | Report #</span><span class="sc">{</span>fields[<span class="st">'rpt_num'</span>]<span class="sc">}</span><span class="ss"> | "</span></span>
+<span id="cb8-215"><a href="#cb8-215" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Date: </span><span class="sc">{</span>normalize_date(fields[<span class="st">'rpt_date'</span>])<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb8-216"><a href="#cb8-216" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-217"><a href="#cb8-217" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [</span>
+<span id="cb8-218"><a href="#cb8-218" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb8-219"><a href="#cb8-219" aria-hidden="true" tabindex="-1"></a>            <span class="st">"instruction"</span>: <span class="st">"What are the present operations reported on this well?"</span>,</span>
+<span id="cb8-220"><a href="#cb8-220" aria-hidden="true" tabindex="-1"></a>            <span class="st">"input"</span>: context,</span>
+<span id="cb8-221"><a href="#cb8-221" aria-hidden="true" tabindex="-1"></a>            <span class="st">"output"</span>: fields[<span class="st">"present_operations"</span>],</span>
+<span id="cb8-222"><a href="#cb8-222" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb8-223"><a href="#cb8-223" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb8-224"><a href="#cb8-224" aria-hidden="true" tabindex="-1"></a>            <span class="st">"instruction"</span>: <span class="st">"What activity is planned next?"</span>,</span>
+<span id="cb8-225"><a href="#cb8-225" aria-hidden="true" tabindex="-1"></a>            <span class="st">"input"</span>: context,</span>
+<span id="cb8-226"><a href="#cb8-226" aria-hidden="true" tabindex="-1"></a>            <span class="st">"output"</span>: fields[<span class="st">"activity_planned"</span>],</span>
+<span id="cb8-227"><a href="#cb8-227" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb8-228"><a href="#cb8-228" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb8-229"><a href="#cb8-229" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-230"><a href="#cb8-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-231"><a href="#cb8-231" aria-hidden="true" tabindex="-1"></a>Running <span class="in">`build_examples_for_report()`</span> on <span class="in">`Drilling_038`</span> prints:</span>
+<span id="cb8-232"><a href="#cb8-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-233"><a href="#cb8-233" aria-hidden="true" tabindex="-1"></a><span class="in">```json</span></span>
+<span id="cb8-234"><a href="#cb8-234" aria-hidden="true" tabindex="-1"></a>[</span>
+<span id="cb8-235"><a href="#cb8-235" aria-hidden="true" tabindex="-1"></a>  {</span>
+<span id="cb8-236"><a href="#cb8-236" aria-hidden="true" tabindex="-1"></a>    <span class="st">"instruction"</span><span class="op">:</span> <span class="st">"What are the present operations reported on this well?"</span><span class="op">,</span></span>
+<span id="cb8-237"><a href="#cb8-237" aria-hidden="true" tabindex="-1"></a>    <span class="st">"input"</span><span class="op">:</span> <span class="st">"Well: FORGE 16A [78]-32 | Report #38 | Date: 2020-11-26"</span><span class="op">,</span></span>
+<span id="cb8-238"><a href="#cb8-238" aria-hidden="true" tabindex="-1"></a>    <span class="st">"output"</span><span class="op">:</span> <span class="st">"PIPE FREE, TRIP OUT OF HOLE FOR BHA INSPECTION"</span></span>
+<span id="cb8-239"><a href="#cb8-239" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb8-240"><a href="#cb8-240" aria-hidden="true" tabindex="-1"></a>  {</span>
+<span id="cb8-241"><a href="#cb8-241" aria-hidden="true" tabindex="-1"></a>    <span class="st">"instruction"</span><span class="op">:</span> <span class="st">"What activity is planned next?"</span><span class="op">,</span></span>
+<span id="cb8-242"><a href="#cb8-242" aria-hidden="true" tabindex="-1"></a>    <span class="st">"input"</span><span class="op">:</span> <span class="st">"Well: FORGE 16A [78]-32 | Report #38 | Date: 2020-11-26"</span><span class="op">,</span></span>
+<span id="cb8-243"><a href="#cb8-243" aria-hidden="true" tabindex="-1"></a>    <span class="st">"output"</span><span class="op">:</span> <span class="st">"INSPECT BHA, TRIP IN HOLE DRILL CURVE"</span></span>
+<span id="cb8-244"><a href="#cb8-244" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-245"><a href="#cb8-245" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb8-246"><a href="#cb8-246" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-247"><a href="#cb8-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-248"><a href="#cb8-248" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-249"><a href="#cb8-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-250"><a href="#cb8-250" aria-hidden="true" tabindex="-1"></a>Each report becomes two training examples, one per field, sharing the</span>
+<span id="cb8-251"><a href="#cb8-251" aria-hidden="true" tabindex="-1"></a>same <span class="in">`input`</span> context (well, report number, date) so the model can learn</span>
+<span id="cb8-252"><a href="#cb8-252" aria-hidden="true" tabindex="-1"></a>to condition its answer on which report is being asked about.</span>
+<span id="cb8-253"><a href="#cb8-253" aria-hidden="true" tabindex="-1"></a><span class="in">`normalize_date`</span> just makes every date consistently <span class="in">`YYYY-MM-DD`</span>, since</span>
+<span id="cb8-254"><a href="#cb8-254" aria-hidden="true" tabindex="-1"></a>this archive's own reports don't all format dates the same way.</span>
+<span id="cb8-255"><a href="#cb8-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-256"><a href="#cb8-256" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 3: Build and save the full training set — minus one report, on purpose</span></span>
+<span id="cb8-257"><a href="#cb8-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-258"><a href="#cb8-258" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-259"><a href="#cb8-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-260"><a href="#cb8-260" aria-hidden="true" tabindex="-1"></a>One report is a proof of concept; Chapter 5's fine-tune needs the whole</span>
+<span id="cb8-261"><a href="#cb8-261" aria-hidden="true" tabindex="-1"></a>sample archive, saved to a file the next chapters can load without</span>
+<span id="cb8-262"><a href="#cb8-262" aria-hidden="true" tabindex="-1"></a>re-running PDF extraction every time. But if Chapter 5 trains on every</span>
+<span id="cb8-263"><a href="#cb8-263" aria-hidden="true" tabindex="-1"></a>report and then tests on those same reports, a good score would only</span>
+<span id="cb8-264"><a href="#cb8-264" aria-hidden="true" tabindex="-1"></a>prove the model *memorized* 18 flashcards — not that fine-tuning taught</span>
+<span id="cb8-265"><a href="#cb8-265" aria-hidden="true" tabindex="-1"></a>it anything that generalizes. This step reserves one drilling report,</span>
+<span id="cb8-266"><a href="#cb8-266" aria-hidden="true" tabindex="-1"></a><span class="in">`Drilling_037`</span> (2020-11-25), out of the training set entirely, so</span>
+<span id="cb8-267"><a href="#cb8-267" aria-hidden="true" tabindex="-1"></a>Chapter 5 has a report the model has genuinely never seen to test</span>
+<span id="cb8-268"><a href="#cb8-268" aria-hidden="true" tabindex="-1"></a>against.</span>
+<span id="cb8-269"><a href="#cb8-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-270"><a href="#cb8-270" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-271"><a href="#cb8-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-272"><a href="#cb8-272" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Every PDF in <span class="in">`datasets/sample_training_set/`</span></span>
+<span id="cb8-273"><a href="#cb8-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-274"><a href="#cb8-274" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-275"><a href="#cb8-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-276"><a href="#cb8-276" aria-hidden="true" tabindex="-1"></a>A <span class="in">`.jsonl`</span> file (one JSON object per line — the standard format this</span>
+<span id="cb8-277"><a href="#cb8-277" aria-hidden="true" tabindex="-1"></a>book uses for training data) plus summary lines reporting the held-out</span>
+<span id="cb8-278"><a href="#cb8-278" aria-hidden="true" tabindex="-1"></a>report, how many examples were built, and how many reports were</span>
+<span id="cb8-279"><a href="#cb8-279" aria-hidden="true" tabindex="-1"></a>skipped.</span>
+<span id="cb8-280"><a href="#cb8-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-283"><a href="#cb8-283" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-284"><a href="#cb8-284" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-285"><a href="#cb8-285" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb8-286"><a href="#cb8-286" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb8-287"><a href="#cb8-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-288"><a href="#cb8-288" aria-hidden="true" tabindex="-1"></a>SAMPLE_SET_DIR <span class="op">=</span> Path(<span class="st">"datasets/sample_training_set"</span>)</span>
+<span id="cb8-289"><a href="#cb8-289" aria-hidden="true" tabindex="-1"></a>OUTPUT_PATH <span class="op">=</span> Path(<span class="st">"datasets/training_examples/sample_training_examples.jsonl"</span>)</span>
+<span id="cb8-290"><a href="#cb8-290" aria-hidden="true" tabindex="-1"></a>HELD_OUT_REPORT <span class="op">=</span> <span class="st">"FORGE-16A-78-32_Drilling_037_2020-11-25.pdf"</span></span>
+<span id="cb8-291"><a href="#cb8-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-292"><a href="#cb8-292" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_training_examples(sample_dir<span class="op">=</span>SAMPLE_SET_DIR):</span>
+<span id="cb8-293"><a href="#cb8-293" aria-hidden="true" tabindex="-1"></a>    examples, skipped, held_out <span class="op">=</span> [], [], []</span>
+<span id="cb8-294"><a href="#cb8-294" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> pdf_path <span class="kw">in</span> <span class="bu">sorted</span>(sample_dir.glob(<span class="st">"*.pdf"</span>)):</span>
+<span id="cb8-295"><a href="#cb8-295" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> pdf_path.name <span class="op">==</span> HELD_OUT_REPORT:</span>
+<span id="cb8-296"><a href="#cb8-296" aria-hidden="true" tabindex="-1"></a>            held_out.append(pdf_path.name)</span>
+<span id="cb8-297"><a href="#cb8-297" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb8-298"><a href="#cb8-298" aria-hidden="true" tabindex="-1"></a>        report_examples <span class="op">=</span> build_examples_for_report(pdf_path)</span>
+<span id="cb8-299"><a href="#cb8-299" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> report_examples:</span>
+<span id="cb8-300"><a href="#cb8-300" aria-hidden="true" tabindex="-1"></a>            examples.extend(report_examples)</span>
+<span id="cb8-301"><a href="#cb8-301" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb8-302"><a href="#cb8-302" aria-hidden="true" tabindex="-1"></a>            skipped.append(pdf_path.name)</span>
+<span id="cb8-303"><a href="#cb8-303" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> held_out:</span>
+<span id="cb8-304"><a href="#cb8-304" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Reserved </span><span class="sc">{</span><span class="bu">len</span>(held_out)<span class="sc">}</span><span class="ss"> held-out report(s) for Chapter 5's generalization check: </span><span class="sc">{</span>held_out<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-305"><a href="#cb8-305" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> skipped:</span>
+<span id="cb8-306"><a href="#cb8-306" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Skipped </span><span class="sc">{</span><span class="bu">len</span>(skipped)<span class="sc">}</span><span class="ss"> report(s) with an unrecognized field layout: </span><span class="sc">{</span>skipped<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-307"><a href="#cb8-307" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> examples</span>
+<span id="cb8-308"><a href="#cb8-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-309"><a href="#cb8-309" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_examples_jsonl(examples, output_path<span class="op">=</span>OUTPUT_PATH):</span>
+<span id="cb8-310"><a href="#cb8-310" aria-hidden="true" tabindex="-1"></a>    output_path.parent.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-311"><a href="#cb8-311" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> output_path.<span class="bu">open</span>(<span class="st">"w"</span>, encoding<span class="op">=</span><span class="st">"utf-8"</span>) <span class="im">as</span> f:</span>
+<span id="cb8-312"><a href="#cb8-312" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> example <span class="kw">in</span> examples:</span>
+<span id="cb8-313"><a href="#cb8-313" aria-hidden="true" tabindex="-1"></a>            f.write(json.dumps(example) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb8-314"><a href="#cb8-314" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-315"><a href="#cb8-315" aria-hidden="true" tabindex="-1"></a>examples <span class="op">=</span> build_training_examples()</span>
+<span id="cb8-316"><a href="#cb8-316" aria-hidden="true" tabindex="-1"></a>save_examples_jsonl(examples)</span>
+<span id="cb8-317"><a href="#cb8-317" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Built </span><span class="sc">{</span><span class="bu">len</span>(examples)<span class="sc">}</span><span class="ss"> training examples -&gt; </span><span class="sc">{</span>OUTPUT_PATH<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-318"><a href="#cb8-318" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-319"><a href="#cb8-319" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-320"><a href="#cb8-320" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-321"><a href="#cb8-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-322"><a href="#cb8-322" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-323"><a href="#cb8-323" aria-hidden="true" tabindex="-1"></a><span class="in">Reserved 1 held-out report(s) for Chapter 5's generalization check: ['FORGE-16A-78-32_Drilling_037_2020-11-25.pdf']</span></span>
+<span id="cb8-324"><a href="#cb8-324" aria-hidden="true" tabindex="-1"></a><span class="in">Skipped 1 report(s) with an unrecognized field layout: ['FORGE-16A-78-32_Completion_003_2021-01-06.pdf']</span></span>
+<span id="cb8-325"><a href="#cb8-325" aria-hidden="true" tabindex="-1"></a><span class="in">Built 16 training examples -&gt; datasets/training_examples/sample_training_examples.jsonl</span></span>
+<span id="cb8-326"><a href="#cb8-326" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-327"><a href="#cb8-327" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-328"><a href="#cb8-328" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-329"><a href="#cb8-329" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-330"><a href="#cb8-330" aria-hidden="true" tabindex="-1"></a>Of the ten sample reports, one (<span class="in">`Completion_003`</span>) is a *completion*</span>
+<span id="cb8-331"><a href="#cb8-331" aria-hidden="true" tabindex="-1"></a>report using different field labels (<span class="in">`Present Ops:`</span> / <span class="in">`Next 24 Hours:`</span></span>
+<span id="cb8-332"><a href="#cb8-332" aria-hidden="true" tabindex="-1"></a>instead of <span class="in">`PRESENT OPERATIONS:`</span> / <span class="in">`ACTIVITY PLANNED:`</span>) and gets</span>
+<span id="cb8-333"><a href="#cb8-333" aria-hidden="true" tabindex="-1"></a>correctly skipped rather than silently producing a garbage example. A</span>
+<span id="cb8-334"><a href="#cb8-334" aria-hidden="true" tabindex="-1"></a>second, <span class="in">`Drilling_037`</span>, is a perfectly normal, recognized drilling</span>
+<span id="cb8-335"><a href="#cb8-335" aria-hidden="true" tabindex="-1"></a>report — it isn't skipped for a data-quality reason, it's *deliberately</span>
+<span id="cb8-336"><a href="#cb8-336" aria-hidden="true" tabindex="-1"></a>withheld* from training. That leaves eight reports, each contributing</span>
+<span id="cb8-337"><a href="#cb8-337" aria-hidden="true" tabindex="-1"></a>two examples — 16 total. <span class="in">`datasets/training_examples/`</span> is generated, not</span>
+<span id="cb8-338"><a href="#cb8-338" aria-hidden="true" tabindex="-1"></a>committed to this repository — regenerate it any time by re-running this</span>
+<span id="cb8-339"><a href="#cb8-339" aria-hidden="true" tabindex="-1"></a>script (see <span class="in">`book/.gitignore`</span>).</span>
+<span id="cb8-340"><a href="#cb8-340" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-341"><a href="#cb8-341" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Engineering Translation: held-out data"}</span>
+<span id="cb8-342"><a href="#cb8-342" aria-hidden="true" tabindex="-1"></a>**Held-out data** is data you deliberately keep out of training so you</span>
+<span id="cb8-343"><a href="#cb8-343" aria-hidden="true" tabindex="-1"></a>have something honest to test on afterward — like a well test string</span>
+<span id="cb8-344"><a href="#cb8-344" aria-hidden="true" tabindex="-1"></a>never touched during a workover, kept clean specifically so its</span>
+<span id="cb8-345"><a href="#cb8-345" aria-hidden="true" tabindex="-1"></a>before/after readings mean something. A model tested only on the exact</span>
+<span id="cb8-346"><a href="#cb8-346" aria-hidden="true" tabindex="-1"></a>data it trained on can't tell you whether it learned anything general;</span>
+<span id="cb8-347"><a href="#cb8-347" aria-hidden="true" tabindex="-1"></a>it can only tell you whether it memorized.</span>
+<span id="cb8-348"><a href="#cb8-348" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-349"><a href="#cb8-349" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-350"><a href="#cb8-350" aria-hidden="true" tabindex="-1"></a>This is a deliberately simple first training set — every <span class="in">`output`</span> is a</span>
+<span id="cb8-351"><a href="#cb8-351" aria-hidden="true" tabindex="-1"></a>single field value copied verbatim from a report, not a rich summary or</span>
+<span id="cb8-352"><a href="#cb8-352" aria-hidden="true" tabindex="-1"></a>judgment call. That's on purpose (see "Why not just write our own</span>
+<span id="cb8-353"><a href="#cb8-353" aria-hidden="true" tabindex="-1"></a>summaries?" above), but it also means this training set mostly teaches</span>
+<span id="cb8-354"><a href="#cb8-354" aria-hidden="true" tabindex="-1"></a>field recall, not operational reasoning. Later chapters build richer</span>
+<span id="cb8-355"><a href="#cb8-355" aria-hidden="true" tabindex="-1"></a>training examples (Chapter 7) and a proper evaluation harness beyond</span>
+<span id="cb8-356"><a href="#cb8-356" aria-hidden="true" tabindex="-1"></a>one held-out report (Chapter 11); this chapter's job is just to get a</span>
+<span id="cb8-357"><a href="#cb8-357" aria-hidden="true" tabindex="-1"></a>first, honest training/held-out split in place before fine-tuning ever</span>
+<span id="cb8-358"><a href="#cb8-358" aria-hidden="true" tabindex="-1"></a>starts.</span>
+<span id="cb8-359"><a href="#cb8-359" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-360"><a href="#cb8-360" aria-hidden="true" tabindex="-1"></a><span class="fu">## Practical exercise</span></span>
+<span id="cb8-361"><a href="#cb8-361" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-362"><a href="#cb8-362" aria-hidden="true" tabindex="-1"></a>🟢 **Beginner**</span>
+<span id="cb8-363"><a href="#cb8-363" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-364"><a href="#cb8-364" aria-hidden="true" tabindex="-1"></a>**Try it yourself:** run <span class="in">`python code/chapter_02/build_training_examples.py`</span></span>
+<span id="cb8-365"><a href="#cb8-365" aria-hidden="true" tabindex="-1"></a>from inside <span class="in">`book/`</span>, then open the generated</span>
+<span id="cb8-366"><a href="#cb8-366" aria-hidden="true" tabindex="-1"></a><span class="in">`datasets/training_examples/sample_training_examples.jsonl`</span> in a text</span>
+<span id="cb8-367"><a href="#cb8-367" aria-hidden="true" tabindex="-1"></a>editor.</span>
+<span id="cb8-368"><a href="#cb8-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-369"><a href="#cb8-369" aria-hidden="true" tabindex="-1"></a>**You'll know it worked when:** the script prints `Built 16 training</span>
+<span id="cb8-370"><a href="#cb8-370" aria-hidden="true" tabindex="-1"></a>examples`, the file has exactly 16 lines, the first one matches report</span>
+<span id="cb8-371"><a href="#cb8-371" aria-hidden="true" tabindex="-1"></a><span class="in">`#3`</span> (<span class="in">`Drilling_003`</span>, 2020-10-22) — the earliest report in the sample</span>
+<span id="cb8-372"><a href="#cb8-372" aria-hidden="true" tabindex="-1"></a>set — and no line anywhere in the file mentions <span class="in">`Report #37`</span>.</span>
+<span id="cb8-373"><a href="#cb8-373" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-374"><a href="#cb8-374" aria-hidden="true" tabindex="-1"></a><span class="fu">## Field notes</span></span>
+<span id="cb8-375"><a href="#cb8-375" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-376"><a href="#cb8-376" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="Field notes: one field, not the whole story"}</span>
+<span id="cb8-377"><a href="#cb8-377" aria-hidden="true" tabindex="-1"></a>**Query/Action:** extracting fields for reports <span class="in">`#49`</span> and <span class="in">`#50`</span> — the</span>
+<span id="cb8-378"><a href="#cb8-378" aria-hidden="true" tabindex="-1"></a>same packers-fail-to-fishing sequence referenced in the author's</span>
+<span id="cb8-379"><a href="#cb8-379" aria-hidden="true" tabindex="-1"></a>previous book.</span>
+<span id="cb8-380"><a href="#cb8-380" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-381"><a href="#cb8-381" aria-hidden="true" tabindex="-1"></a>**Result:** report <span class="in">`#49`</span>'s <span class="in">`activity_planned`</span> is literally `"FISHING</span>
+<span id="cb8-382"><a href="#cb8-382" aria-hidden="true" tabindex="-1"></a>OPERATIONS"` — confirming that real event directly from this archive.</span>
+<span id="cb8-383"><a href="#cb8-383" aria-hidden="true" tabindex="-1"></a>Report <span class="in">`#50`</span>'s <span class="in">`present_operations`</span>, the very next day, is `"TRIP IN</span>
+<span id="cb8-384"><a href="#cb8-384" aria-hidden="true" tabindex="-1"></a>HOLE WITH DIRECTIONAL BHA"` — not a restatement of "fishing" at all,</span>
+<span id="cb8-385"><a href="#cb8-385" aria-hidden="true" tabindex="-1"></a>even though report <span class="in">`#49`</span> had just announced it as the plan.</span>
+<span id="cb8-386"><a href="#cb8-386" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-387"><a href="#cb8-387" aria-hidden="true" tabindex="-1"></a>**Why:** the reports say (report <span class="in">`#49`</span>, activity planned): `"FISHING</span>
+<span id="cb8-388"><a href="#cb8-388" aria-hidden="true" tabindex="-1"></a>OPERATIONS"<span class="in">`; (report `</span>#50<span class="in">`, present operations): `</span>"TRIP IN HOLE WITH</span>
+<span id="cb8-389"><a href="#cb8-389" aria-hidden="true" tabindex="-1"></a>DIRECTIONAL BHA"`. Each field is a narrow, honest snapshot of *one*</span>
+<span id="cb8-390"><a href="#cb8-390" aria-hidden="true" tabindex="-1"></a>report at *one* moment — it was never written to also summarize what</span>
+<span id="cb8-391"><a href="#cb8-391" aria-hidden="true" tabindex="-1"></a>happened the next day.</span>
+<span id="cb8-392"><a href="#cb8-392" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-393"><a href="#cb8-393" aria-hidden="true" tabindex="-1"></a>**Lesson:** even perfectly clean, extractive ground truth like this only</span>
+<span id="cb8-394"><a href="#cb8-394" aria-hidden="true" tabindex="-1"></a>answers questions about a single report in isolation. Connecting the</span>
+<span id="cb8-395"><a href="#cb8-395" aria-hidden="true" tabindex="-1"></a>story across reports — the plan in <span class="in">`#49`</span> to the actual outcome by</span>
+<span id="cb8-396"><a href="#cb8-396" aria-hidden="true" tabindex="-1"></a><span class="in">`#50`</span> — needs more than two fields from one PDF. That's exactly why</span>
+<span id="cb8-397"><a href="#cb8-397" aria-hidden="true" tabindex="-1"></a>Part II exists: Chapter 9's hybrid retrieval is what eventually lets a</span>
+<span id="cb8-398"><a href="#cb8-398" aria-hidden="true" tabindex="-1"></a>question span more than one report.</span>
+<span id="cb8-399"><a href="#cb8-399" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-400"><a href="#cb8-400" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-401"><a href="#cb8-401" aria-hidden="true" tabindex="-1"></a><span class="fu">## Challenge exercise</span></span>
+<span id="cb8-402"><a href="#cb8-402" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-403"><a href="#cb8-403" aria-hidden="true" tabindex="-1"></a>🟠 **Intermediate**</span>
+<span id="cb8-404"><a href="#cb8-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-405"><a href="#cb8-405" aria-hidden="true" tabindex="-1"></a>**Challenge:** extend <span class="in">`build_examples_for_report()`</span> to also handle the</span>
+<span id="cb8-406"><a href="#cb8-406" aria-hidden="true" tabindex="-1"></a>completion report's different field layout (<span class="in">`Present Ops:`</span> / `Next 24</span>
+<span id="cb8-407"><a href="#cb8-407" aria-hidden="true" tabindex="-1"></a>Hours:`, and a two-digit-year date format), so 9 of the 10 sample</span>
+<span id="cb8-408"><a href="#cb8-408" aria-hidden="true" tabindex="-1"></a>reports contribute examples instead of 8 (<span class="in">`Drilling_037`</span> stays reserved</span>
+<span id="cb8-409"><a href="#cb8-409" aria-hidden="true" tabindex="-1"></a>either way — see Step 3). A reference solution is at</span>
+<span id="cb8-410"><a href="#cb8-410" aria-hidden="true" tabindex="-1"></a><span class="in">`code/chapter_02/challenge/challenge.py`</span> — it produces 18 training</span>
+<span id="cb8-411"><a href="#cb8-411" aria-hidden="true" tabindex="-1"></a>examples total, 0 reports skipped.</span>
+<span id="cb8-412"><a href="#cb8-412" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-413"><a href="#cb8-413" aria-hidden="true" tabindex="-1"></a><span class="fu">## Key takeaways</span></span>
+<span id="cb8-414"><a href="#cb8-414" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-415"><a href="#cb8-415" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A training example in this book is an <span class="in">`instruction`</span> / <span class="in">`input`</span> /</span>
+<span id="cb8-416"><a href="#cb8-416" aria-hidden="true" tabindex="-1"></a>  <span class="in">`output`</span> triple — a single flashcard the model can study from.</span>
+<span id="cb8-417"><a href="#cb8-417" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Using a report's own self-reported fields as the <span class="in">`output`</span> avoids</span>
+<span id="cb8-418"><a href="#cb8-418" aria-hidden="true" tabindex="-1"></a>  fabricating ground truth; the label is never anyone's guess.</span>
+<span id="cb8-419"><a href="#cb8-419" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`pdfplumber`</span> plus a handful of regex patterns reliably extracts</span>
+<span id="cb8-420"><a href="#cb8-420" aria-hidden="true" tabindex="-1"></a>  structured fields from a fixed-form report — but only the form layout</span>
+<span id="cb8-421"><a href="#cb8-421" aria-hidden="true" tabindex="-1"></a>  it was written for.</span>
+<span id="cb8-422"><a href="#cb8-422" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Different report types (drilling vs. completion) can use different</span>
+<span id="cb8-423"><a href="#cb8-423" aria-hidden="true" tabindex="-1"></a>  field labels even within the same archive. Detect and skip what your</span>
+<span id="cb8-424"><a href="#cb8-424" aria-hidden="true" tabindex="-1"></a>  extractor doesn't recognize, rather than silently producing a bad</span>
+<span id="cb8-425"><a href="#cb8-425" aria-hidden="true" tabindex="-1"></a>  example.</span>
+<span id="cb8-426"><a href="#cb8-426" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Skipping and holding out are different things done for different</span>
+<span id="cb8-427"><a href="#cb8-427" aria-hidden="true" tabindex="-1"></a>  reasons: a report gets *skipped* because your extractor can't parse</span>
+<span id="cb8-428"><a href="#cb8-428" aria-hidden="true" tabindex="-1"></a>  it; a report gets *held out* on purpose, even though it parses fine,</span>
+<span id="cb8-429"><a href="#cb8-429" aria-hidden="true" tabindex="-1"></a>  so there's an honest, unseen test left once fine-tuning starts.</span>
+<span id="cb8-430"><a href="#cb8-430" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-431"><a href="#cb8-431" aria-hidden="true" tabindex="-1"></a><span class="fu">## Repository files</span></span>
+<span id="cb8-432"><a href="#cb8-432" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-433"><a href="#cb8-433" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> File <span class="pp">|</span> Purpose <span class="pp">|</span></span>
+<span id="cb8-434"><a href="#cb8-434" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb8-435"><a href="#cb8-435" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_02/build_training_examples.py`</span> <span class="pp">|</span> Extracts fields and builds instruction/response training examples <span class="pp">|</span></span>
+<span id="cb8-436"><a href="#cb8-436" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_02/challenge/challenge.py`</span> <span class="pp">|</span> Reference solution: also handles the completion report's field layout <span class="pp">|</span></span>
+<span id="cb8-437"><a href="#cb8-437" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`datasets/sample_training_set/`</span> <span class="pp">|</span> The 10 source report PDFs this chapter reads <span class="pp">|</span></span>
+<span id="cb8-438"><a href="#cb8-438" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`datasets/training_examples/sample_training_examples.jsonl`</span> <span class="pp">|</span> Generated output (not committed — regenerate by running the script) <span class="pp">|</span></span>
+<span id="cb8-439"><a href="#cb8-439" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`notebooks/chapter_02_explore.ipynb`</span> <span class="pp">|</span> Interactive companion notebook <span class="pp">|</span></span>
+<span id="cb8-440"><a href="#cb8-440" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-441"><a href="#cb8-441" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution title="CHECKPOINT — Chapter 2"}</span>
+<span id="cb8-442"><a href="#cb8-442" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Extracted structured fields from a real report PDF with <span class="in">`pdfplumber`</span></span>
+<span id="cb8-443"><a href="#cb8-443" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Built instruction/response training examples using a report's own</span>
+<span id="cb8-444"><a href="#cb8-444" aria-hidden="true" tabindex="-1"></a>      words as ground truth</span>
+<span id="cb8-445"><a href="#cb8-445" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Detected and skipped a report with an unrecognized field layout,</span>
+<span id="cb8-446"><a href="#cb8-446" aria-hidden="true" tabindex="-1"></a>      instead of silently mishandling it</span>
+<span id="cb8-447"><a href="#cb8-447" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Reserved one recognized, well-formed report as held-out data,</span>
+<span id="cb8-448"><a href="#cb8-448" aria-hidden="true" tabindex="-1"></a>      instead of training on everything available</span>
+<span id="cb8-449"><a href="#cb8-449" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-450"><a href="#cb8-450" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-451"><a href="#cb8-451" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}</span>
+<span id="cb8-452"><a href="#cb8-452" aria-hidden="true" tabindex="-1"></a>**`build_training_examples.py`** — turns 8 of the 9 drilling-format</span>
+<span id="cb8-453"><a href="#cb8-453" aria-hidden="true" tabindex="-1"></a>reports in <span class="in">`datasets/sample_training_set/`</span> into 16 real training</span>
+<span id="cb8-454"><a href="#cb8-454" aria-hidden="true" tabindex="-1"></a>examples, saved to <span class="in">`datasets/training_examples/sample_training_examples.jsonl`</span>.</span>
+<span id="cb8-455"><a href="#cb8-455" aria-hidden="true" tabindex="-1"></a>The 9th, <span class="in">`Drilling_037`</span>, is reserved untouched for Chapter 5's held-out</span>
+<span id="cb8-456"><a href="#cb8-456" aria-hidden="true" tabindex="-1"></a>generalization check. Chapter 5 fine-tunes on data built exactly this</span>
+<span id="cb8-457"><a href="#cb8-457" aria-hidden="true" tabindex="-1"></a>way, at a larger scale.</span>
+<span id="cb8-458"><a href="#cb8-458" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-459"><a href="#cb8-459" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-460"><a href="#cb8-460" aria-hidden="true" tabindex="-1"></a><span class="fu">## What can you do now that you couldn't do before?</span></span>
+<span id="cb8-461"><a href="#cb8-461" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-462"><a href="#cb8-462" aria-hidden="true" tabindex="-1"></a>You can turn a folder of real, inconsistently-formatted report PDFs into</span>
+<span id="cb8-463"><a href="#cb8-463" aria-hidden="true" tabindex="-1"></a>a training-ready dataset without inventing a single label — and you know</span>
+<span id="cb8-464"><a href="#cb8-464" aria-hidden="true" tabindex="-1"></a>precisely which reports your extractor handles and which it doesn't,</span>
+<span id="cb8-465"><a href="#cb8-465" aria-hidden="true" tabindex="-1"></a>instead of hoping.</span>
+<span id="cb8-466"><a href="#cb8-466" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-467"><a href="#cb8-467" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suggested next step</span></span>
+<span id="cb8-468"><a href="#cb8-468" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-469"><a href="#cb8-469" aria-hidden="true" tabindex="-1"></a>**Coming up in Chapter 3:** before spending any time actually</span>
+<span id="cb8-470"><a href="#cb8-470" aria-hidden="true" tabindex="-1"></a>fine-tuning, Chapter 3 runs a proper baseline test — the base model</span>
+<span id="cb8-471"><a href="#cb8-471" aria-hidden="true" tabindex="-1"></a>against a batch of real questions drawn from the 16 training examples</span>
+<span id="cb8-472"><a href="#cb8-472" aria-hidden="true" tabindex="-1"></a>you just built — so you have hard, reproducible evidence of exactly what</span>
+<span id="cb8-473"><a href="#cb8-473" aria-hidden="true" tabindex="-1"></a>it gets wrong, and something concrete to compare Chapter 5's fine-tuned</span>
+<span id="cb8-474"><a href="#cb8-474" aria-hidden="true" tabindex="-1"></a>model against afterward. <span class="in">`Drilling_037`</span>, held out here, stays untouched</span>
+<span id="cb8-475"><a href="#cb8-475" aria-hidden="true" tabindex="-1"></a>until Chapter 5.</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Fine-Tuning Local LLM for Drilling &amp; Completions</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/djimrastephane/llm-ft-drilling-completions-book/edit/main/chapters/chapter_02.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/djimrastephane/llm-ft-drilling-completions-book/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

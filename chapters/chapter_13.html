@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>13&nbsp; Continuous Fine-Tuning: Keeping the Model Current – Fine-Tuning Local LLM for Drilling &amp; Completions</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../appendix/appendix_a_environment_setup.html" rel="next">
+<link href="../chapters/chapter_12.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-5a1953863e1f72ef3b996ef827f01ca7.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-f352355e9c4cf757a45f4f8798595620.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/chapter_06.html">Part II — Industrialising the System</a></li><li class="breadcrumb-item"><a href="../chapters/chapter_13.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Continuous Fine-Tuning: Keeping the Model Current</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Fine-Tuning Local LLM for Drilling &amp; Completions</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/djimrastephane/llm-ft-drilling-completions-book" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="../Fine-Tuning-Local-LLM-for-Drilling---Completions.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../preface.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../acknowledgements.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Acknowledgements</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 0 — Preparing Your Local LLM Workshop</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_00.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Part 0: Preparing Your Local LLM Workshop</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_01.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Loading and Running Your First Local LLM</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Turning Drilling &amp; Completions Reports into Training Examples</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Baseline Prompting: What the Model Gets Wrong Before Fine-Tuning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_04.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Tokenization and Embeddings for Domain Fine-Tuning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_05.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Your First LoRA Fine-Tune</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Industrialising the System</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_06.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">A Data Quality Gate for Training Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_07.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Formatting and Chunking a Training Set at Scale</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_08.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Fine-Tuning at Scale with Checkpointing and Experiment Tracking</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_09.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Hybrid System: Combining Fine-Tuning with Retrieval</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Traceable Outputs and Hallucination Mitigation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_11.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Evaluating a Fine-Tuned Domain Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Detecting Drift Across Model Versions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_13.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Continuous Fine-Tuning: Keeping the Model Current</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a_environment_setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A: Environment Setup</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a1_jupyter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A1: Using Jupyter Notebook</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a2_vscode.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A2: Using VS Code</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a3_pycharm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A3: Using PyCharm Community</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a4_positron.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A4: Using Positron</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_a5_terminal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix A5: Terminal Only</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_b_glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix B: Drilling, Completions &amp; Fine-Tuning Glossary</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">13.1</span> Learning objectives</a></li>
+  <li><a href="#operational-problem" id="toc-operational-problem" class="nav-link" data-scroll-target="#operational-problem"><span class="header-section-number">13.2</span> Operational Problem</a></li>
+  <li><a href="#example-the-same-question-this-book-has-asked-all-along-one-more-time" id="toc-example-the-same-question-this-book-has-asked-all-along-one-more-time" class="nav-link" data-scroll-target="#example-the-same-question-this-book-has-asked-all-along-one-more-time"><span class="header-section-number">13.3</span> Example: the same question this book has asked all along, one more time</a></li>
+  <li><a href="#theory" id="toc-theory" class="nav-link" data-scroll-target="#theory"><span class="header-section-number">13.4</span> Theory</a></li>
+  <li><a href="#why-we-retrained-isnt-the-same-claim-as-its-better" id="toc-why-we-retrained-isnt-the-same-claim-as-its-better" class="nav-link" data-scroll-target="#why-we-retrained-isnt-the-same-claim-as-its-better"><span class="header-section-number">13.5</span> Why “we retrained” isn’t the same claim as “it’s better”</a></li>
+  <li><a href="#implementation" id="toc-implementation" class="nav-link" data-scroll-target="#implementation"><span class="header-section-number">13.6</span> Implementation</a>
+  <ul class="collapse">
+  <li><a href="#step-1-split-the-archive-by-a-chronological-cutoff" id="toc-step-1-split-the-archive-by-a-chronological-cutoff" class="nav-link" data-scroll-target="#step-1-split-the-archive-by-a-chronological-cutoff"><span class="header-section-number">13.6.1</span> Step 1: Split the archive by a chronological cutoff</a></li>
+  </ul></li>
+  <li><a href="#what-problem-are-we-solving" id="toc-what-problem-are-we-solving" class="nav-link" data-scroll-target="#what-problem-are-we-solving"><span class="header-section-number">13.7</span> What problem are we solving?</a></li>
+  <li><a href="#inputs" id="toc-inputs" class="nav-link" data-scroll-target="#inputs"><span class="header-section-number">13.8</span> Inputs</a></li>
+  <li><a href="#expected-output" id="toc-expected-output" class="nav-link" data-scroll-target="#expected-output"><span class="header-section-number">13.9</span> Expected Output</a></li>
+  <li><a href="#what-just-happened" id="toc-what-just-happened" class="nav-link" data-scroll-target="#what-just-happened"><span class="header-section-number">13.10</span> What just happened?</a></li>
+  <li><a href="#production-reality" id="toc-production-reality" class="nav-link" data-scroll-target="#production-reality"><span class="header-section-number">13.11</span> Production Reality</a>
+  <ul class="collapse">
+  <li><a href="#step-2-train-the-current-model-then-continue-on-the-new-batch" id="toc-step-2-train-the-current-model-then-continue-on-the-new-batch" class="nav-link" data-scroll-target="#step-2-train-the-current-model-then-continue-on-the-new-batch"><span class="header-section-number">13.11.1</span> Step 2: Train the current model, then continue on the new batch</a></li>
+  </ul></li>
+  <li><a href="#what-problem-are-we-solving-1" id="toc-what-problem-are-we-solving-1" class="nav-link" data-scroll-target="#what-problem-are-we-solving-1"><span class="header-section-number">13.12</span> What problem are we solving?</a></li>
+  <li><a href="#inputs-1" id="toc-inputs-1" class="nav-link" data-scroll-target="#inputs-1"><span class="header-section-number">13.13</span> Inputs</a></li>
+  <li><a href="#expected-output-1" id="toc-expected-output-1" class="nav-link" data-scroll-target="#expected-output-1"><span class="header-section-number">13.14</span> Expected Output</a></li>
+  <li><a href="#what-just-happened-1" id="toc-what-just-happened-1" class="nav-link" data-scroll-target="#what-just-happened-1"><span class="header-section-number">13.15</span> What just happened?</a></li>
+  <li><a href="#production-reality-1" id="toc-production-reality-1" class="nav-link" data-scroll-target="#production-reality-1"><span class="header-section-number">13.16</span> Production Reality</a>
+  <ul class="collapse">
+  <li><a href="#step-3-compare-before-deciding-to-deploy" id="toc-step-3-compare-before-deciding-to-deploy" class="nav-link" data-scroll-target="#step-3-compare-before-deciding-to-deploy"><span class="header-section-number">13.16.1</span> Step 3: Compare before deciding to deploy</a></li>
+  </ul></li>
+  <li><a href="#what-problem-are-we-solving-2" id="toc-what-problem-are-we-solving-2" class="nav-link" data-scroll-target="#what-problem-are-we-solving-2"><span class="header-section-number">13.17</span> What problem are we solving?</a></li>
+  <li><a href="#inputs-2" id="toc-inputs-2" class="nav-link" data-scroll-target="#inputs-2"><span class="header-section-number">13.18</span> Inputs</a></li>
+  <li><a href="#expected-output-2" id="toc-expected-output-2" class="nav-link" data-scroll-target="#expected-output-2"><span class="header-section-number">13.19</span> Expected Output</a></li>
+  <li><a href="#what-just-happened-2" id="toc-what-just-happened-2" class="nav-link" data-scroll-target="#what-just-happened-2"><span class="header-section-number">13.20</span> What just happened?</a></li>
+  <li><a href="#practical-exercise" id="toc-practical-exercise" class="nav-link" data-scroll-target="#practical-exercise"><span class="header-section-number">13.21</span> Practical exercise</a></li>
+  <li><a href="#field-notes" id="toc-field-notes" class="nav-link" data-scroll-target="#field-notes"><span class="header-section-number">13.22</span> Field notes</a></li>
+  <li><a href="#challenge-exercise" id="toc-challenge-exercise" class="nav-link" data-scroll-target="#challenge-exercise"><span class="header-section-number">13.23</span> Challenge exercise</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">13.24</span> Key takeaways</a></li>
+  <li><a href="#repository-files" id="toc-repository-files" class="nav-link" data-scroll-target="#repository-files"><span class="header-section-number">13.25</span> Repository files</a></li>
+  <li><a href="#what-can-you-do-now-that-you-couldnt-do-before" id="toc-what-can-you-do-now-that-you-couldnt-do-before" class="nav-link" data-scroll-target="#what-can-you-do-now-that-you-couldnt-do-before"><span class="header-section-number">13.26</span> What can you do now that you couldn’t do before?</a></li>
+  <li><a href="#see-it-side-by-side" id="toc-see-it-side-by-side" class="nav-link" data-scroll-target="#see-it-side-by-side"><span class="header-section-number">13.27</span> See it side by side</a></li>
+  <li><a href="#suggested-next-step" id="toc-suggested-next-step" class="nav-link" data-scroll-target="#suggested-next-step"><span class="header-section-number">13.28</span> Suggested next step</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/djimrastephane/llm-ft-drilling-completions-book/edit/main/chapters/chapter_13.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/djimrastephane/llm-ft-drilling-completions-book/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/chapter_06.html">Part II — Industrialising the System</a></li><li class="breadcrumb-item"><a href="../chapters/chapter_13.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Continuous Fine-Tuning: Keeping the Model Current</span></a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span id="sec-chapter-13" class="quarto-section-identifier"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Continuous Fine-Tuning: Keeping the Model Current</span></span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="pipeline-diagram">
+<p><img src="../figures/diagrams/pipeline_ch13_light.svg" class="diagram-light img-fluid" width="180"> <img src="../figures/diagrams/pipeline_ch13_dark.svg" class="diagram-dark img-fluid" width="180"></p>
+</div>
+<div class="chapter-status">
+<p>Progress <code>█████████████</code> <strong>13 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 45-60 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🔴 Advanced</p>
+</div>
+<section id="learning-objectives" class="level2" data-number="13.1">
+<h2 data-number="13.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">13.1</span> Learning objectives</h2>
+<p>By the end of this chapter, you will be able to:</p>
+<ul>
+<li>Simulate new reports arriving after a model is already in production, using a real chronological split of this book’s own archive</li>
+<li>Continue fine-tuning an existing checkpoint on just the new batch, reusing Chapter 8’s exact save-and-resume mechanism</li>
+<li>Run Chapter 12’s comparison harness on the result to decide whether an updated model is actually worth deploying</li>
+<li>Explain, from a real run, why “new data arrived” is not the same claim as “the new model is better”</li>
+</ul>
+</section>
+<section id="operational-problem" class="level2" data-number="13.2">
+<h2 data-number="13.2" class="anchored" data-anchor-id="operational-problem"><span class="header-section-number">13.2</span> Operational Problem</h2>
+<p>Sarah, the intervention engineer who first asked back in Chapter 9 whether she could trust an answer or still had to go find the PDF herself, has one last version of that question now that the book is almost done: <em>“Everything we’ve built assumes the reports we have today. What happens when new ones come in next month — do we just retrain and swap in whatever comes out?”</em></p>
+</section>
+<section id="example-the-same-question-this-book-has-asked-all-along-one-more-time" class="level2" data-number="13.3">
+<h2 data-number="13.3" class="anchored" data-anchor-id="example-the-same-question-this-book-has-asked-all-along-one-more-time"><span class="header-section-number">13.3</span> Example: the same question this book has asked all along, one more time</h2>
+<p>Simulate exactly that. Split this book’s real, quality-gated archive by report number — reports before <code>#60</code> stand in for “already in production,” reports <code>#60</code> onward stand in for “just arrived” — train a model on the first group, continue training it on the second, and ask Chapter 12’s comparison harness whether the result is actually better:</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Current model vs. updated model, same held-out set both times">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Current model vs.&nbsp;updated model, same held-out set both times
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<pre><code>Current model: exact_match=0  avg_overlap=0.464  perplexity=25.92
+Updated model: exact_match=0  avg_overlap=0.125  perplexity=25.73
+
+Direction: exact_match=unchanged  avg_overlap=regressed  perplexity=improved</code></pre>
+</div>
+</div>
+<p>New data arrived. Training ran without errors. Loss fell. And by one of this book’s own metrics, the result is a regression. This isn’t a hypothetical warning — it’s what actually happened the one time this book ran the full loop for real.</p>
+</section>
+<section id="theory" class="level2" data-number="13.4">
+<h2 data-number="13.4" class="anchored" data-anchor-id="theory"><span class="header-section-number">13.4</span> Theory</h2>
+<div class="callout callout-style-default callout-tip callout-titled" title="Engineering Translation: continuous fine-tuning">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Engineering Translation: continuous fine-tuning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Continuous fine-tuning</strong> means updating a model again as new data becomes available, instead of training it once and leaving it fixed forever. It answers <em>how</em> to incorporate new data. It does not by itself answer <em>whether</em> the result should replace what’s currently running — that’s still Chapter 12’s job, run again on the new checkpoint.</p>
+</div>
+</div>
+</section>
+<section id="why-we-retrained-isnt-the-same-claim-as-its-better" class="level2" data-number="13.5">
+<h2 data-number="13.5" class="anchored" data-anchor-id="why-we-retrained-isnt-the-same-claim-as-its-better"><span class="header-section-number">13.5</span> Why “we retrained” isn’t the same claim as “it’s better”</h2>
+<p>The tempting shortcut this chapter exists to head off: new reports arrived, so retrain, and deploy whatever comes out, because newer data must mean a more current, more capable model. The Example above is the real counter-case — training completed cleanly, loss fell every epoch, and the resulting model still regressed on the same held-out set by <code>avg_overlap</code>. Retraining is a mechanical step. Deciding whether the result should replace what’s live is a separate decision, and it needs Chapter 12’s comparison, run again, every time — not assumed from the fact that training happened.</p>
+</section>
+<section id="implementation" class="level2" data-number="13.6">
+<h2 data-number="13.6" class="anchored" data-anchor-id="implementation"><span class="header-section-number">13.6</span> Implementation</h2>
+<section id="step-1-split-the-archive-by-a-chronological-cutoff" class="level3" data-number="13.6.1">
+<h3 data-number="13.6.1" class="anchored" data-anchor-id="step-1-split-the-archive-by-a-chronological-cutoff"><span class="header-section-number">13.6.1</span> Step 1: Split the archive by a chronological cutoff</h3>
+</section>
+</section>
+<section id="what-problem-are-we-solving" class="level2" data-number="13.7">
+<h2 data-number="13.7" class="anchored" data-anchor-id="what-problem-are-we-solving"><span class="header-section-number">13.7</span> What problem are we solving?</h2>
+<p>Simulate “new reports arriving” using this book’s own real archive, without touching the one report (<code>#37</code>) reserved as held-out everywhere else in this book.</p>
+</section>
+<section id="inputs" class="level2" data-number="13.8">
+<h2 data-number="13.8" class="anchored" data-anchor-id="inputs"><span class="header-section-number">13.8</span> Inputs</h2>
+<ul>
+<li><code>build_archive_records</code> (Chapter 6), <code>HELD_OUT_REPORT</code> (Chapter 2)</li>
+<li>A cutoff report number</li>
+</ul>
+</section>
+<section id="expected-output" class="level2" data-number="13.9">
+<h2 data-number="13.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">13.9</span> Expected Output</h2>
+<p>Two lists of real report records: everything before the cutoff, and everything at or after it.</p>
+<div id="27843c7e" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>CUTOFF_REPORT_NUM <span class="op">=</span> <span class="dv">60</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> split_archive_by_cutoff(cutoff: <span class="bu">int</span> <span class="op">=</span> CUTOFF_REPORT_NUM) <span class="op">-&gt;</span> <span class="bu">tuple</span>[<span class="bu">list</span>[<span class="bu">dict</span>], <span class="bu">list</span>[<span class="bu">dict</span>]]:</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    records <span class="op">=</span> build_archive_records()</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    ok <span class="op">=</span> [r <span class="cf">for</span> r <span class="kw">in</span> records <span class="cf">if</span> r[<span class="st">"status"</span>] <span class="op">==</span> <span class="st">"ok"</span> <span class="kw">and</span> r[<span class="st">"file"</span>] <span class="op">!=</span> HELD_OUT_REPORT]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    current_reports <span class="op">=</span> [r <span class="cf">for</span> r <span class="kw">in</span> ok <span class="cf">if</span> r[<span class="st">"rpt_num"</span>] <span class="op">&lt;</span> cutoff]</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    new_reports <span class="op">=</span> [r <span class="cf">for</span> r <span class="kw">in</span> ok <span class="cf">if</span> r[<span class="st">"rpt_num"</span>] <span class="op">&gt;=</span> cutoff]</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> current_reports, new_reports</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>current_reports, new_reports <span class="op">=</span> split_archive_by_cutoff()</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"'Currently in production': </span><span class="sc">{</span><span class="bu">len</span>(current_reports)<span class="sc">}</span><span class="ss"> reports"</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"New reports just arrived:  </span><span class="sc">{</span><span class="bu">len</span>(new_reports)<span class="sc">}</span><span class="ss"> reports"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Running this exact code prints:</p>
+<pre><code>'Currently in production': 57 reports
+New reports just arrived:  17 reports</code></pre>
+</section>
+<section id="what-just-happened" class="level2" data-number="13.10">
+<h2 data-number="13.10" class="anchored" data-anchor-id="what-just-happened"><span class="header-section-number">13.10</span> What just happened?</h2>
+<p><code>57 + 17 = 74</code> — every quality-gated, non-held-out report in the archive, split by report number into “before” and “after” a real cutoff. Report <code>#37</code> never appears in either half, the same reservation every earlier chapter has respected.</p>
+</section>
+<section id="production-reality" class="level2" data-number="13.11">
+<h2 data-number="13.11" class="anchored" data-anchor-id="production-reality"><span class="header-section-number">13.11</span> Production Reality</h2>
+<p>This book’s archive stops in early January 2021 — there’s no genuinely new data to wait for. A production system would use the actual date a report was filed, not a chosen report-number cutoff, and the “new” batch would arrive continuously, a few reports at a time, not as one 17-report batch.</p>
+<section id="step-2-train-the-current-model-then-continue-on-the-new-batch" class="level3" data-number="13.11.1">
+<h3 data-number="13.11.1" class="anchored" data-anchor-id="step-2-train-the-current-model-then-continue-on-the-new-batch"><span class="header-section-number">13.11.1</span> Step 2: Train the current model, then continue on the new batch</h3>
+</section>
+</section>
+<section id="what-problem-are-we-solving-1" class="level2" data-number="13.12">
+<h2 data-number="13.12" class="anchored" data-anchor-id="what-problem-are-we-solving-1"><span class="header-section-number">13.12</span> What problem are we solving?</h2>
+<p>Produce two real checkpoints — one trained on the archive as it stood before the cutoff, one continuing training on only the new batch — using Chapter 8’s exact checkpoint-and-resume mechanism.</p>
+</section>
+<section id="inputs-1" class="level2" data-number="13.13">
+<h2 data-number="13.13" class="anchored" data-anchor-id="inputs-1"><span class="header-section-number">13.13</span> Inputs</h2>
+<ul>
+<li><code>current_examples</code> and <code>new_examples</code>, built with Chapter 7’s chunker</li>
+<li><code>train_with_checkpoints</code>, <code>save_checkpoint</code>, <code>load_checkpoint</code> (Chapter 8), reused unchanged</li>
+</ul>
+</section>
+<section id="expected-output-1" class="level2" data-number="13.14">
+<h2 data-number="13.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">13.14</span> Expected Output</h2>
+<p>Four checkpoints: two from training on the current archive, two more continuing on the new batch alone.</p>
+<div id="968ca244" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>model, tokenizer <span class="op">=</span> load_model_and_tokenizer(MODEL_NAME)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>lora_model <span class="op">=</span> build_lora_model(model)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>train_with_checkpoints(lora_model, tokenizer, current_examples, held_out_eval_set, run_dir, logger, num_epochs<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>current_checkpoint <span class="op">=</span> run_dir <span class="op">/</span> <span class="st">"checkpoint_2"</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="kw">del</span> model, lora_model</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>model, tokenizer <span class="op">=</span> load_model_and_tokenizer(MODEL_NAME)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>lora_model <span class="op">=</span> load_checkpoint(model, current_checkpoint)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>train_with_checkpoints(lora_model, tokenizer, new_examples, held_out_eval_set, run_dir, logger, num_epochs<span class="op">=</span><span class="dv">2</span>, start_epoch<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>updated_checkpoint <span class="op">=</span> save_checkpoint(lora_model, run_dir, epoch<span class="op">=</span><span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Running this exact code prints:</p>
+<pre><code>  epoch 1: avg loss 3.0296, held-out 0/8 (410s) -&gt; checkpoint_1
+  epoch 2: avg loss 2.3672, held-out 0/8 (409s) -&gt; checkpoint_2
+  epoch 3: avg loss 1.8747, held-out 0/8 (142s) -&gt; checkpoint_3
+  epoch 4: avg loss 1.5092, held-out 0/8 (145s) -&gt; checkpoint_4</code></pre>
+</section>
+<section id="what-just-happened-1" class="level2" data-number="13.15">
+<h2 data-number="13.15" class="anchored" data-anchor-id="what-just-happened-1"><span class="header-section-number">13.15</span> What just happened?</h2>
+<p>Loss fell at every epoch, in both stages — training worked exactly as intended, on both the current archive and the new batch. <code>checkpoint_2</code> is “currently in production”; <code>checkpoint_4</code> is “the update after new reports arrived,” produced the same reload-from-disk way Chapter 8 already simulates a crash and restart. Nothing about this step signals a problem. That’s the point of Step 3.</p>
+</section>
+<section id="production-reality-1" class="level2" data-number="13.16">
+<h2 data-number="13.16" class="anchored" data-anchor-id="production-reality-1"><span class="header-section-number">13.16</span> Production Reality</h2>
+<p>Two epochs on 179 new examples is a small, fast update by design — a real production system might retrain more or less aggressively depending on how much new data has accumulated and how expensive a full retrain is. This chapter’s fixed 2-epoch continuation is a teaching choice, not a tuned production schedule.</p>
+<section id="step-3-compare-before-deciding-to-deploy" class="level3" data-number="13.16.1">
+<h3 data-number="13.16.1" class="anchored" data-anchor-id="step-3-compare-before-deciding-to-deploy"><span class="header-section-number">13.16.1</span> Step 3: Compare before deciding to deploy</h3>
+</section>
+</section>
+<section id="what-problem-are-we-solving-2" class="level2" data-number="13.17">
+<h2 data-number="13.17" class="anchored" data-anchor-id="what-problem-are-we-solving-2"><span class="header-section-number">13.17</span> What problem are we solving?</h2>
+<p>Answer the question Step 2’s clean training run can’t: is <code>checkpoint_4</code> actually an improvement over <code>checkpoint_2</code>?</p>
+</section>
+<section id="inputs-2" class="level2" data-number="13.18">
+<h2 data-number="13.18" class="anchored" data-anchor-id="inputs-2"><span class="header-section-number">13.18</span> Inputs</h2>
+<ul>
+<li>Both checkpoints from Step 2, reloaded fresh from disk</li>
+<li><code>load_version</code>, <code>summarize_version</code>, and <code>compare_versions</code> (Chapter 12), reused unchanged</li>
+</ul>
+</section>
+<section id="expected-output-2" class="level2" data-number="13.19">
+<h2 data-number="13.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">13.19</span> Expected Output</h2>
+<p>A direction per metric between the current and updated model.</p>
+<div id="6d8456f9" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lora_current, tokenizer <span class="op">=</span> load_version(current_checkpoint)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>summary_current <span class="op">=</span> summarize_version(lora_current, tokenizer, held_out_eval_set)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>lora_updated, _ <span class="op">=</span> load_version(updated_checkpoint)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>summary_updated <span class="op">=</span> summarize_version(lora_updated, tokenizer, held_out_eval_set)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Current model: </span><span class="sc">{</span>summary_current<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Updated model: </span><span class="sc">{</span>summary_updated<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Direction:     </span><span class="sc">{</span>compare_versions(summary_current, summary_updated)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Running this exact code prints:</p>
+<pre><code>Current model: {'exact_match': 0, 'avg_overlap': 0.464, 'perplexity': 25.92}
+Updated model: {'exact_match': 0, 'avg_overlap': 0.125, 'perplexity': 25.73}
+Direction:     {'exact_match': 'unchanged', 'avg_overlap': 'regressed', 'perplexity': 'improved'}</code></pre>
+</section>
+<section id="what-just-happened-2" class="level2" data-number="13.20">
+<h2 data-number="13.20" class="anchored" data-anchor-id="what-just-happened-2"><span class="header-section-number">13.20</span> What just happened?</h2>
+<p>The same disagreement Chapter 12 found comparing two epochs of one run, and comparing two entirely different training regimes, shows up a third time here, on a genuinely new scenario: real new data, really incorporated. <code>avg_overlap</code> says this update made things worse. Perplexity’s “improved” label points the right direction but by a small margin — <code>25.92 -&gt; 25.73</code> is about <code>0.7%</code>, nowhere near the substantial, <code>6×</code> gap Chapter 11 found between a base and fine-tuned model. Chapter 12’s own Production Reality warned that this comparison has no noise threshold; this run is a live example of why that matters: a real disagreement (<code>avg_overlap</code>) sits next to a real but minor “improvement” (<code>perplexity</code>), and only one of them is worth acting on.</p>
+<p>This step’s loader is worth noticing too: it calls <code>load_version</code> (Chapter 12), not Step 2’s <code>load_checkpoint</code> (Chapter 8) — the two look interchangeable but aren’t. <code>load_checkpoint</code> sets <code>is_trainable=True</code>, which leaves the model in <strong>train mode</strong>, dropout included. That’s correct for resuming training in Step 2; loading a checkpoint the same way just to <em>evaluate</em> it would leave dropout switched on during scoring, making perplexity noisy from run to run for no real reason. Catching this meant literally checking <code>model.training</code> after loading — it printed <code>True</code> where it should have printed <code>False</code>, on the first attempt at this exact step.</p>
+</section>
+<section id="practical-exercise" class="level2" data-number="13.21">
+<h2 data-number="13.21" class="anchored" data-anchor-id="practical-exercise"><span class="header-section-number">13.21</span> Practical exercise</h2>
+<p>🟢 <strong>Beginner</strong></p>
+<p><strong>Try it yourself:</strong> run <code>python code/chapter_13/continuous_finetune.py</code> from inside <code>book/</code> (it takes roughly 20-25 minutes on CPU) and compare its printed output to the transcripts above.</p>
+<p><strong>You’ll know it worked when:</strong> you see <code>avg_overlap: regressed</code> in the final comparison, and you can explain in one sentence why that means this particular update shouldn’t be deployed without a closer look, even though training itself ran cleanly.</p>
+</section>
+<section id="field-notes" class="level2" data-number="13.22">
+<h2 data-number="13.22" class="anchored" data-anchor-id="field-notes"><span class="header-section-number">13.22</span> Field notes</h2>
+<div class="callout callout-style-default callout-warning callout-titled" title="Field notes: the new batch skews toward a different phase of the well">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Field notes: the new batch skews toward a different phase of the well
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Query:</strong> what the 17 new reports (<code>#60</code> onward) actually describe, compared to what the held-out evaluation report (<code>#37</code>) describes.</p>
+<p><strong>Result:</strong> <code>20</code> of the new batch’s <code>179</code> examples mention casing or cement — concentrated in the last several reports, right at the archive’s end (<em>“Rig up and run 7” casing,“</em> <em>“Cement 7” casing,“<em> </em>”Production Casing Wait on Cement”</em>). The updated model’s memorized-sounding template shifts to match: <em>“Production Casing Run Csg &amp; Cement Rig up cementing equipment,”</em> replacing the current model’s <em>“Production Drilling Cond Mud &amp; Circ Circulate for temperature.”</em> Report <code>#37</code>, the held-out report this chapter still evaluates against, is from the middle of the well program — active drilling, not casing.</p>
+<p><strong>Why:</strong> a real well program drills first and cases and cements later, near total depth. The new batch isn’t random new data; it’s disproportionately drawn from a later, different operational phase than the report this chapter evaluates against. Continuing training on it pulled the model’s default template toward casing/cementing language, which fits the new reports and doesn’t fit report <code>#37</code>.</p>
+<p><strong>Lesson:</strong> “the new data is real and relevant” and “the new data resembles what you’re evaluating against” are different claims. A drop in <code>avg_overlap</code> here isn’t a training bug — it’s an honest reflection of what the new batch actually contains, and exactly the kind of thing a human should look at before deciding whether report <code>#37</code>-style questions are still important enough to weight for, or whether the archive’s growing casing/cementing content means the evaluation set itself needs to grow too.</p>
+</div>
+</div>
+</section>
+<section id="challenge-exercise" class="level2" data-number="13.23">
+<h2 data-number="13.23" class="anchored" data-anchor-id="challenge-exercise"><span class="header-section-number">13.23</span> Challenge exercise</h2>
+<p>🟠 <strong>Intermediate</strong></p>
+<p><strong>Challenge:</strong> this chapter’s evaluation set is still Chapter 11’s original 8 questions, all from report <code>#37</code> — a report about active drilling, not casing. Build a second held-out check from one of the new batch’s own reports (held out from the “new” training set the same way <code>#37</code> is held out from everything) and compare the updated model against it instead. A reference solution is at <code>code/chapter_13/challenge/challenge.py</code> — on a real run, holding report <code>#65</code> (2020-12-23, <code>20</code> real examples) out of the new-batch continuation and evaluating against it afterward gives <code>{'exact_match': 0, 'avg_overlap': 0.14, 'perplexity': 16.56}</code>. Perplexity is noticeably lower here than either model scored against report <code>#37</code> (<code>~25.8</code>) — the updated model finds a report from its own new batch’s operational phase less surprising than one from an earlier phase, even though <code>avg_overlap</code> stays just as low. Recency alone didn’t fix what changed; matching the evaluation report’s operational phase did more than matching its training era.</p>
+</section>
+<section id="key-takeaways" class="level2" data-number="13.24">
+<h2 data-number="13.24" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">13.24</span> Key takeaways</h2>
+<ul>
+<li>Training completing without errors, with loss falling every epoch, says nothing about whether the result should replace what’s in production. This chapter’s real run trained cleanly and still regressed on <code>avg_overlap</code>.</li>
+<li>The same metric-disagreement pattern Chapter 12 found comparing epochs, and comparing entirely different training regimes, showed up a third time in a genuinely new scenario — this isn’t a one-off quirk of one comparison.</li>
+<li>A regression is worth investigating, not just flagging: the real cause here was traceable to what the new reports actually contain, not a training bug.</li>
+<li>Perplexity moving in the “improved” direction by under <code>1%</code> is not the same claim as the substantial, <code>6×</code> gap Chapter 11 found between a base and fine-tuned model. Direction alone, without magnitude, can overstate a trivial change.</li>
+<li>A model left in train mode (dropout still active) scores noisily even in eval-only code — <code>load_checkpoint</code>’s <code>is_trainable=True</code> is right for resuming training and wrong for scoring; catching it meant checking <code>model.training</code> directly, not just distrusting a number that looked slightly different between runs.</li>
+</ul>
+</section>
+<section id="repository-files" class="level2" data-number="13.25">
+<h2 data-number="13.25" class="anchored" data-anchor-id="repository-files"><span class="header-section-number">13.25</span> Repository files</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>code/chapter_13/continuous_finetune.py</code></td>
+<td>Splits the archive, trains a current model, continues training on new reports, and compares the result</td>
+</tr>
+<tr class="even">
+<td><code>code/chapter_13/challenge/challenge.py</code></td>
+<td>Reference solution: evaluating against a held-out report from the new batch itself</td>
+</tr>
+<tr class="odd">
+<td><code>notebooks/chapter_13_explore.ipynb</code></td>
+<td>Interactive companion notebook</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-caution callout-titled" title="CHECKPOINT — Chapter 13">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Caution</span>CHECKPOINT — Chapter 13
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Simulated new reports arriving using a real chronological split of this book’s own archive</label></li>
+<li><label><input type="checkbox" checked="">Continued fine-tuning an existing checkpoint on just the new batch, reusing Chapter 8’s save-and-resume mechanism unchanged</label></li>
+<li><label><input type="checkbox" checked="">Ran Chapter 12’s comparison on the result and found a real regression, not a hypothetical one</label></li>
+<li><label><input type="checkbox" checked="">Traced that regression back to a real, sensible cause instead of treating the metric as unexplainable noise</label></li>
+</ul>
+</div>
+</div>
+<div class="built-box callout callout-style-default callout-tip callout-titled" title="✓ WHAT YOU BUILT">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>✓ WHAT YOU BUILT
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong><code>continuous_finetune.py</code></strong> — splits this book’s real archive by a chronological cutoff, trains a “current” model on one side, continues training it on the “new” side using Chapter 8’s exact checkpoint mechanism, and runs Chapter 12’s comparison to decide whether the result actually deserves to replace what’s running. On a real run, it doesn’t.</p>
+</div>
+</div>
+</section>
+<section id="what-can-you-do-now-that-you-couldnt-do-before" class="level2" data-number="13.26">
+<h2 data-number="13.26" class="anchored" data-anchor-id="what-can-you-do-now-that-you-couldnt-do-before"><span class="header-section-number">13.26</span> What can you do now that you couldn’t do before?</h2>
+<p>You can retrain a model on new data as it arrives, and — because you built Chapter 12’s comparison first — you can tell the difference between “we retrained” and “we improved,” instead of deploying whatever a clean training run happens to produce.</p>
+</section>
+<section id="see-it-side-by-side" class="level2" data-number="13.27">
+<h2 data-number="13.27" class="anchored" data-anchor-id="see-it-side-by-side"><span class="header-section-number">13.27</span> See it side by side</h2>
+<p>Every real checkpoint sitting in <code>checkpoints/</code> right now — from Chapter 5’s first fine-tune through this chapter’s continuously-updated one — is something the book’s companion app (<code>app/</code>) can load directly, not a separate demo built beside this book. Its Model Playground puts the base and fine-tuned answers side by side on the same real prompt; Before vs.&nbsp;After Evaluation runs this book’s own metrics live across the full held-out set; Dataset Explorer browses the real training examples behind them; and Failure Analysis reruns the book’s own documented failure cases — including a real regression like the one this chapter just found — against whichever checkpoint you actually have. See <code>app/README.md</code> to run it; nothing in it is pre-recorded, so your own checkpoint may not reproduce this book’s exact numbers, and that difference is itself real information.</p>
+<div id="fig-app-evaluation" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Screenshot of the companion app's Before vs. After Evaluation page, showing a results table for the base model and three fine-tuned checkpoints, a callout stating the latest checkpoint regressed on both average overlap and perplexity compared to the previous one, and per-transition percentage changes for each metric.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-app-evaluation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../figures/app_screenshot_evaluation.jpg" class="img-fluid figure-img" alt="Screenshot of the companion app's Before vs. After Evaluation page, showing a results table for the base model and three fine-tuned checkpoints, a callout stating the latest checkpoint regressed on both average overlap and perplexity compared to the previous one, and per-transition percentage changes for each metric.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-app-evaluation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.1: Before vs.&nbsp;After Evaluation, screenshotted from a real local run across this book’s own checkpoints – the exact “latest doesn’t mean best” regression this chapter’s own version-comparison run found above, surfaced automatically by the app.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="suggested-next-step" class="level2" data-number="13.28">
+<h2 data-number="13.28" class="anchored" data-anchor-id="suggested-next-step"><span class="header-section-number">13.28</span> Suggested next step</h2>
+<p>This is the last chapter. Every tool in it runs on your own data, not just this book’s Utah FORGE archive: Chapter 6’s gate checks a new archive’s quality, Chapter 8 fine-tunes it at whatever scale it has, Chapters 9 and 10 add retrieval and a faithfulness check on top, Chapter 11 builds a real evaluation set from whatever you hold out, and Chapters 12 and 13 decide, honestly, whether a new version is actually worth deploying. The book’s own archive stops in January 2021. Yours doesn’t have to.</p>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/chapter_12.html" class="pagination-link" aria-label="Detecting Drift Across Model Versions">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Detecting Drift Across Model Versions</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../appendix/appendix_a_environment_setup.html" class="pagination-link" aria-label="Appendix A: Environment Setup">
+        <span class="nav-page-text">Appendix A: Environment Setup</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Continuous Fine-Tuning: Keeping the Model Current {#sec-chapter-13}</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>::: {.content-visible when-format="html"}</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>::: {.pipeline-diagram}</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="al">![](../figures/diagrams/pipeline_ch13_light.svg)</span>{.diagram-light width="180"}</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="al">![](../figures/diagrams/pipeline_ch13_dark.svg)</span>{.diagram-dark width="180"}</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>::: {.content-visible when-format="pdf"}</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="al">![](../figures/diagrams/pipeline_ch13.pdf)</span>{width="180" fig-align="center"}</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>::: {.chapter-status}</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`█████████████`</span> **13 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 45-60 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🔴 Advanced</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learning objectives</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>By the end of this chapter, you will be able to:</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Simulate new reports arriving after a model is already in production,</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  using a real chronological split of this book's own archive</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Continue fine-tuning an existing checkpoint on just the new batch,</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  reusing Chapter 8's exact save-and-resume mechanism</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Run Chapter 12's comparison harness on the result to decide whether</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>  an updated model is actually worth deploying</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Explain, from a real run, why "new data arrived" is not the same</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>  claim as "the new model is better"</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="fu">## Operational Problem</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>Sarah, the intervention engineer who first asked back in Chapter 9</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>whether she could trust an answer or still had to go find the PDF</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>herself, has one last version of that question now that the book is</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>almost done: *"Everything we've built assumes the reports we have</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>today. What happens when new ones come in next month — do we just</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>retrain and swap in whatever comes out?"*</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="fu">## Example: the same question this book has asked all along, one more time</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>Simulate exactly that. Split this book's real, quality-gated archive</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>by report number — reports before <span class="in">`#60`</span> stand in for "already in</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>production," reports <span class="in">`#60`</span> onward stand in for "just arrived" — train</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>a model on the first group, continue training it on the second, and</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>ask Chapter 12's comparison harness whether the result is actually</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>better:</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="Current model vs. updated model, same held-out set both times"}</span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="in">Current model: exact_match=0  avg_overlap=0.464  perplexity=25.92</span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="in">Updated model: exact_match=0  avg_overlap=0.125  perplexity=25.73</span></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a><span class="in">Direction: exact_match=unchanged  avg_overlap=regressed  perplexity=improved</span></span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>New data arrived. Training ran without errors. Loss fell. And by one</span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>of this book's own metrics, the result is a regression. This isn't a</span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>hypothetical warning — it's what actually happened the one time this</span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>book ran the full loop for real.</span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a><span class="fu">## Theory</span></span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Engineering Translation: continuous fine-tuning"}</span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>**Continuous fine-tuning** means updating a model again as new data</span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>becomes available, instead of training it once and leaving it fixed</span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>forever. It answers *how* to incorporate new data. It does not by</span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>itself answer *whether* the result should replace what's currently</span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>running — that's still Chapter 12's job, run again on the new</span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>checkpoint.</span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why "we retrained" isn't the same claim as "it's better"</span></span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>The tempting shortcut this chapter exists to head off: new reports</span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>arrived, so retrain, and deploy whatever comes out, because newer data</span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>must mean a more current, more capable model. The Example above is the</span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>real counter-case — training completed cleanly, loss fell every epoch,</span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>and the resulting model still regressed on the same held-out set by</span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a><span class="in">`avg_overlap`</span>. Retraining is a mechanical step. Deciding whether the</span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a>result should replace what's live is a separate decision, and it needs</span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a>Chapter 12's comparison, run again, every time — not assumed from the</span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a>fact that training happened.</span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a><span class="fu">## Implementation</span></span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 1: Split the archive by a chronological cutoff</span></span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a>Simulate "new reports arriving" using this book's own real archive,</span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a>without touching the one report (<span class="in">`#37`</span>) reserved as held-out</span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a>everywhere else in this book.</span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`build_archive_records`</span> (Chapter 6), <span class="in">`HELD_OUT_REPORT`</span> (Chapter 2)</span>
+<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A cutoff report number</span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a>Two lists of real report records: everything before the cutoff, and</span>
+<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a>everything at or after it.</span>
+<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a>CUTOFF_REPORT_NUM <span class="op">=</span> <span class="dv">60</span></span>
+<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> split_archive_by_cutoff(cutoff: <span class="bu">int</span> <span class="op">=</span> CUTOFF_REPORT_NUM) <span class="op">-&gt;</span> <span class="bu">tuple</span>[<span class="bu">list</span>[<span class="bu">dict</span>], <span class="bu">list</span>[<span class="bu">dict</span>]]:</span>
+<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a>    records <span class="op">=</span> build_archive_records()</span>
+<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a>    ok <span class="op">=</span> [r <span class="cf">for</span> r <span class="kw">in</span> records <span class="cf">if</span> r[<span class="st">"status"</span>] <span class="op">==</span> <span class="st">"ok"</span> <span class="kw">and</span> r[<span class="st">"file"</span>] <span class="op">!=</span> HELD_OUT_REPORT]</span>
+<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a>    current_reports <span class="op">=</span> [r <span class="cf">for</span> r <span class="kw">in</span> ok <span class="cf">if</span> r[<span class="st">"rpt_num"</span>] <span class="op">&lt;</span> cutoff]</span>
+<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a>    new_reports <span class="op">=</span> [r <span class="cf">for</span> r <span class="kw">in</span> ok <span class="cf">if</span> r[<span class="st">"rpt_num"</span>] <span class="op">&gt;=</span> cutoff]</span>
+<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> current_reports, new_reports</span>
+<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a>current_reports, new_reports <span class="op">=</span> split_archive_by_cutoff()</span>
+<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"'Currently in production': </span><span class="sc">{</span><span class="bu">len</span>(current_reports)<span class="sc">}</span><span class="ss"> reports"</span>)</span>
+<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"New reports just arrived:  </span><span class="sc">{</span><span class="bu">len</span>(new_reports)<span class="sc">}</span><span class="ss"> reports"</span>)</span>
+<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a><span class="in">'Currently in production': 57 reports</span></span>
+<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a><span class="in">New reports just arrived:  17 reports</span></span>
+<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a><span class="in">`57 + 17 = 74`</span> — every quality-gated, non-held-out report in the</span>
+<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a>archive, split by report number into "before" and "after" a real</span>
+<span id="cb8-137"><a href="#cb8-137" aria-hidden="true" tabindex="-1"></a>cutoff. Report <span class="in">`#37`</span> never appears in either half, the same reservation</span>
+<span id="cb8-138"><a href="#cb8-138" aria-hidden="true" tabindex="-1"></a>every earlier chapter has respected.</span>
+<span id="cb8-139"><a href="#cb8-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a><span class="fu">## Production Reality</span></span>
+<span id="cb8-141"><a href="#cb8-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-142"><a href="#cb8-142" aria-hidden="true" tabindex="-1"></a>This book's archive stops in early January 2021 — there's no genuinely</span>
+<span id="cb8-143"><a href="#cb8-143" aria-hidden="true" tabindex="-1"></a>new data to wait for. A production system would use the actual date a</span>
+<span id="cb8-144"><a href="#cb8-144" aria-hidden="true" tabindex="-1"></a>report was filed, not a chosen report-number cutoff, and the "new"</span>
+<span id="cb8-145"><a href="#cb8-145" aria-hidden="true" tabindex="-1"></a>batch would arrive continuously, a few reports at a time, not as one</span>
+<span id="cb8-146"><a href="#cb8-146" aria-hidden="true" tabindex="-1"></a>17-report batch.</span>
+<span id="cb8-147"><a href="#cb8-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-148"><a href="#cb8-148" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 2: Train the current model, then continue on the new batch</span></span>
+<span id="cb8-149"><a href="#cb8-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-150"><a href="#cb8-150" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-151"><a href="#cb8-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-152"><a href="#cb8-152" aria-hidden="true" tabindex="-1"></a>Produce two real checkpoints — one trained on the archive as it stood</span>
+<span id="cb8-153"><a href="#cb8-153" aria-hidden="true" tabindex="-1"></a>before the cutoff, one continuing training on only the new batch —</span>
+<span id="cb8-154"><a href="#cb8-154" aria-hidden="true" tabindex="-1"></a>using Chapter 8's exact checkpoint-and-resume mechanism.</span>
+<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`current_examples`</span> and <span class="in">`new_examples`</span>, built with Chapter 7's chunker</span>
+<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`train_with_checkpoints`</span>, <span class="in">`save_checkpoint`</span>, <span class="in">`load_checkpoint`</span></span>
+<span id="cb8-160"><a href="#cb8-160" aria-hidden="true" tabindex="-1"></a>  (Chapter 8), reused unchanged</span>
+<span id="cb8-161"><a href="#cb8-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-162"><a href="#cb8-162" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-163"><a href="#cb8-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-164"><a href="#cb8-164" aria-hidden="true" tabindex="-1"></a>Four checkpoints: two from training on the current archive, two more</span>
+<span id="cb8-165"><a href="#cb8-165" aria-hidden="true" tabindex="-1"></a>continuing on the new batch alone.</span>
+<span id="cb8-166"><a href="#cb8-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-169"><a href="#cb8-169" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-170"><a href="#cb8-170" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-171"><a href="#cb8-171" aria-hidden="true" tabindex="-1"></a>model, tokenizer <span class="op">=</span> load_model_and_tokenizer(MODEL_NAME)</span>
+<span id="cb8-172"><a href="#cb8-172" aria-hidden="true" tabindex="-1"></a>lora_model <span class="op">=</span> build_lora_model(model)</span>
+<span id="cb8-173"><a href="#cb8-173" aria-hidden="true" tabindex="-1"></a>train_with_checkpoints(lora_model, tokenizer, current_examples, held_out_eval_set, run_dir, logger, num_epochs<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb8-174"><a href="#cb8-174" aria-hidden="true" tabindex="-1"></a>current_checkpoint <span class="op">=</span> run_dir <span class="op">/</span> <span class="st">"checkpoint_2"</span></span>
+<span id="cb8-175"><a href="#cb8-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-176"><a href="#cb8-176" aria-hidden="true" tabindex="-1"></a><span class="kw">del</span> model, lora_model</span>
+<span id="cb8-177"><a href="#cb8-177" aria-hidden="true" tabindex="-1"></a>model, tokenizer <span class="op">=</span> load_model_and_tokenizer(MODEL_NAME)</span>
+<span id="cb8-178"><a href="#cb8-178" aria-hidden="true" tabindex="-1"></a>lora_model <span class="op">=</span> load_checkpoint(model, current_checkpoint)</span>
+<span id="cb8-179"><a href="#cb8-179" aria-hidden="true" tabindex="-1"></a>train_with_checkpoints(lora_model, tokenizer, new_examples, held_out_eval_set, run_dir, logger, num_epochs<span class="op">=</span><span class="dv">2</span>, start_epoch<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb8-180"><a href="#cb8-180" aria-hidden="true" tabindex="-1"></a>updated_checkpoint <span class="op">=</span> save_checkpoint(lora_model, run_dir, epoch<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb8-181"><a href="#cb8-181" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-182"><a href="#cb8-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-183"><a href="#cb8-183" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-184"><a href="#cb8-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-185"><a href="#cb8-185" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-186"><a href="#cb8-186" aria-hidden="true" tabindex="-1"></a><span class="in">  epoch 1: avg loss 3.0296, held-out 0/8 (410s) -&gt; checkpoint_1</span></span>
+<span id="cb8-187"><a href="#cb8-187" aria-hidden="true" tabindex="-1"></a><span class="in">  epoch 2: avg loss 2.3672, held-out 0/8 (409s) -&gt; checkpoint_2</span></span>
+<span id="cb8-188"><a href="#cb8-188" aria-hidden="true" tabindex="-1"></a><span class="in">  epoch 3: avg loss 1.8747, held-out 0/8 (142s) -&gt; checkpoint_3</span></span>
+<span id="cb8-189"><a href="#cb8-189" aria-hidden="true" tabindex="-1"></a><span class="in">  epoch 4: avg loss 1.5092, held-out 0/8 (145s) -&gt; checkpoint_4</span></span>
+<span id="cb8-190"><a href="#cb8-190" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-191"><a href="#cb8-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-192"><a href="#cb8-192" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-193"><a href="#cb8-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-194"><a href="#cb8-194" aria-hidden="true" tabindex="-1"></a>Loss fell at every epoch, in both stages — training worked exactly as</span>
+<span id="cb8-195"><a href="#cb8-195" aria-hidden="true" tabindex="-1"></a>intended, on both the current archive and the new batch. <span class="in">`checkpoint_2`</span></span>
+<span id="cb8-196"><a href="#cb8-196" aria-hidden="true" tabindex="-1"></a>is "currently in production"; <span class="in">`checkpoint_4`</span> is "the update after new</span>
+<span id="cb8-197"><a href="#cb8-197" aria-hidden="true" tabindex="-1"></a>reports arrived," produced the same reload-from-disk way Chapter 8</span>
+<span id="cb8-198"><a href="#cb8-198" aria-hidden="true" tabindex="-1"></a>already simulates a crash and restart. Nothing about this step signals</span>
+<span id="cb8-199"><a href="#cb8-199" aria-hidden="true" tabindex="-1"></a>a problem. That's the point of Step 3.</span>
+<span id="cb8-200"><a href="#cb8-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-201"><a href="#cb8-201" aria-hidden="true" tabindex="-1"></a><span class="fu">## Production Reality</span></span>
+<span id="cb8-202"><a href="#cb8-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-203"><a href="#cb8-203" aria-hidden="true" tabindex="-1"></a>Two epochs on 179 new examples is a small, fast update by design — a</span>
+<span id="cb8-204"><a href="#cb8-204" aria-hidden="true" tabindex="-1"></a>real production system might retrain more or less aggressively</span>
+<span id="cb8-205"><a href="#cb8-205" aria-hidden="true" tabindex="-1"></a>depending on how much new data has accumulated and how expensive a</span>
+<span id="cb8-206"><a href="#cb8-206" aria-hidden="true" tabindex="-1"></a>full retrain is. This chapter's fixed 2-epoch continuation is a</span>
+<span id="cb8-207"><a href="#cb8-207" aria-hidden="true" tabindex="-1"></a>teaching choice, not a tuned production schedule.</span>
+<span id="cb8-208"><a href="#cb8-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-209"><a href="#cb8-209" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 3: Compare before deciding to deploy</span></span>
+<span id="cb8-210"><a href="#cb8-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-211"><a href="#cb8-211" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-212"><a href="#cb8-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-213"><a href="#cb8-213" aria-hidden="true" tabindex="-1"></a>Answer the question Step 2's clean training run can't: is</span>
+<span id="cb8-214"><a href="#cb8-214" aria-hidden="true" tabindex="-1"></a><span class="in">`checkpoint_4`</span> actually an improvement over <span class="in">`checkpoint_2`</span>?</span>
+<span id="cb8-215"><a href="#cb8-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-216"><a href="#cb8-216" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-217"><a href="#cb8-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-218"><a href="#cb8-218" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Both checkpoints from Step 2, reloaded fresh from disk</span>
+<span id="cb8-219"><a href="#cb8-219" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`load_version`</span>, <span class="in">`summarize_version`</span>, and <span class="in">`compare_versions`</span></span>
+<span id="cb8-220"><a href="#cb8-220" aria-hidden="true" tabindex="-1"></a>  (Chapter 12), reused unchanged</span>
+<span id="cb8-221"><a href="#cb8-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-222"><a href="#cb8-222" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-223"><a href="#cb8-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-224"><a href="#cb8-224" aria-hidden="true" tabindex="-1"></a>A direction per metric between the current and updated model.</span>
+<span id="cb8-225"><a href="#cb8-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-228"><a href="#cb8-228" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-229"><a href="#cb8-229" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-230"><a href="#cb8-230" aria-hidden="true" tabindex="-1"></a>lora_current, tokenizer <span class="op">=</span> load_version(current_checkpoint)</span>
+<span id="cb8-231"><a href="#cb8-231" aria-hidden="true" tabindex="-1"></a>summary_current <span class="op">=</span> summarize_version(lora_current, tokenizer, held_out_eval_set)</span>
+<span id="cb8-232"><a href="#cb8-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-233"><a href="#cb8-233" aria-hidden="true" tabindex="-1"></a>lora_updated, _ <span class="op">=</span> load_version(updated_checkpoint)</span>
+<span id="cb8-234"><a href="#cb8-234" aria-hidden="true" tabindex="-1"></a>summary_updated <span class="op">=</span> summarize_version(lora_updated, tokenizer, held_out_eval_set)</span>
+<span id="cb8-235"><a href="#cb8-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-236"><a href="#cb8-236" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Current model: </span><span class="sc">{</span>summary_current<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-237"><a href="#cb8-237" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Updated model: </span><span class="sc">{</span>summary_updated<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-238"><a href="#cb8-238" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Direction:     </span><span class="sc">{</span>compare_versions(summary_current, summary_updated)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-239"><a href="#cb8-239" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-240"><a href="#cb8-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-241"><a href="#cb8-241" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-242"><a href="#cb8-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-243"><a href="#cb8-243" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-244"><a href="#cb8-244" aria-hidden="true" tabindex="-1"></a><span class="in">Current model: {'exact_match': 0, 'avg_overlap': 0.464, 'perplexity': 25.92}</span></span>
+<span id="cb8-245"><a href="#cb8-245" aria-hidden="true" tabindex="-1"></a><span class="in">Updated model: {'exact_match': 0, 'avg_overlap': 0.125, 'perplexity': 25.73}</span></span>
+<span id="cb8-246"><a href="#cb8-246" aria-hidden="true" tabindex="-1"></a><span class="in">Direction:     {'exact_match': 'unchanged', 'avg_overlap': 'regressed', 'perplexity': 'improved'}</span></span>
+<span id="cb8-247"><a href="#cb8-247" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-248"><a href="#cb8-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-249"><a href="#cb8-249" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-250"><a href="#cb8-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-251"><a href="#cb8-251" aria-hidden="true" tabindex="-1"></a>The same disagreement Chapter 12 found comparing two epochs of one</span>
+<span id="cb8-252"><a href="#cb8-252" aria-hidden="true" tabindex="-1"></a>run, and comparing two entirely different training regimes, shows up a</span>
+<span id="cb8-253"><a href="#cb8-253" aria-hidden="true" tabindex="-1"></a>third time here, on a genuinely new scenario: real new data, really</span>
+<span id="cb8-254"><a href="#cb8-254" aria-hidden="true" tabindex="-1"></a>incorporated. <span class="in">`avg_overlap`</span> says this update made things worse.</span>
+<span id="cb8-255"><a href="#cb8-255" aria-hidden="true" tabindex="-1"></a>Perplexity's "improved" label points the right direction but by a</span>
+<span id="cb8-256"><a href="#cb8-256" aria-hidden="true" tabindex="-1"></a>small margin — <span class="in">`25.92 -&gt; 25.73`</span> is about <span class="in">`0.7%`</span>, nowhere near the</span>
+<span id="cb8-257"><a href="#cb8-257" aria-hidden="true" tabindex="-1"></a>substantial, <span class="in">`6×`</span> gap Chapter 11 found between a base and fine-tuned</span>
+<span id="cb8-258"><a href="#cb8-258" aria-hidden="true" tabindex="-1"></a>model. Chapter 12's own Production Reality warned that this comparison</span>
+<span id="cb8-259"><a href="#cb8-259" aria-hidden="true" tabindex="-1"></a>has no noise threshold; this run is a live example of why that</span>
+<span id="cb8-260"><a href="#cb8-260" aria-hidden="true" tabindex="-1"></a>matters: a real disagreement (<span class="in">`avg_overlap`</span>) sits next to a real but</span>
+<span id="cb8-261"><a href="#cb8-261" aria-hidden="true" tabindex="-1"></a>minor "improvement" (<span class="in">`perplexity`</span>), and only one of them is worth</span>
+<span id="cb8-262"><a href="#cb8-262" aria-hidden="true" tabindex="-1"></a>acting on.</span>
+<span id="cb8-263"><a href="#cb8-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-264"><a href="#cb8-264" aria-hidden="true" tabindex="-1"></a>This step's loader is worth noticing too: it calls <span class="in">`load_version`</span></span>
+<span id="cb8-265"><a href="#cb8-265" aria-hidden="true" tabindex="-1"></a>(Chapter 12), not Step 2's <span class="in">`load_checkpoint`</span> (Chapter 8) — the two</span>
+<span id="cb8-266"><a href="#cb8-266" aria-hidden="true" tabindex="-1"></a>look interchangeable but aren't. <span class="in">`load_checkpoint`</span> sets</span>
+<span id="cb8-267"><a href="#cb8-267" aria-hidden="true" tabindex="-1"></a><span class="in">`is_trainable=True`</span>, which leaves the model in **train mode**, dropout</span>
+<span id="cb8-268"><a href="#cb8-268" aria-hidden="true" tabindex="-1"></a>included. That's correct for resuming training in Step 2; loading a</span>
+<span id="cb8-269"><a href="#cb8-269" aria-hidden="true" tabindex="-1"></a>checkpoint the same way just to *evaluate* it would leave dropout</span>
+<span id="cb8-270"><a href="#cb8-270" aria-hidden="true" tabindex="-1"></a>switched on during scoring, making perplexity noisy from run to run</span>
+<span id="cb8-271"><a href="#cb8-271" aria-hidden="true" tabindex="-1"></a>for no real reason. Catching this meant literally checking</span>
+<span id="cb8-272"><a href="#cb8-272" aria-hidden="true" tabindex="-1"></a><span class="in">`model.training`</span> after loading — it printed <span class="in">`True`</span> where it should</span>
+<span id="cb8-273"><a href="#cb8-273" aria-hidden="true" tabindex="-1"></a>have printed <span class="in">`False`</span>, on the first attempt at this exact step.</span>
+<span id="cb8-274"><a href="#cb8-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-275"><a href="#cb8-275" aria-hidden="true" tabindex="-1"></a><span class="fu">## Practical exercise</span></span>
+<span id="cb8-276"><a href="#cb8-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-277"><a href="#cb8-277" aria-hidden="true" tabindex="-1"></a>🟢 **Beginner**</span>
+<span id="cb8-278"><a href="#cb8-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-279"><a href="#cb8-279" aria-hidden="true" tabindex="-1"></a>**Try it yourself:** run</span>
+<span id="cb8-280"><a href="#cb8-280" aria-hidden="true" tabindex="-1"></a><span class="in">`python code/chapter_13/continuous_finetune.py`</span> from inside <span class="in">`book/`</span></span>
+<span id="cb8-281"><a href="#cb8-281" aria-hidden="true" tabindex="-1"></a>(it takes roughly 20-25 minutes on CPU) and compare its printed output</span>
+<span id="cb8-282"><a href="#cb8-282" aria-hidden="true" tabindex="-1"></a>to the transcripts above.</span>
+<span id="cb8-283"><a href="#cb8-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-284"><a href="#cb8-284" aria-hidden="true" tabindex="-1"></a>**You'll know it worked when:** you see <span class="in">`avg_overlap: regressed`</span> in</span>
+<span id="cb8-285"><a href="#cb8-285" aria-hidden="true" tabindex="-1"></a>the final comparison, and you can explain in one sentence why that</span>
+<span id="cb8-286"><a href="#cb8-286" aria-hidden="true" tabindex="-1"></a>means this particular update shouldn't be deployed without a closer</span>
+<span id="cb8-287"><a href="#cb8-287" aria-hidden="true" tabindex="-1"></a>look, even though training itself ran cleanly.</span>
+<span id="cb8-288"><a href="#cb8-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-289"><a href="#cb8-289" aria-hidden="true" tabindex="-1"></a><span class="fu">## Field notes</span></span>
+<span id="cb8-290"><a href="#cb8-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-291"><a href="#cb8-291" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="Field notes: the new batch skews toward a different phase of the well"}</span>
+<span id="cb8-292"><a href="#cb8-292" aria-hidden="true" tabindex="-1"></a>**Query:** what the 17 new reports (<span class="in">`#60`</span> onward) actually describe,</span>
+<span id="cb8-293"><a href="#cb8-293" aria-hidden="true" tabindex="-1"></a>compared to what the held-out evaluation report (<span class="in">`#37`</span>) describes.</span>
+<span id="cb8-294"><a href="#cb8-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-295"><a href="#cb8-295" aria-hidden="true" tabindex="-1"></a>**Result:** <span class="in">`20`</span> of the new batch's <span class="in">`179`</span> examples mention casing or</span>
+<span id="cb8-296"><a href="#cb8-296" aria-hidden="true" tabindex="-1"></a>cement — concentrated in the last several reports, right at the</span>
+<span id="cb8-297"><a href="#cb8-297" aria-hidden="true" tabindex="-1"></a>archive's end (*"Rig up and run 7" casing,"* *"Cement 7" casing,"*</span>
+<span id="cb8-298"><a href="#cb8-298" aria-hidden="true" tabindex="-1"></a>*"Production Casing Wait on Cement"*). The updated model's</span>
+<span id="cb8-299"><a href="#cb8-299" aria-hidden="true" tabindex="-1"></a>memorized-sounding template shifts to match: *"Production Casing Run</span>
+<span id="cb8-300"><a href="#cb8-300" aria-hidden="true" tabindex="-1"></a>Csg &amp; Cement Rig up cementing equipment,"* replacing the current</span>
+<span id="cb8-301"><a href="#cb8-301" aria-hidden="true" tabindex="-1"></a>model's *"Production Drilling Cond Mud &amp; Circ Circulate for</span>
+<span id="cb8-302"><a href="#cb8-302" aria-hidden="true" tabindex="-1"></a>temperature."* Report <span class="in">`#37`</span>, the held-out report this chapter still</span>
+<span id="cb8-303"><a href="#cb8-303" aria-hidden="true" tabindex="-1"></a>evaluates against, is from the middle of the well program — active</span>
+<span id="cb8-304"><a href="#cb8-304" aria-hidden="true" tabindex="-1"></a>drilling, not casing.</span>
+<span id="cb8-305"><a href="#cb8-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-306"><a href="#cb8-306" aria-hidden="true" tabindex="-1"></a>**Why:** a real well program drills first and cases and cements later,</span>
+<span id="cb8-307"><a href="#cb8-307" aria-hidden="true" tabindex="-1"></a>near total depth. The new batch isn't random new data; it's</span>
+<span id="cb8-308"><a href="#cb8-308" aria-hidden="true" tabindex="-1"></a>disproportionately drawn from a later, different operational phase</span>
+<span id="cb8-309"><a href="#cb8-309" aria-hidden="true" tabindex="-1"></a>than the report this chapter evaluates against. Continuing training on</span>
+<span id="cb8-310"><a href="#cb8-310" aria-hidden="true" tabindex="-1"></a>it pulled the model's default template toward casing/cementing</span>
+<span id="cb8-311"><a href="#cb8-311" aria-hidden="true" tabindex="-1"></a>language, which fits the new reports and doesn't fit report <span class="in">`#37`</span>.</span>
+<span id="cb8-312"><a href="#cb8-312" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-313"><a href="#cb8-313" aria-hidden="true" tabindex="-1"></a>**Lesson:** "the new data is real and relevant" and "the new data</span>
+<span id="cb8-314"><a href="#cb8-314" aria-hidden="true" tabindex="-1"></a>resembles what you're evaluating against" are different claims. A drop</span>
+<span id="cb8-315"><a href="#cb8-315" aria-hidden="true" tabindex="-1"></a>in <span class="in">`avg_overlap`</span> here isn't a training bug — it's an honest reflection</span>
+<span id="cb8-316"><a href="#cb8-316" aria-hidden="true" tabindex="-1"></a>of what the new batch actually contains, and exactly the kind of thing</span>
+<span id="cb8-317"><a href="#cb8-317" aria-hidden="true" tabindex="-1"></a>a human should look at before deciding whether report <span class="in">`#37`</span>-style</span>
+<span id="cb8-318"><a href="#cb8-318" aria-hidden="true" tabindex="-1"></a>questions are still important enough to weight for, or whether the</span>
+<span id="cb8-319"><a href="#cb8-319" aria-hidden="true" tabindex="-1"></a>archive's growing casing/cementing content means the evaluation set</span>
+<span id="cb8-320"><a href="#cb8-320" aria-hidden="true" tabindex="-1"></a>itself needs to grow too.</span>
+<span id="cb8-321"><a href="#cb8-321" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-322"><a href="#cb8-322" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-323"><a href="#cb8-323" aria-hidden="true" tabindex="-1"></a><span class="fu">## Challenge exercise</span></span>
+<span id="cb8-324"><a href="#cb8-324" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-325"><a href="#cb8-325" aria-hidden="true" tabindex="-1"></a>🟠 **Intermediate**</span>
+<span id="cb8-326"><a href="#cb8-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-327"><a href="#cb8-327" aria-hidden="true" tabindex="-1"></a>**Challenge:** this chapter's evaluation set is still Chapter 11's</span>
+<span id="cb8-328"><a href="#cb8-328" aria-hidden="true" tabindex="-1"></a>original 8 questions, all from report <span class="in">`#37`</span> — a report about active</span>
+<span id="cb8-329"><a href="#cb8-329" aria-hidden="true" tabindex="-1"></a>drilling, not casing. Build a second held-out check from one of the</span>
+<span id="cb8-330"><a href="#cb8-330" aria-hidden="true" tabindex="-1"></a>new batch's own reports (held out from the "new" training set the same</span>
+<span id="cb8-331"><a href="#cb8-331" aria-hidden="true" tabindex="-1"></a>way <span class="in">`#37`</span> is held out from everything) and compare the updated model</span>
+<span id="cb8-332"><a href="#cb8-332" aria-hidden="true" tabindex="-1"></a>against it instead. A reference solution is at</span>
+<span id="cb8-333"><a href="#cb8-333" aria-hidden="true" tabindex="-1"></a><span class="in">`code/chapter_13/challenge/challenge.py`</span> — on a real run, holding</span>
+<span id="cb8-334"><a href="#cb8-334" aria-hidden="true" tabindex="-1"></a>report <span class="in">`#65`</span> (2020-12-23, <span class="in">`20`</span> real examples) out of the new-batch</span>
+<span id="cb8-335"><a href="#cb8-335" aria-hidden="true" tabindex="-1"></a>continuation and evaluating against it afterward gives</span>
+<span id="cb8-336"><a href="#cb8-336" aria-hidden="true" tabindex="-1"></a><span class="in">`{'exact_match': 0, 'avg_overlap': 0.14, 'perplexity': 16.56}`</span>.</span>
+<span id="cb8-337"><a href="#cb8-337" aria-hidden="true" tabindex="-1"></a>Perplexity is noticeably lower here than either model scored against</span>
+<span id="cb8-338"><a href="#cb8-338" aria-hidden="true" tabindex="-1"></a>report <span class="in">`#37`</span> (<span class="in">`~25.8`</span>) — the updated model finds a report from its own</span>
+<span id="cb8-339"><a href="#cb8-339" aria-hidden="true" tabindex="-1"></a>new batch's operational phase less surprising than one from an earlier</span>
+<span id="cb8-340"><a href="#cb8-340" aria-hidden="true" tabindex="-1"></a>phase, even though <span class="in">`avg_overlap`</span> stays just as low. Recency alone</span>
+<span id="cb8-341"><a href="#cb8-341" aria-hidden="true" tabindex="-1"></a>didn't fix what changed; matching the evaluation report's operational</span>
+<span id="cb8-342"><a href="#cb8-342" aria-hidden="true" tabindex="-1"></a>phase did more than matching its training era.</span>
+<span id="cb8-343"><a href="#cb8-343" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-344"><a href="#cb8-344" aria-hidden="true" tabindex="-1"></a><span class="fu">## Key takeaways</span></span>
+<span id="cb8-345"><a href="#cb8-345" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-346"><a href="#cb8-346" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Training completing without errors, with loss falling every epoch,</span>
+<span id="cb8-347"><a href="#cb8-347" aria-hidden="true" tabindex="-1"></a>  says nothing about whether the result should replace what's in</span>
+<span id="cb8-348"><a href="#cb8-348" aria-hidden="true" tabindex="-1"></a>  production. This chapter's real run trained cleanly and still</span>
+<span id="cb8-349"><a href="#cb8-349" aria-hidden="true" tabindex="-1"></a>  regressed on <span class="in">`avg_overlap`</span>.</span>
+<span id="cb8-350"><a href="#cb8-350" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The same metric-disagreement pattern Chapter 12 found comparing</span>
+<span id="cb8-351"><a href="#cb8-351" aria-hidden="true" tabindex="-1"></a>  epochs, and comparing entirely different training regimes, showed up</span>
+<span id="cb8-352"><a href="#cb8-352" aria-hidden="true" tabindex="-1"></a>  a third time in a genuinely new scenario — this isn't a one-off</span>
+<span id="cb8-353"><a href="#cb8-353" aria-hidden="true" tabindex="-1"></a>  quirk of one comparison.</span>
+<span id="cb8-354"><a href="#cb8-354" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A regression is worth investigating, not just flagging: the real</span>
+<span id="cb8-355"><a href="#cb8-355" aria-hidden="true" tabindex="-1"></a>  cause here was traceable to what the new reports actually contain,</span>
+<span id="cb8-356"><a href="#cb8-356" aria-hidden="true" tabindex="-1"></a>  not a training bug.</span>
+<span id="cb8-357"><a href="#cb8-357" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Perplexity moving in the "improved" direction by under <span class="in">`1%`</span> is not</span>
+<span id="cb8-358"><a href="#cb8-358" aria-hidden="true" tabindex="-1"></a>  the same claim as the substantial, <span class="in">`6×`</span> gap Chapter 11 found between</span>
+<span id="cb8-359"><a href="#cb8-359" aria-hidden="true" tabindex="-1"></a>  a base and fine-tuned model. Direction alone, without magnitude, can</span>
+<span id="cb8-360"><a href="#cb8-360" aria-hidden="true" tabindex="-1"></a>  overstate a trivial change.</span>
+<span id="cb8-361"><a href="#cb8-361" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A model left in train mode (dropout still active) scores noisily</span>
+<span id="cb8-362"><a href="#cb8-362" aria-hidden="true" tabindex="-1"></a>  even in eval-only code — <span class="in">`load_checkpoint`</span>'s <span class="in">`is_trainable=True`</span> is</span>
+<span id="cb8-363"><a href="#cb8-363" aria-hidden="true" tabindex="-1"></a>  right for resuming training and wrong for scoring; catching it meant</span>
+<span id="cb8-364"><a href="#cb8-364" aria-hidden="true" tabindex="-1"></a>  checking <span class="in">`model.training`</span> directly, not just distrusting a number</span>
+<span id="cb8-365"><a href="#cb8-365" aria-hidden="true" tabindex="-1"></a>  that looked slightly different between runs.</span>
+<span id="cb8-366"><a href="#cb8-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-367"><a href="#cb8-367" aria-hidden="true" tabindex="-1"></a><span class="fu">## Repository files</span></span>
+<span id="cb8-368"><a href="#cb8-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-369"><a href="#cb8-369" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> File <span class="pp">|</span> Purpose <span class="pp">|</span></span>
+<span id="cb8-370"><a href="#cb8-370" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb8-371"><a href="#cb8-371" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_13/continuous_finetune.py`</span> <span class="pp">|</span> Splits the archive, trains a current model, continues training on new reports, and compares the result <span class="pp">|</span></span>
+<span id="cb8-372"><a href="#cb8-372" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_13/challenge/challenge.py`</span> <span class="pp">|</span> Reference solution: evaluating against a held-out report from the new batch itself <span class="pp">|</span></span>
+<span id="cb8-373"><a href="#cb8-373" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`notebooks/chapter_13_explore.ipynb`</span> <span class="pp">|</span> Interactive companion notebook <span class="pp">|</span></span>
+<span id="cb8-374"><a href="#cb8-374" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-375"><a href="#cb8-375" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution title="CHECKPOINT — Chapter 13"}</span>
+<span id="cb8-376"><a href="#cb8-376" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Simulated new reports arriving using a real chronological split</span>
+<span id="cb8-377"><a href="#cb8-377" aria-hidden="true" tabindex="-1"></a>      of this book's own archive</span>
+<span id="cb8-378"><a href="#cb8-378" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Continued fine-tuning an existing checkpoint on just the new</span>
+<span id="cb8-379"><a href="#cb8-379" aria-hidden="true" tabindex="-1"></a>      batch, reusing Chapter 8's save-and-resume mechanism unchanged</span>
+<span id="cb8-380"><a href="#cb8-380" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Ran Chapter 12's comparison on the result and found a real</span>
+<span id="cb8-381"><a href="#cb8-381" aria-hidden="true" tabindex="-1"></a>      regression, not a hypothetical one</span>
+<span id="cb8-382"><a href="#cb8-382" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Traced that regression back to a real, sensible cause instead of</span>
+<span id="cb8-383"><a href="#cb8-383" aria-hidden="true" tabindex="-1"></a>      treating the metric as unexplainable noise</span>
+<span id="cb8-384"><a href="#cb8-384" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-385"><a href="#cb8-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-386"><a href="#cb8-386" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}</span>
+<span id="cb8-387"><a href="#cb8-387" aria-hidden="true" tabindex="-1"></a>**`continuous_finetune.py`** — splits this book's real archive by a</span>
+<span id="cb8-388"><a href="#cb8-388" aria-hidden="true" tabindex="-1"></a>chronological cutoff, trains a "current" model on one side, continues</span>
+<span id="cb8-389"><a href="#cb8-389" aria-hidden="true" tabindex="-1"></a>training it on the "new" side using Chapter 8's exact checkpoint</span>
+<span id="cb8-390"><a href="#cb8-390" aria-hidden="true" tabindex="-1"></a>mechanism, and runs Chapter 12's comparison to decide whether the</span>
+<span id="cb8-391"><a href="#cb8-391" aria-hidden="true" tabindex="-1"></a>result actually deserves to replace what's running. On a real run, it</span>
+<span id="cb8-392"><a href="#cb8-392" aria-hidden="true" tabindex="-1"></a>doesn't.</span>
+<span id="cb8-393"><a href="#cb8-393" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-394"><a href="#cb8-394" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-395"><a href="#cb8-395" aria-hidden="true" tabindex="-1"></a><span class="fu">## What can you do now that you couldn't do before?</span></span>
+<span id="cb8-396"><a href="#cb8-396" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-397"><a href="#cb8-397" aria-hidden="true" tabindex="-1"></a>You can retrain a model on new data as it arrives, and — because you</span>
+<span id="cb8-398"><a href="#cb8-398" aria-hidden="true" tabindex="-1"></a>built Chapter 12's comparison first — you can tell the difference</span>
+<span id="cb8-399"><a href="#cb8-399" aria-hidden="true" tabindex="-1"></a>between "we retrained" and "we improved," instead of deploying</span>
+<span id="cb8-400"><a href="#cb8-400" aria-hidden="true" tabindex="-1"></a>whatever a clean training run happens to produce.</span>
+<span id="cb8-401"><a href="#cb8-401" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-402"><a href="#cb8-402" aria-hidden="true" tabindex="-1"></a><span class="fu">## See it side by side</span></span>
+<span id="cb8-403"><a href="#cb8-403" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-404"><a href="#cb8-404" aria-hidden="true" tabindex="-1"></a>Every real checkpoint sitting in <span class="in">`checkpoints/`</span> right now — from</span>
+<span id="cb8-405"><a href="#cb8-405" aria-hidden="true" tabindex="-1"></a>Chapter 5's first fine-tune through this chapter's continuously-updated</span>
+<span id="cb8-406"><a href="#cb8-406" aria-hidden="true" tabindex="-1"></a>one — is something the book's companion app (<span class="in">`app/`</span>) can load directly,</span>
+<span id="cb8-407"><a href="#cb8-407" aria-hidden="true" tabindex="-1"></a>not a separate demo built beside this book. Its Model Playground puts</span>
+<span id="cb8-408"><a href="#cb8-408" aria-hidden="true" tabindex="-1"></a>the base and fine-tuned answers side by side on the same real prompt;</span>
+<span id="cb8-409"><a href="#cb8-409" aria-hidden="true" tabindex="-1"></a>Before vs. After Evaluation runs this book's own metrics live across</span>
+<span id="cb8-410"><a href="#cb8-410" aria-hidden="true" tabindex="-1"></a>the full held-out set; Dataset Explorer browses the real training</span>
+<span id="cb8-411"><a href="#cb8-411" aria-hidden="true" tabindex="-1"></a>examples behind them; and Failure Analysis reruns the book's own</span>
+<span id="cb8-412"><a href="#cb8-412" aria-hidden="true" tabindex="-1"></a>documented failure cases — including a real regression like the one</span>
+<span id="cb8-413"><a href="#cb8-413" aria-hidden="true" tabindex="-1"></a>this chapter just found — against whichever checkpoint you actually</span>
+<span id="cb8-414"><a href="#cb8-414" aria-hidden="true" tabindex="-1"></a>have. See <span class="in">`app/README.md`</span> to run it; nothing in it is pre-recorded, so</span>
+<span id="cb8-415"><a href="#cb8-415" aria-hidden="true" tabindex="-1"></a>your own checkpoint may not reproduce this book's exact numbers, and</span>
+<span id="cb8-416"><a href="#cb8-416" aria-hidden="true" tabindex="-1"></a>that difference is itself real information.</span>
+<span id="cb8-417"><a href="#cb8-417" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-418"><a href="#cb8-418" aria-hidden="true" tabindex="-1"></a>![Before vs. After Evaluation, screenshotted from a real local run</span>
+<span id="cb8-419"><a href="#cb8-419" aria-hidden="true" tabindex="-1"></a>across this book's own checkpoints -- the exact "latest doesn't mean</span>
+<span id="cb8-420"><a href="#cb8-420" aria-hidden="true" tabindex="-1"></a>best" regression this chapter's own version-comparison run found above,</span>
+<span id="cb8-421"><a href="#cb8-421" aria-hidden="true" tabindex="-1"></a>surfaced automatically by the</span>
+<span id="cb8-422"><a href="#cb8-422" aria-hidden="true" tabindex="-1"></a>app.](../figures/app_screenshot_evaluation.jpg){#fig-app-evaluation fig-alt="Screenshot of the companion app's Before vs. After Evaluation page, showing a results table for the base model and three fine-tuned checkpoints, a callout stating the latest checkpoint regressed on both average overlap and perplexity compared to the previous one, and per-transition percentage changes for each metric."}</span>
+<span id="cb8-423"><a href="#cb8-423" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-424"><a href="#cb8-424" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suggested next step</span></span>
+<span id="cb8-425"><a href="#cb8-425" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-426"><a href="#cb8-426" aria-hidden="true" tabindex="-1"></a>This is the last chapter. Every tool in it runs on your own data, not</span>
+<span id="cb8-427"><a href="#cb8-427" aria-hidden="true" tabindex="-1"></a>just this book's Utah FORGE archive: Chapter 6's gate checks a new</span>
+<span id="cb8-428"><a href="#cb8-428" aria-hidden="true" tabindex="-1"></a>archive's quality, Chapter 8 fine-tunes it at whatever scale it has,</span>
+<span id="cb8-429"><a href="#cb8-429" aria-hidden="true" tabindex="-1"></a>Chapters 9 and 10 add retrieval and a faithfulness check on top,</span>
+<span id="cb8-430"><a href="#cb8-430" aria-hidden="true" tabindex="-1"></a>Chapter 11 builds a real evaluation set from whatever you hold out, and</span>
+<span id="cb8-431"><a href="#cb8-431" aria-hidden="true" tabindex="-1"></a>Chapters 12 and 13 decide, honestly, whether a new version is actually</span>
+<span id="cb8-432"><a href="#cb8-432" aria-hidden="true" tabindex="-1"></a>worth deploying. The book's own archive stops in January 2021. Yours</span>
+<span id="cb8-433"><a href="#cb8-433" aria-hidden="true" tabindex="-1"></a>doesn't have to.</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Fine-Tuning Local LLM for Drilling &amp; Completions</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/djimrastephane/llm-ft-drilling-completions-book/edit/main/chapters/chapter_13.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/djimrastephane/llm-ft-drilling-completions-book/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
