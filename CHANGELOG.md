@@ -743,3 +743,23 @@ highlights in narrative form.
   duplicate field-value groups, Chapter 8's `2.755 → 2.164 → 1.821`
   training-loss curve, Chapter 9's `4/4` vs `3/4` BM25-vs-dense
   retrieval result) in place of the old placeholder chapter map.
+- The GitHub issue tracker showed 82 open issues even though Part 0 and
+  every chapter, the diagrams pipeline, all appendices, and the
+  companion app (V1-V3) are drafted, verified, and passing CI. The
+  tracker was a granular project-planning breakdown created in one
+  batch on 2026-07-20 (per-chapter tracking issues plus five sub-tasks
+  each -- Write narrative / Verify code / Create figures / Review /
+  Final proof -- for Chapters 3-13, plus infrastructure issues for
+  diagrams, appendices, and the companion app); only the earliest four
+  issues (Part 0, Chapter 1, Chapter 2, the training dataset) were ever
+  closed as the corresponding work shipped, and closing lapsed after
+  that even though the work kept shipping. Closed the 80 issues that
+  map to now-completed work, each with a comment pointing to the
+  specific commit that completed it (e.g. Chapter draft commits like
+  `e1af03c`, the diagrams-pipeline commit `4e3b17f`, the companion app's
+  `745cb75`/`4a5d9bc`/`1a4535e`/`36e3f6a`). Verified against the real
+  repository state before closing anything -- e.g. confirmed
+  `figures/cover.jpg` does not exist and no companion-app screenshots
+  are referenced from any chapter -- so 2 issues (`#1` book cover,
+  `#80` companion app screenshots) were left open as genuinely
+  unfinished work, not closed along with the rest.
