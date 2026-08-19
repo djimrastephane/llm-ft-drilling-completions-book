@@ -191,6 +191,26 @@ highlights in narrative form.
   from both the count and its bulleted page list) -- corrected there
   too.
 
+### Fixed
+
+- **The book's own copies of the Model Playground and Before vs. After
+  Evaluation screenshots were still the tiny, mostly-empty originals**,
+  even though commit `82bdccc` already diagnosed and fixed this exact
+  problem for the README's copies. Both `app_screenshot_playground.jpg`
+  and `app_screenshot_evaluation.jpg` are full-browser captures at
+  2352x1097 where the real Streamlit content only fills the left ~48%
+  of the frame; scaled to a normal reading column, the actual text and
+  scores rendered too small to read comfortably -- confirmed by
+  rendering the published site with headless Chrome and inspecting the
+  actual pixels, not just the HTML. That commit's message noted the
+  originals were "also used as-is in `book/index.qmd` and
+  `book/chapters/chapter_13.qmd`" and left them untouched, scoping the
+  fix to the README only. Pointed both book figures (`index.qmd`'s
+  `#fig-app-playground`, Chapter 13's `#fig-app-evaluation`) at the
+  already-cropped `*_readme.jpg` versions instead of generating new
+  assets -- same files the README already uses, same fix, no new
+  images needed.
+
 ## [1.0.0] - 2026-08-19
 
 Part 0 and all 13 chapters written, tested, and passing CI on Linux,
