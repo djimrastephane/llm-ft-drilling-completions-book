@@ -14,6 +14,36 @@ highlights in narrative form.
 
 ### Added
 
+- **A whole-book roadmap diagram**, distinct from every chapter's own
+  two-box opening pipeline diagram. Prompted by comparing this README
+  against `rasbt/LLMs-from-scratch`'s mental-model image. Prototyped
+  first as an HTML/SVG sketch (published as an Artifact) and reviewed
+  over several rounds -- including a pass translating box labels into
+  oil-and-gas operational terminology (Pilot Calibration, QA/QC Gate,
+  Audit Trail, Degradation Monitoring, Validation Testing, Pilot Gate
+  Review), adopted where accurate and declined where it overclaimed
+  what the book's code actually does (no "live" retrieval, no
+  "enterprise-wide" scale, no "safety testing," no "secure on-prem" --
+  see the review thread for the specific reasoning on each). Built in
+  TikZ as a new dedicated renderer, `render_roadmap_diagram()` in
+  `figures/diagrams/generate_diagrams.py`, following the same
+  hand-placed-coordinates pattern as the existing LoRA-grid and
+  recall-gap figures -- two colour-coded lanes (Part I reuses the
+  book's existing link-color accent, Part II reuses the existing "WHAT
+  YOU BUILT" callout green) joined by a dashed checkpoint banner
+  quoting Chapter 5's real, unedited result: `13/16` on the examples it
+  trained on, `0/2` on a report it never saw. Produces the usual
+  `.pdf`/`_light.svg`/`_dark.svg` trio for the book plus a standalone
+  `figures/roadmap.png` for the root README (which has no light/dark
+  image-swap mechanism, same reason `figures/cover.jpg` is a single
+  static file). Verified with a standalone TikZ-to-PNG preview before
+  wiring in, and with a full local `quarto render index.qmd` after --
+  the first attempt caught a real path bug (referenced
+  `figures/roadmap.pdf` from `index.qmd` instead of
+  `figures/diagrams/roadmap.pdf`, where the renderer actually writes
+  it), fixed and re-verified. Linked from the root README's "Your
+  Learning Journey" section (replacing the old plain-text arrow chain)
+  and from `index.qmd`'s "What you will build" section.
 - **Root-level `TROUBLESHOOTING.md`.** Prompted by comparing this
   README against `rasbt/LLMs-from-scratch`'s, which links a plain-text
   troubleshooting guide right under its badges. This repo already had

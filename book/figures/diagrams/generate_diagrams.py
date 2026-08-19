@@ -54,10 +54,18 @@ THEORY_DIAGRAMS: dict[int, list[tuple[str, list[str]]]] = {}
 LIGHT_PALETTE = {
     "box_fill": "FFFFFF", "box_border": "0B5394", "text": "222222", "arrow": "0B5394",
     "soft_fill": "E6EEF7", "strong_border": "073763",
+    # Second accent family + neutral, added for the whole-book roadmap
+    # diagram below -- part2 reuses the same green already used for the
+    # "WHAT YOU BUILT" callout boxes (see custom.scss) rather than
+    # inventing a new color.
+    "part2_border": "2E7D32", "part2_soft": "E7F3E8",
+    "neutral": "5B6673", "neutral_soft": "EEF1F4", "neutral_strong": "333B44",
 }
 DARK_PALETTE = {
     "box_fill": "2B2E33", "box_border": "58A6FF", "text": "E8E8E8", "arrow": "58A6FF",
     "soft_fill": "2A3542", "strong_border": "8FC3FF",
+    "part2_border": "6FCF7A", "part2_soft": "1D3320",
+    "neutral": "9BA3AD", "neutral_soft": "22262B", "neutral_strong": "C7CDD4",
 }
 
 TIKZ_TEMPLATE = r"""
@@ -227,6 +235,146 @@ RECALL_GAP_TIKZ_TEMPLATE = r"""
 """
 
 
+# Whole-book roadmap: distinct from every chapter's own two-box opening
+# pipeline diagram above -- one picture for the entire book, prototyped
+# first as an HTML/SVG sketch and reviewed before this TikZ build (see
+# that sketch's own review thread for why each box is worded the way it
+# is). Two colour-coded lanes for Part I (reuses the book's existing
+# link-color accent) and Part II (reuses the existing "WHAT YOU BUILT"
+# callout green -- see part2_border/part2_soft in the palettes above),
+# joined by a dashed checkpoint banner quoting Chapter 5's real,
+# unedited result: 13/16 on the examples it trained on, 0/2 on a report
+# it never saw. Coordinates are hand-placed in cm, absolute, the same
+# way the LoRA and recall-gap figures above are -- this shape (two
+# multi-node rows plus a snaking connector) doesn't fit the simple
+# vertical-chain renderer.
+ROADMAP_TIKZ_TEMPLATE = r"""
+\documentclass[tikz,border=6pt]{standalone}
+\usepackage{xcolor}
+\usepackage{sansmathfonts}
+\renewcommand{\familydefault}{\sfdefault}
+\definecolor{boxfill}{HTML}{%(box_fill)s}
+\definecolor{part1border}{HTML}{%(box_border)s}
+\definecolor{part1soft}{HTML}{%(soft_fill)s}
+\definecolor{part2border}{HTML}{%(part2_border)s}
+\definecolor{part2soft}{HTML}{%(part2_soft)s}
+\definecolor{neutralcolor}{HTML}{%(neutral)s}
+\definecolor{neutralsoft}{HTML}{%(neutral_soft)s}
+\definecolor{neutralstrong}{HTML}{%(neutral_strong)s}
+\definecolor{textcolor}{HTML}{%(text)s}
+\usetikzlibrary{arrows.meta}
+\begin{document}
+\begin{tikzpicture}[
+    p1box/.style={rectangle, rounded corners=2pt, draw=part1border, fill=part1soft,
+      line width=1.1pt, minimum width=4.4cm, minimum height=1.6cm, text width=3.9cm,
+      text=textcolor, font=\small, align=center, inner sep=4pt},
+    p2box/.style={rectangle, rounded corners=2pt, draw=part2border, fill=part2soft,
+      line width=1.1pt, minimum width=4.4cm, minimum height=1.6cm, text width=3.9cm,
+      text=textcolor, font=\small, align=center, inner sep=4pt},
+    neubox/.style={rectangle, rounded corners=2pt, draw=neutralcolor, fill=neutralsoft,
+      line width=1.1pt, text=textcolor, font=\small, align=center, inner sep=6pt},
+    ckptbox/.style={rectangle, rounded corners=3pt, draw=neutralcolor, fill=neutralsoft,
+      dashed, line width=1.1pt},
+    badge1/.style={circle, fill=part1border, draw=boxfill, line width=0.9pt,
+      minimum size=0.62cm, font=\tiny\bfseries, text=boxfill},
+    badge2/.style={circle, fill=part2border, draw=boxfill, line width=0.9pt,
+      minimum size=0.62cm, font=\tiny\bfseries, text=boxfill},
+    arrN/.style={-{Stealth[length=2.4mm]}, neutralcolor, line width=1pt},
+    arr1/.style={-{Stealth[length=2.4mm]}, part1border, line width=1pt},
+    arr2/.style={-{Stealth[length=2.4mm]}, part2border, line width=1pt}
+  ]
+
+%% Start inputs
+\node[neubox, minimum width=5.5cm, minimum height=1.4cm, text width=5.0cm] (start-a) at (10.45,-1.45) {General-Purpose Base Model};
+\node[neubox, minimum width=5.5cm, minimum height=1.4cm, text width=5.0cm] (start-b) at (16.55,-1.45) {Your Raw Reports};
+\draw[arrN] (10.45,-2.15) -- (10.45,-2.75);
+\draw[arrN] (16.55,-2.15) -- (16.55,-2.75);
+
+%% Part 0
+\node[neubox, minimum width=24cm, minimum height=1.15cm] (part0) at (13.5,-3.325) {Part 0 --- Prepare Your Local LLM Workshop};
+\draw[arrN] (13.5,-3.9) -- (13.5,-5.15);
+
+%% Part I lane label
+\node[font=\bfseries\small, text=part1border, anchor=west] at (1.5,-4.8) {PART I --- FOUNDATIONS};
+
+%% Part I boxes (chapters 1-5)
+\node[p1box] (c1) at (3.7,-5.95) {Load Base Model};
+\node[badge1] at (1.5,-5.15) {1};
+\node[p1box] (c2) at (8.6,-5.95) {Build Training Data};
+\node[badge1] at (6.4,-5.15) {2};
+\node[p1box] (c3) at (13.5,-5.95) {Baseline Benchmark};
+\node[badge1] at (11.3,-5.15) {3};
+\node[p1box] (c4) at (18.4,-5.95) {Text Standardization};
+\node[badge1] at (16.2,-5.15) {4};
+\node[p1box] (c5) at (23.3,-5.95) {Pilot Calibration};
+\node[badge1] at (21.1,-5.15) {5};
+
+\draw[arr1] (5.9,-5.95) -- (6.4,-5.95);
+\draw[arr1] (10.8,-5.95) -- (11.3,-5.95);
+\draw[arr1] (15.7,-5.95) -- (16.2,-5.95);
+\draw[arr1] (20.6,-5.95) -- (21.1,-5.95);
+\draw[arr1] (13.5,-6.75) -- (13.5,-7.5);
+
+%% Checkpoint banner (Chapter 5's real, honest result)
+\node[ckptbox, minimum width=24cm, minimum height=1.85cm] at (13.5,-8.425) {};
+\node[font=\bfseries\small, text=neutralstrong] at (13.5,-8.15) {Pilot Gate Review --- Checkpoint after Chapter 5};
+\node[font=\small, text=textcolor] at (13.5,-8.7) {13/16 correct on the examples it trained on $\cdot$ 0/2 on a report it never saw};
+\draw[arr2] (13.5,-9.35) -- (13.5,-10.6);
+
+%% Part II lane label
+\node[font=\bfseries\small, text=part2border, anchor=west] at (1.5,-10.25) {PART II --- INDUSTRIALIZING};
+
+%% Part II row 1 (chapters 6-9)
+\node[p2box] (c6) at (6.15,-11.4) {QA / QC Gate};
+\node[badge2] at (3.95,-10.6) {6};
+\node[p2box] (c7) at (11.05,-11.4) {Format at Scale};
+\node[badge2] at (8.85,-10.6) {7};
+\node[p2box] (c8) at (15.95,-11.4) {Fine-Tune at Scale};
+\node[badge2] at (13.75,-10.6) {8};
+\node[p2box] (c9) at (20.85,-11.4) {+ Archive Search};
+\node[badge2] at (18.65,-10.6) {9};
+
+\draw[arr2] (8.35,-11.4) -- (8.85,-11.4);
+\draw[arr2] (13.25,-11.4) -- (13.75,-11.4);
+\draw[arr2] (18.15,-11.4) -- (18.65,-11.4);
+
+%% Snake connector: end of row 1 (Ch.9) down and across to start of row 2 (Ch.10)
+\draw[arr2] (20.85,-12.2) -- (20.85,-12.7) -- (6.15,-12.7) -- (6.15,-13.2);
+
+%% Part II row 2 (chapters 10-13)
+\node[p2box] (c10) at (6.15,-14.0) {Audit Trail};
+\node[badge2] at (3.95,-13.2) {10};
+\node[p2box] (c11) at (11.05,-14.0) {Validation Testing};
+\node[badge2] at (8.85,-13.2) {11};
+\node[p2box] (c12) at (15.95,-14.0) {Degradation Monitoring};
+\node[badge2] at (13.75,-13.2) {12};
+\node[p2box] (c13) at (20.85,-14.0) {Continuous Fine-Tuning};
+\node[badge2] at (18.65,-13.2) {13};
+
+\draw[arr2] (8.35,-14.0) -- (8.85,-14.0);
+\draw[arr2] (13.25,-14.0) -- (13.75,-14.0);
+\draw[arr2] (18.15,-14.0) -- (18.65,-14.0);
+\draw[arrN] (13.5,-14.8) -- (13.5,-15.4);
+
+%% Final output
+\node[rectangle, rounded corners=3pt, draw=neutralstrong, fill=neutralsoft, line width=1.3pt,
+      minimum width=12cm, minimum height=1.85cm, text width=11cm, align=center,
+      font=\bfseries\small, text=textcolor] at (13.5,-16.325)
+      {Traceable, Evaluated, Continuously-Updated Local Model};
+
+%% Legend
+\node[rectangle, fill=part1border, minimum width=0.35cm, minimum height=0.35cm, inner sep=0] at (1.68,-17.9) {};
+\node[font=\scriptsize, text=neutralstrong, anchor=west] at (2.0,-17.9) {Part I --- Foundations (Ch. 1--5)};
+\node[rectangle, fill=part2border, minimum width=0.35cm, minimum height=0.35cm, inner sep=0] at (10.68,-17.9) {};
+\node[font=\scriptsize, text=neutralstrong, anchor=west] at (11.0,-17.9) {Part II --- Industrializing (Ch. 6--13)};
+\node[rectangle, fill=neutralcolor, minimum width=0.35cm, minimum height=0.35cm, inner sep=0] at (19.68,-17.9) {};
+\node[font=\scriptsize, text=neutralstrong, anchor=west] at (20.0,-17.9) {Setup, inputs \& final output};
+
+\end{tikzpicture}
+\end{document}
+"""
+
+
 # Book cover (figures/cover.jpg, referenced by _quarto.yml's cover-image).
 # Reuses the exact box/arrow style every chapter's own pipeline diagram
 # uses, scaled up, so the cover visually rhymes with the diagrams a reader
@@ -333,6 +481,27 @@ def render_recall_gap_diagram(name: str = "recall_gap_ch05") -> None:
         _pdf_to_svg(dark_pdf, OUTPUT_DIR / f"{name}_dark.svg")
 
 
+def render_roadmap_diagram(name: str = "roadmap") -> None:
+    """Render the whole-book roadmap to <name>.pdf, _light.svg, _dark.svg in OUTPUT_DIR,
+    plus a standalone ../roadmap.png (light only) for the root README, which -- unlike
+    the Quarto book -- has no light/dark image-swap mechanism, the same way figures/cover.jpg
+    is a single static file for the same reason."""
+    with tempfile.TemporaryDirectory() as tmp:
+        workdir = Path(tmp)
+        light_pdf = _compile_tex_to_pdf(ROADMAP_TIKZ_TEMPLATE % LIGHT_PALETTE, workdir, f"{name}_light")
+        dark_pdf = _compile_tex_to_pdf(ROADMAP_TIKZ_TEMPLATE % DARK_PALETTE, workdir, f"{name}_dark")
+
+        shutil.copy(light_pdf, OUTPUT_DIR / f"{name}.pdf")
+        _pdf_to_svg(light_pdf, OUTPUT_DIR / f"{name}_light.svg")
+        _pdf_to_svg(dark_pdf, OUTPUT_DIR / f"{name}_dark.svg")
+
+        png_base = OUTPUT_DIR.parent / name
+        subprocess.run(
+            ["pdftocairo", "-png", "-r", "300", "-singlefile", str(light_pdf), str(png_base)],
+            check=True,
+        )
+
+
 def render_cover(name: str = "cover") -> None:
     """Render the book cover to figures/cover.jpg (one file, no light/dark pair --
     a physical book cover doesn't need a dark-mode variant)."""
@@ -357,6 +526,9 @@ def main() -> None:
 
     render_recall_gap_diagram()
     print("Rendered recall_gap_ch05 (.pdf, _light.svg, _dark.svg)")
+
+    render_roadmap_diagram()
+    print("Rendered roadmap (.pdf, _light.svg, _dark.svg, ../roadmap.png)")
 
     render_cover()
     print("Rendered cover (../cover.jpg)")

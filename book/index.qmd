@@ -90,6 +90,31 @@ building and trusting a private, local, domain-specific model.
 | 5 | Run your first LoRA fine-tune and compare it to the baseline |
 | 6–13 | Scale the system to larger, cleaner datasets, combine fine-tuning with retrieval, evaluate rigorously, detect drift, and keep the model current as new reports arrive |
 
+One picture for the whole route above, distinct from each chapter's own
+two-box opening diagram: where you start, all 13 chapters grouped into
+Part I and Part II, and the one honest checkpoint in the middle that
+keeps this map from overselling itself.
+
+::: {.content-visible when-format="html"}
+::: {#fig-roadmap .pipeline-diagram}
+![](figures/diagrams/roadmap_light.svg){.diagram-light}
+
+![](figures/diagrams/roadmap_dark.svg){.diagram-dark}
+
+The reader's route through the book: Part I's five foundation chapters
+reach a real, honest checkpoint (13/16 on trained examples, 0/2 on a
+held-out report) before Part II's eight chapters industrialize the
+system.
+:::
+:::
+
+::: {.content-visible when-format="pdf"}
+![The reader's route through the book: Part I's five foundation
+chapters reach a real, honest checkpoint (13/16 on trained examples,
+0/2 on a held-out report) before Part II's eight chapters industrialize
+the system.](figures/diagrams/roadmap.pdf){#fig-roadmap-pdf fig-align="center"}
+:::
+
 ## Management view: why this matters
 
 If you're deciding whether to fund or adopt work like this, here's the

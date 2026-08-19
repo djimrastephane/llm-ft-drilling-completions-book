@@ -259,29 +259,16 @@ elsewhere.
 
 # Your Learning Journey
 
-Each arrow below is one or more chapters of real, working code — not a
-diagram of what's theoretically possible.
+One picture for the whole book — distinct from each chapter's own
+two-box opening diagram — showing where you start, all 13 chapters
+grouped into Part I and Part II, and the one honest checkpoint in the
+middle that keeps this map from overselling itself:
 
-```
-Base Local LLM
-   ↓
-Domain Training Data
-   ↓
-Baseline Prompting (what it gets wrong)
-   ↓
-Tokenization & Embeddings
-   ↓
-First LoRA Fine-Tune
-   ↓
-Data Quality & Scale
-   ↓
-Hybrid Fine-Tuning + Retrieval
-   ↓
-Traceable, Evaluated, Continuously Updated Model
-```
+<img src="book/figures/roadmap.png" alt="A route map of the book: a base model and raw reports feed into Part 0 setup, then Part I's five foundation chapters (loading the base model, building training data, a baseline benchmark, text standardization, and a pilot calibration fine-tune), which reach a Pilot Gate Review checkpoint reporting a real result of 13 out of 16 correct on trained examples but 0 out of 2 on a held-out report, then Part II's eight industrializing chapters (a QA/QC gate, formatting at scale, fine-tuning at scale, archive search, an audit trail, validation testing, degradation monitoring, and continuous fine-tuning), ending in a traceable, evaluated, continuously updated local model." width="900">
 
-By the last arrow, you're not reading about fine-tuning — you built a
-working system yourself, and you understand every piece of it.
+By the final box, you're not reading about fine-tuning — you built a
+working system yourself, and you understand every piece of it, honest
+checkpoint included.
 
 ## Reader Contract
 
