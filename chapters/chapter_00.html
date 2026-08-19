@@ -524,6 +524,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives">Learning objectives</a></li>
+  <li><a href="#ai-terms-youll-meet-in-this-book" id="toc-ai-terms-youll-meet-in-this-book" class="nav-link" data-scroll-target="#ai-terms-youll-meet-in-this-book">AI terms you’ll meet in this book</a></li>
   <li><a href="#why-this-chapter-exists" id="toc-why-this-chapter-exists" class="nav-link" data-scroll-target="#why-this-chapter-exists">0.1 Why this chapter exists</a></li>
   <li><a href="#install-python" id="toc-install-python" class="nav-link" data-scroll-target="#install-python">0.2 Install Python</a></li>
   <li><a href="#clone-this-repository" id="toc-clone-this-repository" class="nav-link" data-scroll-target="#clone-this-repository">0.3 Clone this repository</a></li>
@@ -577,6 +578,88 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Check whether your machine has a GPU fine-tuning can use, and know what to expect if it doesn’t</li>
 <li>Run <code>setup_check.py</code> and get a clean bill of health before Chapter 1</li>
 </ul>
+</section>
+<section id="ai-terms-youll-meet-in-this-book" class="level2">
+<h2 class="anchored" data-anchor-id="ai-terms-youll-meet-in-this-book">AI terms you’ll meet in this book</h2>
+<p>New vocabulary shows up gradually, one or two terms per chapter, each explained with an “Engineering Translation” callout the first time it matters. This page isn’t a substitute for those — it’s a quick-reference sheet to glance back at when a term from an earlier chapter resurfaces and you just want the short version, not the full explanation again. (Appendix B has the complete glossary, oilfield abbreviations included, if you need more than this.)</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Term</th>
+<th>What it means here</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Model</td>
+<td>The software that generates an answer from a question.</td>
+</tr>
+<tr class="even">
+<td>Base model</td>
+<td>The general-purpose model before any domain fine-tuning — Chapter 1’s starting point.</td>
+</tr>
+<tr class="odd">
+<td>Fine-tuning</td>
+<td>Updating a model’s weights on your own examples so it performs better on your specific task.</td>
+</tr>
+<tr class="even">
+<td>Weights</td>
+<td>The model’s internal numbers that determine its behavior — what fine-tuning actually changes.</td>
+</tr>
+<tr class="odd">
+<td>Token</td>
+<td>One piece of text after the model’s tokenizer cuts it up — sometimes a whole word, sometimes a fragment — Chapter 4.</td>
+</tr>
+<tr class="even">
+<td>Embedding</td>
+<td>A list of numbers standing in for a token or phrase, so the model can do math with meaning instead of letters — Chapter 4.</td>
+</tr>
+<tr class="odd">
+<td>LoRA adapter</td>
+<td>A small, separate set of numbers trained instead of the full model, added on top of the frozen base weights — Chapter 5.</td>
+</tr>
+<tr class="even">
+<td>Rank</td>
+<td>How narrow LoRA’s two small adapter tables are — smaller is cheaper to train, at the cost of a rougher approximation — Chapter 5.</td>
+</tr>
+<tr class="odd">
+<td>Training example</td>
+<td>One input and the answer you want the model to learn from — Chapter 2.</td>
+</tr>
+<tr class="even">
+<td>Epoch</td>
+<td>One full pass through the training data.</td>
+</tr>
+<tr class="odd">
+<td>Loss</td>
+<td>A number measuring how wrong the model’s predictions were on one pass — should fall as training continues.</td>
+</tr>
+<tr class="even">
+<td>Checkpoint</td>
+<td>A saved snapshot of the model’s weights at one point in training — something to resume from if a run is interrupted — Chapter 8.</td>
+</tr>
+<tr class="odd">
+<td>Held-out data</td>
+<td>Reports deliberately kept out of training so you have something honest to test on afterward — Chapter 2.</td>
+</tr>
+<tr class="even">
+<td>Inference</td>
+<td>Asking the trained model a question and getting an answer back, as opposed to training it.</td>
+</tr>
+<tr class="odd">
+<td>Quantization</td>
+<td>Storing a model’s weights at lower numerical precision to shrink memory and speed up inference, at some accuracy cost.</td>
+</tr>
+<tr class="even">
+<td>Perplexity</td>
+<td>A numeric measure of how well a model predicts held-out text; lower is generally better — Chapter 11.</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="why-this-chapter-exists" class="level2">
 <h2 class="anchored" data-anchor-id="why-this-chapter-exists">0.1 Why this chapter exists</h2>
@@ -676,7 +759,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="check-your-hardware" class="level2">
 <h2 class="anchored" data-anchor-id="check-your-hardware">0.6 Check your hardware</h2>
 <p>Fine-tuning, even the parameter-efficient kind this book uses, is more sensitive to your hardware than simply running a model is. This section doesn’t require you to buy anything — it just sets expectations for later chapters.</p>
-<div id="5398ae7c" class="cell" data-execution_count="1">
+<div id="16dbfcdc" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> torch.cuda.is_available():</span>
@@ -1340,297 +1423,326 @@ Workshop is ready.</code></pre>
 <span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  what to expect if it doesn't</span>
 <span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Run <span class="in">`setup_check.py`</span> and get a clean bill of health before Chapter 1</span>
 <span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.1 Why this chapter exists</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="fu">## AI terms you'll meet in this book</span></span>
 <span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>Every chapter from here on assumes four things are already true: Python</span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>is installed, this repository is on your machine, a virtual environment</span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>for it is active, and this book's packages are installed inside that</span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>environment. None of that is difficult, but skipping or rushing it is</span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>the single most common reason a reader gets stuck before Chapter 1 even</span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>starts — usually with a confusing error that has nothing to do with</span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>drilling, completions, or language models, and everything to do with one</span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>of these four things not being true yet.</span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>This chapter does all four, one step at a time, with no assumption that</span>
-<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>you've done any of it before.</span>
-<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Already comfortable with Python and virtual environments?"}</span>
-<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>Skip the explanations in **0.2** (installing Python), **0.6** (hardware</span>
-<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>check), and **0.7** (choosing an editor) — you already know that part.</span>
-<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>You still need to actually do **0.3** (clone this repository), **0.4**</span>
-<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>(create this book's own virtual environment), **0.5** (install its</span>
-<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>requirements), and **0.8** (run the setup check) like everyone else —</span>
-<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>they're specific to this book, not to Python in general — but you can</span>
-<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>move through them fast. If 0.8 comes back clean, you're done with this</span>
-<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>chapter.</span>
-<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.2 Install Python</span></span>
-<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a>This book targets **Python 3.11 or later** — the same version pinned in</span>
-<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a><span class="in">`requirements.txt`</span> and <span class="in">`environment.yml`</span>.</span>
-<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Engineering Translation: what is Python, here?"}</span>
-<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a>Python is the programming language every script in this book is written</span>
-<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a>in. Installing it is like installing the one piece of shop equipment</span>
-<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a>every other tool in this book plugs into — nothing past this section</span>
-<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a>runs without it.</span>
-<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a>**macOS:** Python 3 usually needs to be installed explicitly (the</span>
-<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a>system's built-in <span class="in">`python3`</span> is often older or missing entirely).</span>
-<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a>Download the latest 3.11+ installer from</span>
-<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">python.org/downloads</span><span class="co">](https://www.python.org/downloads/)</span> and run it, or</span>
-<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a>if you have <span class="co">[</span><span class="ot">Homebrew</span><span class="co">](https://brew.sh)</span> installed:</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>New vocabulary shows up gradually, one or two terms per chapter, each</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>explained with an "Engineering Translation" callout the first time it</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>matters. This page isn't a substitute for those — it's a quick-reference</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>sheet to glance back at when a term from an earlier chapter resurfaces</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>and you just want the short version, not the full explanation again.</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>(Appendix B has the complete glossary, oilfield abbreviations included,</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>if you need more than this.)</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Term <span class="pp">|</span> What it means here <span class="pp">|</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Model <span class="pp">|</span> The software that generates an answer from a question. <span class="pp">|</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Base model <span class="pp">|</span> The general-purpose model before any domain fine-tuning — Chapter 1's starting point. <span class="pp">|</span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Fine-tuning <span class="pp">|</span> Updating a model's weights on your own examples so it performs better on your specific task. <span class="pp">|</span></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Weights <span class="pp">|</span> The model's internal numbers that determine its behavior — what fine-tuning actually changes. <span class="pp">|</span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Token <span class="pp">|</span> One piece of text after the model's tokenizer cuts it up — sometimes a whole word, sometimes a fragment — Chapter 4. <span class="pp">|</span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Embedding <span class="pp">|</span> A list of numbers standing in for a token or phrase, so the model can do math with meaning instead of letters — Chapter 4. <span class="pp">|</span></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> LoRA adapter <span class="pp">|</span> A small, separate set of numbers trained instead of the full model, added on top of the frozen base weights — Chapter 5. <span class="pp">|</span></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Rank <span class="pp">|</span> How narrow LoRA's two small adapter tables are — smaller is cheaper to train, at the cost of a rougher approximation — Chapter 5. <span class="pp">|</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Training example <span class="pp">|</span> One input and the answer you want the model to learn from — Chapter 2. <span class="pp">|</span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Epoch <span class="pp">|</span> One full pass through the training data. <span class="pp">|</span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Loss <span class="pp">|</span> A number measuring how wrong the model's predictions were on one pass — should fall as training continues. <span class="pp">|</span></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Checkpoint <span class="pp">|</span> A saved snapshot of the model's weights at one point in training — something to resume from if a run is interrupted — Chapter 8. <span class="pp">|</span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Held-out data <span class="pp">|</span> Reports deliberately kept out of training so you have something honest to test on afterward — Chapter 2. <span class="pp">|</span></span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Inference <span class="pp">|</span> Asking the trained model a question and getting an answer back, as opposed to training it. <span class="pp">|</span></span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Quantization <span class="pp">|</span> Storing a model's weights at lower numerical precision to shrink memory and speed up inference, at some accuracy cost. <span class="pp">|</span></span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Perplexity <span class="pp">|</span> A numeric measure of how well a model predicts held-out text; lower is generally better — Chapter 11. <span class="pp">|</span></span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.1 Why this chapter exists</span></span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a>Every chapter from here on assumes four things are already true: Python</span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a>is installed, this repository is on your machine, a virtual environment</span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a>for it is active, and this book's packages are installed inside that</span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a>environment. None of that is difficult, but skipping or rushing it is</span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a>the single most common reason a reader gets stuck before Chapter 1 even</span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a>starts — usually with a confusing error that has nothing to do with</span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a>drilling, completions, or language models, and everything to do with one</span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a>of these four things not being true yet.</span>
+<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a>This chapter does all four, one step at a time, with no assumption that</span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a>you've done any of it before.</span>
 <span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-62"><a href="#cb13-62" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb13-63"><a href="#cb13-63" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install python@3.11</span>
-<span id="cb13-64"><a href="#cb13-64" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb13-65"><a href="#cb13-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-66"><a href="#cb13-66" aria-hidden="true" tabindex="-1"></a>**Windows:** download the installer from</span>
-<span id="cb13-67"><a href="#cb13-67" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">python.org/downloads</span><span class="co">](https://www.python.org/downloads/)</span>. On the first</span>
-<span id="cb13-68"><a href="#cb13-68" aria-hidden="true" tabindex="-1"></a>installer screen, check **"Add python.exe to PATH"** before clicking</span>
-<span id="cb13-69"><a href="#cb13-69" aria-hidden="true" tabindex="-1"></a>Install — this is the step almost everyone forgets, and it's what</span>
-<span id="cb13-70"><a href="#cb13-70" aria-hidden="true" tabindex="-1"></a>Section 0.11 below assumes you didn't.</span>
-<span id="cb13-71"><a href="#cb13-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-72"><a href="#cb13-72" aria-hidden="true" tabindex="-1"></a>**Linux:** most distributions ship Python 3, but check the version — it</span>
-<span id="cb13-73"><a href="#cb13-73" aria-hidden="true" tabindex="-1"></a>may be older than 3.11. On Ubuntu/Debian:</span>
+<span id="cb13-62"><a href="#cb13-62" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Already comfortable with Python and virtual environments?"}</span>
+<span id="cb13-63"><a href="#cb13-63" aria-hidden="true" tabindex="-1"></a>Skip the explanations in **0.2** (installing Python), **0.6** (hardware</span>
+<span id="cb13-64"><a href="#cb13-64" aria-hidden="true" tabindex="-1"></a>check), and **0.7** (choosing an editor) — you already know that part.</span>
+<span id="cb13-65"><a href="#cb13-65" aria-hidden="true" tabindex="-1"></a>You still need to actually do **0.3** (clone this repository), **0.4**</span>
+<span id="cb13-66"><a href="#cb13-66" aria-hidden="true" tabindex="-1"></a>(create this book's own virtual environment), **0.5** (install its</span>
+<span id="cb13-67"><a href="#cb13-67" aria-hidden="true" tabindex="-1"></a>requirements), and **0.8** (run the setup check) like everyone else —</span>
+<span id="cb13-68"><a href="#cb13-68" aria-hidden="true" tabindex="-1"></a>they're specific to this book, not to Python in general — but you can</span>
+<span id="cb13-69"><a href="#cb13-69" aria-hidden="true" tabindex="-1"></a>move through them fast. If 0.8 comes back clean, you're done with this</span>
+<span id="cb13-70"><a href="#cb13-70" aria-hidden="true" tabindex="-1"></a>chapter.</span>
+<span id="cb13-71"><a href="#cb13-71" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb13-72"><a href="#cb13-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-73"><a href="#cb13-73" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.2 Install Python</span></span>
 <span id="cb13-74"><a href="#cb13-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-75"><a href="#cb13-75" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb13-76"><a href="#cb13-76" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> apt install python3 python3-venv python3-pip</span>
-<span id="cb13-77"><a href="#cb13-77" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb13-78"><a href="#cb13-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-79"><a href="#cb13-79" aria-hidden="true" tabindex="-1"></a>**Confirm it worked:**</span>
-<span id="cb13-80"><a href="#cb13-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-81"><a href="#cb13-81" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb13-82"><a href="#cb13-82" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">--version</span></span>
-<span id="cb13-83"><a href="#cb13-83" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-75"><a href="#cb13-75" aria-hidden="true" tabindex="-1"></a>This book targets **Python 3.11 or later** — the same version pinned in</span>
+<span id="cb13-76"><a href="#cb13-76" aria-hidden="true" tabindex="-1"></a><span class="in">`requirements.txt`</span> and <span class="in">`environment.yml`</span>.</span>
+<span id="cb13-77"><a href="#cb13-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-78"><a href="#cb13-78" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Engineering Translation: what is Python, here?"}</span>
+<span id="cb13-79"><a href="#cb13-79" aria-hidden="true" tabindex="-1"></a>Python is the programming language every script in this book is written</span>
+<span id="cb13-80"><a href="#cb13-80" aria-hidden="true" tabindex="-1"></a>in. Installing it is like installing the one piece of shop equipment</span>
+<span id="cb13-81"><a href="#cb13-81" aria-hidden="true" tabindex="-1"></a>every other tool in this book plugs into — nothing past this section</span>
+<span id="cb13-82"><a href="#cb13-82" aria-hidden="true" tabindex="-1"></a>runs without it.</span>
+<span id="cb13-83"><a href="#cb13-83" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb13-84"><a href="#cb13-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-85"><a href="#cb13-85" aria-hidden="true" tabindex="-1"></a>**Expected output:** something like <span class="in">`Python 3.11.9`</span> (any 3.11 or later</span>
-<span id="cb13-86"><a href="#cb13-86" aria-hidden="true" tabindex="-1"></a>patch version is fine). If you see <span class="in">`command not found`</span> or a version</span>
-<span id="cb13-87"><a href="#cb13-87" aria-hidden="true" tabindex="-1"></a>below 3.11, revisit the install step for your platform above.</span>
-<span id="cb13-88"><a href="#cb13-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-89"><a href="#cb13-89" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.3 Clone this repository</span></span>
+<span id="cb13-85"><a href="#cb13-85" aria-hidden="true" tabindex="-1"></a>**macOS:** Python 3 usually needs to be installed explicitly (the</span>
+<span id="cb13-86"><a href="#cb13-86" aria-hidden="true" tabindex="-1"></a>system's built-in <span class="in">`python3`</span> is often older or missing entirely).</span>
+<span id="cb13-87"><a href="#cb13-87" aria-hidden="true" tabindex="-1"></a>Download the latest 3.11+ installer from</span>
+<span id="cb13-88"><a href="#cb13-88" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">python.org/downloads</span><span class="co">](https://www.python.org/downloads/)</span> and run it, or</span>
+<span id="cb13-89"><a href="#cb13-89" aria-hidden="true" tabindex="-1"></a>if you have <span class="co">[</span><span class="ot">Homebrew</span><span class="co">](https://brew.sh)</span> installed:</span>
 <span id="cb13-90"><a href="#cb13-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-91"><a href="#cb13-91" aria-hidden="true" tabindex="-1"></a>If you're comfortable with <span class="in">`git`</span>:</span>
-<span id="cb13-92"><a href="#cb13-92" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-93"><a href="#cb13-93" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb13-94"><a href="#cb13-94" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/djimrastephane/llm-ft-drilling-completions-book.git</span>
-<span id="cb13-95"><a href="#cb13-95" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> llm-ft-drilling-completions-book</span>
-<span id="cb13-96"><a href="#cb13-96" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb13-97"><a href="#cb13-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-98"><a href="#cb13-98" aria-hidden="true" tabindex="-1"></a>Never used <span class="in">`git`</span> before? Click the **Download ZIP** button on the</span>
-<span id="cb13-99"><a href="#cb13-99" aria-hidden="true" tabindex="-1"></a>repository's GitHub page instead, unzip it, and open a terminal inside</span>
-<span id="cb13-100"><a href="#cb13-100" aria-hidden="true" tabindex="-1"></a>the unzipped folder.</span>
-<span id="cb13-101"><a href="#cb13-101" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-102"><a href="#cb13-102" aria-hidden="true" tabindex="-1"></a>**Expected output:** a folder named</span>
-<span id="cb13-103"><a href="#cb13-103" aria-hidden="true" tabindex="-1"></a><span class="in">`llm-ft-drilling-completions-book`</span> (or similar) containing, among other</span>
-<span id="cb13-104"><a href="#cb13-104" aria-hidden="true" tabindex="-1"></a>things, a <span class="in">`book/`</span> folder — everything from here on happens inside <span class="in">`book/`</span>.</span>
-<span id="cb13-105"><a href="#cb13-105" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-106"><a href="#cb13-106" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb13-107"><a href="#cb13-107" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> book</span>
-<span id="cb13-108"><a href="#cb13-108" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-91"><a href="#cb13-91" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb13-92"><a href="#cb13-92" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install python@3.11</span>
+<span id="cb13-93"><a href="#cb13-93" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-94"><a href="#cb13-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-95"><a href="#cb13-95" aria-hidden="true" tabindex="-1"></a>**Windows:** download the installer from</span>
+<span id="cb13-96"><a href="#cb13-96" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">python.org/downloads</span><span class="co">](https://www.python.org/downloads/)</span>. On the first</span>
+<span id="cb13-97"><a href="#cb13-97" aria-hidden="true" tabindex="-1"></a>installer screen, check **"Add python.exe to PATH"** before clicking</span>
+<span id="cb13-98"><a href="#cb13-98" aria-hidden="true" tabindex="-1"></a>Install — this is the step almost everyone forgets, and it's what</span>
+<span id="cb13-99"><a href="#cb13-99" aria-hidden="true" tabindex="-1"></a>Section 0.11 below assumes you didn't.</span>
+<span id="cb13-100"><a href="#cb13-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-101"><a href="#cb13-101" aria-hidden="true" tabindex="-1"></a>**Linux:** most distributions ship Python 3, but check the version — it</span>
+<span id="cb13-102"><a href="#cb13-102" aria-hidden="true" tabindex="-1"></a>may be older than 3.11. On Ubuntu/Debian:</span>
+<span id="cb13-103"><a href="#cb13-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-104"><a href="#cb13-104" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb13-105"><a href="#cb13-105" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> apt install python3 python3-venv python3-pip</span>
+<span id="cb13-106"><a href="#cb13-106" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-107"><a href="#cb13-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-108"><a href="#cb13-108" aria-hidden="true" tabindex="-1"></a>**Confirm it worked:**</span>
 <span id="cb13-109"><a href="#cb13-109" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-110"><a href="#cb13-110" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.4 Create and activate a virtual environment</span></span>
-<span id="cb13-111"><a href="#cb13-111" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-112"><a href="#cb13-112" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Engineering Translation: what is a virtual environment?"}</span>
-<span id="cb13-113"><a href="#cb13-113" aria-hidden="true" tabindex="-1"></a>A virtual environment is a private, self-contained set of Python</span>
-<span id="cb13-114"><a href="#cb13-114" aria-hidden="true" tabindex="-1"></a>packages just for this project — like a dedicated toolbox for this book</span>
-<span id="cb13-115"><a href="#cb13-115" aria-hidden="true" tabindex="-1"></a>that doesn't get mixed up with tools installed for anything else on your</span>
-<span id="cb13-116"><a href="#cb13-116" aria-hidden="true" tabindex="-1"></a>machine. Without it, this book's packages (and their exact versions)</span>
-<span id="cb13-117"><a href="#cb13-117" aria-hidden="true" tabindex="-1"></a>could conflict with something else Python-related already on your</span>
-<span id="cb13-118"><a href="#cb13-118" aria-hidden="true" tabindex="-1"></a>system.</span>
-<span id="cb13-119"><a href="#cb13-119" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb13-120"><a href="#cb13-120" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-121"><a href="#cb13-121" aria-hidden="true" tabindex="-1"></a>From inside <span class="in">`book/`</span>:</span>
-<span id="cb13-122"><a href="#cb13-122" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-123"><a href="#cb13-123" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb13-124"><a href="#cb13-124" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb13-110"><a href="#cb13-110" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb13-111"><a href="#cb13-111" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">--version</span></span>
+<span id="cb13-112"><a href="#cb13-112" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-113"><a href="#cb13-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-114"><a href="#cb13-114" aria-hidden="true" tabindex="-1"></a>**Expected output:** something like <span class="in">`Python 3.11.9`</span> (any 3.11 or later</span>
+<span id="cb13-115"><a href="#cb13-115" aria-hidden="true" tabindex="-1"></a>patch version is fine). If you see <span class="in">`command not found`</span> or a version</span>
+<span id="cb13-116"><a href="#cb13-116" aria-hidden="true" tabindex="-1"></a>below 3.11, revisit the install step for your platform above.</span>
+<span id="cb13-117"><a href="#cb13-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-118"><a href="#cb13-118" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.3 Clone this repository</span></span>
+<span id="cb13-119"><a href="#cb13-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-120"><a href="#cb13-120" aria-hidden="true" tabindex="-1"></a>If you're comfortable with <span class="in">`git`</span>:</span>
+<span id="cb13-121"><a href="#cb13-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-122"><a href="#cb13-122" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb13-123"><a href="#cb13-123" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/djimrastephane/llm-ft-drilling-completions-book.git</span>
+<span id="cb13-124"><a href="#cb13-124" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> llm-ft-drilling-completions-book</span>
 <span id="cb13-125"><a href="#cb13-125" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb13-126"><a href="#cb13-126" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-127"><a href="#cb13-127" aria-hidden="true" tabindex="-1"></a>**What just happened?** This created a <span class="in">`.venv`</span> folder holding a private</span>
-<span id="cb13-128"><a href="#cb13-128" aria-hidden="true" tabindex="-1"></a>copy of Python and an empty toolbox, specific to this project.</span>
-<span id="cb13-129"><a href="#cb13-129" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-130"><a href="#cb13-130" aria-hidden="true" tabindex="-1"></a>Now activate it — you'll need to do this every time you open a new</span>
-<span id="cb13-131"><a href="#cb13-131" aria-hidden="true" tabindex="-1"></a>terminal window to work on this book:</span>
-<span id="cb13-132"><a href="#cb13-132" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-133"><a href="#cb13-133" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb13-134"><a href="#cb13-134" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate          <span class="co"># macOS/Linux</span></span>
-<span id="cb13-135"><a href="#cb13-135" aria-hidden="true" tabindex="-1"></a><span class="ex">.venv\Scripts\activate</span>             <span class="co"># Windows (Command Prompt or PowerShell)</span></span>
-<span id="cb13-136"><a href="#cb13-136" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb13-137"><a href="#cb13-137" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-138"><a href="#cb13-138" aria-hidden="true" tabindex="-1"></a>**Expected result:** your terminal prompt now starts with <span class="in">`(.venv)`</span>.</span>
-<span id="cb13-139"><a href="#cb13-139" aria-hidden="true" tabindex="-1"></a>That prefix is your confirmation the virtual environment is active —</span>
-<span id="cb13-140"><a href="#cb13-140" aria-hidden="true" tabindex="-1"></a>if it's missing, the next step will install packages into the wrong</span>
-<span id="cb13-141"><a href="#cb13-141" aria-hidden="true" tabindex="-1"></a>place.</span>
-<span id="cb13-142"><a href="#cb13-142" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-143"><a href="#cb13-143" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.5 Install requirements</span></span>
-<span id="cb13-144"><a href="#cb13-144" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-145"><a href="#cb13-145" aria-hidden="true" tabindex="-1"></a>With <span class="in">`(.venv)`</span> showing in your prompt and still inside <span class="in">`book/`</span>:</span>
-<span id="cb13-146"><a href="#cb13-146" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-147"><a href="#cb13-147" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb13-148"><a href="#cb13-148" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-r</span> requirements.txt</span>
-<span id="cb13-149"><a href="#cb13-149" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb13-150"><a href="#cb13-150" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-151"><a href="#cb13-151" aria-hidden="true" tabindex="-1"></a>**What just happened?** <span class="in">`pip`</span> read the list of packages this book needs</span>
-<span id="cb13-152"><a href="#cb13-152" aria-hidden="true" tabindex="-1"></a>— <span class="in">`transformers`</span>, <span class="in">`torch`</span>, <span class="in">`peft`</span>, and the rest — and installed them</span>
-<span id="cb13-153"><a href="#cb13-153" aria-hidden="true" tabindex="-1"></a>into your <span class="in">`.venv`</span>. <span class="in">`torch`</span> in particular is a large download (several</span>
-<span id="cb13-154"><a href="#cb13-154" aria-hidden="true" tabindex="-1"></a>hundred MB to a few GB depending on platform and whether a GPU build is</span>
-<span id="cb13-155"><a href="#cb13-155" aria-hidden="true" tabindex="-1"></a>selected), so this step can take a few minutes even on a fast</span>
-<span id="cb13-156"><a href="#cb13-156" aria-hidden="true" tabindex="-1"></a>connection. That's normal.</span>
-<span id="cb13-157"><a href="#cb13-157" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-158"><a href="#cb13-158" aria-hidden="true" tabindex="-1"></a>**Expected output:** a long scroll of <span class="in">`Downloading...`</span> and</span>
-<span id="cb13-159"><a href="#cb13-159" aria-hidden="true" tabindex="-1"></a><span class="in">`Installing collected packages...`</span> lines, ending with something like</span>
-<span id="cb13-160"><a href="#cb13-160" aria-hidden="true" tabindex="-1"></a><span class="in">`Successfully installed torch-... transformers-... peft-... ...`</span> and no</span>
-<span id="cb13-161"><a href="#cb13-161" aria-hidden="true" tabindex="-1"></a>red <span class="in">`ERROR`</span> lines.</span>
-<span id="cb13-162"><a href="#cb13-162" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-163"><a href="#cb13-163" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="bitsandbytes and your platform"}</span>
-<span id="cb13-164"><a href="#cb13-164" aria-hidden="true" tabindex="-1"></a><span class="in">`requirements.txt`</span> installs <span class="in">`bitsandbytes`</span> (used for 4-/8-bit QLoRA</span>
-<span id="cb13-165"><a href="#cb13-165" aria-hidden="true" tabindex="-1"></a>fine-tuning) only on Linux — it has no working build for macOS. If</span>
-<span id="cb13-166"><a href="#cb13-166" aria-hidden="true" tabindex="-1"></a>you're on macOS or a CPU-only machine, this is expected and not an</span>
-<span id="cb13-167"><a href="#cb13-167" aria-hidden="true" tabindex="-1"></a>error; Chapter 5 explains the full-precision LoRA path you'll use</span>
-<span id="cb13-168"><a href="#cb13-168" aria-hidden="true" tabindex="-1"></a>instead.</span>
-<span id="cb13-169"><a href="#cb13-169" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb13-170"><a href="#cb13-170" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-171"><a href="#cb13-171" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.6 Check your hardware</span></span>
-<span id="cb13-172"><a href="#cb13-172" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-173"><a href="#cb13-173" aria-hidden="true" tabindex="-1"></a>Fine-tuning, even the parameter-efficient kind this book uses, is more</span>
-<span id="cb13-174"><a href="#cb13-174" aria-hidden="true" tabindex="-1"></a>sensitive to your hardware than simply running a model is. This section</span>
-<span id="cb13-175"><a href="#cb13-175" aria-hidden="true" tabindex="-1"></a>doesn't require you to buy anything — it just sets expectations for</span>
-<span id="cb13-176"><a href="#cb13-176" aria-hidden="true" tabindex="-1"></a>later chapters.</span>
-<span id="cb13-177"><a href="#cb13-177" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-180"><a href="#cb13-180" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb13-181"><a href="#cb13-181" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb13-182"><a href="#cb13-182" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
-<span id="cb13-183"><a href="#cb13-183" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-184"><a href="#cb13-184" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> torch.cuda.is_available():</span>
-<span id="cb13-185"><a href="#cb13-185" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"CUDA GPU available: </span><span class="sc">{</span>torch<span class="sc">.</span>cuda<span class="sc">.</span>get_device_name(<span class="dv">0</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb13-186"><a href="#cb13-186" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> torch.backends.mps.is_available():</span>
-<span id="cb13-187"><a href="#cb13-187" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Apple Silicon MPS device available"</span>)</span>
-<span id="cb13-188"><a href="#cb13-188" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb13-189"><a href="#cb13-189" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"No GPU detected -- CPU-only."</span>)</span>
-<span id="cb13-190"><a href="#cb13-190" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-127"><a href="#cb13-127" aria-hidden="true" tabindex="-1"></a>Never used <span class="in">`git`</span> before? Click the **Download ZIP** button on the</span>
+<span id="cb13-128"><a href="#cb13-128" aria-hidden="true" tabindex="-1"></a>repository's GitHub page instead, unzip it, and open a terminal inside</span>
+<span id="cb13-129"><a href="#cb13-129" aria-hidden="true" tabindex="-1"></a>the unzipped folder.</span>
+<span id="cb13-130"><a href="#cb13-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-131"><a href="#cb13-131" aria-hidden="true" tabindex="-1"></a>**Expected output:** a folder named</span>
+<span id="cb13-132"><a href="#cb13-132" aria-hidden="true" tabindex="-1"></a><span class="in">`llm-ft-drilling-completions-book`</span> (or similar) containing, among other</span>
+<span id="cb13-133"><a href="#cb13-133" aria-hidden="true" tabindex="-1"></a>things, a <span class="in">`book/`</span> folder — everything from here on happens inside <span class="in">`book/`</span>.</span>
+<span id="cb13-134"><a href="#cb13-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-135"><a href="#cb13-135" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb13-136"><a href="#cb13-136" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> book</span>
+<span id="cb13-137"><a href="#cb13-137" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-138"><a href="#cb13-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-139"><a href="#cb13-139" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.4 Create and activate a virtual environment</span></span>
+<span id="cb13-140"><a href="#cb13-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-141"><a href="#cb13-141" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Engineering Translation: what is a virtual environment?"}</span>
+<span id="cb13-142"><a href="#cb13-142" aria-hidden="true" tabindex="-1"></a>A virtual environment is a private, self-contained set of Python</span>
+<span id="cb13-143"><a href="#cb13-143" aria-hidden="true" tabindex="-1"></a>packages just for this project — like a dedicated toolbox for this book</span>
+<span id="cb13-144"><a href="#cb13-144" aria-hidden="true" tabindex="-1"></a>that doesn't get mixed up with tools installed for anything else on your</span>
+<span id="cb13-145"><a href="#cb13-145" aria-hidden="true" tabindex="-1"></a>machine. Without it, this book's packages (and their exact versions)</span>
+<span id="cb13-146"><a href="#cb13-146" aria-hidden="true" tabindex="-1"></a>could conflict with something else Python-related already on your</span>
+<span id="cb13-147"><a href="#cb13-147" aria-hidden="true" tabindex="-1"></a>system.</span>
+<span id="cb13-148"><a href="#cb13-148" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb13-149"><a href="#cb13-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-150"><a href="#cb13-150" aria-hidden="true" tabindex="-1"></a>From inside <span class="in">`book/`</span>:</span>
+<span id="cb13-151"><a href="#cb13-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-152"><a href="#cb13-152" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb13-153"><a href="#cb13-153" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb13-154"><a href="#cb13-154" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-155"><a href="#cb13-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-156"><a href="#cb13-156" aria-hidden="true" tabindex="-1"></a>**What just happened?** This created a <span class="in">`.venv`</span> folder holding a private</span>
+<span id="cb13-157"><a href="#cb13-157" aria-hidden="true" tabindex="-1"></a>copy of Python and an empty toolbox, specific to this project.</span>
+<span id="cb13-158"><a href="#cb13-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-159"><a href="#cb13-159" aria-hidden="true" tabindex="-1"></a>Now activate it — you'll need to do this every time you open a new</span>
+<span id="cb13-160"><a href="#cb13-160" aria-hidden="true" tabindex="-1"></a>terminal window to work on this book:</span>
+<span id="cb13-161"><a href="#cb13-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-162"><a href="#cb13-162" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb13-163"><a href="#cb13-163" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate          <span class="co"># macOS/Linux</span></span>
+<span id="cb13-164"><a href="#cb13-164" aria-hidden="true" tabindex="-1"></a><span class="ex">.venv\Scripts\activate</span>             <span class="co"># Windows (Command Prompt or PowerShell)</span></span>
+<span id="cb13-165"><a href="#cb13-165" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-166"><a href="#cb13-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-167"><a href="#cb13-167" aria-hidden="true" tabindex="-1"></a>**Expected result:** your terminal prompt now starts with <span class="in">`(.venv)`</span>.</span>
+<span id="cb13-168"><a href="#cb13-168" aria-hidden="true" tabindex="-1"></a>That prefix is your confirmation the virtual environment is active —</span>
+<span id="cb13-169"><a href="#cb13-169" aria-hidden="true" tabindex="-1"></a>if it's missing, the next step will install packages into the wrong</span>
+<span id="cb13-170"><a href="#cb13-170" aria-hidden="true" tabindex="-1"></a>place.</span>
+<span id="cb13-171"><a href="#cb13-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-172"><a href="#cb13-172" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.5 Install requirements</span></span>
+<span id="cb13-173"><a href="#cb13-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-174"><a href="#cb13-174" aria-hidden="true" tabindex="-1"></a>With <span class="in">`(.venv)`</span> showing in your prompt and still inside <span class="in">`book/`</span>:</span>
+<span id="cb13-175"><a href="#cb13-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-176"><a href="#cb13-176" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb13-177"><a href="#cb13-177" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-r</span> requirements.txt</span>
+<span id="cb13-178"><a href="#cb13-178" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-179"><a href="#cb13-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-180"><a href="#cb13-180" aria-hidden="true" tabindex="-1"></a>**What just happened?** <span class="in">`pip`</span> read the list of packages this book needs</span>
+<span id="cb13-181"><a href="#cb13-181" aria-hidden="true" tabindex="-1"></a>— <span class="in">`transformers`</span>, <span class="in">`torch`</span>, <span class="in">`peft`</span>, and the rest — and installed them</span>
+<span id="cb13-182"><a href="#cb13-182" aria-hidden="true" tabindex="-1"></a>into your <span class="in">`.venv`</span>. <span class="in">`torch`</span> in particular is a large download (several</span>
+<span id="cb13-183"><a href="#cb13-183" aria-hidden="true" tabindex="-1"></a>hundred MB to a few GB depending on platform and whether a GPU build is</span>
+<span id="cb13-184"><a href="#cb13-184" aria-hidden="true" tabindex="-1"></a>selected), so this step can take a few minutes even on a fast</span>
+<span id="cb13-185"><a href="#cb13-185" aria-hidden="true" tabindex="-1"></a>connection. That's normal.</span>
+<span id="cb13-186"><a href="#cb13-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-187"><a href="#cb13-187" aria-hidden="true" tabindex="-1"></a>**Expected output:** a long scroll of <span class="in">`Downloading...`</span> and</span>
+<span id="cb13-188"><a href="#cb13-188" aria-hidden="true" tabindex="-1"></a><span class="in">`Installing collected packages...`</span> lines, ending with something like</span>
+<span id="cb13-189"><a href="#cb13-189" aria-hidden="true" tabindex="-1"></a><span class="in">`Successfully installed torch-... transformers-... peft-... ...`</span> and no</span>
+<span id="cb13-190"><a href="#cb13-190" aria-hidden="true" tabindex="-1"></a>red <span class="in">`ERROR`</span> lines.</span>
 <span id="cb13-191"><a href="#cb13-191" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-192"><a href="#cb13-192" aria-hidden="true" tabindex="-1"></a>**What just happened?** This checks for three possibilities: an</span>
-<span id="cb13-193"><a href="#cb13-193" aria-hidden="true" tabindex="-1"></a>NVIDIA GPU (<span class="in">`cuda`</span>), an Apple Silicon Mac's built-in accelerator</span>
-<span id="cb13-194"><a href="#cb13-194" aria-hidden="true" tabindex="-1"></a>(<span class="in">`mps`</span>), or neither.</span>
-<span id="cb13-195"><a href="#cb13-195" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-196"><a href="#cb13-196" aria-hidden="true" tabindex="-1"></a>**What this means for you:**</span>
-<span id="cb13-197"><a href="#cb13-197" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-198"><a href="#cb13-198" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**CUDA GPU:** the most comfortable path. Chapter 5's fine-tune, and</span>
-<span id="cb13-199"><a href="#cb13-199" aria-hidden="true" tabindex="-1"></a>  the heavier Part II chapters, will run in minutes.</span>
-<span id="cb13-200"><a href="#cb13-200" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Apple Silicon MPS:** works well for this book's small models, though</span>
-<span id="cb13-201"><a href="#cb13-201" aria-hidden="true" tabindex="-1"></a>  somewhat slower than a dedicated CUDA GPU.</span>
-<span id="cb13-202"><a href="#cb13-202" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**CPU-only:** every chapter is still designed to run — you'll use a</span>
-<span id="cb13-203"><a href="#cb13-203" aria-hidden="true" tabindex="-1"></a>  smaller model and fewer training steps where a chapter calls for it,</span>
-<span id="cb13-204"><a href="#cb13-204" aria-hidden="true" tabindex="-1"></a>  at the cost of longer wait times, not a dead end.</span>
-<span id="cb13-205"><a href="#cb13-205" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-206"><a href="#cb13-206" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.7 Choose your workshop (editor or notebook)</span></span>
-<span id="cb13-207"><a href="#cb13-207" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-208"><a href="#cb13-208" aria-hidden="true" tabindex="-1"></a>You don't need a specific editor to follow this book. Pick whichever of</span>
-<span id="cb13-209"><a href="#cb13-209" aria-hidden="true" tabindex="-1"></a>these you're most comfortable with — there is no wrong choice, and all</span>
-<span id="cb13-210"><a href="#cb13-210" aria-hidden="true" tabindex="-1"></a>five run the exact same code:</span>
-<span id="cb13-211"><a href="#cb13-211" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-212"><a href="#cb13-212" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Environment <span class="pp">|</span> Recommended for <span class="pp">|</span> Guide <span class="pp">|</span></span>
-<span id="cb13-213"><a href="#cb13-213" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb13-214"><a href="#cb13-214" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Jupyter Notebook <span class="pp">|</span> Learning and experimentation <span class="pp">|</span> <span class="co">[</span><span class="ot">Appendix A1</span><span class="co">](../appendix/appendix_a1_jupyter.qmd)</span> <span class="pp">|</span></span>
-<span id="cb13-215"><a href="#cb13-215" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> VS Code <span class="pp">|</span> General coding <span class="pp">|</span> <span class="co">[</span><span class="ot">Appendix A2</span><span class="co">](../appendix/appendix_a2_vscode.qmd)</span> <span class="pp">|</span></span>
-<span id="cb13-216"><a href="#cb13-216" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> PyCharm Community <span class="pp">|</span> Larger projects <span class="pp">|</span> <span class="co">[</span><span class="ot">Appendix A3</span><span class="co">](../appendix/appendix_a3_pycharm.qmd)</span> <span class="pp">|</span></span>
-<span id="cb13-217"><a href="#cb13-217" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Positron <span class="pp">|</span> Data science workflows <span class="pp">|</span> <span class="co">[</span><span class="ot">Appendix A4</span><span class="co">](../appendix/appendix_a4_positron.qmd)</span> <span class="pp">|</span></span>
-<span id="cb13-218"><a href="#cb13-218" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Terminal only <span class="pp">|</span> Minimal setup <span class="pp">|</span> <span class="co">[</span><span class="ot">Appendix A5</span><span class="co">](../appendix/appendix_a5_terminal.qmd)</span> <span class="pp">|</span></span>
-<span id="cb13-219"><a href="#cb13-219" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-220"><a href="#cb13-220" aria-hidden="true" tabindex="-1"></a>If you're not sure, Jupyter Notebook or VS Code are the most common</span>
-<span id="cb13-221"><a href="#cb13-221" aria-hidden="true" tabindex="-1"></a>starting points. You can always switch later — nothing in this book</span>
-<span id="cb13-222"><a href="#cb13-222" aria-hidden="true" tabindex="-1"></a>locks you into one choice.</span>
-<span id="cb13-223"><a href="#cb13-223" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-224"><a href="#cb13-224" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.8 Run the setup check</span></span>
-<span id="cb13-225"><a href="#cb13-225" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-226"><a href="#cb13-226" aria-hidden="true" tabindex="-1"></a>With <span class="in">`(.venv)`</span> active and requirements installed, from inside <span class="in">`book/`</span>:</span>
-<span id="cb13-227"><a href="#cb13-227" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-228"><a href="#cb13-228" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb13-229"><a href="#cb13-229" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> code/setup_check.py</span>
-<span id="cb13-230"><a href="#cb13-230" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb13-231"><a href="#cb13-231" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-232"><a href="#cb13-232" aria-hidden="true" tabindex="-1"></a>**Expected output:**</span>
-<span id="cb13-233"><a href="#cb13-233" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-234"><a href="#cb13-234" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb13-235"><a href="#cb13-235" aria-hidden="true" tabindex="-1"></a><span class="in">Fine-Tuning Local LLM for Drilling &amp; Completions -- setup check</span></span>
+<span id="cb13-192"><a href="#cb13-192" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="bitsandbytes and your platform"}</span>
+<span id="cb13-193"><a href="#cb13-193" aria-hidden="true" tabindex="-1"></a><span class="in">`requirements.txt`</span> installs <span class="in">`bitsandbytes`</span> (used for 4-/8-bit QLoRA</span>
+<span id="cb13-194"><a href="#cb13-194" aria-hidden="true" tabindex="-1"></a>fine-tuning) only on Linux — it has no working build for macOS. If</span>
+<span id="cb13-195"><a href="#cb13-195" aria-hidden="true" tabindex="-1"></a>you're on macOS or a CPU-only machine, this is expected and not an</span>
+<span id="cb13-196"><a href="#cb13-196" aria-hidden="true" tabindex="-1"></a>error; Chapter 5 explains the full-precision LoRA path you'll use</span>
+<span id="cb13-197"><a href="#cb13-197" aria-hidden="true" tabindex="-1"></a>instead.</span>
+<span id="cb13-198"><a href="#cb13-198" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb13-199"><a href="#cb13-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-200"><a href="#cb13-200" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.6 Check your hardware</span></span>
+<span id="cb13-201"><a href="#cb13-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-202"><a href="#cb13-202" aria-hidden="true" tabindex="-1"></a>Fine-tuning, even the parameter-efficient kind this book uses, is more</span>
+<span id="cb13-203"><a href="#cb13-203" aria-hidden="true" tabindex="-1"></a>sensitive to your hardware than simply running a model is. This section</span>
+<span id="cb13-204"><a href="#cb13-204" aria-hidden="true" tabindex="-1"></a>doesn't require you to buy anything — it just sets expectations for</span>
+<span id="cb13-205"><a href="#cb13-205" aria-hidden="true" tabindex="-1"></a>later chapters.</span>
+<span id="cb13-206"><a href="#cb13-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-209"><a href="#cb13-209" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb13-210"><a href="#cb13-210" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb13-211"><a href="#cb13-211" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb13-212"><a href="#cb13-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-213"><a href="#cb13-213" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> torch.cuda.is_available():</span>
+<span id="cb13-214"><a href="#cb13-214" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"CUDA GPU available: </span><span class="sc">{</span>torch<span class="sc">.</span>cuda<span class="sc">.</span>get_device_name(<span class="dv">0</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-215"><a href="#cb13-215" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> torch.backends.mps.is_available():</span>
+<span id="cb13-216"><a href="#cb13-216" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Apple Silicon MPS device available"</span>)</span>
+<span id="cb13-217"><a href="#cb13-217" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb13-218"><a href="#cb13-218" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"No GPU detected -- CPU-only."</span>)</span>
+<span id="cb13-219"><a href="#cb13-219" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-220"><a href="#cb13-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-221"><a href="#cb13-221" aria-hidden="true" tabindex="-1"></a>**What just happened?** This checks for three possibilities: an</span>
+<span id="cb13-222"><a href="#cb13-222" aria-hidden="true" tabindex="-1"></a>NVIDIA GPU (<span class="in">`cuda`</span>), an Apple Silicon Mac's built-in accelerator</span>
+<span id="cb13-223"><a href="#cb13-223" aria-hidden="true" tabindex="-1"></a>(<span class="in">`mps`</span>), or neither.</span>
+<span id="cb13-224"><a href="#cb13-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-225"><a href="#cb13-225" aria-hidden="true" tabindex="-1"></a>**What this means for you:**</span>
+<span id="cb13-226"><a href="#cb13-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-227"><a href="#cb13-227" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**CUDA GPU:** the most comfortable path. Chapter 5's fine-tune, and</span>
+<span id="cb13-228"><a href="#cb13-228" aria-hidden="true" tabindex="-1"></a>  the heavier Part II chapters, will run in minutes.</span>
+<span id="cb13-229"><a href="#cb13-229" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Apple Silicon MPS:** works well for this book's small models, though</span>
+<span id="cb13-230"><a href="#cb13-230" aria-hidden="true" tabindex="-1"></a>  somewhat slower than a dedicated CUDA GPU.</span>
+<span id="cb13-231"><a href="#cb13-231" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**CPU-only:** every chapter is still designed to run — you'll use a</span>
+<span id="cb13-232"><a href="#cb13-232" aria-hidden="true" tabindex="-1"></a>  smaller model and fewer training steps where a chapter calls for it,</span>
+<span id="cb13-233"><a href="#cb13-233" aria-hidden="true" tabindex="-1"></a>  at the cost of longer wait times, not a dead end.</span>
+<span id="cb13-234"><a href="#cb13-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-235"><a href="#cb13-235" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.7 Choose your workshop (editor or notebook)</span></span>
 <span id="cb13-236"><a href="#cb13-236" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-237"><a href="#cb13-237" aria-hidden="true" tabindex="-1"></a><span class="in">[OK] Python 3.11.9</span></span>
-<span id="cb13-238"><a href="#cb13-238" aria-hidden="true" tabindex="-1"></a><span class="in">[OK] torch importable</span></span>
-<span id="cb13-239"><a href="#cb13-239" aria-hidden="true" tabindex="-1"></a><span class="in">[OK] transformers importable</span></span>
-<span id="cb13-240"><a href="#cb13-240" aria-hidden="true" tabindex="-1"></a><span class="in">[OK] peft importable</span></span>
-<span id="cb13-241"><a href="#cb13-241" aria-hidden="true" tabindex="-1"></a><span class="in">[OK] datasets importable</span></span>
-<span id="cb13-242"><a href="#cb13-242" aria-hidden="true" tabindex="-1"></a><span class="in">[OK] accelerate importable</span></span>
-<span id="cb13-243"><a href="#cb13-243" aria-hidden="true" tabindex="-1"></a><span class="in">[INFO] No GPU detected -- CPU-only. Fine-tuning chapters will still work with a small model, just more slowly.</span></span>
-<span id="cb13-244"><a href="#cb13-244" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-245"><a href="#cb13-245" aria-hidden="true" tabindex="-1"></a><span class="in">Workshop is ready.</span></span>
-<span id="cb13-246"><a href="#cb13-246" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb13-247"><a href="#cb13-247" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-248"><a href="#cb13-248" aria-hidden="true" tabindex="-1"></a>(Your <span class="in">`[INFO]`</span> line will instead name a CUDA GPU or MPS if you have one</span>
-<span id="cb13-249"><a href="#cb13-249" aria-hidden="true" tabindex="-1"></a>— see Section 0.6.)</span>
-<span id="cb13-250"><a href="#cb13-250" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-251"><a href="#cb13-251" aria-hidden="true" tabindex="-1"></a>If you instead see any <span class="in">`[FAIL]`</span> line, do not continue to Chapter 1 yet</span>
-<span id="cb13-252"><a href="#cb13-252" aria-hidden="true" tabindex="-1"></a>— see Section 0.11, Troubleshooting, below.</span>
-<span id="cb13-253"><a href="#cb13-253" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-254"><a href="#cb13-254" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.9 Optional: install a local model runtime</span></span>
-<span id="cb13-255"><a href="#cb13-255" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-256"><a href="#cb13-256" aria-hidden="true" tabindex="-1"></a>Chapters 1–13 use <span class="in">`transformers`</span> and <span class="in">`peft`</span> directly — nothing here</span>
-<span id="cb13-257"><a href="#cb13-257" aria-hidden="true" tabindex="-1"></a>requires any additional software. If you'd also like a familiar,</span>
-<span id="cb13-258"><a href="#cb13-258" aria-hidden="true" tabindex="-1"></a>general-purpose way to run local models outside this book's own code</span>
-<span id="cb13-259"><a href="#cb13-259" aria-hidden="true" tabindex="-1"></a>(useful later for quick comparisons), <span class="co">[</span><span class="ot">Ollama</span><span class="co">](https://ollama.com)</span> is a</span>
-<span id="cb13-260"><a href="#cb13-260" aria-hidden="true" tabindex="-1"></a>convenient optional install. Pull the same size model this book uses</span>
-<span id="cb13-261"><a href="#cb13-261" aria-hidden="true" tabindex="-1"></a>throughout (<span class="in">`Qwen2.5-1.5B-Instruct`</span>, from Chapter 1 on) so any</span>
-<span id="cb13-262"><a href="#cb13-262" aria-hidden="true" tabindex="-1"></a>comparison you make is apples-to-apples, not a bigger model quietly</span>
-<span id="cb13-263"><a href="#cb13-263" aria-hidden="true" tabindex="-1"></a>doing better:</span>
-<span id="cb13-264"><a href="#cb13-264" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-265"><a href="#cb13-265" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb13-266"><a href="#cb13-266" aria-hidden="true" tabindex="-1"></a><span class="co"># after installing from ollama.com</span></span>
-<span id="cb13-267"><a href="#cb13-267" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> pull qwen2.5:1.5b-instruct</span>
-<span id="cb13-268"><a href="#cb13-268" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> serve</span>
-<span id="cb13-269"><a href="#cb13-269" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb13-270"><a href="#cb13-270" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-271"><a href="#cb13-271" aria-hidden="true" tabindex="-1"></a>This step is entirely optional and can be skipped for now.</span>
-<span id="cb13-272"><a href="#cb13-272" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-273"><a href="#cb13-273" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.10 First success checkpoint</span></span>
-<span id="cb13-274"><a href="#cb13-274" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-275"><a href="#cb13-275" aria-hidden="true" tabindex="-1"></a>You are ready for Chapter 1 when:</span>
+<span id="cb13-237"><a href="#cb13-237" aria-hidden="true" tabindex="-1"></a>You don't need a specific editor to follow this book. Pick whichever of</span>
+<span id="cb13-238"><a href="#cb13-238" aria-hidden="true" tabindex="-1"></a>these you're most comfortable with — there is no wrong choice, and all</span>
+<span id="cb13-239"><a href="#cb13-239" aria-hidden="true" tabindex="-1"></a>five run the exact same code:</span>
+<span id="cb13-240"><a href="#cb13-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-241"><a href="#cb13-241" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Environment <span class="pp">|</span> Recommended for <span class="pp">|</span> Guide <span class="pp">|</span></span>
+<span id="cb13-242"><a href="#cb13-242" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb13-243"><a href="#cb13-243" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Jupyter Notebook <span class="pp">|</span> Learning and experimentation <span class="pp">|</span> <span class="co">[</span><span class="ot">Appendix A1</span><span class="co">](../appendix/appendix_a1_jupyter.qmd)</span> <span class="pp">|</span></span>
+<span id="cb13-244"><a href="#cb13-244" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> VS Code <span class="pp">|</span> General coding <span class="pp">|</span> <span class="co">[</span><span class="ot">Appendix A2</span><span class="co">](../appendix/appendix_a2_vscode.qmd)</span> <span class="pp">|</span></span>
+<span id="cb13-245"><a href="#cb13-245" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> PyCharm Community <span class="pp">|</span> Larger projects <span class="pp">|</span> <span class="co">[</span><span class="ot">Appendix A3</span><span class="co">](../appendix/appendix_a3_pycharm.qmd)</span> <span class="pp">|</span></span>
+<span id="cb13-246"><a href="#cb13-246" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Positron <span class="pp">|</span> Data science workflows <span class="pp">|</span> <span class="co">[</span><span class="ot">Appendix A4</span><span class="co">](../appendix/appendix_a4_positron.qmd)</span> <span class="pp">|</span></span>
+<span id="cb13-247"><a href="#cb13-247" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Terminal only <span class="pp">|</span> Minimal setup <span class="pp">|</span> <span class="co">[</span><span class="ot">Appendix A5</span><span class="co">](../appendix/appendix_a5_terminal.qmd)</span> <span class="pp">|</span></span>
+<span id="cb13-248"><a href="#cb13-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-249"><a href="#cb13-249" aria-hidden="true" tabindex="-1"></a>If you're not sure, Jupyter Notebook or VS Code are the most common</span>
+<span id="cb13-250"><a href="#cb13-250" aria-hidden="true" tabindex="-1"></a>starting points. You can always switch later — nothing in this book</span>
+<span id="cb13-251"><a href="#cb13-251" aria-hidden="true" tabindex="-1"></a>locks you into one choice.</span>
+<span id="cb13-252"><a href="#cb13-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-253"><a href="#cb13-253" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.8 Run the setup check</span></span>
+<span id="cb13-254"><a href="#cb13-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-255"><a href="#cb13-255" aria-hidden="true" tabindex="-1"></a>With <span class="in">`(.venv)`</span> active and requirements installed, from inside <span class="in">`book/`</span>:</span>
+<span id="cb13-256"><a href="#cb13-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-257"><a href="#cb13-257" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb13-258"><a href="#cb13-258" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> code/setup_check.py</span>
+<span id="cb13-259"><a href="#cb13-259" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-260"><a href="#cb13-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-261"><a href="#cb13-261" aria-hidden="true" tabindex="-1"></a>**Expected output:**</span>
+<span id="cb13-262"><a href="#cb13-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-263"><a href="#cb13-263" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-264"><a href="#cb13-264" aria-hidden="true" tabindex="-1"></a><span class="in">Fine-Tuning Local LLM for Drilling &amp; Completions -- setup check</span></span>
+<span id="cb13-265"><a href="#cb13-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-266"><a href="#cb13-266" aria-hidden="true" tabindex="-1"></a><span class="in">[OK] Python 3.11.9</span></span>
+<span id="cb13-267"><a href="#cb13-267" aria-hidden="true" tabindex="-1"></a><span class="in">[OK] torch importable</span></span>
+<span id="cb13-268"><a href="#cb13-268" aria-hidden="true" tabindex="-1"></a><span class="in">[OK] transformers importable</span></span>
+<span id="cb13-269"><a href="#cb13-269" aria-hidden="true" tabindex="-1"></a><span class="in">[OK] peft importable</span></span>
+<span id="cb13-270"><a href="#cb13-270" aria-hidden="true" tabindex="-1"></a><span class="in">[OK] datasets importable</span></span>
+<span id="cb13-271"><a href="#cb13-271" aria-hidden="true" tabindex="-1"></a><span class="in">[OK] accelerate importable</span></span>
+<span id="cb13-272"><a href="#cb13-272" aria-hidden="true" tabindex="-1"></a><span class="in">[INFO] No GPU detected -- CPU-only. Fine-tuning chapters will still work with a small model, just more slowly.</span></span>
+<span id="cb13-273"><a href="#cb13-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-274"><a href="#cb13-274" aria-hidden="true" tabindex="-1"></a><span class="in">Workshop is ready.</span></span>
+<span id="cb13-275"><a href="#cb13-275" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb13-276"><a href="#cb13-276" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-277"><a href="#cb13-277" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution title="CHECKPOINT — Part 0"}</span>
-<span id="cb13-278"><a href="#cb13-278" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> <span class="in">`python3 --version`</span> reports 3.11 or later</span>
-<span id="cb13-279"><a href="#cb13-279" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> This repository is on your machine, with a <span class="in">`book/`</span> folder</span>
-<span id="cb13-280"><a href="#cb13-280" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Your terminal prompt shows <span class="in">`(.venv)`</span></span>
-<span id="cb13-281"><a href="#cb13-281" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> <span class="in">`pip install -r requirements.txt`</span> finished with no <span class="in">`ERROR`</span> lines</span>
-<span id="cb13-282"><a href="#cb13-282" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> <span class="in">`python code/setup_check.py`</span> printed <span class="in">`Workshop is ready.`</span></span>
-<span id="cb13-283"><a href="#cb13-283" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb13-277"><a href="#cb13-277" aria-hidden="true" tabindex="-1"></a>(Your <span class="in">`[INFO]`</span> line will instead name a CUDA GPU or MPS if you have one</span>
+<span id="cb13-278"><a href="#cb13-278" aria-hidden="true" tabindex="-1"></a>— see Section 0.6.)</span>
+<span id="cb13-279"><a href="#cb13-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-280"><a href="#cb13-280" aria-hidden="true" tabindex="-1"></a>If you instead see any <span class="in">`[FAIL]`</span> line, do not continue to Chapter 1 yet</span>
+<span id="cb13-281"><a href="#cb13-281" aria-hidden="true" tabindex="-1"></a>— see Section 0.11, Troubleshooting, below.</span>
+<span id="cb13-282"><a href="#cb13-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-283"><a href="#cb13-283" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.9 Optional: install a local model runtime</span></span>
 <span id="cb13-284"><a href="#cb13-284" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-285"><a href="#cb13-285" aria-hidden="true" tabindex="-1"></a>If every box above is true, you're done with Part 0.</span>
-<span id="cb13-286"><a href="#cb13-286" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-287"><a href="#cb13-287" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.11 Troubleshooting</span></span>
-<span id="cb13-288"><a href="#cb13-288" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-289"><a href="#cb13-289" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Symptom <span class="pp">|</span> Likely cause <span class="pp">|</span></span>
-<span id="cb13-290"><a href="#cb13-290" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb13-291"><a href="#cb13-291" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`command not found: python3`</span> (Windows) <span class="pp">|</span> Python wasn't added to <span class="in">`PATH`</span> during install — re-run the installer and check "Add python.exe to PATH" (Section 0.2). <span class="pp">|</span></span>
-<span id="cb13-292"><a href="#cb13-292" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`python3 --version`</span> shows a version below 3.11 <span class="pp">|</span> You have an older Python 3 install alongside a newer one; try <span class="in">`python3.11 --version`</span> explicitly, or reinstall from python.org. <span class="pp">|</span></span>
-<span id="cb13-293"><a href="#cb13-293" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Prompt never shows <span class="in">`(.venv)`</span> after activating <span class="pp">|</span> Confirm you ran the activate command from *inside* <span class="in">`book/`</span>, and that <span class="in">`.venv/`</span> actually exists there (Section 0.4). <span class="pp">|</span></span>
-<span id="cb13-294"><a href="#cb13-294" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`pip install -r requirements.txt`</span> fails partway through <span class="pp">|</span> Re-run the same command — a partial download is the most common cause and simply retrying often finishes the job. If it fails on <span class="in">`torch`</span> specifically, try <span class="in">`pip install torch`</span> alone first, then re-run <span class="in">`pip install -r requirements.txt`</span>. <span class="pp">|</span></span>
-<span id="cb13-295"><a href="#cb13-295" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`setup_check.py`</span> reports <span class="in">`[FAIL] &lt;package&gt; not importable`</span> <span class="pp">|</span> <span class="in">`(.venv)`</span> isn't active, or <span class="in">`pip install -r requirements.txt`</span> didn't finish successfully — re-check Sections 0.4 and 0.5. <span class="pp">|</span></span>
-<span id="cb13-296"><a href="#cb13-296" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`ModuleNotFoundError: No module named 'torch.backends'`</span> when checking hardware <span class="pp">|</span> Your <span class="in">`torch`</span> install didn't complete — re-run <span class="in">`pip install -r requirements.txt`</span> and check for <span class="in">`ERROR`</span> lines. <span class="pp">|</span></span>
-<span id="cb13-297"><a href="#cb13-297" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-298"><a href="#cb13-298" aria-hidden="true" tabindex="-1"></a><span class="fu">## What can you do now that you couldn't do before?</span></span>
+<span id="cb13-285"><a href="#cb13-285" aria-hidden="true" tabindex="-1"></a>Chapters 1–13 use <span class="in">`transformers`</span> and <span class="in">`peft`</span> directly — nothing here</span>
+<span id="cb13-286"><a href="#cb13-286" aria-hidden="true" tabindex="-1"></a>requires any additional software. If you'd also like a familiar,</span>
+<span id="cb13-287"><a href="#cb13-287" aria-hidden="true" tabindex="-1"></a>general-purpose way to run local models outside this book's own code</span>
+<span id="cb13-288"><a href="#cb13-288" aria-hidden="true" tabindex="-1"></a>(useful later for quick comparisons), <span class="co">[</span><span class="ot">Ollama</span><span class="co">](https://ollama.com)</span> is a</span>
+<span id="cb13-289"><a href="#cb13-289" aria-hidden="true" tabindex="-1"></a>convenient optional install. Pull the same size model this book uses</span>
+<span id="cb13-290"><a href="#cb13-290" aria-hidden="true" tabindex="-1"></a>throughout (<span class="in">`Qwen2.5-1.5B-Instruct`</span>, from Chapter 1 on) so any</span>
+<span id="cb13-291"><a href="#cb13-291" aria-hidden="true" tabindex="-1"></a>comparison you make is apples-to-apples, not a bigger model quietly</span>
+<span id="cb13-292"><a href="#cb13-292" aria-hidden="true" tabindex="-1"></a>doing better:</span>
+<span id="cb13-293"><a href="#cb13-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-294"><a href="#cb13-294" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb13-295"><a href="#cb13-295" aria-hidden="true" tabindex="-1"></a><span class="co"># after installing from ollama.com</span></span>
+<span id="cb13-296"><a href="#cb13-296" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> pull qwen2.5:1.5b-instruct</span>
+<span id="cb13-297"><a href="#cb13-297" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> serve</span>
+<span id="cb13-298"><a href="#cb13-298" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb13-299"><a href="#cb13-299" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-300"><a href="#cb13-300" aria-hidden="true" tabindex="-1"></a>You have a working Python environment, this book's dependencies</span>
-<span id="cb13-301"><a href="#cb13-301" aria-hidden="true" tabindex="-1"></a>installed, and a hardware check that tells you what to expect from</span>
-<span id="cb13-302"><a href="#cb13-302" aria-hidden="true" tabindex="-1"></a>later fine-tuning chapters — everything Chapter 1 assumes is already in</span>
-<span id="cb13-303"><a href="#cb13-303" aria-hidden="true" tabindex="-1"></a>place.</span>
-<span id="cb13-304"><a href="#cb13-304" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-305"><a href="#cb13-305" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suggested next step</span></span>
-<span id="cb13-306"><a href="#cb13-306" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-307"><a href="#cb13-307" aria-hidden="true" tabindex="-1"></a>**Coming up in Chapter 1:** with your workshop ready, Chapter 1 loads a</span>
-<span id="cb13-308"><a href="#cb13-308" aria-hidden="true" tabindex="-1"></a>general-purpose local model for the first time and generates its first</span>
-<span id="cb13-309"><a href="#cb13-309" aria-hidden="true" tabindex="-1"></a>completion — the base model you'll spend the rest of Part I fine-tuning</span>
-<span id="cb13-310"><a href="#cb13-310" aria-hidden="true" tabindex="-1"></a>into something that actually understands drilling and completions</span>
-<span id="cb13-311"><a href="#cb13-311" aria-hidden="true" tabindex="-1"></a>reports.</span>
+<span id="cb13-300"><a href="#cb13-300" aria-hidden="true" tabindex="-1"></a>This step is entirely optional and can be skipped for now.</span>
+<span id="cb13-301"><a href="#cb13-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-302"><a href="#cb13-302" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.10 First success checkpoint</span></span>
+<span id="cb13-303"><a href="#cb13-303" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-304"><a href="#cb13-304" aria-hidden="true" tabindex="-1"></a>You are ready for Chapter 1 when:</span>
+<span id="cb13-305"><a href="#cb13-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-306"><a href="#cb13-306" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution title="CHECKPOINT — Part 0"}</span>
+<span id="cb13-307"><a href="#cb13-307" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> <span class="in">`python3 --version`</span> reports 3.11 or later</span>
+<span id="cb13-308"><a href="#cb13-308" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> This repository is on your machine, with a <span class="in">`book/`</span> folder</span>
+<span id="cb13-309"><a href="#cb13-309" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Your terminal prompt shows <span class="in">`(.venv)`</span></span>
+<span id="cb13-310"><a href="#cb13-310" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> <span class="in">`pip install -r requirements.txt`</span> finished with no <span class="in">`ERROR`</span> lines</span>
+<span id="cb13-311"><a href="#cb13-311" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> <span class="in">`python code/setup_check.py`</span> printed <span class="in">`Workshop is ready.`</span></span>
+<span id="cb13-312"><a href="#cb13-312" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb13-313"><a href="#cb13-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-314"><a href="#cb13-314" aria-hidden="true" tabindex="-1"></a>If every box above is true, you're done with Part 0.</span>
+<span id="cb13-315"><a href="#cb13-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-316"><a href="#cb13-316" aria-hidden="true" tabindex="-1"></a><span class="fu">## 0.11 Troubleshooting</span></span>
+<span id="cb13-317"><a href="#cb13-317" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-318"><a href="#cb13-318" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Symptom <span class="pp">|</span> Likely cause <span class="pp">|</span></span>
+<span id="cb13-319"><a href="#cb13-319" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb13-320"><a href="#cb13-320" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`command not found: python3`</span> (Windows) <span class="pp">|</span> Python wasn't added to <span class="in">`PATH`</span> during install — re-run the installer and check "Add python.exe to PATH" (Section 0.2). <span class="pp">|</span></span>
+<span id="cb13-321"><a href="#cb13-321" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`python3 --version`</span> shows a version below 3.11 <span class="pp">|</span> You have an older Python 3 install alongside a newer one; try <span class="in">`python3.11 --version`</span> explicitly, or reinstall from python.org. <span class="pp">|</span></span>
+<span id="cb13-322"><a href="#cb13-322" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Prompt never shows <span class="in">`(.venv)`</span> after activating <span class="pp">|</span> Confirm you ran the activate command from *inside* <span class="in">`book/`</span>, and that <span class="in">`.venv/`</span> actually exists there (Section 0.4). <span class="pp">|</span></span>
+<span id="cb13-323"><a href="#cb13-323" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`pip install -r requirements.txt`</span> fails partway through <span class="pp">|</span> Re-run the same command — a partial download is the most common cause and simply retrying often finishes the job. If it fails on <span class="in">`torch`</span> specifically, try <span class="in">`pip install torch`</span> alone first, then re-run <span class="in">`pip install -r requirements.txt`</span>. <span class="pp">|</span></span>
+<span id="cb13-324"><a href="#cb13-324" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`setup_check.py`</span> reports <span class="in">`[FAIL] &lt;package&gt; not importable`</span> <span class="pp">|</span> <span class="in">`(.venv)`</span> isn't active, or <span class="in">`pip install -r requirements.txt`</span> didn't finish successfully — re-check Sections 0.4 and 0.5. <span class="pp">|</span></span>
+<span id="cb13-325"><a href="#cb13-325" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`ModuleNotFoundError: No module named 'torch.backends'`</span> when checking hardware <span class="pp">|</span> Your <span class="in">`torch`</span> install didn't complete — re-run <span class="in">`pip install -r requirements.txt`</span> and check for <span class="in">`ERROR`</span> lines. <span class="pp">|</span></span>
+<span id="cb13-326"><a href="#cb13-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-327"><a href="#cb13-327" aria-hidden="true" tabindex="-1"></a><span class="fu">## What can you do now that you couldn't do before?</span></span>
+<span id="cb13-328"><a href="#cb13-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-329"><a href="#cb13-329" aria-hidden="true" tabindex="-1"></a>You have a working Python environment, this book's dependencies</span>
+<span id="cb13-330"><a href="#cb13-330" aria-hidden="true" tabindex="-1"></a>installed, and a hardware check that tells you what to expect from</span>
+<span id="cb13-331"><a href="#cb13-331" aria-hidden="true" tabindex="-1"></a>later fine-tuning chapters — everything Chapter 1 assumes is already in</span>
+<span id="cb13-332"><a href="#cb13-332" aria-hidden="true" tabindex="-1"></a>place.</span>
+<span id="cb13-333"><a href="#cb13-333" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-334"><a href="#cb13-334" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suggested next step</span></span>
+<span id="cb13-335"><a href="#cb13-335" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-336"><a href="#cb13-336" aria-hidden="true" tabindex="-1"></a>**Coming up in Chapter 1:** with your workshop ready, Chapter 1 loads a</span>
+<span id="cb13-337"><a href="#cb13-337" aria-hidden="true" tabindex="-1"></a>general-purpose local model for the first time and generates its first</span>
+<span id="cb13-338"><a href="#cb13-338" aria-hidden="true" tabindex="-1"></a>completion — the base model you'll spend the rest of Part I fine-tuning</span>
+<span id="cb13-339"><a href="#cb13-339" aria-hidden="true" tabindex="-1"></a>into something that actually understands drilling and completions</span>
+<span id="cb13-340"><a href="#cb13-340" aria-hidden="true" tabindex="-1"></a>reports.</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

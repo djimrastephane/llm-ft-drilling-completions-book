@@ -683,6 +683,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Replacing a proper document search / retrieval system for questions that span reports it never trained on</li>
 <li>Proving anything about generalization from a small training set on its own — that claim needs a held-out check, not just a lower loss number</li>
 </ul>
+<p>At a glance, the two lists above come down to this:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Question</th>
+<th style="text-align: center;">Fine-tuning</th>
+<th style="text-align: center;">Retrieval</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Teach the model your shorthand and vocabulary?</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">No</td>
+</tr>
+<tr class="even">
+<td>Match your reports’ own writing style?</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">No</td>
+</tr>
+<tr class="odd">
+<td>Recall one specific fact from one specific report?</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+<tr class="even">
+<td>Cite which source document an answer came from?</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+<tr class="odd">
+<td>Answer questions about reports it never trained on?</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+<tr class="even">
+<td>Prove it generalizes, on its own?</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">n/a</td>
+</tr>
+</tbody>
+</table>
+<p>That’s a table worth being able to redraw from memory — it’s the argument for why this book eventually uses both together (Chapter 9), not a case for picking one and discarding the other.</p>
 <p>This book starts with fine-tuning anyway, because <em>teaching the model your domain</em> is a real, necessary step even for a system that will later add retrieval on top of it. Chapter 9 is where those two techniques combine — fine-tuning for how your operation talks and reasons, retrieval for grounding answers in a specific, citable report. Neither replaces the other; Chapter 5’s own results are the concrete evidence for why.</p>
 </section>
 <section id="implementation" class="level2" data-number="3.7">
@@ -704,7 +747,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output" class="level2" data-number="3.10">
 <h2 data-number="3.10" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">3.10</span> Expected Output</h2>
 <p>A plain-text prompt string, with no trace of the expected answer.</p>
-<div id="5c6c673b" class="cell" data-execution_count="1">
+<div id="f2ec8b3b" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -752,7 +795,7 @@ Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22</code></pre>
 <section id="expected-output-1" class="level2" data-number="3.15">
 <h2 data-number="3.15" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">3.15</span> Expected Output</h2>
 <p>A dictionary recording the question, the hidden expected answer, the model’s actual answer, and whether they matched.</p>
-<div id="3d1a4cfb" class="cell" data-execution_count="2">
+<div id="3755b76a" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ask_baseline(model, tokenizer, example: <span class="bu">dict</span>, max_new_tokens: <span class="bu">int</span> <span class="op">=</span> <span class="dv">60</span>) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    prompt <span class="op">=</span> build_prompt(example)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    answer <span class="op">=</span> generate_reply(model, tokenizer, prompt, max_new_tokens<span class="op">=</span>max_new_tokens)</span>
@@ -802,7 +845,7 @@ Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22</code></pre>
 <section id="expected-output-2" class="level2" data-number="3.20">
 <h2 data-number="3.20" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">3.20</span> Expected Output</h2>
 <p>A summary line reporting how many of the 16 answers matched, and a saved <code>.jsonl</code> file with one result per question.</p>
-<div id="3207a21c" class="cell" data-execution_count="3">
+<div id="08963820" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>TRAINING_BASELINE_OUTPUT_PATH <span class="op">=</span> BOOK_ROOT <span class="op">/</span> <span class="st">"datasets"</span> <span class="op">/</span> <span class="st">"training_examples"</span> <span class="op">/</span> <span class="st">"training_baseline_results.jsonl"</span></span>
@@ -1588,353 +1631,368 @@ Saved -&gt; datasets/training_examples/training_baseline_results.jsonl</code></p
 <span id="cb8-148"><a href="#cb8-148" aria-hidden="true" tabindex="-1"></a>  its own — that claim needs a held-out check, not just a lower loss</span>
 <span id="cb8-149"><a href="#cb8-149" aria-hidden="true" tabindex="-1"></a>  number</span>
 <span id="cb8-150"><a href="#cb8-150" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-151"><a href="#cb8-151" aria-hidden="true" tabindex="-1"></a>This book starts with fine-tuning anyway, because *teaching the model</span>
-<span id="cb8-152"><a href="#cb8-152" aria-hidden="true" tabindex="-1"></a>your domain* is a real, necessary step even for a system that will</span>
-<span id="cb8-153"><a href="#cb8-153" aria-hidden="true" tabindex="-1"></a>later add retrieval on top of it. Chapter 9 is where those two</span>
-<span id="cb8-154"><a href="#cb8-154" aria-hidden="true" tabindex="-1"></a>techniques combine — fine-tuning for how your operation talks and</span>
-<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a>reasons, retrieval for grounding answers in a specific, citable report.</span>
-<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a>Neither replaces the other; Chapter 5's own results are the concrete</span>
-<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a>evidence for why.</span>
-<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a><span class="fu">## Implementation</span></span>
-<span id="cb8-160"><a href="#cb8-160" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-161"><a href="#cb8-161" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 1: Turn Chapter 2's training examples into baseline questions</span></span>
-<span id="cb8-162"><a href="#cb8-162" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-163"><a href="#cb8-163" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
-<span id="cb8-164"><a href="#cb8-164" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-165"><a href="#cb8-165" aria-hidden="true" tabindex="-1"></a>Each Chapter 2 training example is a dictionary with <span class="in">`instruction`</span>,</span>
-<span id="cb8-166"><a href="#cb8-166" aria-hidden="true" tabindex="-1"></a><span class="in">`input`</span>, and <span class="in">`output`</span>. A baseline question is just the first two, joined</span>
-<span id="cb8-167"><a href="#cb8-167" aria-hidden="true" tabindex="-1"></a>into the single string the model actually receives — the <span class="in">`output`</span> must</span>
-<span id="cb8-168"><a href="#cb8-168" aria-hidden="true" tabindex="-1"></a>never appear in it, or the test proves nothing.</span>
-<span id="cb8-169"><a href="#cb8-169" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-170"><a href="#cb8-170" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
-<span id="cb8-171"><a href="#cb8-171" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-172"><a href="#cb8-172" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>One training example (as built by <span class="in">`build_training_examples()`</span> in</span>
-<span id="cb8-173"><a href="#cb8-173" aria-hidden="true" tabindex="-1"></a>  Chapter 2)</span>
-<span id="cb8-174"><a href="#cb8-174" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-175"><a href="#cb8-175" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
-<span id="cb8-176"><a href="#cb8-176" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-177"><a href="#cb8-177" aria-hidden="true" tabindex="-1"></a>A plain-text prompt string, with no trace of the expected answer.</span>
-<span id="cb8-178"><a href="#cb8-178" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-181"><a href="#cb8-181" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-182"><a href="#cb8-182" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb8-183"><a href="#cb8-183" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
-<span id="cb8-184"><a href="#cb8-184" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb8-185"><a href="#cb8-185" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-186"><a href="#cb8-186" aria-hidden="true" tabindex="-1"></a>BOOK_ROOT <span class="op">=</span> Path(<span class="va">__file__</span>).resolve().parents[<span class="dv">2</span>]</span>
-<span id="cb8-187"><a href="#cb8-187" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="bu">str</span>(BOOK_ROOT <span class="op">/</span> <span class="st">"code"</span> <span class="op">/</span> <span class="st">"chapter_01"</span>))</span>
-<span id="cb8-188"><a href="#cb8-188" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="bu">str</span>(BOOK_ROOT <span class="op">/</span> <span class="st">"code"</span> <span class="op">/</span> <span class="st">"chapter_02"</span>))</span>
+<span id="cb8-151"><a href="#cb8-151" aria-hidden="true" tabindex="-1"></a>At a glance, the two lists above come down to this:</span>
+<span id="cb8-152"><a href="#cb8-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-153"><a href="#cb8-153" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Question <span class="pp">|</span> Fine-tuning <span class="pp">|</span> Retrieval <span class="pp">|</span></span>
+<span id="cb8-154"><a href="#cb8-154" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|:---:|:---:|</span></span>
+<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Teach the model your shorthand and vocabulary? <span class="pp">|</span> Yes <span class="pp">|</span> No <span class="pp">|</span></span>
+<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Match your reports' own writing style? <span class="pp">|</span> Yes <span class="pp">|</span> No <span class="pp">|</span></span>
+<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Recall one specific fact from one specific report? <span class="pp">|</span> No <span class="pp">|</span> Yes <span class="pp">|</span></span>
+<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Cite which source document an answer came from? <span class="pp">|</span> No <span class="pp">|</span> Yes <span class="pp">|</span></span>
+<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Answer questions about reports it never trained on? <span class="pp">|</span> No <span class="pp">|</span> Yes <span class="pp">|</span></span>
+<span id="cb8-160"><a href="#cb8-160" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Prove it generalizes, on its own? <span class="pp">|</span> No <span class="pp">|</span> n/a <span class="pp">|</span></span>
+<span id="cb8-161"><a href="#cb8-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-162"><a href="#cb8-162" aria-hidden="true" tabindex="-1"></a>That's a table worth being able to redraw from memory — it's the</span>
+<span id="cb8-163"><a href="#cb8-163" aria-hidden="true" tabindex="-1"></a>argument for why this book eventually uses both together (Chapter 9),</span>
+<span id="cb8-164"><a href="#cb8-164" aria-hidden="true" tabindex="-1"></a>not a case for picking one and discarding the other.</span>
+<span id="cb8-165"><a href="#cb8-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-166"><a href="#cb8-166" aria-hidden="true" tabindex="-1"></a>This book starts with fine-tuning anyway, because *teaching the model</span>
+<span id="cb8-167"><a href="#cb8-167" aria-hidden="true" tabindex="-1"></a>your domain* is a real, necessary step even for a system that will</span>
+<span id="cb8-168"><a href="#cb8-168" aria-hidden="true" tabindex="-1"></a>later add retrieval on top of it. Chapter 9 is where those two</span>
+<span id="cb8-169"><a href="#cb8-169" aria-hidden="true" tabindex="-1"></a>techniques combine — fine-tuning for how your operation talks and</span>
+<span id="cb8-170"><a href="#cb8-170" aria-hidden="true" tabindex="-1"></a>reasons, retrieval for grounding answers in a specific, citable report.</span>
+<span id="cb8-171"><a href="#cb8-171" aria-hidden="true" tabindex="-1"></a>Neither replaces the other; Chapter 5's own results are the concrete</span>
+<span id="cb8-172"><a href="#cb8-172" aria-hidden="true" tabindex="-1"></a>evidence for why.</span>
+<span id="cb8-173"><a href="#cb8-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-174"><a href="#cb8-174" aria-hidden="true" tabindex="-1"></a><span class="fu">## Implementation</span></span>
+<span id="cb8-175"><a href="#cb8-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-176"><a href="#cb8-176" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 1: Turn Chapter 2's training examples into baseline questions</span></span>
+<span id="cb8-177"><a href="#cb8-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-178"><a href="#cb8-178" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-179"><a href="#cb8-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-180"><a href="#cb8-180" aria-hidden="true" tabindex="-1"></a>Each Chapter 2 training example is a dictionary with <span class="in">`instruction`</span>,</span>
+<span id="cb8-181"><a href="#cb8-181" aria-hidden="true" tabindex="-1"></a><span class="in">`input`</span>, and <span class="in">`output`</span>. A baseline question is just the first two, joined</span>
+<span id="cb8-182"><a href="#cb8-182" aria-hidden="true" tabindex="-1"></a>into the single string the model actually receives — the <span class="in">`output`</span> must</span>
+<span id="cb8-183"><a href="#cb8-183" aria-hidden="true" tabindex="-1"></a>never appear in it, or the test proves nothing.</span>
+<span id="cb8-184"><a href="#cb8-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-185"><a href="#cb8-185" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-186"><a href="#cb8-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-187"><a href="#cb8-187" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>One training example (as built by <span class="in">`build_training_examples()`</span> in</span>
+<span id="cb8-188"><a href="#cb8-188" aria-hidden="true" tabindex="-1"></a>  Chapter 2)</span>
 <span id="cb8-189"><a href="#cb8-189" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-190"><a href="#cb8-190" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> build_training_examples <span class="im">import</span> build_training_examples</span>
-<span id="cb8-191"><a href="#cb8-191" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> load_local_model <span class="im">import</span> MODEL_NAME, generate_reply, load_model_and_tokenizer</span>
-<span id="cb8-192"><a href="#cb8-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-190"><a href="#cb8-190" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-191"><a href="#cb8-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-192"><a href="#cb8-192" aria-hidden="true" tabindex="-1"></a>A plain-text prompt string, with no trace of the expected answer.</span>
 <span id="cb8-193"><a href="#cb8-193" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-194"><a href="#cb8-194" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_prompt(example: <span class="bu">dict</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
-<span id="cb8-195"><a href="#cb8-195" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"</span><span class="sc">{</span>example[<span class="st">'instruction'</span>]<span class="sc">}</span><span class="ch">\n</span><span class="sc">{</span>example[<span class="st">'input'</span>]<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb8-196"><a href="#cb8-196" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-197"><a href="#cb8-197" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-198"><a href="#cb8-198" aria-hidden="true" tabindex="-1"></a>examples <span class="op">=</span> build_training_examples()</span>
-<span id="cb8-199"><a href="#cb8-199" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(build_prompt(examples[<span class="dv">0</span>]))</span>
-<span id="cb8-200"><a href="#cb8-200" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-201"><a href="#cb8-201" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-202"><a href="#cb8-202" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
-<span id="cb8-203"><a href="#cb8-203" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-204"><a href="#cb8-204" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-205"><a href="#cb8-205" aria-hidden="true" tabindex="-1"></a><span class="in">What are the present operations reported on this well?</span></span>
-<span id="cb8-206"><a href="#cb8-206" aria-hidden="true" tabindex="-1"></a><span class="in">Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22</span></span>
-<span id="cb8-207"><a href="#cb8-207" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-196"><a href="#cb8-196" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-197"><a href="#cb8-197" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-198"><a href="#cb8-198" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb8-199"><a href="#cb8-199" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb8-200"><a href="#cb8-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-201"><a href="#cb8-201" aria-hidden="true" tabindex="-1"></a>BOOK_ROOT <span class="op">=</span> Path(<span class="va">__file__</span>).resolve().parents[<span class="dv">2</span>]</span>
+<span id="cb8-202"><a href="#cb8-202" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="bu">str</span>(BOOK_ROOT <span class="op">/</span> <span class="st">"code"</span> <span class="op">/</span> <span class="st">"chapter_01"</span>))</span>
+<span id="cb8-203"><a href="#cb8-203" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="bu">str</span>(BOOK_ROOT <span class="op">/</span> <span class="st">"code"</span> <span class="op">/</span> <span class="st">"chapter_02"</span>))</span>
+<span id="cb8-204"><a href="#cb8-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-205"><a href="#cb8-205" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> build_training_examples <span class="im">import</span> build_training_examples</span>
+<span id="cb8-206"><a href="#cb8-206" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> load_local_model <span class="im">import</span> MODEL_NAME, generate_reply, load_model_and_tokenizer</span>
+<span id="cb8-207"><a href="#cb8-207" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-208"><a href="#cb8-208" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-209"><a href="#cb8-209" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
-<span id="cb8-210"><a href="#cb8-210" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-211"><a href="#cb8-211" aria-hidden="true" tabindex="-1"></a><span class="in">`build_prompt`</span> concatenates <span class="in">`instruction`</span> and <span class="in">`input`</span> with a newline —</span>
-<span id="cb8-212"><a href="#cb8-212" aria-hidden="true" tabindex="-1"></a>nothing more. <span class="in">`build_training_examples()`</span> is the exact same function</span>
-<span id="cb8-213"><a href="#cb8-213" aria-hidden="true" tabindex="-1"></a>Chapter 2 uses to build the training set, imported directly rather than</span>
-<span id="cb8-214"><a href="#cb8-214" aria-hidden="true" tabindex="-1"></a>copied, so this chapter's questions are guaranteed to be the same ones</span>
-<span id="cb8-215"><a href="#cb8-215" aria-hidden="true" tabindex="-1"></a>Chapter 5 eventually trains on.</span>
+<span id="cb8-209"><a href="#cb8-209" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_prompt(example: <span class="bu">dict</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb8-210"><a href="#cb8-210" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"</span><span class="sc">{</span>example[<span class="st">'instruction'</span>]<span class="sc">}</span><span class="ch">\n</span><span class="sc">{</span>example[<span class="st">'input'</span>]<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb8-211"><a href="#cb8-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-212"><a href="#cb8-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-213"><a href="#cb8-213" aria-hidden="true" tabindex="-1"></a>examples <span class="op">=</span> build_training_examples()</span>
+<span id="cb8-214"><a href="#cb8-214" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(build_prompt(examples[<span class="dv">0</span>]))</span>
+<span id="cb8-215"><a href="#cb8-215" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb8-216"><a href="#cb8-216" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-217"><a href="#cb8-217" aria-hidden="true" tabindex="-1"></a><span class="fu">## Production Reality</span></span>
+<span id="cb8-217"><a href="#cb8-217" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
 <span id="cb8-218"><a href="#cb8-218" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-219"><a href="#cb8-219" aria-hidden="true" tabindex="-1"></a>Every one of these questions only ever gives the model the report's</span>
-<span id="cb8-220"><a href="#cb8-220" aria-hidden="true" tabindex="-1"></a>*metadata* — well name, report number, date — never the report's actual</span>
-<span id="cb8-221"><a href="#cb8-221" aria-hidden="true" tabindex="-1"></a>text. That's deliberate: it isolates exactly what fine-tuning is for</span>
-<span id="cb8-222"><a href="#cb8-222" aria-hidden="true" tabindex="-1"></a>(Chapter 5 bakes each report's specific facts into the model's weights,</span>
-<span id="cb8-223"><a href="#cb8-223" aria-hidden="true" tabindex="-1"></a>so it no longer needs the text handed to it). A separate, equally valid</span>
-<span id="cb8-224"><a href="#cb8-224" aria-hidden="true" tabindex="-1"></a>question — can the model answer correctly when it *is* given the report</span>
-<span id="cb8-225"><a href="#cb8-225" aria-hidden="true" tabindex="-1"></a>text? — is this chapter's challenge exercise, and it previews why</span>
-<span id="cb8-226"><a href="#cb8-226" aria-hidden="true" tabindex="-1"></a>Chapter 9 eventually combines fine-tuning with retrieval instead of</span>
-<span id="cb8-227"><a href="#cb8-227" aria-hidden="true" tabindex="-1"></a>picking one or the other.</span>
-<span id="cb8-228"><a href="#cb8-228" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-229"><a href="#cb8-229" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 2: Ask the base model, with the real answer hidden</span></span>
-<span id="cb8-230"><a href="#cb8-230" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-231"><a href="#cb8-231" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
-<span id="cb8-232"><a href="#cb8-232" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-233"><a href="#cb8-233" aria-hidden="true" tabindex="-1"></a>For one baseline question, get the base model's answer and check it</span>
-<span id="cb8-234"><a href="#cb8-234" aria-hidden="true" tabindex="-1"></a>against the report's real value — the smallest unit of this chapter's</span>
-<span id="cb8-235"><a href="#cb8-235" aria-hidden="true" tabindex="-1"></a>harness.</span>
-<span id="cb8-236"><a href="#cb8-236" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-237"><a href="#cb8-237" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
-<span id="cb8-238"><a href="#cb8-238" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-239"><a href="#cb8-239" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The loaded <span class="in">`model`</span> and <span class="in">`tokenizer`</span> from Chapter 1</span>
-<span id="cb8-240"><a href="#cb8-240" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>One training example</span>
-<span id="cb8-241"><a href="#cb8-241" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-242"><a href="#cb8-242" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-219"><a href="#cb8-219" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-220"><a href="#cb8-220" aria-hidden="true" tabindex="-1"></a><span class="in">What are the present operations reported on this well?</span></span>
+<span id="cb8-221"><a href="#cb8-221" aria-hidden="true" tabindex="-1"></a><span class="in">Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22</span></span>
+<span id="cb8-222"><a href="#cb8-222" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-223"><a href="#cb8-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-224"><a href="#cb8-224" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-225"><a href="#cb8-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-226"><a href="#cb8-226" aria-hidden="true" tabindex="-1"></a><span class="in">`build_prompt`</span> concatenates <span class="in">`instruction`</span> and <span class="in">`input`</span> with a newline —</span>
+<span id="cb8-227"><a href="#cb8-227" aria-hidden="true" tabindex="-1"></a>nothing more. <span class="in">`build_training_examples()`</span> is the exact same function</span>
+<span id="cb8-228"><a href="#cb8-228" aria-hidden="true" tabindex="-1"></a>Chapter 2 uses to build the training set, imported directly rather than</span>
+<span id="cb8-229"><a href="#cb8-229" aria-hidden="true" tabindex="-1"></a>copied, so this chapter's questions are guaranteed to be the same ones</span>
+<span id="cb8-230"><a href="#cb8-230" aria-hidden="true" tabindex="-1"></a>Chapter 5 eventually trains on.</span>
+<span id="cb8-231"><a href="#cb8-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-232"><a href="#cb8-232" aria-hidden="true" tabindex="-1"></a><span class="fu">## Production Reality</span></span>
+<span id="cb8-233"><a href="#cb8-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-234"><a href="#cb8-234" aria-hidden="true" tabindex="-1"></a>Every one of these questions only ever gives the model the report's</span>
+<span id="cb8-235"><a href="#cb8-235" aria-hidden="true" tabindex="-1"></a>*metadata* — well name, report number, date — never the report's actual</span>
+<span id="cb8-236"><a href="#cb8-236" aria-hidden="true" tabindex="-1"></a>text. That's deliberate: it isolates exactly what fine-tuning is for</span>
+<span id="cb8-237"><a href="#cb8-237" aria-hidden="true" tabindex="-1"></a>(Chapter 5 bakes each report's specific facts into the model's weights,</span>
+<span id="cb8-238"><a href="#cb8-238" aria-hidden="true" tabindex="-1"></a>so it no longer needs the text handed to it). A separate, equally valid</span>
+<span id="cb8-239"><a href="#cb8-239" aria-hidden="true" tabindex="-1"></a>question — can the model answer correctly when it *is* given the report</span>
+<span id="cb8-240"><a href="#cb8-240" aria-hidden="true" tabindex="-1"></a>text? — is this chapter's challenge exercise, and it previews why</span>
+<span id="cb8-241"><a href="#cb8-241" aria-hidden="true" tabindex="-1"></a>Chapter 9 eventually combines fine-tuning with retrieval instead of</span>
+<span id="cb8-242"><a href="#cb8-242" aria-hidden="true" tabindex="-1"></a>picking one or the other.</span>
 <span id="cb8-243"><a href="#cb8-243" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-244"><a href="#cb8-244" aria-hidden="true" tabindex="-1"></a>A dictionary recording the question, the hidden expected answer, the</span>
-<span id="cb8-245"><a href="#cb8-245" aria-hidden="true" tabindex="-1"></a>model's actual answer, and whether they matched.</span>
-<span id="cb8-246"><a href="#cb8-246" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-249"><a href="#cb8-249" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-250"><a href="#cb8-250" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb8-251"><a href="#cb8-251" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ask_baseline(model, tokenizer, example: <span class="bu">dict</span>, max_new_tokens: <span class="bu">int</span> <span class="op">=</span> <span class="dv">60</span>) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
-<span id="cb8-252"><a href="#cb8-252" aria-hidden="true" tabindex="-1"></a>    prompt <span class="op">=</span> build_prompt(example)</span>
-<span id="cb8-253"><a href="#cb8-253" aria-hidden="true" tabindex="-1"></a>    answer <span class="op">=</span> generate_reply(model, tokenizer, prompt, max_new_tokens<span class="op">=</span>max_new_tokens)</span>
-<span id="cb8-254"><a href="#cb8-254" aria-hidden="true" tabindex="-1"></a>    expected <span class="op">=</span> example[<span class="st">"output"</span>]</span>
-<span id="cb8-255"><a href="#cb8-255" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
-<span id="cb8-256"><a href="#cb8-256" aria-hidden="true" tabindex="-1"></a>        <span class="st">"instruction"</span>: example[<span class="st">"instruction"</span>],</span>
-<span id="cb8-257"><a href="#cb8-257" aria-hidden="true" tabindex="-1"></a>        <span class="st">"input"</span>: example[<span class="st">"input"</span>],</span>
-<span id="cb8-258"><a href="#cb8-258" aria-hidden="true" tabindex="-1"></a>        <span class="st">"expected"</span>: expected,</span>
-<span id="cb8-259"><a href="#cb8-259" aria-hidden="true" tabindex="-1"></a>        <span class="st">"base_model_answer"</span>: answer,</span>
-<span id="cb8-260"><a href="#cb8-260" aria-hidden="true" tabindex="-1"></a>        <span class="st">"matched_expected"</span>: expected.strip().lower() <span class="kw">in</span> answer.strip().lower(),</span>
-<span id="cb8-261"><a href="#cb8-261" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb8-262"><a href="#cb8-262" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-263"><a href="#cb8-263" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-264"><a href="#cb8-264" aria-hidden="true" tabindex="-1"></a>model, tokenizer <span class="op">=</span> load_model_and_tokenizer(MODEL_NAME)</span>
-<span id="cb8-265"><a href="#cb8-265" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ask_baseline(model, tokenizer, examples[<span class="dv">0</span>]))</span>
-<span id="cb8-266"><a href="#cb8-266" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-267"><a href="#cb8-267" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-268"><a href="#cb8-268" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
-<span id="cb8-269"><a href="#cb8-269" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-270"><a href="#cb8-270" aria-hidden="true" tabindex="-1"></a><span class="in">```json</span></span>
-<span id="cb8-271"><a href="#cb8-271" aria-hidden="true" tabindex="-1"></a>{</span>
-<span id="cb8-272"><a href="#cb8-272" aria-hidden="true" tabindex="-1"></a>  <span class="st">"instruction"</span><span class="op">:</span> <span class="st">"What are the present operations reported on this well?"</span><span class="op">,</span></span>
-<span id="cb8-273"><a href="#cb8-273" aria-hidden="true" tabindex="-1"></a>  <span class="st">"input"</span><span class="op">:</span> <span class="st">"Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22"</span><span class="op">,</span></span>
-<span id="cb8-274"><a href="#cb8-274" aria-hidden="true" tabindex="-1"></a>  <span class="st">"expected"</span><span class="op">:</span> <span class="st">"RIGGING UP WITH FRONTIER CREWS AND SUPERVISION AND JW JONES TRUCKING"</span><span class="op">,</span></span>
-<span id="cb8-275"><a href="#cb8-275" aria-hidden="true" tabindex="-1"></a>  <span class="st">"base_model_answer"</span><span class="op">:</span> <span class="st">"The report you've provided appears to be for a well called </span><span class="sc">\"</span><span class="st">FORGE 16A [78]-32</span><span class="sc">\"</span><span class="st"> and it is dated October 22, 2020. The specific details of what operations were reported are not explicitly stated in your message. However, based"</span><span class="op">,</span></span>
-<span id="cb8-276"><a href="#cb8-276" aria-hidden="true" tabindex="-1"></a>  <span class="st">"matched_expected"</span><span class="op">:</span> <span class="kw">false</span></span>
-<span id="cb8-277"><a href="#cb8-277" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb8-278"><a href="#cb8-278" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-279"><a href="#cb8-279" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-280"><a href="#cb8-280" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
-<span id="cb8-281"><a href="#cb8-281" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-282"><a href="#cb8-282" aria-hidden="true" tabindex="-1"></a>The model was asked exactly what Chapter 2's <span class="in">`input`</span> field contains —</span>
-<span id="cb8-283"><a href="#cb8-283" aria-hidden="true" tabindex="-1"></a>well name, report number, date — and nothing else. It answers honestly</span>
-<span id="cb8-284"><a href="#cb8-284" aria-hidden="true" tabindex="-1"></a>that "the specific details... are not explicitly stated," rather than</span>
-<span id="cb8-285"><a href="#cb8-285" aria-hidden="true" tabindex="-1"></a>inventing a plausible-sounding operation. That's a meaningfully</span>
-<span id="cb8-286"><a href="#cb8-286" aria-hidden="true" tabindex="-1"></a>*better* failure than confident fabrication would be, but it's still a</span>
-<span id="cb8-287"><a href="#cb8-287" aria-hidden="true" tabindex="-1"></a>failure: the harness needed the report's real value, and didn't get it.</span>
-<span id="cb8-288"><a href="#cb8-288" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-289"><a href="#cb8-289" aria-hidden="true" tabindex="-1"></a><span class="fu">## Production Reality</span></span>
-<span id="cb8-290"><a href="#cb8-290" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-291"><a href="#cb8-291" aria-hidden="true" tabindex="-1"></a><span class="in">`max_new_tokens=60`</span> caps the reply short on purpose, so this chapter's</span>
-<span id="cb8-292"><a href="#cb8-292" aria-hidden="true" tabindex="-1"></a>16-question run finishes in a couple of minutes on CPU. A shorter cap</span>
-<span id="cb8-293"><a href="#cb8-293" aria-hidden="true" tabindex="-1"></a>also means some replies (like the one above) get cut off mid-sentence</span>
-<span id="cb8-294"><a href="#cb8-294" aria-hidden="true" tabindex="-1"></a>rather than reaching a natural stopping point — acceptable here because</span>
-<span id="cb8-295"><a href="#cb8-295" aria-hidden="true" tabindex="-1"></a><span class="in">`matched_expected`</span> only checks for the report's specific value, which</span>
-<span id="cb8-296"><a href="#cb8-296" aria-hidden="true" tabindex="-1"></a>would appear (or not) well before token 60 in every one of this</span>
-<span id="cb8-297"><a href="#cb8-297" aria-hidden="true" tabindex="-1"></a>archive's short, single-line field outputs.</span>
-<span id="cb8-298"><a href="#cb8-298" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-299"><a href="#cb8-299" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 3: Run the full training baseline and save it for Chapter 5</span></span>
-<span id="cb8-300"><a href="#cb8-300" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-301"><a href="#cb8-301" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
-<span id="cb8-302"><a href="#cb8-302" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-303"><a href="#cb8-303" aria-hidden="true" tabindex="-1"></a>One question proves the harness works. Chapter 5 needs all 16, saved</span>
-<span id="cb8-304"><a href="#cb8-304" aria-hidden="true" tabindex="-1"></a>somewhere it can load without re-running the base model.</span>
+<span id="cb8-244"><a href="#cb8-244" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 2: Ask the base model, with the real answer hidden</span></span>
+<span id="cb8-245"><a href="#cb8-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-246"><a href="#cb8-246" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-247"><a href="#cb8-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-248"><a href="#cb8-248" aria-hidden="true" tabindex="-1"></a>For one baseline question, get the base model's answer and check it</span>
+<span id="cb8-249"><a href="#cb8-249" aria-hidden="true" tabindex="-1"></a>against the report's real value — the smallest unit of this chapter's</span>
+<span id="cb8-250"><a href="#cb8-250" aria-hidden="true" tabindex="-1"></a>harness.</span>
+<span id="cb8-251"><a href="#cb8-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-252"><a href="#cb8-252" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-253"><a href="#cb8-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-254"><a href="#cb8-254" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The loaded <span class="in">`model`</span> and <span class="in">`tokenizer`</span> from Chapter 1</span>
+<span id="cb8-255"><a href="#cb8-255" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>One training example</span>
+<span id="cb8-256"><a href="#cb8-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-257"><a href="#cb8-257" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-258"><a href="#cb8-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-259"><a href="#cb8-259" aria-hidden="true" tabindex="-1"></a>A dictionary recording the question, the hidden expected answer, the</span>
+<span id="cb8-260"><a href="#cb8-260" aria-hidden="true" tabindex="-1"></a>model's actual answer, and whether they matched.</span>
+<span id="cb8-261"><a href="#cb8-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-264"><a href="#cb8-264" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-265"><a href="#cb8-265" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-266"><a href="#cb8-266" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ask_baseline(model, tokenizer, example: <span class="bu">dict</span>, max_new_tokens: <span class="bu">int</span> <span class="op">=</span> <span class="dv">60</span>) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
+<span id="cb8-267"><a href="#cb8-267" aria-hidden="true" tabindex="-1"></a>    prompt <span class="op">=</span> build_prompt(example)</span>
+<span id="cb8-268"><a href="#cb8-268" aria-hidden="true" tabindex="-1"></a>    answer <span class="op">=</span> generate_reply(model, tokenizer, prompt, max_new_tokens<span class="op">=</span>max_new_tokens)</span>
+<span id="cb8-269"><a href="#cb8-269" aria-hidden="true" tabindex="-1"></a>    expected <span class="op">=</span> example[<span class="st">"output"</span>]</span>
+<span id="cb8-270"><a href="#cb8-270" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb8-271"><a href="#cb8-271" aria-hidden="true" tabindex="-1"></a>        <span class="st">"instruction"</span>: example[<span class="st">"instruction"</span>],</span>
+<span id="cb8-272"><a href="#cb8-272" aria-hidden="true" tabindex="-1"></a>        <span class="st">"input"</span>: example[<span class="st">"input"</span>],</span>
+<span id="cb8-273"><a href="#cb8-273" aria-hidden="true" tabindex="-1"></a>        <span class="st">"expected"</span>: expected,</span>
+<span id="cb8-274"><a href="#cb8-274" aria-hidden="true" tabindex="-1"></a>        <span class="st">"base_model_answer"</span>: answer,</span>
+<span id="cb8-275"><a href="#cb8-275" aria-hidden="true" tabindex="-1"></a>        <span class="st">"matched_expected"</span>: expected.strip().lower() <span class="kw">in</span> answer.strip().lower(),</span>
+<span id="cb8-276"><a href="#cb8-276" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb8-277"><a href="#cb8-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-278"><a href="#cb8-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-279"><a href="#cb8-279" aria-hidden="true" tabindex="-1"></a>model, tokenizer <span class="op">=</span> load_model_and_tokenizer(MODEL_NAME)</span>
+<span id="cb8-280"><a href="#cb8-280" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ask_baseline(model, tokenizer, examples[<span class="dv">0</span>]))</span>
+<span id="cb8-281"><a href="#cb8-281" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-282"><a href="#cb8-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-283"><a href="#cb8-283" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-284"><a href="#cb8-284" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-285"><a href="#cb8-285" aria-hidden="true" tabindex="-1"></a><span class="in">```json</span></span>
+<span id="cb8-286"><a href="#cb8-286" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb8-287"><a href="#cb8-287" aria-hidden="true" tabindex="-1"></a>  <span class="st">"instruction"</span><span class="op">:</span> <span class="st">"What are the present operations reported on this well?"</span><span class="op">,</span></span>
+<span id="cb8-288"><a href="#cb8-288" aria-hidden="true" tabindex="-1"></a>  <span class="st">"input"</span><span class="op">:</span> <span class="st">"Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22"</span><span class="op">,</span></span>
+<span id="cb8-289"><a href="#cb8-289" aria-hidden="true" tabindex="-1"></a>  <span class="st">"expected"</span><span class="op">:</span> <span class="st">"RIGGING UP WITH FRONTIER CREWS AND SUPERVISION AND JW JONES TRUCKING"</span><span class="op">,</span></span>
+<span id="cb8-290"><a href="#cb8-290" aria-hidden="true" tabindex="-1"></a>  <span class="st">"base_model_answer"</span><span class="op">:</span> <span class="st">"The report you've provided appears to be for a well called </span><span class="sc">\"</span><span class="st">FORGE 16A [78]-32</span><span class="sc">\"</span><span class="st"> and it is dated October 22, 2020. The specific details of what operations were reported are not explicitly stated in your message. However, based"</span><span class="op">,</span></span>
+<span id="cb8-291"><a href="#cb8-291" aria-hidden="true" tabindex="-1"></a>  <span class="st">"matched_expected"</span><span class="op">:</span> <span class="kw">false</span></span>
+<span id="cb8-292"><a href="#cb8-292" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-293"><a href="#cb8-293" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-294"><a href="#cb8-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-295"><a href="#cb8-295" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-296"><a href="#cb8-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-297"><a href="#cb8-297" aria-hidden="true" tabindex="-1"></a>The model was asked exactly what Chapter 2's <span class="in">`input`</span> field contains —</span>
+<span id="cb8-298"><a href="#cb8-298" aria-hidden="true" tabindex="-1"></a>well name, report number, date — and nothing else. It answers honestly</span>
+<span id="cb8-299"><a href="#cb8-299" aria-hidden="true" tabindex="-1"></a>that "the specific details... are not explicitly stated," rather than</span>
+<span id="cb8-300"><a href="#cb8-300" aria-hidden="true" tabindex="-1"></a>inventing a plausible-sounding operation. That's a meaningfully</span>
+<span id="cb8-301"><a href="#cb8-301" aria-hidden="true" tabindex="-1"></a>*better* failure than confident fabrication would be, but it's still a</span>
+<span id="cb8-302"><a href="#cb8-302" aria-hidden="true" tabindex="-1"></a>failure: the harness needed the report's real value, and didn't get it.</span>
+<span id="cb8-303"><a href="#cb8-303" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-304"><a href="#cb8-304" aria-hidden="true" tabindex="-1"></a><span class="fu">## Production Reality</span></span>
 <span id="cb8-305"><a href="#cb8-305" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-306"><a href="#cb8-306" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
-<span id="cb8-307"><a href="#cb8-307" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-308"><a href="#cb8-308" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Every training example from <span class="in">`build_training_examples()`</span></span>
-<span id="cb8-309"><a href="#cb8-309" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-310"><a href="#cb8-310" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
-<span id="cb8-311"><a href="#cb8-311" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-312"><a href="#cb8-312" aria-hidden="true" tabindex="-1"></a>A summary line reporting how many of the 16 answers matched, and a</span>
-<span id="cb8-313"><a href="#cb8-313" aria-hidden="true" tabindex="-1"></a>saved <span class="in">`.jsonl`</span> file with one result per question.</span>
-<span id="cb8-314"><a href="#cb8-314" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-317"><a href="#cb8-317" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-318"><a href="#cb8-318" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb8-319"><a href="#cb8-319" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb8-306"><a href="#cb8-306" aria-hidden="true" tabindex="-1"></a><span class="in">`max_new_tokens=60`</span> caps the reply short on purpose, so this chapter's</span>
+<span id="cb8-307"><a href="#cb8-307" aria-hidden="true" tabindex="-1"></a>16-question run finishes in a couple of minutes on CPU. A shorter cap</span>
+<span id="cb8-308"><a href="#cb8-308" aria-hidden="true" tabindex="-1"></a>also means some replies (like the one above) get cut off mid-sentence</span>
+<span id="cb8-309"><a href="#cb8-309" aria-hidden="true" tabindex="-1"></a>rather than reaching a natural stopping point — acceptable here because</span>
+<span id="cb8-310"><a href="#cb8-310" aria-hidden="true" tabindex="-1"></a><span class="in">`matched_expected`</span> only checks for the report's specific value, which</span>
+<span id="cb8-311"><a href="#cb8-311" aria-hidden="true" tabindex="-1"></a>would appear (or not) well before token 60 in every one of this</span>
+<span id="cb8-312"><a href="#cb8-312" aria-hidden="true" tabindex="-1"></a>archive's short, single-line field outputs.</span>
+<span id="cb8-313"><a href="#cb8-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-314"><a href="#cb8-314" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 3: Run the full training baseline and save it for Chapter 5</span></span>
+<span id="cb8-315"><a href="#cb8-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-316"><a href="#cb8-316" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-317"><a href="#cb8-317" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-318"><a href="#cb8-318" aria-hidden="true" tabindex="-1"></a>One question proves the harness works. Chapter 5 needs all 16, saved</span>
+<span id="cb8-319"><a href="#cb8-319" aria-hidden="true" tabindex="-1"></a>somewhere it can load without re-running the base model.</span>
 <span id="cb8-320"><a href="#cb8-320" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-321"><a href="#cb8-321" aria-hidden="true" tabindex="-1"></a>TRAINING_BASELINE_OUTPUT_PATH <span class="op">=</span> BOOK_ROOT <span class="op">/</span> <span class="st">"datasets"</span> <span class="op">/</span> <span class="st">"training_examples"</span> <span class="op">/</span> <span class="st">"training_baseline_results.jsonl"</span></span>
+<span id="cb8-321"><a href="#cb8-321" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
 <span id="cb8-322"><a href="#cb8-322" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-323"><a href="#cb8-323" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-324"><a href="#cb8-324" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_baseline(model, tokenizer, examples: <span class="bu">list</span>[<span class="bu">dict</span>]) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">dict</span>]:</span>
-<span id="cb8-325"><a href="#cb8-325" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [ask_baseline(model, tokenizer, example) <span class="cf">for</span> example <span class="kw">in</span> examples]</span>
+<span id="cb8-323"><a href="#cb8-323" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Every training example from <span class="in">`build_training_examples()`</span></span>
+<span id="cb8-324"><a href="#cb8-324" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-325"><a href="#cb8-325" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
 <span id="cb8-326"><a href="#cb8-326" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-327"><a href="#cb8-327" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-328"><a href="#cb8-328" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_results_jsonl(results: <span class="bu">list</span>[<span class="bu">dict</span>], output_path: Path <span class="op">=</span> TRAINING_BASELINE_OUTPUT_PATH) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
-<span id="cb8-329"><a href="#cb8-329" aria-hidden="true" tabindex="-1"></a>    output_path.parent.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb8-330"><a href="#cb8-330" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> output_path.<span class="bu">open</span>(<span class="st">"w"</span>, encoding<span class="op">=</span><span class="st">"utf-8"</span>) <span class="im">as</span> f:</span>
-<span id="cb8-331"><a href="#cb8-331" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> result <span class="kw">in</span> results:</span>
-<span id="cb8-332"><a href="#cb8-332" aria-hidden="true" tabindex="-1"></a>            f.write(json.dumps(result) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb8-333"><a href="#cb8-333" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-334"><a href="#cb8-334" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-335"><a href="#cb8-335" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> run_baseline(model, tokenizer, examples)</span>
-<span id="cb8-336"><a href="#cb8-336" aria-hidden="true" tabindex="-1"></a>save_results_jsonl(results)</span>
+<span id="cb8-327"><a href="#cb8-327" aria-hidden="true" tabindex="-1"></a>A summary line reporting how many of the 16 answers matched, and a</span>
+<span id="cb8-328"><a href="#cb8-328" aria-hidden="true" tabindex="-1"></a>saved <span class="in">`.jsonl`</span> file with one result per question.</span>
+<span id="cb8-329"><a href="#cb8-329" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-332"><a href="#cb8-332" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-333"><a href="#cb8-333" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-334"><a href="#cb8-334" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb8-335"><a href="#cb8-335" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-336"><a href="#cb8-336" aria-hidden="true" tabindex="-1"></a>TRAINING_BASELINE_OUTPUT_PATH <span class="op">=</span> BOOK_ROOT <span class="op">/</span> <span class="st">"datasets"</span> <span class="op">/</span> <span class="st">"training_examples"</span> <span class="op">/</span> <span class="st">"training_baseline_results.jsonl"</span></span>
 <span id="cb8-337"><a href="#cb8-337" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-338"><a href="#cb8-338" aria-hidden="true" tabindex="-1"></a>matched <span class="op">=</span> <span class="bu">sum</span>(r[<span class="st">"matched_expected"</span>] <span class="cf">for</span> r <span class="kw">in</span> results)</span>
-<span id="cb8-339"><a href="#cb8-339" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Training baseline: </span><span class="sc">{</span>matched<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span><span class="bu">len</span>(results)<span class="sc">}</span><span class="ss"> answers contained the report's actual value verbatim"</span>)</span>
-<span id="cb8-340"><a href="#cb8-340" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Saved -&gt; </span><span class="sc">{</span>TRAINING_BASELINE_OUTPUT_PATH<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb8-341"><a href="#cb8-341" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-338"><a href="#cb8-338" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-339"><a href="#cb8-339" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_baseline(model, tokenizer, examples: <span class="bu">list</span>[<span class="bu">dict</span>]) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">dict</span>]:</span>
+<span id="cb8-340"><a href="#cb8-340" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [ask_baseline(model, tokenizer, example) <span class="cf">for</span> example <span class="kw">in</span> examples]</span>
+<span id="cb8-341"><a href="#cb8-341" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-342"><a href="#cb8-342" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-343"><a href="#cb8-343" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
-<span id="cb8-344"><a href="#cb8-344" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-345"><a href="#cb8-345" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-346"><a href="#cb8-346" aria-hidden="true" tabindex="-1"></a><span class="in">Training baseline: 0/16 answers contained the report's actual value verbatim</span></span>
-<span id="cb8-347"><a href="#cb8-347" aria-hidden="true" tabindex="-1"></a><span class="in">Saved -&gt; datasets/training_examples/training_baseline_results.jsonl</span></span>
-<span id="cb8-348"><a href="#cb8-348" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-343"><a href="#cb8-343" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_results_jsonl(results: <span class="bu">list</span>[<span class="bu">dict</span>], output_path: Path <span class="op">=</span> TRAINING_BASELINE_OUTPUT_PATH) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb8-344"><a href="#cb8-344" aria-hidden="true" tabindex="-1"></a>    output_path.parent.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-345"><a href="#cb8-345" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> output_path.<span class="bu">open</span>(<span class="st">"w"</span>, encoding<span class="op">=</span><span class="st">"utf-8"</span>) <span class="im">as</span> f:</span>
+<span id="cb8-346"><a href="#cb8-346" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> result <span class="kw">in</span> results:</span>
+<span id="cb8-347"><a href="#cb8-347" aria-hidden="true" tabindex="-1"></a>            f.write(json.dumps(result) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb8-348"><a href="#cb8-348" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-349"><a href="#cb8-349" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-350"><a href="#cb8-350" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
-<span id="cb8-351"><a href="#cb8-351" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-352"><a href="#cb8-352" aria-hidden="true" tabindex="-1"></a>Every one of the 16 questions built from the 8 recognized, non-held-out</span>
-<span id="cb8-353"><a href="#cb8-353" aria-hidden="true" tabindex="-1"></a>sample reports came back with <span class="in">`matched_expected: false`</span>. Not one exact</span>
-<span id="cb8-354"><a href="#cb8-354" aria-hidden="true" tabindex="-1"></a>number, status, or operation name from the archive appears in any</span>
-<span id="cb8-355"><a href="#cb8-355" aria-hidden="true" tabindex="-1"></a>answer — because the model was never given any of them, and it has no</span>
-<span id="cb8-356"><a href="#cb8-356" aria-hidden="true" tabindex="-1"></a>other way to know which specific well this is. <span class="in">`0/16`</span> is this chapter's</span>
-<span id="cb8-357"><a href="#cb8-357" aria-hidden="true" tabindex="-1"></a>training baseline. Chapter 5 reruns this exact harness against the</span>
-<span id="cb8-358"><a href="#cb8-358" aria-hidden="true" tabindex="-1"></a>fine-tuned model and compares its score directly against this one — but</span>
-<span id="cb8-359"><a href="#cb8-359" aria-hidden="true" tabindex="-1"></a>that comparison alone only shows training recall. See below.</span>
-<span id="cb8-360"><a href="#cb8-360" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-361"><a href="#cb8-361" aria-hidden="true" tabindex="-1"></a><span class="fu">## Training recall vs. generalization</span></span>
-<span id="cb8-362"><a href="#cb8-362" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-363"><a href="#cb8-363" aria-hidden="true" tabindex="-1"></a>A <span class="in">`0/16`</span> baseline is easy to beat: fine-tune on these same 16 examples,</span>
-<span id="cb8-364"><a href="#cb8-364" aria-hidden="true" tabindex="-1"></a>rerun this harness, and the score will very likely improve — a small</span>
-<span id="cb8-365"><a href="#cb8-365" aria-hidden="true" tabindex="-1"></a>model with a handful of LoRA-adjustable parameters (Chapter 5) can</span>
-<span id="cb8-366"><a href="#cb8-366" aria-hidden="true" tabindex="-1"></a>often just memorize 16 short flashcards. That improvement would be</span>
-<span id="cb8-367"><a href="#cb8-367" aria-hidden="true" tabindex="-1"></a>real, but it would only prove the model *learned these exact examples*,</span>
-<span id="cb8-368"><a href="#cb8-368" aria-hidden="true" tabindex="-1"></a>not that it learned anything that transfers to a report it has never</span>
-<span id="cb8-369"><a href="#cb8-369" aria-hidden="true" tabindex="-1"></a>seen.</span>
-<span id="cb8-370"><a href="#cb8-370" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-371"><a href="#cb8-371" aria-hidden="true" tabindex="-1"></a>That's exactly why Chapter 2 reserved <span class="in">`Drilling_037`</span> out of training</span>
-<span id="cb8-372"><a href="#cb8-372" aria-hidden="true" tabindex="-1"></a>entirely. Chapter 5 has to report two separate numbers, not one:</span>
-<span id="cb8-373"><a href="#cb8-373" aria-hidden="true" tabindex="-1"></a>training-set recall on these 16 examples, and a held-out generalization</span>
-<span id="cb8-374"><a href="#cb8-374" aria-hidden="true" tabindex="-1"></a>score on <span class="in">`Drilling_037`</span>'s own 2 examples — a report the fine-tuned model</span>
-<span id="cb8-375"><a href="#cb8-375" aria-hidden="true" tabindex="-1"></a>never trained on. Only the second number is evidence of learning that</span>
-<span id="cb8-376"><a href="#cb8-376" aria-hidden="true" tabindex="-1"></a>generalizes; the first is evidence of memorization capacity. Neither</span>
-<span id="cb8-377"><a href="#cb8-377" aria-hidden="true" tabindex="-1"></a>number alone tells the full story, and Chapter 11 later replaces this</span>
-<span id="cb8-378"><a href="#cb8-378" aria-hidden="true" tabindex="-1"></a>one-report check with a proper evaluation harness — but even a single</span>
-<span id="cb8-379"><a href="#cb8-379" aria-hidden="true" tabindex="-1"></a>honest held-out report beats zero.</span>
-<span id="cb8-380"><a href="#cb8-380" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-381"><a href="#cb8-381" aria-hidden="true" tabindex="-1"></a><span class="fu">## Practical exercise</span></span>
-<span id="cb8-382"><a href="#cb8-382" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-383"><a href="#cb8-383" aria-hidden="true" tabindex="-1"></a>🟢 **Beginner**</span>
-<span id="cb8-384"><a href="#cb8-384" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-385"><a href="#cb8-385" aria-hidden="true" tabindex="-1"></a>**Try it yourself:** run</span>
-<span id="cb8-386"><a href="#cb8-386" aria-hidden="true" tabindex="-1"></a><span class="in">`python code/chapter_03/baseline_prompting.py`</span> from inside <span class="in">`book/`</span>,</span>
-<span id="cb8-387"><a href="#cb8-387" aria-hidden="true" tabindex="-1"></a>then open <span class="in">`datasets/training_examples/training_baseline_results.jsonl`</span></span>
-<span id="cb8-388"><a href="#cb8-388" aria-hidden="true" tabindex="-1"></a>and read through all 16 answers.</span>
-<span id="cb8-389"><a href="#cb8-389" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-390"><a href="#cb8-390" aria-hidden="true" tabindex="-1"></a>**You'll know it worked when:** the script prints `Training baseline:</span>
-<span id="cb8-391"><a href="#cb8-391" aria-hidden="true" tabindex="-1"></a>0/16`, the file has exactly 16 lines, none of the model's answers</span>
-<span id="cb8-392"><a href="#cb8-392" aria-hidden="true" tabindex="-1"></a>contain a specific operation, status, or number from the actual report</span>
-<span id="cb8-393"><a href="#cb8-393" aria-hidden="true" tabindex="-1"></a>(most will instead say something like "not explicitly stated"), and no</span>
-<span id="cb8-394"><a href="#cb8-394" aria-hidden="true" tabindex="-1"></a>line mentions <span class="in">`Report #37`</span> — that report is reserved, not tested here.</span>
+<span id="cb8-350"><a href="#cb8-350" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> run_baseline(model, tokenizer, examples)</span>
+<span id="cb8-351"><a href="#cb8-351" aria-hidden="true" tabindex="-1"></a>save_results_jsonl(results)</span>
+<span id="cb8-352"><a href="#cb8-352" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-353"><a href="#cb8-353" aria-hidden="true" tabindex="-1"></a>matched <span class="op">=</span> <span class="bu">sum</span>(r[<span class="st">"matched_expected"</span>] <span class="cf">for</span> r <span class="kw">in</span> results)</span>
+<span id="cb8-354"><a href="#cb8-354" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Training baseline: </span><span class="sc">{</span>matched<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span><span class="bu">len</span>(results)<span class="sc">}</span><span class="ss"> answers contained the report's actual value verbatim"</span>)</span>
+<span id="cb8-355"><a href="#cb8-355" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Saved -&gt; </span><span class="sc">{</span>TRAINING_BASELINE_OUTPUT_PATH<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-356"><a href="#cb8-356" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-357"><a href="#cb8-357" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-358"><a href="#cb8-358" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-359"><a href="#cb8-359" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-360"><a href="#cb8-360" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-361"><a href="#cb8-361" aria-hidden="true" tabindex="-1"></a><span class="in">Training baseline: 0/16 answers contained the report's actual value verbatim</span></span>
+<span id="cb8-362"><a href="#cb8-362" aria-hidden="true" tabindex="-1"></a><span class="in">Saved -&gt; datasets/training_examples/training_baseline_results.jsonl</span></span>
+<span id="cb8-363"><a href="#cb8-363" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-364"><a href="#cb8-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-365"><a href="#cb8-365" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-366"><a href="#cb8-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-367"><a href="#cb8-367" aria-hidden="true" tabindex="-1"></a>Every one of the 16 questions built from the 8 recognized, non-held-out</span>
+<span id="cb8-368"><a href="#cb8-368" aria-hidden="true" tabindex="-1"></a>sample reports came back with <span class="in">`matched_expected: false`</span>. Not one exact</span>
+<span id="cb8-369"><a href="#cb8-369" aria-hidden="true" tabindex="-1"></a>number, status, or operation name from the archive appears in any</span>
+<span id="cb8-370"><a href="#cb8-370" aria-hidden="true" tabindex="-1"></a>answer — because the model was never given any of them, and it has no</span>
+<span id="cb8-371"><a href="#cb8-371" aria-hidden="true" tabindex="-1"></a>other way to know which specific well this is. <span class="in">`0/16`</span> is this chapter's</span>
+<span id="cb8-372"><a href="#cb8-372" aria-hidden="true" tabindex="-1"></a>training baseline. Chapter 5 reruns this exact harness against the</span>
+<span id="cb8-373"><a href="#cb8-373" aria-hidden="true" tabindex="-1"></a>fine-tuned model and compares its score directly against this one — but</span>
+<span id="cb8-374"><a href="#cb8-374" aria-hidden="true" tabindex="-1"></a>that comparison alone only shows training recall. See below.</span>
+<span id="cb8-375"><a href="#cb8-375" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-376"><a href="#cb8-376" aria-hidden="true" tabindex="-1"></a><span class="fu">## Training recall vs. generalization</span></span>
+<span id="cb8-377"><a href="#cb8-377" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-378"><a href="#cb8-378" aria-hidden="true" tabindex="-1"></a>A <span class="in">`0/16`</span> baseline is easy to beat: fine-tune on these same 16 examples,</span>
+<span id="cb8-379"><a href="#cb8-379" aria-hidden="true" tabindex="-1"></a>rerun this harness, and the score will very likely improve — a small</span>
+<span id="cb8-380"><a href="#cb8-380" aria-hidden="true" tabindex="-1"></a>model with a handful of LoRA-adjustable parameters (Chapter 5) can</span>
+<span id="cb8-381"><a href="#cb8-381" aria-hidden="true" tabindex="-1"></a>often just memorize 16 short flashcards. That improvement would be</span>
+<span id="cb8-382"><a href="#cb8-382" aria-hidden="true" tabindex="-1"></a>real, but it would only prove the model *learned these exact examples*,</span>
+<span id="cb8-383"><a href="#cb8-383" aria-hidden="true" tabindex="-1"></a>not that it learned anything that transfers to a report it has never</span>
+<span id="cb8-384"><a href="#cb8-384" aria-hidden="true" tabindex="-1"></a>seen.</span>
+<span id="cb8-385"><a href="#cb8-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-386"><a href="#cb8-386" aria-hidden="true" tabindex="-1"></a>That's exactly why Chapter 2 reserved <span class="in">`Drilling_037`</span> out of training</span>
+<span id="cb8-387"><a href="#cb8-387" aria-hidden="true" tabindex="-1"></a>entirely. Chapter 5 has to report two separate numbers, not one:</span>
+<span id="cb8-388"><a href="#cb8-388" aria-hidden="true" tabindex="-1"></a>training-set recall on these 16 examples, and a held-out generalization</span>
+<span id="cb8-389"><a href="#cb8-389" aria-hidden="true" tabindex="-1"></a>score on <span class="in">`Drilling_037`</span>'s own 2 examples — a report the fine-tuned model</span>
+<span id="cb8-390"><a href="#cb8-390" aria-hidden="true" tabindex="-1"></a>never trained on. Only the second number is evidence of learning that</span>
+<span id="cb8-391"><a href="#cb8-391" aria-hidden="true" tabindex="-1"></a>generalizes; the first is evidence of memorization capacity. Neither</span>
+<span id="cb8-392"><a href="#cb8-392" aria-hidden="true" tabindex="-1"></a>number alone tells the full story, and Chapter 11 later replaces this</span>
+<span id="cb8-393"><a href="#cb8-393" aria-hidden="true" tabindex="-1"></a>one-report check with a proper evaluation harness — but even a single</span>
+<span id="cb8-394"><a href="#cb8-394" aria-hidden="true" tabindex="-1"></a>honest held-out report beats zero.</span>
 <span id="cb8-395"><a href="#cb8-395" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-396"><a href="#cb8-396" aria-hidden="true" tabindex="-1"></a><span class="fu">## Field notes</span></span>
+<span id="cb8-396"><a href="#cb8-396" aria-hidden="true" tabindex="-1"></a><span class="fu">## Practical exercise</span></span>
 <span id="cb8-397"><a href="#cb8-397" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-398"><a href="#cb8-398" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="Field notes: the model invents the wrong kind of document"}</span>
-<span id="cb8-399"><a href="#cb8-399" aria-hidden="true" tabindex="-1"></a>**Query:** report <span class="in">`#49`</span>'s "What activity is planned next?" question —</span>
-<span id="cb8-400"><a href="#cb8-400" aria-hidden="true" tabindex="-1"></a>the same fishing-operations report referenced in Chapter 2's Field</span>
-<span id="cb8-401"><a href="#cb8-401" aria-hidden="true" tabindex="-1"></a>notes.</span>
-<span id="cb8-402"><a href="#cb8-402" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-403"><a href="#cb8-403" aria-hidden="true" tabindex="-1"></a>**Result:** *"The text you provided appears to be from an online forum</span>
-<span id="cb8-404"><a href="#cb8-404" aria-hidden="true" tabindex="-1"></a>or discussion board where someone has posted their progress on a</span>
-<span id="cb8-405"><a href="#cb8-405" aria-hidden="true" tabindex="-1"></a>project called 'FORGE 16A' with the report number #49 and the date of</span>
-<span id="cb8-406"><a href="#cb8-406" aria-hidden="true" tabindex="-1"></a>December 7, 2020. Without more context about what this refers..."*</span>
-<span id="cb8-407"><a href="#cb8-407" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-408"><a href="#cb8-408" aria-hidden="true" tabindex="-1"></a>**Why:** report <span class="in">`#49`</span>'s real <span class="in">`activity_planned`</span> value is `"FISHING</span>
-<span id="cb8-409"><a href="#cb8-409" aria-hidden="true" tabindex="-1"></a>OPERATIONS"` — the model was never given that, only the metadata string</span>
-<span id="cb8-410"><a href="#cb8-410" aria-hidden="true" tabindex="-1"></a><span class="in">`"Well: FORGE 16A [78]-32 | Report #49 | Date: 2020-12-07"`</span>. Rather than</span>
-<span id="cb8-411"><a href="#cb8-411" aria-hidden="true" tabindex="-1"></a>guess at an oilfield operation, it guesses at what *kind of document*</span>
-<span id="cb8-412"><a href="#cb8-412" aria-hidden="true" tabindex="-1"></a>would contain a bare project name and report number — and lands on "an</span>
-<span id="cb8-413"><a href="#cb8-413" aria-hidden="true" tabindex="-1"></a>online forum or discussion board post," which is a reasonable guess for</span>
-<span id="cb8-414"><a href="#cb8-414" aria-hidden="true" tabindex="-1"></a>generic internet text and a completely wrong one for a daily drilling</span>
-<span id="cb8-415"><a href="#cb8-415" aria-hidden="true" tabindex="-1"></a>report.</span>
-<span id="cb8-416"><a href="#cb8-416" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-417"><a href="#cb8-417" aria-hidden="true" tabindex="-1"></a>**Lesson:** this base model doesn't just lack this well's facts — it</span>
-<span id="cb8-418"><a href="#cb8-418" aria-hidden="true" tabindex="-1"></a>doesn't yet recognize the *shape* of the document it's being asked</span>
-<span id="cb8-419"><a href="#cb8-419" aria-hidden="true" tabindex="-1"></a>about. That's a second, deeper gap fine-tuning has to close, beyond</span>
-<span id="cb8-420"><a href="#cb8-420" aria-hidden="true" tabindex="-1"></a>memorizing individual report values.</span>
-<span id="cb8-421"><a href="#cb8-421" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-398"><a href="#cb8-398" aria-hidden="true" tabindex="-1"></a>🟢 **Beginner**</span>
+<span id="cb8-399"><a href="#cb8-399" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-400"><a href="#cb8-400" aria-hidden="true" tabindex="-1"></a>**Try it yourself:** run</span>
+<span id="cb8-401"><a href="#cb8-401" aria-hidden="true" tabindex="-1"></a><span class="in">`python code/chapter_03/baseline_prompting.py`</span> from inside <span class="in">`book/`</span>,</span>
+<span id="cb8-402"><a href="#cb8-402" aria-hidden="true" tabindex="-1"></a>then open <span class="in">`datasets/training_examples/training_baseline_results.jsonl`</span></span>
+<span id="cb8-403"><a href="#cb8-403" aria-hidden="true" tabindex="-1"></a>and read through all 16 answers.</span>
+<span id="cb8-404"><a href="#cb8-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-405"><a href="#cb8-405" aria-hidden="true" tabindex="-1"></a>**You'll know it worked when:** the script prints `Training baseline:</span>
+<span id="cb8-406"><a href="#cb8-406" aria-hidden="true" tabindex="-1"></a>0/16`, the file has exactly 16 lines, none of the model's answers</span>
+<span id="cb8-407"><a href="#cb8-407" aria-hidden="true" tabindex="-1"></a>contain a specific operation, status, or number from the actual report</span>
+<span id="cb8-408"><a href="#cb8-408" aria-hidden="true" tabindex="-1"></a>(most will instead say something like "not explicitly stated"), and no</span>
+<span id="cb8-409"><a href="#cb8-409" aria-hidden="true" tabindex="-1"></a>line mentions <span class="in">`Report #37`</span> — that report is reserved, not tested here.</span>
+<span id="cb8-410"><a href="#cb8-410" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-411"><a href="#cb8-411" aria-hidden="true" tabindex="-1"></a><span class="fu">## Field notes</span></span>
+<span id="cb8-412"><a href="#cb8-412" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-413"><a href="#cb8-413" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="Field notes: the model invents the wrong kind of document"}</span>
+<span id="cb8-414"><a href="#cb8-414" aria-hidden="true" tabindex="-1"></a>**Query:** report <span class="in">`#49`</span>'s "What activity is planned next?" question —</span>
+<span id="cb8-415"><a href="#cb8-415" aria-hidden="true" tabindex="-1"></a>the same fishing-operations report referenced in Chapter 2's Field</span>
+<span id="cb8-416"><a href="#cb8-416" aria-hidden="true" tabindex="-1"></a>notes.</span>
+<span id="cb8-417"><a href="#cb8-417" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-418"><a href="#cb8-418" aria-hidden="true" tabindex="-1"></a>**Result:** *"The text you provided appears to be from an online forum</span>
+<span id="cb8-419"><a href="#cb8-419" aria-hidden="true" tabindex="-1"></a>or discussion board where someone has posted their progress on a</span>
+<span id="cb8-420"><a href="#cb8-420" aria-hidden="true" tabindex="-1"></a>project called 'FORGE 16A' with the report number #49 and the date of</span>
+<span id="cb8-421"><a href="#cb8-421" aria-hidden="true" tabindex="-1"></a>December 7, 2020. Without more context about what this refers..."*</span>
 <span id="cb8-422"><a href="#cb8-422" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-423"><a href="#cb8-423" aria-hidden="true" tabindex="-1"></a><span class="fu">## Challenge exercise</span></span>
-<span id="cb8-424"><a href="#cb8-424" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-425"><a href="#cb8-425" aria-hidden="true" tabindex="-1"></a>🟠 **Intermediate**</span>
-<span id="cb8-426"><a href="#cb8-426" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-427"><a href="#cb8-427" aria-hidden="true" tabindex="-1"></a>**Challenge:** <span class="in">`baseline_prompting.py`</span> only ever gives the model each</span>
-<span id="cb8-428"><a href="#cb8-428" aria-hidden="true" tabindex="-1"></a>report's metadata, never its actual text — so <span class="in">`0/16`</span> mostly proves the</span>
-<span id="cb8-429"><a href="#cb8-429" aria-hidden="true" tabindex="-1"></a>model has no way to know the answer, not that fine-tuning is the only</span>
-<span id="cb8-430"><a href="#cb8-430" aria-hidden="true" tabindex="-1"></a>possible fix. Extend the harness to include each report's full extracted</span>
-<span id="cb8-431"><a href="#cb8-431" aria-hidden="true" tabindex="-1"></a>text (from Chapter 2's <span class="in">`extract_text()`</span>) alongside the question, and</span>
-<span id="cb8-432"><a href="#cb8-432" aria-hidden="true" tabindex="-1"></a>re-measure the match rate. A reference solution is at</span>
-<span id="cb8-433"><a href="#cb8-433" aria-hidden="true" tabindex="-1"></a><span class="in">`code/chapter_03/challenge/challenge.py`</span> — on a real run, it scores</span>
-<span id="cb8-434"><a href="#cb8-434" aria-hidden="true" tabindex="-1"></a><span class="in">`6/16`</span>, up from <span class="in">`0/16`</span>, but still well short of perfect: even reading the</span>
-<span id="cb8-435"><a href="#cb8-435" aria-hidden="true" tabindex="-1"></a>report directly, this small base model doesn't reliably reproduce its</span>
-<span id="cb8-436"><a href="#cb8-436" aria-hidden="true" tabindex="-1"></a>exact wording. Keep that number in mind for Chapter 9, which combines</span>
-<span id="cb8-437"><a href="#cb8-437" aria-hidden="true" tabindex="-1"></a>fine-tuning with exactly this kind of retrieved context.</span>
-<span id="cb8-438"><a href="#cb8-438" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-439"><a href="#cb8-439" aria-hidden="true" tabindex="-1"></a><span class="fu">## Key takeaways</span></span>
-<span id="cb8-440"><a href="#cb8-440" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-441"><a href="#cb8-441" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A baseline is only useful if it's fixed and reproducible: same</span>
-<span id="cb8-442"><a href="#cb8-442" aria-hidden="true" tabindex="-1"></a>  questions, same withheld answers, saved results, every time.</span>
-<span id="cb8-443"><a href="#cb8-443" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>This chapter's training baseline questions are Chapter 2's real</span>
-<span id="cb8-444"><a href="#cb8-444" aria-hidden="true" tabindex="-1"></a>  training examples, with the <span class="in">`output`</span> withheld — not a separate,</span>
-<span id="cb8-445"><a href="#cb8-445" aria-hidden="true" tabindex="-1"></a>  invented test set.</span>
-<span id="cb8-446"><a href="#cb8-446" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>On this book's sample archive, the unmodified base model scores</span>
-<span id="cb8-447"><a href="#cb8-447" aria-hidden="true" tabindex="-1"></a>  <span class="in">`0/16`</span> on exact-match — not because it hallucinates wildly, but</span>
-<span id="cb8-448"><a href="#cb8-448" aria-hidden="true" tabindex="-1"></a>  because it correctly (and unhelpfully) admits it wasn't given the</span>
-<span id="cb8-449"><a href="#cb8-449" aria-hidden="true" tabindex="-1"></a>  report's content.</span>
-<span id="cb8-450"><a href="#cb8-450" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A training baseline only measures memorization capacity. Proving</span>
-<span id="cb8-451"><a href="#cb8-451" aria-hidden="true" tabindex="-1"></a>  fine-tuning generalizes needs a separate score on data the model</span>
-<span id="cb8-452"><a href="#cb8-452" aria-hidden="true" tabindex="-1"></a>  never trained on — Chapter 2's held-out report, <span class="in">`Drilling_037`</span>, exists</span>
-<span id="cb8-453"><a href="#cb8-453" aria-hidden="true" tabindex="-1"></a>  for exactly that reason, and Chapter 5 reports both numbers.</span>
-<span id="cb8-454"><a href="#cb8-454" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`matched_expected`</span> is a deliberately crude, honest scoring rule.</span>
-<span id="cb8-455"><a href="#cb8-455" aria-hidden="true" tabindex="-1"></a>  Chapter 11 builds something more forgiving; this chapter's harness</span>
-<span id="cb8-456"><a href="#cb8-456" aria-hidden="true" tabindex="-1"></a>  exists so there's a saved, comparable number to build on.</span>
-<span id="cb8-457"><a href="#cb8-457" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-458"><a href="#cb8-458" aria-hidden="true" tabindex="-1"></a><span class="fu">## Repository files</span></span>
-<span id="cb8-459"><a href="#cb8-459" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-460"><a href="#cb8-460" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> File <span class="pp">|</span> Purpose <span class="pp">|</span></span>
-<span id="cb8-461"><a href="#cb8-461" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb8-462"><a href="#cb8-462" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_03/baseline_prompting.py`</span> <span class="pp">|</span> Builds training baseline questions from Chapter 2's training examples, runs the base model, saves results <span class="pp">|</span></span>
-<span id="cb8-463"><a href="#cb8-463" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_03/challenge/challenge.py`</span> <span class="pp">|</span> Reference solution: re-runs the same questions with each report's full text included <span class="pp">|</span></span>
-<span id="cb8-464"><a href="#cb8-464" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`datasets/training_examples/training_baseline_results.jsonl`</span> <span class="pp">|</span> Generated output (not committed — regenerate by running the script) <span class="pp">|</span></span>
-<span id="cb8-465"><a href="#cb8-465" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`notebooks/chapter_03_explore.ipynb`</span> <span class="pp">|</span> Interactive companion notebook <span class="pp">|</span></span>
-<span id="cb8-466"><a href="#cb8-466" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-467"><a href="#cb8-467" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution title="CHECKPOINT — Chapter 3"}</span>
-<span id="cb8-468"><a href="#cb8-468" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Turned Chapter 2's training examples into training baseline</span>
-<span id="cb8-469"><a href="#cb8-469" aria-hidden="true" tabindex="-1"></a>      questions with the answer withheld</span>
-<span id="cb8-470"><a href="#cb8-470" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Ran the base model against all 16 questions and saved every answer</span>
-<span id="cb8-471"><a href="#cb8-471" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Measured a real, reproducible training baseline score (<span class="in">`0/16`</span>) to</span>
-<span id="cb8-472"><a href="#cb8-472" aria-hidden="true" tabindex="-1"></a>      compare Chapter 5's fine-tuned model against</span>
-<span id="cb8-473"><a href="#cb8-473" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Can explain why this training baseline alone won't prove</span>
-<span id="cb8-474"><a href="#cb8-474" aria-hidden="true" tabindex="-1"></a>      generalization, and what Chapter 5's held-out check adds</span>
-<span id="cb8-475"><a href="#cb8-475" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-476"><a href="#cb8-476" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-477"><a href="#cb8-477" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}</span>
-<span id="cb8-478"><a href="#cb8-478" aria-hidden="true" tabindex="-1"></a>**`baseline_prompting.py`** — runs the unmodified base model against</span>
-<span id="cb8-479"><a href="#cb8-479" aria-hidden="true" tabindex="-1"></a>Chapter 2's 16 training examples with every answer hidden, and saves the</span>
-<span id="cb8-480"><a href="#cb8-480" aria-hidden="true" tabindex="-1"></a>results to <span class="in">`datasets/training_examples/training_baseline_results.jsonl`</span>.</span>
-<span id="cb8-481"><a href="#cb8-481" aria-hidden="true" tabindex="-1"></a>Chapter 5 reruns this same harness against the fine-tuned model for a</span>
-<span id="cb8-482"><a href="#cb8-482" aria-hidden="true" tabindex="-1"></a>training-recall comparison, and runs a second, separate check against</span>
-<span id="cb8-483"><a href="#cb8-483" aria-hidden="true" tabindex="-1"></a>the held-out report for a generalization comparison.</span>
-<span id="cb8-484"><a href="#cb8-484" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-485"><a href="#cb8-485" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-486"><a href="#cb8-486" aria-hidden="true" tabindex="-1"></a><span class="fu">## What can you do now that you couldn't do before?</span></span>
-<span id="cb8-487"><a href="#cb8-487" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-488"><a href="#cb8-488" aria-hidden="true" tabindex="-1"></a>You can produce a fixed, reproducible number for exactly how well the</span>
-<span id="cb8-489"><a href="#cb8-489" aria-hidden="true" tabindex="-1"></a>base model performs on your own training questions — something to point</span>
-<span id="cb8-490"><a href="#cb8-490" aria-hidden="true" tabindex="-1"></a>to, not just a feeling — and you have it saved to a file Chapter 5 will</span>
-<span id="cb8-491"><a href="#cb8-491" aria-hidden="true" tabindex="-1"></a>compare against directly. You can also tell the difference between "the</span>
-<span id="cb8-492"><a href="#cb8-492" aria-hidden="true" tabindex="-1"></a>model learned its training set" and "the model generalizes," and you</span>
-<span id="cb8-493"><a href="#cb8-493" aria-hidden="true" tabindex="-1"></a>know which one this chapter's number actually proves.</span>
-<span id="cb8-494"><a href="#cb8-494" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-495"><a href="#cb8-495" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suggested next step</span></span>
-<span id="cb8-496"><a href="#cb8-496" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-497"><a href="#cb8-497" aria-hidden="true" tabindex="-1"></a>**Coming up in Chapter 4:** fine-tuning (Chapter 5) works by adjusting</span>
-<span id="cb8-498"><a href="#cb8-498" aria-hidden="true" tabindex="-1"></a>how the model represents text internally — but "text" isn't what a</span>
-<span id="cb8-499"><a href="#cb8-499" aria-hidden="true" tabindex="-1"></a>model actually reads. Chapter 4 opens up tokenization and embeddings,</span>
-<span id="cb8-500"><a href="#cb8-500" aria-hidden="true" tabindex="-1"></a>the layer underneath every prompt this chapter sent, so LoRA fine-tuning</span>
-<span id="cb8-501"><a href="#cb8-501" aria-hidden="true" tabindex="-1"></a>doesn't feel like a black box when you get there. Chapter 5 then reruns</span>
-<span id="cb8-502"><a href="#cb8-502" aria-hidden="true" tabindex="-1"></a>this chapter's training baseline against the fine-tuned model, and runs</span>
-<span id="cb8-503"><a href="#cb8-503" aria-hidden="true" tabindex="-1"></a>its held-out counterpart against <span class="in">`Drilling_037`</span> for the first time.</span>
+<span id="cb8-423"><a href="#cb8-423" aria-hidden="true" tabindex="-1"></a>**Why:** report <span class="in">`#49`</span>'s real <span class="in">`activity_planned`</span> value is `"FISHING</span>
+<span id="cb8-424"><a href="#cb8-424" aria-hidden="true" tabindex="-1"></a>OPERATIONS"` — the model was never given that, only the metadata string</span>
+<span id="cb8-425"><a href="#cb8-425" aria-hidden="true" tabindex="-1"></a><span class="in">`"Well: FORGE 16A [78]-32 | Report #49 | Date: 2020-12-07"`</span>. Rather than</span>
+<span id="cb8-426"><a href="#cb8-426" aria-hidden="true" tabindex="-1"></a>guess at an oilfield operation, it guesses at what *kind of document*</span>
+<span id="cb8-427"><a href="#cb8-427" aria-hidden="true" tabindex="-1"></a>would contain a bare project name and report number — and lands on "an</span>
+<span id="cb8-428"><a href="#cb8-428" aria-hidden="true" tabindex="-1"></a>online forum or discussion board post," which is a reasonable guess for</span>
+<span id="cb8-429"><a href="#cb8-429" aria-hidden="true" tabindex="-1"></a>generic internet text and a completely wrong one for a daily drilling</span>
+<span id="cb8-430"><a href="#cb8-430" aria-hidden="true" tabindex="-1"></a>report.</span>
+<span id="cb8-431"><a href="#cb8-431" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-432"><a href="#cb8-432" aria-hidden="true" tabindex="-1"></a>**Lesson:** this base model doesn't just lack this well's facts — it</span>
+<span id="cb8-433"><a href="#cb8-433" aria-hidden="true" tabindex="-1"></a>doesn't yet recognize the *shape* of the document it's being asked</span>
+<span id="cb8-434"><a href="#cb8-434" aria-hidden="true" tabindex="-1"></a>about. That's a second, deeper gap fine-tuning has to close, beyond</span>
+<span id="cb8-435"><a href="#cb8-435" aria-hidden="true" tabindex="-1"></a>memorizing individual report values.</span>
+<span id="cb8-436"><a href="#cb8-436" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-437"><a href="#cb8-437" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-438"><a href="#cb8-438" aria-hidden="true" tabindex="-1"></a><span class="fu">## Challenge exercise</span></span>
+<span id="cb8-439"><a href="#cb8-439" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-440"><a href="#cb8-440" aria-hidden="true" tabindex="-1"></a>🟠 **Intermediate**</span>
+<span id="cb8-441"><a href="#cb8-441" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-442"><a href="#cb8-442" aria-hidden="true" tabindex="-1"></a>**Challenge:** <span class="in">`baseline_prompting.py`</span> only ever gives the model each</span>
+<span id="cb8-443"><a href="#cb8-443" aria-hidden="true" tabindex="-1"></a>report's metadata, never its actual text — so <span class="in">`0/16`</span> mostly proves the</span>
+<span id="cb8-444"><a href="#cb8-444" aria-hidden="true" tabindex="-1"></a>model has no way to know the answer, not that fine-tuning is the only</span>
+<span id="cb8-445"><a href="#cb8-445" aria-hidden="true" tabindex="-1"></a>possible fix. Extend the harness to include each report's full extracted</span>
+<span id="cb8-446"><a href="#cb8-446" aria-hidden="true" tabindex="-1"></a>text (from Chapter 2's <span class="in">`extract_text()`</span>) alongside the question, and</span>
+<span id="cb8-447"><a href="#cb8-447" aria-hidden="true" tabindex="-1"></a>re-measure the match rate. A reference solution is at</span>
+<span id="cb8-448"><a href="#cb8-448" aria-hidden="true" tabindex="-1"></a><span class="in">`code/chapter_03/challenge/challenge.py`</span> — on a real run, it scores</span>
+<span id="cb8-449"><a href="#cb8-449" aria-hidden="true" tabindex="-1"></a><span class="in">`6/16`</span>, up from <span class="in">`0/16`</span>, but still well short of perfect: even reading the</span>
+<span id="cb8-450"><a href="#cb8-450" aria-hidden="true" tabindex="-1"></a>report directly, this small base model doesn't reliably reproduce its</span>
+<span id="cb8-451"><a href="#cb8-451" aria-hidden="true" tabindex="-1"></a>exact wording. Keep that number in mind for Chapter 9, which combines</span>
+<span id="cb8-452"><a href="#cb8-452" aria-hidden="true" tabindex="-1"></a>fine-tuning with exactly this kind of retrieved context.</span>
+<span id="cb8-453"><a href="#cb8-453" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-454"><a href="#cb8-454" aria-hidden="true" tabindex="-1"></a><span class="fu">## Key takeaways</span></span>
+<span id="cb8-455"><a href="#cb8-455" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-456"><a href="#cb8-456" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A baseline is only useful if it's fixed and reproducible: same</span>
+<span id="cb8-457"><a href="#cb8-457" aria-hidden="true" tabindex="-1"></a>  questions, same withheld answers, saved results, every time.</span>
+<span id="cb8-458"><a href="#cb8-458" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>This chapter's training baseline questions are Chapter 2's real</span>
+<span id="cb8-459"><a href="#cb8-459" aria-hidden="true" tabindex="-1"></a>  training examples, with the <span class="in">`output`</span> withheld — not a separate,</span>
+<span id="cb8-460"><a href="#cb8-460" aria-hidden="true" tabindex="-1"></a>  invented test set.</span>
+<span id="cb8-461"><a href="#cb8-461" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>On this book's sample archive, the unmodified base model scores</span>
+<span id="cb8-462"><a href="#cb8-462" aria-hidden="true" tabindex="-1"></a>  <span class="in">`0/16`</span> on exact-match — not because it hallucinates wildly, but</span>
+<span id="cb8-463"><a href="#cb8-463" aria-hidden="true" tabindex="-1"></a>  because it correctly (and unhelpfully) admits it wasn't given the</span>
+<span id="cb8-464"><a href="#cb8-464" aria-hidden="true" tabindex="-1"></a>  report's content.</span>
+<span id="cb8-465"><a href="#cb8-465" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A training baseline only measures memorization capacity. Proving</span>
+<span id="cb8-466"><a href="#cb8-466" aria-hidden="true" tabindex="-1"></a>  fine-tuning generalizes needs a separate score on data the model</span>
+<span id="cb8-467"><a href="#cb8-467" aria-hidden="true" tabindex="-1"></a>  never trained on — Chapter 2's held-out report, <span class="in">`Drilling_037`</span>, exists</span>
+<span id="cb8-468"><a href="#cb8-468" aria-hidden="true" tabindex="-1"></a>  for exactly that reason, and Chapter 5 reports both numbers.</span>
+<span id="cb8-469"><a href="#cb8-469" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`matched_expected`</span> is a deliberately crude, honest scoring rule.</span>
+<span id="cb8-470"><a href="#cb8-470" aria-hidden="true" tabindex="-1"></a>  Chapter 11 builds something more forgiving; this chapter's harness</span>
+<span id="cb8-471"><a href="#cb8-471" aria-hidden="true" tabindex="-1"></a>  exists so there's a saved, comparable number to build on.</span>
+<span id="cb8-472"><a href="#cb8-472" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-473"><a href="#cb8-473" aria-hidden="true" tabindex="-1"></a><span class="fu">## Repository files</span></span>
+<span id="cb8-474"><a href="#cb8-474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-475"><a href="#cb8-475" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> File <span class="pp">|</span> Purpose <span class="pp">|</span></span>
+<span id="cb8-476"><a href="#cb8-476" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb8-477"><a href="#cb8-477" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_03/baseline_prompting.py`</span> <span class="pp">|</span> Builds training baseline questions from Chapter 2's training examples, runs the base model, saves results <span class="pp">|</span></span>
+<span id="cb8-478"><a href="#cb8-478" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_03/challenge/challenge.py`</span> <span class="pp">|</span> Reference solution: re-runs the same questions with each report's full text included <span class="pp">|</span></span>
+<span id="cb8-479"><a href="#cb8-479" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`datasets/training_examples/training_baseline_results.jsonl`</span> <span class="pp">|</span> Generated output (not committed — regenerate by running the script) <span class="pp">|</span></span>
+<span id="cb8-480"><a href="#cb8-480" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`notebooks/chapter_03_explore.ipynb`</span> <span class="pp">|</span> Interactive companion notebook <span class="pp">|</span></span>
+<span id="cb8-481"><a href="#cb8-481" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-482"><a href="#cb8-482" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution title="CHECKPOINT — Chapter 3"}</span>
+<span id="cb8-483"><a href="#cb8-483" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Turned Chapter 2's training examples into training baseline</span>
+<span id="cb8-484"><a href="#cb8-484" aria-hidden="true" tabindex="-1"></a>      questions with the answer withheld</span>
+<span id="cb8-485"><a href="#cb8-485" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Ran the base model against all 16 questions and saved every answer</span>
+<span id="cb8-486"><a href="#cb8-486" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Measured a real, reproducible training baseline score (<span class="in">`0/16`</span>) to</span>
+<span id="cb8-487"><a href="#cb8-487" aria-hidden="true" tabindex="-1"></a>      compare Chapter 5's fine-tuned model against</span>
+<span id="cb8-488"><a href="#cb8-488" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Can explain why this training baseline alone won't prove</span>
+<span id="cb8-489"><a href="#cb8-489" aria-hidden="true" tabindex="-1"></a>      generalization, and what Chapter 5's held-out check adds</span>
+<span id="cb8-490"><a href="#cb8-490" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-491"><a href="#cb8-491" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-492"><a href="#cb8-492" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}</span>
+<span id="cb8-493"><a href="#cb8-493" aria-hidden="true" tabindex="-1"></a>**`baseline_prompting.py`** — runs the unmodified base model against</span>
+<span id="cb8-494"><a href="#cb8-494" aria-hidden="true" tabindex="-1"></a>Chapter 2's 16 training examples with every answer hidden, and saves the</span>
+<span id="cb8-495"><a href="#cb8-495" aria-hidden="true" tabindex="-1"></a>results to <span class="in">`datasets/training_examples/training_baseline_results.jsonl`</span>.</span>
+<span id="cb8-496"><a href="#cb8-496" aria-hidden="true" tabindex="-1"></a>Chapter 5 reruns this same harness against the fine-tuned model for a</span>
+<span id="cb8-497"><a href="#cb8-497" aria-hidden="true" tabindex="-1"></a>training-recall comparison, and runs a second, separate check against</span>
+<span id="cb8-498"><a href="#cb8-498" aria-hidden="true" tabindex="-1"></a>the held-out report for a generalization comparison.</span>
+<span id="cb8-499"><a href="#cb8-499" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-500"><a href="#cb8-500" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-501"><a href="#cb8-501" aria-hidden="true" tabindex="-1"></a><span class="fu">## What can you do now that you couldn't do before?</span></span>
+<span id="cb8-502"><a href="#cb8-502" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-503"><a href="#cb8-503" aria-hidden="true" tabindex="-1"></a>You can produce a fixed, reproducible number for exactly how well the</span>
+<span id="cb8-504"><a href="#cb8-504" aria-hidden="true" tabindex="-1"></a>base model performs on your own training questions — something to point</span>
+<span id="cb8-505"><a href="#cb8-505" aria-hidden="true" tabindex="-1"></a>to, not just a feeling — and you have it saved to a file Chapter 5 will</span>
+<span id="cb8-506"><a href="#cb8-506" aria-hidden="true" tabindex="-1"></a>compare against directly. You can also tell the difference between "the</span>
+<span id="cb8-507"><a href="#cb8-507" aria-hidden="true" tabindex="-1"></a>model learned its training set" and "the model generalizes," and you</span>
+<span id="cb8-508"><a href="#cb8-508" aria-hidden="true" tabindex="-1"></a>know which one this chapter's number actually proves.</span>
+<span id="cb8-509"><a href="#cb8-509" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-510"><a href="#cb8-510" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suggested next step</span></span>
+<span id="cb8-511"><a href="#cb8-511" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-512"><a href="#cb8-512" aria-hidden="true" tabindex="-1"></a>**Coming up in Chapter 4:** fine-tuning (Chapter 5) works by adjusting</span>
+<span id="cb8-513"><a href="#cb8-513" aria-hidden="true" tabindex="-1"></a>how the model represents text internally — but "text" isn't what a</span>
+<span id="cb8-514"><a href="#cb8-514" aria-hidden="true" tabindex="-1"></a>model actually reads. Chapter 4 opens up tokenization and embeddings,</span>
+<span id="cb8-515"><a href="#cb8-515" aria-hidden="true" tabindex="-1"></a>the layer underneath every prompt this chapter sent, so LoRA fine-tuning</span>
+<span id="cb8-516"><a href="#cb8-516" aria-hidden="true" tabindex="-1"></a>doesn't feel like a black box when you get there. Chapter 5 then reruns</span>
+<span id="cb8-517"><a href="#cb8-517" aria-hidden="true" tabindex="-1"></a>this chapter's training baseline against the fine-tuned model, and runs</span>
+<span id="cb8-518"><a href="#cb8-518" aria-hidden="true" tabindex="-1"></a>its held-out counterpart against <span class="in">`Drilling_037`</span> for the first time.</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

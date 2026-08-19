@@ -667,7 +667,7 @@ Direction: exact_match=unchanged  avg_overlap=regressed  perplexity=improved</co
 <section id="expected-output" class="level2" data-number="13.9">
 <h2 data-number="13.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">13.9</span> Expected Output</h2>
 <p>Two lists of real report records: everything before the cutoff, and everything at or after it.</p>
-<div id="27843c7e" class="cell" data-execution_count="1">
+<div id="49953cdd" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>CUTOFF_REPORT_NUM <span class="op">=</span> <span class="dv">60</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -712,7 +712,7 @@ New reports just arrived:  17 reports</code></pre>
 <section id="expected-output-1" class="level2" data-number="13.14">
 <h2 data-number="13.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">13.14</span> Expected Output</h2>
 <p>Four checkpoints: two from training on the current archive, two more continuing on the new batch alone.</p>
-<div id="968ca244" class="cell" data-execution_count="2">
+<div id="ac9e444c" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>model, tokenizer <span class="op">=</span> load_model_and_tokenizer(MODEL_NAME)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>lora_model <span class="op">=</span> build_lora_model(model)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>train_with_checkpoints(lora_model, tokenizer, current_examples, held_out_eval_set, run_dir, logger, num_epochs<span class="op">=</span><span class="dv">2</span>)</span>
@@ -755,7 +755,7 @@ New reports just arrived:  17 reports</code></pre>
 <section id="expected-output-2" class="level2" data-number="13.19">
 <h2 data-number="13.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">13.19</span> Expected Output</h2>
 <p>A direction per metric between the current and updated model.</p>
-<div id="6d8456f9" class="cell" data-execution_count="3">
+<div id="da50fe88" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lora_current, tokenizer <span class="op">=</span> load_version(current_checkpoint)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>summary_current <span class="op">=</span> summarize_version(lora_current, tokenizer, held_out_eval_set)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
