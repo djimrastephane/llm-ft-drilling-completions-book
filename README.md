@@ -104,11 +104,6 @@ Based on the information provided in the driller's report that "during
 the slide lost tool face and became stuck," it suggests that there was
 an issue with the drill bit or other tools getting caught during the
 descent of the drill string...
-
-1. Tool Catching: The drill bit or any attached tools may have become
-   entangled due to debris, mud cake buildup, or other obstructions.
-2. Drill String Configuration: There might be a misalignment or
-   improper configuration of the drill string...
 ```
 
 This fluent, confident, wrong answer is what the AI field calls a
@@ -124,11 +119,12 @@ the actual, millions-of-numbers-deep "knowledge" stored inside it — so
 there's nothing to fine-tune yourself (some providers do sell hosted
 fine-tuning as a separate, metered product; this book's whole point is
 doing it yourself, locally, at no ongoing cost, with the weights in your
-own hands — Chapter 1 covers this in more depth). There's also a data
-question a hosted assistant forces on you that a local model doesn't —
-every prompt, and every report excerpt you paste into it, leaves your
-machine, and real drilling and completions reports are usually
-confidential.
+own hands — Chapter 1 covers this in more depth). Keeping the workflow
+local also gives you direct control over where operational data is
+processed, which matters for drilling and completions reports subject
+to company confidentiality and data-governance requirements — not
+every hosted deployment handles that the same way, but a local model
+sidesteps the question entirely.
 
 This book fixes both problems: it fine-tunes a small local model
 directly on your own reports, chapter by chapter (Chapter 5 onward). And
@@ -227,7 +223,7 @@ If this is your first Python project, do these steps in order:
 | Chapter 3 | 20–30 min |
 
 See [How Long Does Each Chapter Take](#how-long-does-each-chapter-take)
-below for the full breakdown through Chapter 9. You don't need to
+below for the full breakdown through Chapter 13. You don't need to
 understand everything before you start — you need to run the first
 command. Everything else follows from there.
 
@@ -528,21 +524,14 @@ story, not a separate demo built beside it: book chapters → real
 training code → locally generated checkpoints → this app → live
 comparison → reproduced evaluation results. Four pages are real and
 working, completing one coherent evidence chain — training data → model
-behavior → failures: a **Model Playground** that runs the same real
-prompt against the base model and a real fine-tuned checkpoint (with an
-optional retrieval-grounded third answer, screenshotted above); a
-**Before vs. After Evaluation** page that runs the book's own real
-metrics live across the full held-out set for every checkpoint you've
-actually trained, not one cherry-picked example; a **Dataset Explorer**
-that browses the real training examples Chapter 2 and Chapter 7
-actually build, filterable by report number, date, time window, and
-Chapter 6's real quality-gate flags, never by an invented
-domain/topic/difficulty label; and a **Failure Analysis** page that
-reruns Chapter 9/10's 4 real retrieval test cases live — including
-report #21, the book's headline case of a fluent, verified-faithful
-answer grounded in the wrong report — paired with what the book itself
-found, plus a live "shape, not judgment" detector across the held-out
-set.
+behavior → failures:
+
+| Page | Question it answers |
+|---|---|
+| **Model Playground** | How does the model answer this question — base vs. fine-tuned, with an optional retrieval-grounded third answer (screenshotted above)? |
+| **Before vs. After Evaluation** | Did fine-tuning actually improve it, across the full held-out set for every checkpoint you've trained, not one cherry-picked example? |
+| **Dataset Explorer** | What did we train it on — filterable by report number, date, time window, and Chapter 6's real quality-gate flags, never an invented domain/topic/difficulty label? |
+| **Failure Analysis** | Where and how does it fail — reruns Chapter 9/10's 4 real retrieval test cases live, including report #21, the book's headline case of an answer grounded in the wrong report, plus a live "shape, not judgment" detector across the held-out set? |
 
 <img src="book/figures/app_screenshot_evaluation_readme.jpg" alt="Before vs. After Evaluation, screenshotted from a real local run: the book's own metrics computed live across the full held-out set for a real checkpoint, with base-vs-fine-tuned scores shown side by side." width="760">
 

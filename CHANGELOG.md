@@ -14,6 +14,32 @@ highlights in narrative form.
 
 ### Changed
 
+- **Four more README fixes from a second pass of external review
+  feedback.** Narrowed a data-governance claim that was still stated
+  as too absolute after an earlier pass already fixed a related
+  overclaim: "every prompt... leaves your machine, and real reports
+  are usually confidential" implied hosted deployments are
+  categorically unsafe for confidential data, when enterprise hosted
+  platforms can carry contractual privacy/retention controls.
+  Reworded to argue what's actually defensible -- local execution
+  gives direct control over where data is processed -- without
+  claiming every cloud architecture lacks that control. Fixed "See
+  How Long Does Each Chapter Take... for the full breakdown through
+  Chapter 9" -- the table actually runs through Chapter 13; likely
+  went stale when Chapters 10-13 were added after that sentence was
+  first written. Trimmed two sections per specific, bounded feedback
+  (not a broader cut): shortened the "Why Not Just Prompt a Cloud AI
+  Assistant?" base-model transcript by dropping its two-item numbered
+  list, since the surrounding prose already makes the "fluent,
+  confident, wrong" point without it; and turned the Companion App
+  section's dense one-paragraph, four-page description into a
+  "Page | Question it answers" table, matching the same three/four-
+  question framing already used later in the same section -- every
+  fact from the original prose (report #21, the "shape, not judgment"
+  detector, the quality-gate filters, "not one cherry-picked example")
+  preserved in the table's cells, not dropped. Checked "Expected
+  Background"'s `Git` bullet a second time, byte-for-byte -- still
+  completely clean, no malformation in the source; left unchanged.
 - **The two companion-app screenshots in the root README were nearly
   illegible -- fixed by cropping out dead space, not by resizing.**
   Both `app_screenshot_playground.jpg` and `app_screenshot_evaluation.jpg`
