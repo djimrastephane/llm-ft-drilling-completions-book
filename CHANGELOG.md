@@ -38,6 +38,14 @@ highlights in narrative form.
   experimental notebook cells, and the companion Streamlit app's
   by-design empty-checkpoint behavior. Linked from the root README
   directly under the CI badges.
+- **Linked the Troubleshooting Guide from the published book itself,
+  not just the GitHub README.** The root README link above is invisible
+  to anyone reading the book on its published GitHub Pages site rather
+  than browsing the repository, since `TROUBLESHOOTING.md` lives
+  outside `book/` and isn't part of the Quarto render. Added a link to
+  it (and, since it didn't exist yet, a link to the companion
+  repository itself) under `index.qmd`'s "Companion repository"
+  section, verified with a local `quarto render index.qmd`.
 
 ### Changed
 

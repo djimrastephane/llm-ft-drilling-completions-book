@@ -164,8 +164,16 @@ invented on their behalf.
 ## Companion repository
 
 All code, training data, and notebooks referenced in this book live in
-the companion repository. Every chapter lists exactly which files you
-need under **Repository files**.
+the [companion
+repository](https://github.com/djimrastephane/llm-ft-drilling-completions-book)
+on GitHub. Every chapter lists exactly which files you need under
+**Repository files**.
+
+Stuck on something — a setup error, a package that won't install, a
+script that fails partway through? The [Troubleshooting
+Guide](https://github.com/djimrastephane/llm-ft-drilling-completions-book/blob/main/TROUBLESHOOTING.md)
+in that same repository collects the errors readers hit most often, with
+the likely cause for each.
 
 If you've never installed Python or don't know which editor to use, start
 with **Part 0 — Preparing Your Local LLM Workshop**: it works with any
