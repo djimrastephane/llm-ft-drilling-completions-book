@@ -152,12 +152,12 @@ At a glance, the two lists above come down to this:
 
 | Question | Fine-tuning | Retrieval |
 |---|:---:|:---:|
-| Teach the model your shorthand and vocabulary? | Yes | No |
-| Match your reports' own writing style? | Yes | No |
-| Recall one specific fact from one specific report? | No | Yes |
-| Cite which source document an answer came from? | No | Yes |
-| Answer questions about reports it never trained on? | No | Yes |
-| Prove it generalizes, on its own? | No | n/a |
+| Teach the model your shorthand and vocabulary? | `\textcolor{ForestGreen}{\textbf{Yes}}`{=latex}`<span style="color:#1a7f37"><strong>Yes</strong></span>`{=html} | `\textcolor{BrickRed}{\textbf{No}}`{=latex}`<span style="color:#cf222e"><strong>No</strong></span>`{=html} |
+| Match your reports' own writing style? | `\textcolor{ForestGreen}{\textbf{Yes}}`{=latex}`<span style="color:#1a7f37"><strong>Yes</strong></span>`{=html} | `\textcolor{BrickRed}{\textbf{No}}`{=latex}`<span style="color:#cf222e"><strong>No</strong></span>`{=html} |
+| Recall one specific fact from one specific report? | `\textcolor{BrickRed}{\textbf{No}}`{=latex}`<span style="color:#cf222e"><strong>No</strong></span>`{=html} | `\textcolor{ForestGreen}{\textbf{Yes}}`{=latex}`<span style="color:#1a7f37"><strong>Yes</strong></span>`{=html} |
+| Cite which source document an answer came from? | `\textcolor{BrickRed}{\textbf{No}}`{=latex}`<span style="color:#cf222e"><strong>No</strong></span>`{=html} | `\textcolor{ForestGreen}{\textbf{Yes}}`{=latex}`<span style="color:#1a7f37"><strong>Yes</strong></span>`{=html} |
+| Answer questions about reports it never trained on? | `\textcolor{BrickRed}{\textbf{No}}`{=latex}`<span style="color:#cf222e"><strong>No</strong></span>`{=html} | `\textcolor{ForestGreen}{\textbf{Yes}}`{=latex}`<span style="color:#1a7f37"><strong>Yes</strong></span>`{=html} |
+| Prove it generalizes, on its own? | `\textcolor{BrickRed}{\textbf{No}}`{=latex}`<span style="color:#cf222e"><strong>No</strong></span>`{=html} | n/a |
 
 That's a table worth being able to redraw from memory — it's the
 argument for why this book eventually uses both together (Chapter 9),
