@@ -14,6 +14,26 @@ highlights in narrative form.
 
 ### Changed
 
+- **Rewrote the "A Note on AI-Assisted Development" disclosure.** The
+  previous wording ("The ideas, engineering examples, and technical
+  validation are the author's. AI tools including Claude were used to
+  accelerate scaffolding, coding, editing, and documentation tasks.")
+  drew a clean line -- ideas and validation as the author's, AI as
+  execution speed on work the author was already doing -- that this
+  session's own commit history didn't cleanly support: several fixes
+  came from AI independently finding problems the author hadn't
+  flagged (a wrong dense-embedding rank in Chapter 9, a miscounted
+  term occurrence in Chapter 4, a PDF glyph-rendering bug, a stale
+  companion-app status contradiction), closer to AI performing
+  technical verification itself than accelerating verification the
+  author was already running. New wording, provided by the author:
+  engineering direction, domain interpretation, and final technical
+  decisions are the author's; AI tools assisted with coding, editing,
+  documentation, testing, and technical verification throughout
+  development; AI-generated findings and changes were reviewed against
+  the book's code, datasets, and reproducible results before
+  acceptance -- matching how this session's fixes were actually
+  verified before being committed, not just asserted.
 - **Four more README fixes from a second pass of external review
   feedback.** Narrowed a data-governance claim that was still stated
   as too absolute after an earlier pass already fixed a related

@@ -599,9 +599,12 @@ board](https://github.com/djimrastephane?tab=projects).
 
 ## A Note on AI-Assisted Development
 
-The ideas, engineering examples, and technical validation are the
-author's. AI tools including Claude were used to accelerate scaffolding,
-coding, editing, and documentation tasks.
+The engineering direction, domain interpretation, and final technical
+decisions are the author's. AI tools, including Claude, were used
+throughout development to assist with coding, editing, documentation,
+testing, and technical verification. AI-generated findings and changes
+were reviewed against the book's code, datasets, and reproducible
+results before acceptance.
 
 ## Citation
 
