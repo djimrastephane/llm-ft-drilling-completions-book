@@ -700,7 +700,7 @@ test choke manifold 5000 psi</code></pre>
 <section id="expected-output" class="level2" data-number="10.9">
 <h2 data-number="10.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">10.9</span> Expected Output</h2>
 <p>A score from 0.0 to 1.0: the fraction of the answer’s meaningful words that also appear somewhere in the source.</p>
-<div id="c471bb3d" class="cell" data-execution_count="1">
+<div id="e35b6f18" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Words that appear in every prompt's own instruction/input template</span></span>
@@ -761,7 +761,7 @@ test choke manifold 5000 psi</code></pre>
 <section id="expected-output-1" class="level2" data-number="10.14">
 <h2 data-number="10.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">10.14</span> Expected Output</h2>
 <p>The generated answer, every retrieved chunk’s faithfulness score, and a <code>verified_sources</code> list containing only the chunks that actually cross a faithfulness threshold.</p>
-<div id="d6b2ec89" class="cell" data-execution_count="2">
+<div id="3205c614" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> answer_with_traceable_sources(model, tokenizer, instruction, input_context, query, corpus, bm25, k<span class="op">=</span><span class="dv">3</span>, threshold<span class="op">=</span><span class="fl">0.5</span>) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    retrieved <span class="op">=</span> retrieve(query, corpus, bm25, k<span class="op">=</span>k)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    prompt <span class="op">=</span> build_grounded_prompt(instruction, input_context, retrieved)</span>
@@ -802,7 +802,7 @@ test choke manifold 5000 psi</code></pre>
 <section id="expected-output-2" class="level2" data-number="10.19">
 <h2 data-number="10.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">10.19</span> Expected Output</h2>
 <p>Per-case answers, faithfulness scores against every retrieved chunk, and which sources (if any) survive as verified citations.</p>
-<div id="57134a96" class="cell" data-execution_count="3">
+<div id="36c3048e" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> label, input_context, query, target_report <span class="kw">in</span> TEST_CASES:</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> answer_with_traceable_sources(lora_model, tokenizer, INSTRUCTION, input_context, query, corpus, bm25)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>label<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>result[<span class="st">'answer'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
