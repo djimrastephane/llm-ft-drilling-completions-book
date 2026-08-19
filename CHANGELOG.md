@@ -4,7 +4,21 @@ All notable changes to *Fine-Tuning Local LLM for Drilling & Completions*
 are documented in this file. See [RELEASE.md](RELEASE.md) for per-release
 highlights in narrative form.
 
+## Releases
+
+- [Unreleased](#unreleased)
+- [1.0.0 -- 2026-08-19](#100---2026-08-19) -- Part 0 and all 13 chapters
+  complete, tested, and published
+
 ## [Unreleased]
+
+## [1.0.0] - 2026-08-19
+
+Part 0 and all 13 chapters written, tested, and passing CI on Linux,
+macOS, and Windows -- the book's complete content arc, published live
+to GitHub Pages. See [RELEASE.md](RELEASE.md) for the narrative
+highlights; everything below is the detailed, entry-by-entry history
+that got it there.
 
 ### Added
 

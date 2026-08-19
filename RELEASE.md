@@ -5,10 +5,13 @@ Completions*. See [CHANGELOG.md](CHANGELOG.md) for the full history.
 
 ## Unreleased
 
+Nothing pending yet.
+
+## [1.0.0] - 2026-08-19
+
 Part 0 and all 13 chapters are written, tested, and passing CI on
 Linux, macOS, and Windows -- the book's full content arc, start to
-finish, is complete. No tagged release yet; this section tracks what
-would ship in the first one.
+finish, is complete and published live to GitHub Pages.
 
 ### Highlights
 
@@ -36,9 +39,9 @@ archive, never invented.
   loop that simulates new reports arriving and catches a real
   regression before it would have shipped.
 - Dual licensing: MIT for code, CC BY 4.0 for book text.
-- CI workflows for Linux/macOS/Windows test runs and GitHub Pages
-  publishing (`.github/workflows/`) -- publishing is still
-  manual-only, not yet triggered.
+- CI workflows for Linux/macOS/Windows test runs and a manually
+  triggered GitHub Pages publish (`.github/workflows/`), live at
+  <https://djimrastephane.github.io/llm-ft-drilling-completions-book/>.
 
 See [CHANGELOG.md](CHANGELOG.md) for the detailed, chapter-by-chapter
 history, including every bug caught and fixed along the way.

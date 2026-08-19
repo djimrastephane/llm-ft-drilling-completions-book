@@ -144,14 +144,15 @@ path with the failures edited out.
 - Progress: Part 0 and all 13 chapters are written, tested, and passing
   CI (short for continuous integration — the project's automated tests,
   which re-run on every change to catch a broken example before you ever
-  see it). See [CHANGELOG.md](CHANGELOG.md) for the full history of
-  what's landed and why, and [RELEASE.md](RELEASE.md) for per-release
-  highlights — there's no tagged release yet.
-- The book isn't published to GitHub Pages yet — the "Publish book to
-  GitHub Pages" workflow (badge at the top of this file) is still
-  manual-only (`workflow_dispatch`), even though every chapter is now
-  drafted.
-  Read chapters directly as `.qmd` source under
+  see it). Tagged release: [v1.0.0](CHANGELOG.md). See
+  [CHANGELOG.md](CHANGELOG.md) for the full history of what's landed and
+  why, and [RELEASE.md](RELEASE.md) for per-release highlights.
+- **Read the book online:**
+  <https://djimrastephane.github.io/llm-ft-drilling-completions-book/>.
+  The "Publish book to GitHub Pages" workflow (badge at the top of this
+  file) is manually triggered, not run on every push to `main`, so the
+  live site may lag a commit or two behind this repository.
+  You can also read chapters directly as `.qmd` source under
   [`book/chapters/`](book/chapters), or render the whole book locally
   with `quarto render` (see Quickstart in
   [`book/README.md`](book/README.md)).
@@ -427,15 +428,16 @@ covered.
 
 Part 0 and all 13 chapters are written, tested, and passing CI. This
 repository's `.qmd` chapter files are Quarto Markdown — GitHub's file
-viewer shows them as plain unformatted source, since there's no
-published GitHub Pages site yet (see "Progress" above). For the full
-repository layout (folder tree, part/chapter file map) see
-[`book/README.md`](book/README.md).
+viewer shows them as plain unformatted source; read them formatted on
+the [published GitHub Pages
+site](https://djimrastephane.github.io/llm-ft-drilling-completions-book/)
+instead (see "Progress" above). For the full repository layout (folder
+tree, part/chapter file map) see [`book/README.md`](book/README.md).
 
-The "Publish book to GitHub Pages" workflow is still manual-only
-(`workflow_dispatch`) — its badge reflects the last manual run, not
-every push to `main`. Every chapter is now drafted, so nothing is
-blocking a real publish beyond deciding to trigger one.
+The "Publish book to GitHub Pages" workflow is manually triggered
+(`workflow_dispatch`), not run on every push to `main` — its badge
+reflects the last manual run, so the live site may lag a commit or two
+behind this repository's `main` branch.
 
 | Status | Chapter | Main Code (Quick Access) | All Code + Supplementary |
 |---|---|---|---|
