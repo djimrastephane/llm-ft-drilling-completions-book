@@ -9,10 +9,22 @@
 
 This repository contains the chapters, code, and training data for
 **Fine-Tuning Local LLM for Drilling & Completions** — a hands-on,
-build-as-you-go book that teaches drilling and completions engineers how
-to fine-tune and run a private, local large language model on their own
-operational data, assuming zero prior programming or machine-learning
-experience.
+build-as-you-go book that teaches drilling and completions engineers,
+assuming zero prior programming or machine-learning experience, how to
+adapt a private, local AI model to their own operational data.
+
+**What's fine-tuning, and why would you need it?** A general-purpose AI
+model already knows English, but it hasn't spent a career reading your
+rig's daily reports — it's a lot like a competent new hire on day one:
+fluent, capable, and completely unfamiliar with your operation's
+shorthand, report format, and the way your crews actually write things
+up. **Fine-tuning** means having that model study a stack of your own
+real reports until it picks up that operation-specific vocabulary and
+style, the same way a new hire learns the ropes by reading through past
+reports rather than sitting through a generic seminar. Out of the box, a
+model doesn't have that — the next section shows it failing on basic
+oilfield shorthand — and fine-tuning is how you fix it, on your own
+machine, on your own data, without needing to be a programmer.
 
 In *Fine-Tuning Local LLM for Drilling & Completions*, you build a
 working, fine-tuned local model from scratch, one chapter at a time:

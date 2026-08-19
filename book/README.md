@@ -6,9 +6,14 @@
 [![Publish book to GitHub Pages](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml)
 
 Companion source for the book of the same name — a hands-on,
-build-as-you-go guide that teaches drilling and completions engineers how
-to fine-tune and run a private, local large language model on their own
-operational data, assuming no prior programming experience.
+build-as-you-go guide that teaches drilling and completions engineers,
+assuming no prior programming experience, how to adapt a private, local
+AI model to their own operational data. **Fine-tuning**, the book's
+core technique, means having a general-purpose model study a stack of
+your own real reports until it picks up your operation's vocabulary and
+reporting style, rather than staying a fluent-but-generic assistant that
+has never seen your shorthand — see the root [README](../README.md) for
+the full explanation and a concrete before/after example.
 
 Readers start with a general-purpose local model and a folder of drilling
 and completions reports, and finish with a fine-tuned model that

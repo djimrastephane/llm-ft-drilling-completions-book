@@ -904,3 +904,25 @@ highlights in narrative form.
   real, code-backed numbers, and pointed the Field Notes callout at the
   same reference solution for both the similarity scores and the
   occurrence count.
+- **Both READMEs used "fine-tune"/"fine-tuning" six times in their
+  opening paragraphs -- including the book's own title -- before ever
+  explaining what the term means or why a reader would need it.**
+  Reader feedback pointed out that a drilling/completions engineer
+  hitting the term cold in sentence one would reasonably ask "what is
+  this and why do I need it?" This is the same "problem/analogy before
+  jargon" rule this repo's own CLAUDE.md already states for chapter
+  prose, just not yet applied to the READMEs' very first paragraph --
+  `book/index.qmd`'s "Welcome" page already got this right (states the
+  operational problem, generic models not knowing your shorthand,
+  before naming fine-tuning as the fix), so this was specifically a
+  gap in the two READMEs' opening, not a book-wide issue. Added a new
+  "What's fine-tuning, and why would you need it?" paragraph right
+  after the root `README.md`'s first paragraph: a new-hire analogy (a
+  general model is fluent but unfamiliar with your operation, the same
+  way a competent new hire is, until they study your own past reports)
+  before the term gets used again, with a forward-pointer to the
+  concrete hallucination example in the very next section. Gave
+  `book/README.md`'s opening a shorter version of the same grounding,
+  pointing to the root README for the full explanation, since that
+  file is the companion-source README for people already past the "why
+  fine-tune at all" question, not the reader's first stop.
