@@ -147,16 +147,16 @@ By the end of the book you will have built eleven real, working
 artifacts — not eleven topics you read about:
 
 - ✓ **Local model loading and inference script** — run a general-purpose local LLM and evaluate its out-of-the-box answers to drilling and completions questions
-- ✓ **Domain training-example builder** — turn raw drilling and completions reports into a training dataset
-- ✓ **Baseline prompting harness** — measure exactly, and reproducibly, what the base model gets wrong before you touch it
-- ✓ **First LoRA fine-tune** — a real, working parameter-efficient fine-tune, with an honest held-out generalization result
-- ✓ **Data quality gate** — catch bad training data before it ever reaches fine-tuning
-- ✓ **Checkpointed fine-tune at scale** — real experiment tracking and resumable checkpoints, no black-box trainer
-- ✓ **Hybrid fine-tuning + retrieval system** — grounded, citable answers, demonstrated above
-- ✓ **Faithfulness checker** — catches a real, fluent answer that cited the right report but was actually grounded in the wrong one
-- ✓ **Evaluation harness** — a real 8-example held-out set scored three ways, showing that a single metric can make real training progress look like nothing happened
-- ✓ **Model-version drift detector** — caught two of the book's own metrics disagreeing about whether a newer checkpoint is actually an improvement
-- ✓ **Continuous fine-tuning loop** — simulated new reports arriving, retrained on them, and let the drift detector catch a real regression before it would have shipped
+- **Domain training-example builder** — turn raw drilling and completions reports into a training dataset
+- **Baseline prompting harness** — measure exactly, and reproducibly, what the base model gets wrong before you touch it
+- **First LoRA fine-tune** — a real, working parameter-efficient fine-tune, with an honest held-out generalization result
+- **Data quality gate** — catch bad training data before it ever reaches fine-tuning
+- **Checkpointed fine-tune at scale** — real experiment tracking and resumable checkpoints, no black-box trainer
+- **Hybrid fine-tuning + retrieval system** — grounded, citable answers, demonstrated above
+- **Faithfulness checker** — catches a real, fluent answer that cited the right report but was actually grounded in the wrong one
+- **Evaluation harness** — a real 8-example held-out set scored three ways, showing that a single metric can make real training progress look like nothing happened
+- **Model-version drift detector** — caught two of the book's own metrics disagreeing about whether a newer checkpoint is actually an improvement
+- **Continuous fine-tuning loop** — simulated new reports arriving, retrained on them, and let the drift detector catch a real regression before it would have shipped
 
 - Link to the [official source code repository](https://github.com/djimrastephane/llm-ft-drilling-completions-book)
 - License: code is [MIT](LICENSE); the book's text is [CC BY 4.0](LICENSE-CONTENT.md)
@@ -384,10 +384,10 @@ tool.
 
 You are ready for Chapter 1 when:
 
-- ✅ Python runs
-- ✅ `setup_check.py` runs successfully
-- ✅ the sample training set exists in `book/datasets/sample_training_set/`
-- ✅ your virtual environment is active
+- Python runs
+- `setup_check.py` runs successfully
+- the sample training set exists in `book/datasets/sample_training_set/`
+- your virtual environment is active
 
 All four checks are covered in Part 0 — if any of them aren't true yet,
 that's exactly what it's for.
