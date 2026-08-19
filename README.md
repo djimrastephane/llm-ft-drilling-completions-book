@@ -5,6 +5,8 @@
 [![Code tests macOS](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml)
 [![Publish book to GitHub Pages](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml)
 
+[Troubleshooting Guide](TROUBLESHOOTING.md)
+
 **A hands-on book for drilling and completions engineers with zero AI or
 programming background** — fine-tune a private, local AI model on your
 own operational data, add retrieval so it can cite its sources, and

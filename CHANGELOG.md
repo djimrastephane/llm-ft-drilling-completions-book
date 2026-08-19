@@ -12,6 +12,33 @@ highlights in narrative form.
 
 ## [Unreleased]
 
+### Added
+
+- **Root-level `TROUBLESHOOTING.md`.** Prompted by comparing this
+  README against `rasbt/LLMs-from-scratch`'s, which links a plain-text
+  troubleshooting guide right under its badges. This repo already had
+  two troubleshooting tables -- Part 0 Section 0.11 (setup) and
+  Appendix A Section 5 (rendering and fine-tuning packages) -- but both
+  live inside `.qmd` files, which GitHub's file viewer renders as
+  unformatted source rather than a readable page, so neither was
+  actually reachable from the repository landing page. The new file
+  reproduces both tables in plain Markdown and adds real content that
+  didn't exist anywhere before: first-run Hugging Face model-download
+  failures (network, proxy/SSL, disk space), the exact
+  `FileNotFoundError` message a later chapter's script raises when an
+  earlier chapter's checkpoint is missing (Chapter 9's
+  `hybrid_rag_finetune.py` names the missing-checkpoint case
+  explicitly), the fast pytest path (`-m "not slow and not gpu"`) and
+  the `OMP_NUM_THREADS=1` mitigation already anticipated in
+  `book/tests/conftest.py` for a faiss/sentence-transformers crash seen
+  in the author's previous book -- worded as an anticipated risk, not a
+  confirmed failure, since it hasn't occurred in this repo's own CI --
+  the `USE_TF`/`USE_FLAX` silent-crash guard `load_local_model.py`
+  already sets, reframed as advice for readers writing their own
+  experimental notebook cells, and the companion Streamlit app's
+  by-design empty-checkpoint behavior. Linked from the root README
+  directly under the CI badges.
+
 ### Changed
 
 - **Rewrote the "A Note on AI-Assisted Development" disclosure.** The
