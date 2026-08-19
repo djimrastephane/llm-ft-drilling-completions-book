@@ -667,7 +667,7 @@ Direction: exact_match=unchanged  avg_overlap=regressed  perplexity=improved</co
 <section id="expected-output" class="level2" data-number="13.9">
 <h2 data-number="13.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">13.9</span> Expected Output</h2>
 <p>Two lists of real report records: everything before the cutoff, and everything at or after it.</p>
-<div id="137c735c" class="cell" data-execution_count="1">
+<div id="3e180e50" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>CUTOFF_REPORT_NUM <span class="op">=</span> <span class="dv">60</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -712,7 +712,7 @@ New reports just arrived:  17 reports</code></pre>
 <section id="expected-output-1" class="level2" data-number="13.14">
 <h2 data-number="13.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">13.14</span> Expected Output</h2>
 <p>Four checkpoints: two from training on the current archive, two more continuing on the new batch alone.</p>
-<div id="e31436dd" class="cell" data-execution_count="2">
+<div id="8177f38b" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>model, tokenizer <span class="op">=</span> load_model_and_tokenizer(MODEL_NAME)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>lora_model <span class="op">=</span> build_lora_model(model)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>train_with_checkpoints(lora_model, tokenizer, current_examples, held_out_eval_set, run_dir, logger, num_epochs<span class="op">=</span><span class="dv">2</span>)</span>
@@ -755,7 +755,7 @@ New reports just arrived:  17 reports</code></pre>
 <section id="expected-output-2" class="level2" data-number="13.19">
 <h2 data-number="13.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">13.19</span> Expected Output</h2>
 <p>A direction per metric between the current and updated model.</p>
-<div id="dfc667e8" class="cell" data-execution_count="3">
+<div id="18e79246" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lora_current, tokenizer <span class="op">=</span> load_version(current_checkpoint)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>summary_current <span class="op">=</span> summarize_version(lora_current, tokenizer, held_out_eval_set)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -886,7 +886,7 @@ Direction:     {'exact_match': 'unchanged', 'avg_overlap': 'regressed', 'perplex
 <div id="fig-app-evaluation" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Screenshot of the companion app's Before vs. After Evaluation page, showing a results table for the base model and three fine-tuned checkpoints, a callout stating the latest checkpoint regressed on both average overlap and perplexity compared to the previous one, and per-transition percentage changes for each metric.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-app-evaluation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="../figures/app_screenshot_evaluation.jpg" class="img-fluid figure-img" alt="Screenshot of the companion app's Before vs. After Evaluation page, showing a results table for the base model and three fine-tuned checkpoints, a callout stating the latest checkpoint regressed on both average overlap and perplexity compared to the previous one, and per-transition percentage changes for each metric.">
+<img src="../figures/app_screenshot_evaluation_readme.jpg" class="img-fluid figure-img" alt="Screenshot of the companion app's Before vs. After Evaluation page, showing a results table for the base model and three fine-tuned checkpoints, a callout stating the latest checkpoint regressed on both average overlap and perplexity compared to the previous one, and per-transition percentage changes for each metric.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-app-evaluation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;13.1: Before vs.&nbsp;After Evaluation, screenshotted from a real local run across this book’s own checkpoints – the exact “latest doesn’t mean best” regression this chapter’s own version-comparison run found above, surfaced automatically by the app.
@@ -1800,7 +1800,7 @@ Figure&nbsp;13.1: Before vs.&nbsp;After Evaluation, screenshotted from a real lo
 <span id="cb8-419"><a href="#cb8-419" aria-hidden="true" tabindex="-1"></a>across this book's own checkpoints -- the exact "latest doesn't mean</span>
 <span id="cb8-420"><a href="#cb8-420" aria-hidden="true" tabindex="-1"></a>best" regression this chapter's own version-comparison run found above,</span>
 <span id="cb8-421"><a href="#cb8-421" aria-hidden="true" tabindex="-1"></a>surfaced automatically by the</span>
-<span id="cb8-422"><a href="#cb8-422" aria-hidden="true" tabindex="-1"></a>app.](../figures/app_screenshot_evaluation.jpg){#fig-app-evaluation fig-alt="Screenshot of the companion app's Before vs. After Evaluation page, showing a results table for the base model and three fine-tuned checkpoints, a callout stating the latest checkpoint regressed on both average overlap and perplexity compared to the previous one, and per-transition percentage changes for each metric."}</span>
+<span id="cb8-422"><a href="#cb8-422" aria-hidden="true" tabindex="-1"></a>app.](../figures/app_screenshot_evaluation_readme.jpg){#fig-app-evaluation fig-alt="Screenshot of the companion app's Before vs. After Evaluation page, showing a results table for the base model and three fine-tuned checkpoints, a callout stating the latest checkpoint regressed on both average overlap and perplexity compared to the previous one, and per-transition percentage changes for each metric."}</span>
 <span id="cb8-423"><a href="#cb8-423" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-424"><a href="#cb8-424" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suggested next step</span></span>
 <span id="cb8-425"><a href="#cb8-425" aria-hidden="true" tabindex="-1"></a></span>
