@@ -681,7 +681,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output" class="level2" data-number="7.9">
 <h2 data-number="7.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">7.9</span> Expected Output</h2>
 <p>A list of dictionaries, one per logged time window.</p>
-<div id="44df0e27" class="cell" data-execution_count="1">
+<div id="b3f00bdf" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>TIMELINE_SECTION_PATTERN <span class="op">=</span> re.<span class="bu">compile</span>(</span>
@@ -739,7 +739,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output-1" class="level2" data-number="7.14">
 <h2 data-number="7.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">7.14</span> Expected Output</h2>
 <p>A list of one or more chunks, each within the limit, that concatenate back into the original text exactly.</p>
-<div id="8bae27c2" class="cell" data-execution_count="2">
+<div id="857d6bd1" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> chunk_text(text: <span class="bu">str</span>, max_chars: <span class="bu">int</span> <span class="op">=</span> <span class="dv">300</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">str</span>]:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    words <span class="op">=</span> text.split()</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    chunks, current, current_len <span class="op">=</span> [], [], <span class="dv">0</span></span>
@@ -789,7 +789,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output-2" class="level2" data-number="7.19">
 <h2 data-number="7.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">7.19</span> Expected Output</h2>
 <p>A <code>.jsonl</code> file with one example per line, plus counts of how many examples, chunks, and filtered artifacts resulted.</p>
-<div id="b1e819d7" class="cell" data-execution_count="3">
+<div id="737e3cd0" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> contains_cid_artifact(text: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"(cid:"</span> <span class="kw">in</span> text  <span class="co"># pdfplumber's stand-in for an undecoded glyph</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>

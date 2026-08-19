@@ -685,6 +685,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>At a glance, the two lists above come down to this:</p>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 38%">
+<col style="width: 38%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Question</th>
@@ -695,32 +700,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>Teach the model your shorthand and vocabulary?</td>
-<td style="text-align: center;">Yes</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;"><span style="color:#1a7f37"><strong>Yes</strong></span></td>
+<td style="text-align: center;"><span style="color:#cf222e"><strong>No</strong></span></td>
 </tr>
 <tr class="even">
 <td>Match your reports’ own writing style?</td>
-<td style="text-align: center;">Yes</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;"><span style="color:#1a7f37"><strong>Yes</strong></span></td>
+<td style="text-align: center;"><span style="color:#cf222e"><strong>No</strong></span></td>
 </tr>
 <tr class="odd">
 <td>Recall one specific fact from one specific report?</td>
-<td style="text-align: center;">No</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;"><span style="color:#cf222e"><strong>No</strong></span></td>
+<td style="text-align: center;"><span style="color:#1a7f37"><strong>Yes</strong></span></td>
 </tr>
 <tr class="even">
 <td>Cite which source document an answer came from?</td>
-<td style="text-align: center;">No</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;"><span style="color:#cf222e"><strong>No</strong></span></td>
+<td style="text-align: center;"><span style="color:#1a7f37"><strong>Yes</strong></span></td>
 </tr>
 <tr class="odd">
 <td>Answer questions about reports it never trained on?</td>
-<td style="text-align: center;">No</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;"><span style="color:#cf222e"><strong>No</strong></span></td>
+<td style="text-align: center;"><span style="color:#1a7f37"><strong>Yes</strong></span></td>
 </tr>
 <tr class="even">
 <td>Prove it generalizes, on its own?</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;"><span style="color:#cf222e"><strong>No</strong></span></td>
 <td style="text-align: center;">n/a</td>
 </tr>
 </tbody>
@@ -747,7 +752,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output" class="level2" data-number="3.10">
 <h2 data-number="3.10" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">3.10</span> Expected Output</h2>
 <p>A plain-text prompt string, with no trace of the expected answer.</p>
-<div id="f2ec8b3b" class="cell" data-execution_count="1">
+<div id="2f887cd7" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -795,7 +800,7 @@ Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22</code></pre>
 <section id="expected-output-1" class="level2" data-number="3.15">
 <h2 data-number="3.15" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">3.15</span> Expected Output</h2>
 <p>A dictionary recording the question, the hidden expected answer, the model’s actual answer, and whether they matched.</p>
-<div id="3755b76a" class="cell" data-execution_count="2">
+<div id="cf50957a" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ask_baseline(model, tokenizer, example: <span class="bu">dict</span>, max_new_tokens: <span class="bu">int</span> <span class="op">=</span> <span class="dv">60</span>) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    prompt <span class="op">=</span> build_prompt(example)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    answer <span class="op">=</span> generate_reply(model, tokenizer, prompt, max_new_tokens<span class="op">=</span>max_new_tokens)</span>
@@ -845,7 +850,7 @@ Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22</code></pre>
 <section id="expected-output-2" class="level2" data-number="3.20">
 <h2 data-number="3.20" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">3.20</span> Expected Output</h2>
 <p>A summary line reporting how many of the 16 answers matched, and a saved <code>.jsonl</code> file with one result per question.</p>
-<div id="08963820" class="cell" data-execution_count="3">
+<div id="2b0ee9d2" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>TRAINING_BASELINE_OUTPUT_PATH <span class="op">=</span> BOOK_ROOT <span class="op">/</span> <span class="st">"datasets"</span> <span class="op">/</span> <span class="st">"training_examples"</span> <span class="op">/</span> <span class="st">"training_baseline_results.jsonl"</span></span>
@@ -1635,12 +1640,12 @@ Saved -&gt; datasets/training_examples/training_baseline_results.jsonl</code></p
 <span id="cb8-152"><a href="#cb8-152" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-153"><a href="#cb8-153" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Question <span class="pp">|</span> Fine-tuning <span class="pp">|</span> Retrieval <span class="pp">|</span></span>
 <span id="cb8-154"><a href="#cb8-154" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|:---:|:---:|</span></span>
-<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Teach the model your shorthand and vocabulary? <span class="pp">|</span> Yes <span class="pp">|</span> No <span class="pp">|</span></span>
-<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Match your reports' own writing style? <span class="pp">|</span> Yes <span class="pp">|</span> No <span class="pp">|</span></span>
-<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Recall one specific fact from one specific report? <span class="pp">|</span> No <span class="pp">|</span> Yes <span class="pp">|</span></span>
-<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Cite which source document an answer came from? <span class="pp">|</span> No <span class="pp">|</span> Yes <span class="pp">|</span></span>
-<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Answer questions about reports it never trained on? <span class="pp">|</span> No <span class="pp">|</span> Yes <span class="pp">|</span></span>
-<span id="cb8-160"><a href="#cb8-160" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Prove it generalizes, on its own? <span class="pp">|</span> No <span class="pp">|</span> n/a <span class="pp">|</span></span>
+<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Teach the model your shorthand and vocabulary? <span class="pp">|</span> <span class="in">`\textcolor{ForestGreen}{\textbf{Yes}}`</span>{=latex}<span class="in">`&lt;span style="color:#1a7f37"&gt;&lt;strong&gt;Yes&lt;/strong&gt;&lt;/span&gt;`</span>{=html} <span class="pp">|</span> <span class="in">`\textcolor{BrickRed}{\textbf{No}}`</span>{=latex}<span class="in">`&lt;span style="color:#cf222e"&gt;&lt;strong&gt;No&lt;/strong&gt;&lt;/span&gt;`</span>{=html} <span class="pp">|</span></span>
+<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Match your reports' own writing style? <span class="pp">|</span> <span class="in">`\textcolor{ForestGreen}{\textbf{Yes}}`</span>{=latex}<span class="in">`&lt;span style="color:#1a7f37"&gt;&lt;strong&gt;Yes&lt;/strong&gt;&lt;/span&gt;`</span>{=html} <span class="pp">|</span> <span class="in">`\textcolor{BrickRed}{\textbf{No}}`</span>{=latex}<span class="in">`&lt;span style="color:#cf222e"&gt;&lt;strong&gt;No&lt;/strong&gt;&lt;/span&gt;`</span>{=html} <span class="pp">|</span></span>
+<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Recall one specific fact from one specific report? <span class="pp">|</span> <span class="in">`\textcolor{BrickRed}{\textbf{No}}`</span>{=latex}<span class="in">`&lt;span style="color:#cf222e"&gt;&lt;strong&gt;No&lt;/strong&gt;&lt;/span&gt;`</span>{=html} <span class="pp">|</span> <span class="in">`\textcolor{ForestGreen}{\textbf{Yes}}`</span>{=latex}<span class="in">`&lt;span style="color:#1a7f37"&gt;&lt;strong&gt;Yes&lt;/strong&gt;&lt;/span&gt;`</span>{=html} <span class="pp">|</span></span>
+<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Cite which source document an answer came from? <span class="pp">|</span> <span class="in">`\textcolor{BrickRed}{\textbf{No}}`</span>{=latex}<span class="in">`&lt;span style="color:#cf222e"&gt;&lt;strong&gt;No&lt;/strong&gt;&lt;/span&gt;`</span>{=html} <span class="pp">|</span> <span class="in">`\textcolor{ForestGreen}{\textbf{Yes}}`</span>{=latex}<span class="in">`&lt;span style="color:#1a7f37"&gt;&lt;strong&gt;Yes&lt;/strong&gt;&lt;/span&gt;`</span>{=html} <span class="pp">|</span></span>
+<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Answer questions about reports it never trained on? <span class="pp">|</span> <span class="in">`\textcolor{BrickRed}{\textbf{No}}`</span>{=latex}<span class="in">`&lt;span style="color:#cf222e"&gt;&lt;strong&gt;No&lt;/strong&gt;&lt;/span&gt;`</span>{=html} <span class="pp">|</span> <span class="in">`\textcolor{ForestGreen}{\textbf{Yes}}`</span>{=latex}<span class="in">`&lt;span style="color:#1a7f37"&gt;&lt;strong&gt;Yes&lt;/strong&gt;&lt;/span&gt;`</span>{=html} <span class="pp">|</span></span>
+<span id="cb8-160"><a href="#cb8-160" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Prove it generalizes, on its own? <span class="pp">|</span> <span class="in">`\textcolor{BrickRed}{\textbf{No}}`</span>{=latex}<span class="in">`&lt;span style="color:#cf222e"&gt;&lt;strong&gt;No&lt;/strong&gt;&lt;/span&gt;`</span>{=html} <span class="pp">|</span> n/a <span class="pp">|</span></span>
 <span id="cb8-161"><a href="#cb8-161" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-162"><a href="#cb8-162" aria-hidden="true" tabindex="-1"></a>That's a table worth being able to redraw from memory — it's the</span>
 <span id="cb8-163"><a href="#cb8-163" aria-hidden="true" tabindex="-1"></a>argument for why this book eventually uses both together (Chapter 9),</span>

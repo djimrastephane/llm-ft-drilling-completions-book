@@ -694,7 +694,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output" class="level2" data-number="4.9">
 <h2 data-number="4.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">4.9</span> Expected Output</h2>
 <p>A token count and the exact pieces for each term.</p>
-<div id="21ec393c" class="cell" data-execution_count="1">
+<div id="aaedfd2e" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -754,7 +754,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output-1" class="level2" data-number="4.14">
 <h2 data-number="4.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">4.14</span> Expected Output</h2>
 <p>A cosine similarity score for each pair — closer to <code>1.0</code> means “close together,” closer to <code>0</code> means “no relationship,” negative means “pointing away from each other.”</p>
-<div id="5e362f89" class="cell" data-execution_count="2">
+<div id="af34a5c2" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>TERM_PAIRS <span class="op">=</span> [</span>
@@ -814,7 +814,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output-2" class="level2" data-number="4.19">
 <h2 data-number="4.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">4.19</span> Expected Output</h2>
 <p>The same style of cosine similarity scores, from a different, dedicated embedding model.</p>
-<div id="b0de43b2" class="cell" data-execution_count="3">
+<div id="aad12515" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sentence_transformers <span class="im">import</span> SentenceTransformer</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>st_model <span class="op">=</span> SentenceTransformer(<span class="st">"all-MiniLM-L6-v2"</span>)</span>
