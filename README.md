@@ -5,13 +5,18 @@
 [![Code tests macOS](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml)
 [![Publish book to GitHub Pages](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml)
 
-**First time here? Jump straight to [Start Here](#start-here).**
+**A hands-on book for drilling and completions engineers with zero AI or
+programming background** — fine-tune a private, local AI model on your
+own operational data, add retrieval so it can cite its sources, and
+measure every result against real, public Utah FORGE Daily Drilling
+Reports, honestly, including where it fails.
 
-This repository contains the chapters, code, and training data for
-**Fine-Tuning Local LLM for Drilling & Completions** — a hands-on,
-build-as-you-go book that teaches drilling and completions engineers,
-assuming zero prior programming or machine-learning experience, how to
-adapt a private, local AI model to their own operational data.
+**[Read the book](https://djimrastephane.github.io/llm-ft-drilling-completions-book/)** · **[Start Here](#start-here)** · **[Companion App](#companion-app)**
+
+13 chapters · 74 automated tests · Linux ✓ macOS ✓ Windows ✓ · real Utah
+FORGE report data, no synthetic stand-ins
+
+![Model Playground, screenshotted from a real local run: report #37's held-out question, answered live by both the base model and Chapter 5's first fine-tuned checkpoint, with the real exact-match and overlap scores for each.](book/figures/app_screenshot_playground.jpg)
 
 **What's fine-tuning, and why would you need it?** A general-purpose AI
 model already knows English, but it hasn't spent a career reading your
@@ -26,20 +31,50 @@ model doesn't have that — the next section shows it failing on basic
 oilfield shorthand — and fine-tuning is how you fix it, on your own
 machine, on your own data, without needing to be a programmer.
 
-In *Fine-Tuning Local LLM for Drilling & Completions*, you build a
-working, fine-tuned local model from scratch, one chapter at a time:
-loading a general-purpose **open-weight** model (one you download and
-keep on your own machine, not just borrowed access to someone else's),
-turning real reports into training data, measuring exactly what the base
-model gets wrong, running your first **LoRA** fine-tune (a lightweight
-way to teach it your operation's own wording without retraining the
-whole model from scratch), then hardening that prototype at scale —
-saving your progress as you go so a long training run doesn't have to
-start over from zero, catching bad training data before it ever reaches
-fine-tuning, and pairing it with a real search step so the final answer
-comes back backed by real evidence, and traceable to the actual report
-it came from — no cloud training service, no black-box trainer, no data
-leaving your machine.
+### What You're Building
+
+The box below is a **real, verified transcript from Chapter 9's own
+code** — not an illustration, and not something invented for this
+README. Report `#37` is the one report this book's fine-tuned model
+never saw during training (Chapter 2 held it out on purpose). Asked what
+happened on that report's `20:30–21:30` window:
+
+```
+Without retrieval (fine-tuned model alone):
+  Production Casing Run Csg & Cement Rig up casing
+
+With retrieval (Chapter 9's hybrid system):
+  Trip out of hole with BHA #18. Stop at 5,800' and circulate to cool
+  hole and tools.
+  Source: Report #37, 20:30-21:30
+```
+
+The first answer is fluent, plausible, and wrong — a pattern borrowed
+from a different report entirely. The second is close to word-for-word
+what report `#37` actually says, found by a real keyword-retrieval index
+built over the archive and handed to the fine-tuned model as grounding
+text before it answered. Nothing about report `#37` was in the training
+data; only the retrieval step was. **This book teaches you how to build
+the second system from the first.**
+
+That's the destination — and, just as importantly, this book doesn't
+stop at the win. Chapter 5 shows the same honest picture when the fix
+*isn't* in place yet: on the 16 examples it actually trained on — an
+open-book test, where it already saw the answer key — fine-tuning alone
+raised the model's score from `0/16` to `13/16`. But on report `#37`,
+which it never saw during training, that same fine-tuned model still
+scored `0/2` — the real test of whether it learned anything
+transferable, not just memorized what it was shown. Real, working code,
+and the real limitations that motivate the next chapter — not a happy
+path with the failures edited out.
+
+You build this working system one chapter at a time, starting from a
+general-purpose **open-weight** model (one you download and keep on your
+own machine, not borrowed access to someone else's), running your first
+**LoRA** fine-tune (a lightweight way to teach it your operation's own
+wording without retraining the whole model from scratch), then
+hardening and grounding that prototype — see the full eleven-artifact
+build list below.
 
 Every example uses real, publicly available Daily Drilling Reports from
 **Utah FORGE** — a Department of Energy-funded geothermal research well —
@@ -83,14 +118,17 @@ it directly. Here, the underlying problem is simpler: "Trip out of hole"
 — basic, everyday oilfield terminology — is treated like an English
 idiom the model has to guess at, because its general training data
 apparently didn't include enough real oilfield operational text to have
-learned it. A hosted, pay-per-use connection to someone else's model
-can't fix that either: you're given access to run the model, not the
-**weights** themselves — the actual, millions-of-numbers-deep "knowledge"
-stored inside it — so there's nothing to fine-tune (Chapter 1 covers this
-in more depth). There's also a data question a hosted assistant forces on
-you that a local model doesn't — every prompt, and every report excerpt
-you paste into it, leaves your machine, and real drilling and completions
-reports are usually confidential.
+learned it. A hosted chat assistant like this can't fix that either:
+you're given access to run the model, not the **weights** themselves —
+the actual, millions-of-numbers-deep "knowledge" stored inside it — so
+there's nothing to fine-tune yourself (some providers do sell hosted
+fine-tuning as a separate, metered product; this book's whole point is
+doing it yourself, locally, at no ongoing cost, with the weights in your
+own hands — Chapter 1 covers this in more depth). There's also a data
+question a hosted assistant forces on you that a local model doesn't —
+every prompt, and every report excerpt you paste into it, leaves your
+machine, and real drilling and completions reports are usually
+confidential.
 
 This book fixes both problems: it fine-tunes a small local model
 directly on your own reports, chapter by chapter (Chapter 5 onward). And
@@ -103,41 +141,22 @@ so the final answer comes back **grounded** (actually built from a real,
 cited report, not just a plausible guess) and traceable to the report it
 came from.
 
-### What You're Building
+## What You Will Build and Learn
 
-The box below is a **real, verified transcript from Chapter 9's own
-code** — not an illustration, and not something invented for this
-README. Report `#37` is the one report this book's fine-tuned model
-never saw during training (Chapter 2 held it out on purpose). Asked what
-happened on that report's `20:30–21:30` window:
+By the end of the book you will have built eleven real, working
+artifacts — not eleven topics you read about:
 
-```
-Without retrieval (fine-tuned model alone):
-  Production Casing Run Csg & Cement Rig up casing
-
-With retrieval (Chapter 9's hybrid system):
-  Trip out of hole with BHA #18. Stop at 5,800' and circulate to cool
-  hole and tools.
-  Source: Report #37, 20:30-21:30
-```
-
-The first answer is fluent, plausible, and wrong — a pattern borrowed
-from a different report entirely. The second is close to word-for-word
-what report `#37` actually says, found by a real keyword-retrieval index
-built over the archive and handed to the fine-tuned model as grounding
-text before it answered. Nothing about report `#37` was in the training
-data; only the retrieval step was.
-
-That's the destination — and, just as importantly, this book doesn't
-stop at the win. Chapter 5 shows the same honest picture when the fix
-*isn't* in place yet: on the 16 examples it actually trained on — an
-open-book test, where it already saw the answer key — fine-tuning alone
-raised the model's score from `0/16` to `13/16`. But on report `#37`,
-which it never saw during training, that same fine-tuned model still
-scored `0/2` — the real test of whether it learned anything
-transferable, not just memorized what it was shown. Real, working code,
-and the real limitations that motivate the next chapter — not a happy
-path with the failures edited out.
+- ✓ **Local model loading and inference script** — run a general-purpose local LLM and evaluate its out-of-the-box answers to drilling and completions questions
+- ✓ **Domain training-example builder** — turn raw drilling and completions reports into a training dataset
+- ✓ **Baseline prompting harness** — measure exactly, and reproducibly, what the base model gets wrong before you touch it
+- ✓ **First LoRA fine-tune** — a real, working parameter-efficient fine-tune, with an honest held-out generalization result
+- ✓ **Data quality gate** — catch bad training data before it ever reaches fine-tuning
+- ✓ **Checkpointed fine-tune at scale** — real experiment tracking and resumable checkpoints, no black-box trainer
+- ✓ **Hybrid fine-tuning + retrieval system** — grounded, citable answers, demonstrated above
+- ✓ **Faithfulness checker** — catches a real, fluent answer that cited the right report but was actually grounded in the wrong one
+- ✓ **Evaluation harness** — a real 8-example held-out set scored three ways, showing that a single metric can make real training progress look like nothing happened
+- ✓ **Model-version drift detector** — caught two of the book's own metrics disagreeing about whether a newer checkpoint is actually an improvement
+- ✓ **Continuous fine-tuning loop** — simulated new reports arriving, retrained on them, and let the drift detector catch a real regression before it would have shipped
 
 - Link to the [official source code repository](https://github.com/djimrastephane/llm-ft-drilling-completions-book)
 - License: code is [MIT](LICENSE); the book's text is [CC BY 4.0](LICENSE-CONTENT.md)
@@ -178,7 +197,7 @@ this book — worth telling apart before you start:
 |---|---|---|
 | Ten-report sample archive | `book/datasets/sample_training_set/`, committed in this repo | The main path through Chapters 1–5 |
 | 76-report full Utah FORGE archive | `book/datasets/full_training_set/`, committed in this repo | Scale exercises from Chapter 6 onward |
-| Companion app | `book/app/`, in this repo | Planned base-vs-fine-tuned UI — not implemented yet, see [`book/app/README.md`](book/app/README.md) |
+| Companion app | `book/app/`, in this repo | Four real, working pages (Model Playground, Before vs. After Evaluation, Dataset Explorer, Failure Analysis) — see **Companion App** below and [`book/app/README.md`](book/app/README.md) |
 | Companion project (`industrial-ddr-finetuning`) | A separate, private repository | Referenced for real numbers/technique in Part II; not required to follow the book |
 | Your own report archive | Not included — it's yours | The adaptation path after you finish the book |
 
@@ -212,6 +231,32 @@ below for the full breakdown through Chapter 9. You don't need to
 understand everything before you start — you need to run the first
 command. Everything else follows from there.
 
+## Who This Book Is For
+
+This book is written for drilling, completions, intervention, and
+production engineers — and for the digital oilfield professionals and
+energy data scientists who support them. You'll recognize the fit
+quickly: every chapter opens with one of four recurring engineers (Oumy,
+Mike, Sarah, Sean — you'll meet all four) asking the kind of question
+you'd actually ask before trusting a model with your own reports, then
+answers it with real code and a real result, not a hypothetical.
+
+If you've ever wanted a model that actually understands your rig-floor
+shorthand and your operator's reporting style — instead of a generic
+chatbot — this book is for you.
+
+## Who This Book Is Not For
+
+This book is probably not for you if:
+
+- you want a theoretical machine learning textbook
+- you want a mathematical treatment of transformers
+- you want to pretrain a foundation model from scratch
+- you already fine-tune production-scale LLMs professionally
+
+None of that is a criticism — it just means your time is better spent
+elsewhere.
+
 ---
 
 # Your Learning Journey
@@ -239,49 +284,6 @@ Traceable, Evaluated, Continuously Updated Model
 
 By the last arrow, you're not reading about fine-tuning — you built a
 working system yourself, and you understand every piece of it.
-
-## What You Will Build and Learn
-
-By the end of the book you will have built eleven real, working
-artifacts — not eleven topics you read about:
-
-- ✓ **Local model loading and inference script** — run a general-purpose local LLM and evaluate its out-of-the-box answers to drilling and completions questions
-- ✓ **Domain training-example builder** — turn raw drilling and completions reports into a training dataset
-- ✓ **Baseline prompting harness** — measure exactly, and reproducibly, what the base model gets wrong before you touch it
-- ✓ **First LoRA fine-tune** — a real, working parameter-efficient fine-tune, with an honest held-out generalization result
-- ✓ **Data quality gate** — catch bad training data before it ever reaches fine-tuning
-- ✓ **Checkpointed fine-tune at scale** — real experiment tracking and resumable checkpoints, no black-box trainer
-- ✓ **Hybrid fine-tuning + retrieval system** — grounded, citable answers, demonstrated above
-- ✓ **Faithfulness checker** — catches a real, fluent answer that cited the right report but was actually grounded in the wrong one
-- ✓ **Evaluation harness** — a real 8-example held-out set scored three ways, showing that a single metric can make real training progress look like nothing happened
-- ✓ **Model-version drift detector** — caught two of the book's own metrics disagreeing about whether a newer checkpoint is actually an improvement
-- ✓ **Continuous fine-tuning loop** — simulated new reports arriving, retrained on them, and let the drift detector catch a real regression before it would have shipped
-
-## Who This Book Is For
-
-This book is written for drilling, completions, intervention, and
-production engineers — and for the digital oilfield professionals and
-energy data scientists who support them. You'll recognize the fit
-quickly: every chapter opens with one of four recurring engineers (Oumy,
-Mike, Sarah, Sean — you'll meet all four) asking the kind of question
-you'd actually ask before trusting a model with your own reports, then
-answers it with real code and a real result, not a hypothetical.
-
-If you've ever wanted a model that actually understands your rig-floor
-shorthand and your operator's reporting style — instead of a generic
-chatbot — this book is for you.
-
-## Who This Book Is Not For
-
-This book is probably not for you if:
-
-- you want a theoretical machine learning textbook
-- you want a mathematical treatment of transformers
-- you want to pretrain a foundation model from scratch
-- you already fine-tune production-scale LLMs professionally
-
-None of that is a criticism — it just means your time is better spent
-elsewhere.
 
 ## Reader Contract
 
@@ -528,25 +530,29 @@ comparison → reproduced evaluation results. Four pages are real and
 working, completing one coherent evidence chain — training data → model
 behavior → failures: a **Model Playground** that runs the same real
 prompt against the base model and a real fine-tuned checkpoint (with an
-optional retrieval-grounded third answer); a **Before vs. After
-Evaluation** page that runs the book's own real metrics live across the
-full held-out set for every checkpoint you've actually trained, not one
-cherry-picked example; a **Dataset Explorer** that browses the real
-training examples Chapter 2 and Chapter 7 actually build, filterable by
-report number, date, time window, and Chapter 6's real quality-gate
-flags, never by an invented domain/topic/difficulty label; and a
-**Failure Analysis** page that reruns Chapter 9/10's 4 real retrieval
-test cases live — including report #21, the book's headline case of a
-fluent, verified-faithful answer grounded in the wrong report — paired
-with what the book itself found, plus a live "shape, not judgment"
-detector across the held-out set. A "Fine-Tuning or RAG?" page remains
-planned, further out; an Experiment Explorer was considered and
-deliberately dropped, since Before vs. After Evaluation already has the
-necessary evidence once polished — this stays a three-question
-companion (What did we train on? What changed as we fine-tuned? Where
-and how does it fail?) rather than growing into a generic fine-tuning
-platform. Nothing here reimplements the pipeline or invents a metric
-that doesn't already exist in the book's own code — see
+optional retrieval-grounded third answer, screenshotted above); a
+**Before vs. After Evaluation** page that runs the book's own real
+metrics live across the full held-out set for every checkpoint you've
+actually trained, not one cherry-picked example; a **Dataset Explorer**
+that browses the real training examples Chapter 2 and Chapter 7
+actually build, filterable by report number, date, time window, and
+Chapter 6's real quality-gate flags, never by an invented
+domain/topic/difficulty label; and a **Failure Analysis** page that
+reruns Chapter 9/10's 4 real retrieval test cases live — including
+report #21, the book's headline case of a fluent, verified-faithful
+answer grounded in the wrong report — paired with what the book itself
+found, plus a live "shape, not judgment" detector across the held-out
+set.
+
+![Before vs. After Evaluation, screenshotted from a real local run: the book's own metrics computed live across the full held-out set for a real checkpoint, with base-vs-fine-tuned scores shown side by side.](book/figures/app_screenshot_evaluation.jpg)
+
+A "Fine-Tuning or RAG?" page remains planned, further out; an Experiment
+Explorer was considered and deliberately dropped, since Before vs. After
+Evaluation already has the necessary evidence once polished — this stays
+a three-question companion (What did we train on? What changed as we
+fine-tuned? Where and how does it fail?) rather than growing into a
+generic fine-tuning platform. Nothing here reimplements the pipeline or
+invents a metric that doesn't already exist in the book's own code — see
 [`book/app/README.md`](book/app/README.md) for exactly what it reuses
 and how to run it.
 

@@ -1,6 +1,6 @@
 # Companion App: Model Comparison Laboratory
 
-**Status: V1, V2, and V3 frozen** -- three real, working pages complete
+**Status: V1, V2, and V3 frozen** -- four real, working pages complete
 one coherent evidence chain: training data -> model behavior ->
 failures. None of V1/V2/V3 is revisited for new *pages*; the freeze is
 about scope (no Experiment Explorer, no generic fine-tuning platform),
@@ -8,9 +8,13 @@ not about polish -- V1's Before vs. After Evaluation was reworked after
 shipping, per real usability feedback, into the definitive
 model-evolution page described below.
 
-The app now answers three clear questions, an unusually coherent
-structure for a book companion:
+The app now answers three clear questions plus a landing-page
+comparison, an unusually coherent structure for a book companion:
 
+- **Model Playground (V1) — the landing page.** Runs the same real
+  prompt against the base model and a real fine-tuned checkpoint side
+  by side (with an optional retrieval-grounded third answer), the
+  same comparison quoted in this repo's root README.
 - **Dataset Explorer (V2) — "What did we train on?"** Browse the real
   training examples Chapter 2/7 actually build, with real Chapter 6
   quality-gate flags and provenance, not invented metadata.

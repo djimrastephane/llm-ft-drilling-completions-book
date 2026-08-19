@@ -12,6 +12,58 @@ highlights in narrative form.
 
 ## [Unreleased]
 
+### Changed
+
+- **Restructured the root README around a reader's first 20 seconds,
+  based on external review feedback.** The opening previously spent
+  most of its length on explanatory prose before reaching any concrete
+  proof the project works. Added a compact opening block right after
+  the title (one-sentence tagline, a "Read the book / Start Here /
+  Companion App" nav strip, a "13 chapters · 74 automated tests ·
+  Linux/macOS/Windows ✓" signal line, and the companion app's real
+  Model Playground screenshot) before the existing "What's fine-tuning"
+  grounding paragraph. Moved "What You're Building" (Chapter 9's real
+  retrieval transcript -- the strongest evidence in the README) and
+  "What You Will Build and Learn" (the eleven-artifact list) up to
+  follow immediately, ahead of the "Why Not Just Prompt a Cloud AI
+  Assistant?" essay, so a skimmer sees real proof before the longer
+  argument. Trimmed the second intro paragraph, which had become a
+  redundant preview of the artifact list two sections below, from 14
+  lines to 3 -- kept its `open-weight`/`LoRA` glosses in place, since
+  they're each term's only grounding before later bare reuse elsewhere
+  in the file. Narrowed an overclaim in "Why Not Just Prompt a Cloud AI
+  Assistant?" ("a hosted, pay-per-use connection... can't fix that
+  either", stated as if true of all hosted AI) to scope it to the
+  hosted chat assistants actually under discussion, and added a clause
+  acknowledging hosted fine-tuning products exist as a separate,
+  metered alternative to this book's local/free/full-control approach.
+  Added a second screenshot (Before vs. After Evaluation) to the
+  Companion App section, which was previously text-only despite
+  describing a real four-page working app. Kept the new-hire analogy
+  and the "every prompt... leaves your machine" phrasing as-is after
+  considering removing/softening both -- the analogy matches this
+  repo's own established plain-language style for a zero-programming-
+  background reader (the concrete Chapter 9 demo now placed right after
+  it demonstrates the stakes, but doesn't replace explaining the
+  underlying mechanism), and the suggested hedged replacement for
+  "leaves your machine" read like legal copy rather than the book's
+  established voice. All facts, numbers, and links verified unchanged
+  before and after the reorganization -- this was a structural pass,
+  not a content rewrite.
+- **Fixed a real contradiction about the companion app's status.** The
+  Project Map table said "Planned base-vs-fine-tuned UI -- not
+  implemented yet," while the Companion App section further down said
+  "Four pages are real and working" -- both describing the same
+  repository at the same time. Checked the actual app code
+  (`book/app/streamlit_app.py`, `pages/1_Before_After_Evaluation.py`,
+  `2_Dataset_Explorer.py`, `3_Failure_Analysis.py`) to settle it: there
+  really are four real, shipped pages (Model Playground shipped in V1,
+  per commit `745cb75`), so the Project Map row was the stale one --
+  corrected to match. `book/app/README.md`'s own "three real, working
+  pages" framing also undercounted by one (omitted Model Playground
+  from both the count and its bulleted page list) -- corrected there
+  too.
+
 ## [1.0.0] - 2026-08-19
 
 Part 0 and all 13 chapters written, tested, and passing CI on Linux,
