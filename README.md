@@ -16,7 +16,7 @@ Reports, honestly, including where it fails.
 13 chapters · 74 automated tests · Linux ✓ macOS ✓ Windows ✓ · real Utah
 FORGE report data, no synthetic stand-ins
 
-![Model Playground, screenshotted from a real local run: report #37's held-out question, answered live by both the base model and Chapter 5's first fine-tuned checkpoint, with the real exact-match and overlap scores for each.](book/figures/app_screenshot_playground.jpg)
+<img src="book/figures/app_screenshot_playground_readme.jpg" alt="Model Playground, screenshotted from a real local run: report #37's held-out question, answered live by both the base model and Chapter 5's first fine-tuned checkpoint, with the real exact-match and overlap scores for each." width="760">
 
 **What's fine-tuning, and why would you need it?** A general-purpose AI
 model already knows English, but it hasn't spent a career reading your
@@ -544,7 +544,7 @@ answer grounded in the wrong report — paired with what the book itself
 found, plus a live "shape, not judgment" detector across the held-out
 set.
 
-![Before vs. After Evaluation, screenshotted from a real local run: the book's own metrics computed live across the full held-out set for a real checkpoint, with base-vs-fine-tuned scores shown side by side.](book/figures/app_screenshot_evaluation.jpg)
+<img src="book/figures/app_screenshot_evaluation_readme.jpg" alt="Before vs. After Evaluation, screenshotted from a real local run: the book's own metrics computed live across the full held-out set for a real checkpoint, with base-vs-fine-tuned scores shown side by side." width="760">
 
 A "Fine-Tuning or RAG?" page remains planned, further out; an Experiment
 Explorer was considered and deliberately dropped, since Before vs. After

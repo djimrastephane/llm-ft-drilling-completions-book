@@ -14,6 +14,22 @@ highlights in narrative form.
 
 ### Changed
 
+- **The two companion-app screenshots in the root README were nearly
+  illegible -- fixed by cropping out dead space, not by resizing.**
+  Both `app_screenshot_playground.jpg` and `app_screenshot_evaluation.jpg`
+  are full-browser captures at 2352x1097, but the real Streamlit content
+  (sidebar + main panel) only fills the left ~48% of that frame; the
+  right half is empty background. Scaled down to README width, the
+  actual readable text was rendered at roughly half its potential size.
+  Cropped each into a new `*_readme.jpg` file that keeps the sidebar and
+  main content but removes the empty middle gap and the empty right
+  half (built by cropping sidebar and content separately, then
+  compositing them back together with a small gap, since a single
+  rectangular crop couldn't skip the empty band in between without also
+  cutting real content). Left the original two files untouched, since
+  both are also used as-is in `book/index.qmd` and
+  `book/chapters/chapter_13.qmd` for the actual book -- this was scoped
+  to the README specifically, not a change to the book's own figures.
 - **Restructured the root README around a reader's first 20 seconds,
   based on external review feedback.** The opening previously spent
   most of its length on explanatory prose before reaching any concrete
