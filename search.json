@@ -74,7 +74,7 @@
     "href": "index.html#companion-repository",
     "title": "Fine-Tuning Local LLM for Drilling & Completions",
     "section": "Companion repository",
-    "text": "Companion repository\nAll code, training data, and notebooks referenced in this book live in the companion repository. Every chapter lists exactly which files you need under Repository files.\nIf you’ve never installed Python or don’t know which editor to use, start with Part 0 — Preparing Your Local LLM Workshop: it works with any of five common setups (Jupyter Notebook, VS Code, PyCharm Community, Positron, or a terminal alone) and ends with your first script actually running. If you already have Python and a working setup, jump straight to Chapter 1.\nLet’s load our first local model.",
+    "text": "Companion repository\nAll code, training data, and notebooks referenced in this book live in the companion repository on GitHub. Every chapter lists exactly which files you need under Repository files.\nStuck on something — a setup error, a package that won’t install, a script that fails partway through? The Troubleshooting Guide in that same repository collects the errors readers hit most often, with the likely cause for each.\nIf you’ve never installed Python or don’t know which editor to use, start with Part 0 — Preparing Your Local LLM Workshop: it works with any of five common setups (Jupyter Notebook, VS Code, PyCharm Community, Positron, or a terminal alone) and ends with your first script actually running. If you already have Python and a working setup, jump straight to Chapter 1.\nLet’s load our first local model.",
     "crumbs": [
       "Welcome"
     ]

@@ -684,7 +684,7 @@ With retrieval:
 <section id="expected-output" class="level2" data-number="9.9">
 <h2 data-number="9.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">9.9</span> Expected Output</h2>
 <p>Every quality-gated report’s chunks, in one flat list — more than Chapter 7’s training set, because this one keeps the held-out report in.</p>
-<div id="981ea897" class="cell" data-execution_count="1">
+<div id="6db4fd95" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -744,7 +744,7 @@ With retrieval:
 <section id="expected-output-1" class="level2" data-number="9.14">
 <h2 data-number="9.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">9.14</span> Expected Output</h2>
 <p>The top-k chunks, ranked by BM25 score, each labeled with its source report and time window.</p>
-<div id="3bd85781" class="cell" data-execution_count="2">
+<div id="ce83ecd1" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rank_bm25 <span class="im">import</span> BM25Okapi</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -793,7 +793,7 @@ With retrieval:
 <section id="expected-output-2" class="level2" data-number="9.19">
 <h2 data-number="9.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">9.19</span> Expected Output</h2>
 <p>An answer, plus the specific report(s) and time window(s) it was grounded in.</p>
-<div id="284dd045" class="cell" data-execution_count="3">
+<div id="8670ce4f" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_grounded_prompt(instruction, input_context, retrieved_chunks):</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    sources <span class="op">=</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>.join(<span class="ss">f"[Report #</span><span class="sc">{</span>c[<span class="st">'report_num'</span>]<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>c[<span class="st">'from_time'</span>]<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span>c[<span class="st">'to_time'</span>]<span class="sc">}</span><span class="ss">]: </span><span class="sc">{</span>c[<span class="st">'text'</span>]<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> c <span class="kw">in</span> retrieved_chunks)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"</span><span class="sc">{</span>instruction<span class="sc">}</span><span class="ch">\n</span><span class="sc">{</span>input_context<span class="sc">}</span><span class="ch">\n\n</span><span class="ss">Relevant report excerpts:</span><span class="ch">\n</span><span class="sc">{</span>sources<span class="sc">}</span><span class="ss">"</span></span>

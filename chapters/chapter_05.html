@@ -709,7 +709,7 @@ Figure&nbsp;5.1: LoRA trains two small adapter tables. Their product creates a f
 <section id="expected-output" class="level2" data-number="5.9">
 <h2 data-number="5.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">5.9</span> Expected Output</h2>
 <p>Two tensors of matching shape: the full token sequence, and a labels tensor where the prompt portion is replaced with <code>-100</code> (PyTorch’s “ignore this position” marker for loss computation).</p>
-<div id="ad04532a" class="cell" data-execution_count="1">
+<div id="92d3b732" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_training_ids(tokenizer, example: <span class="bu">dict</span>) <span class="op">-&gt;</span> <span class="bu">tuple</span>[torch.Tensor, torch.Tensor]:</span>
@@ -763,7 +763,7 @@ Figure&nbsp;5.1: LoRA trains two small adapter tables. Their product creates a f
 <section id="expected-output-1" class="level2" data-number="5.14">
 <h2 data-number="5.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">5.14</span> Expected Output</h2>
 <p>A wrapped model, plus a printed count of how many parameters are actually trainable.</p>
-<div id="eec90124" class="cell" data-execution_count="2">
+<div id="5c9783b0" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> peft <span class="im">import</span> LoraConfig, TaskType, get_peft_model</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>LORA_CONFIG <span class="op">=</span> LoraConfig(</span>
@@ -807,7 +807,7 @@ Figure&nbsp;5.1: LoRA trains two small adapter tables. Their product creates a f
 <section id="expected-output-2" class="level2" data-number="5.19">
 <h2 data-number="5.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">5.19</span> Expected Output</h2>
 <p>A loss that falls across 20 epochs, then two before/after score comparisons.</p>
-<div id="371a8600" class="cell" data-execution_count="3">
+<div id="dbf39a27" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fine_tune(lora_model, tokenizer, examples: <span class="bu">list</span>[<span class="bu">dict</span>], num_epochs: <span class="bu">int</span> <span class="op">=</span> <span class="dv">20</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    lora_model.train()</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    optimizer <span class="op">=</span> torch.optim.AdamW(lora_model.parameters(), lr<span class="op">=</span><span class="fl">2e-4</span>)</span>
