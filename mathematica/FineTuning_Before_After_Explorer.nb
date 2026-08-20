@@ -4,7 +4,7 @@ Cell["Fine-Tuning Before/After Explorer", "Title"],
 
 Cell["Fine-Tuning Local LLM for Drilling & Completions -- companion notebook", "Subtitle"],
 
-Cell["This notebook lets you interactively explore real answers from this book's own base model and its Chapter 5 LoRA fine-tuned checkpoint, side by side, on the exact real questions and reports Chapter 5 itself uses. Nothing here is invented: every question, reference answer, and model answer below comes from mathematica/export_before_after.py, which reuses this book's own real functions (code/chapter_01, code/chapter_02, code/chapter_03) and the real trained adapter at book/checkpoints/chapter_05_lora. Re-running the export script regenerates this data fresh from a real local run -- it is not a fixed, hand-picked example set.", "Text"],
+Cell["This notebook uses real exported answers from this book's own base model and Chapter 5 LoRA fine-tuned checkpoint. Its job is not just to show that fine-tuning changed answers, but to make the real pattern visible: the model learned many seen training examples, still failed the held-out report, and therefore later chapters need evaluation and retrieval.", "Text"],
 
 Cell[CellGroupData[{
 
@@ -13,66 +13,287 @@ Cell["1. Load the real exported data", "Section"],
 Cell["data = Import[FileNameJoin[{NotebookDirectory[], \"data\", \"before_after_examples.json\"}], \"RawJSON\"];
 summary = data[\"summary\"];
 examplesList = data[\"examples\"];
-Length[examplesList]", "Input"]
+trainingExamples = Select[examplesList, #[\"group\"] === \"training\" &];
+heldOutExamples = Select[examplesList, #[\"group\"] === \"held_out\" &];
+Length[examplesList]", "Input"],
+
+Cell["Helper functions used by the visual sections below.", "Text"],
+
+Cell["ClearAll[groupLabel, statusCell, metricCard, tokenList, cleanToken, highlightedAnswer, shortAnswer, exampleLabel, questionIcon, recallValue, overlapValue];
+
+groupLabel[\"training\"] := \"Training / seen\";
+groupLabel[\"held_out\"] := \"Held-out / never seen\";
+groupLabel[g_] := g;
+
+questionIcon[\"Present Ops\"] := \"Ops\";
+questionIcon[\"Activity Planned\"] := \"Plan\";
+questionIcon[q_] := q;
+
+statusCell[matched_] := Framed[
+  Style[If[TrueQ[matched], \"MATCH\", \"MISS\"], Bold, 11, White],
+  Background -> If[TrueQ[matched], RGBColor[0.12, 0.55, 0.31], RGBColor[0.78, 0.20, 0.20]],
+  FrameStyle -> None,
+  RoundingRadius -> 4,
+  FrameMargins -> {{8, 8}, {3, 3}}
+];
+
+metricCard[label_, value_, note_, color_] := Framed[
+  Column[{Style[label, 11, GrayLevel[0.35]], Style[value, 26, Bold, color], Style[note, 10, GrayLevel[0.35]]}, Spacings -> .35],
+  Background -> RGBColor[0.97, 0.97, 0.95],
+  FrameStyle -> RGBColor[0.82, 0.82, 0.78],
+  FrameMargins -> 12,
+  RoundingRadius -> 6,
+  ImageSize -> 170
+];
+
+tokenList[text_] := ToLowerCase /@ StringCases[text, WordCharacter..];
+cleanToken[text_] := ToLowerCase @ StringJoin @ StringCases[text, WordCharacter..];
+
+highlightedAnswer[answer_, expected_] := Module[
+  {expectedTokens = DeleteDuplicates[tokenList[expected]], parts},
+  parts = StringCases[answer, WhitespaceCharacter .. | Except[WhitespaceCharacter] ..];
+  Pane[
+    Row[
+      If[MemberQ[expectedTokens, cleanToken[#]] && cleanToken[#] =!= \"\",
+        Style[#, Bold, RGBColor[0.05, 0.45, 0.22], Background -> RGBColor[0.88, 0.97, 0.90]],
+        #
+      ] & /@ parts
+    ],
+    {560, Automatic}
+  ]
+];
+
+shortAnswer[text_, n_: 95] := If[StringLength[text] <= n, text, StringTake[text, n] <> \"...\"];
+recallValue[ex_, model_] := ex[model <> \"_metrics\"][\"expected_token_recall\"];
+overlapValue[ex_, model_] := ex[model <> \"_metrics\"][\"jaccard_overlap\"];
+
+exampleLabel[ex_] := \"Report #\" <> ex[\"report_number\"] <> \" | \" <> ex[\"question_type\"] <> \" | \" <> groupLabel[ex[\"group\"]];", "Input"]
 
 }, Open]],
 
 Cell[CellGroupData[{
 
-Cell["2. Real exact-match counts, before vs after fine-tuning", "Section"],
+Cell["2. Executive view: what changed?", "Section"],
 
-Cell["This reproduces the book's own headline Chapter 5 result -- 0/16 to 13/16 on the examples it trained on, 0/2 to 0/2 on a report it never saw -- computed fresh from the exported data, not hardcoded.", "Text"],
+Cell["The headline is intentionally split into seen training questions and a never-seen held-out report. This is the key distinction: fine-tuning improved recall on examples like the ones it studied, but it did not create a grounded memory of the held-out report.", "Text"],
+
+Cell["Grid[
+  {{
+    metricCard[\"Training before\", ToString[summary[\"training_before\"]] <> \"/\" <> ToString[summary[\"training_total\"]], \"base model exact matches\", RGBColor[0.75, 0.18, 0.18]],
+    metricCard[\"Training after\", ToString[summary[\"training_after\"]] <> \"/\" <> ToString[summary[\"training_total\"]], \"fine-tuned exact matches\", RGBColor[0.08, 0.47, 0.25]],
+    metricCard[\"Held-out before\", ToString[summary[\"held_out_before\"]] <> \"/\" <> ToString[summary[\"held_out_total\"]], \"never seen by training\", RGBColor[0.75, 0.18, 0.18]],
+    metricCard[\"Held-out after\", ToString[summary[\"held_out_after\"]] <> \"/\" <> ToString[summary[\"held_out_total\"]], \"still no exact matches\", RGBColor[0.75, 0.18, 0.18]]
+  }},
+  Spacings -> {1.2, 1}
+]", "Input"],
 
 Cell["BarChart[
- {
-  {summary[\"training_before\"], summary[\"training_after\"]},
-  {summary[\"held_out_before\"], summary[\"held_out_after\"]}
- },
- ChartLabels -> {\"Training (seen in fine-tuning)\", \"Held-out (never seen)\"},
- ChartLegends -> {\"Before fine-tuning\", \"After fine-tuning\"},
- PlotLabel -> \"Real exact-match counts -- Chapter 5 LoRA fine-tune\",
- AxesLabel -> {None, \"Correct answers\"},
- ImageSize -> 520
+  {
+    {summary[\"training_before\"], summary[\"training_after\"]},
+    {summary[\"held_out_before\"], summary[\"held_out_after\"]}
+  },
+  ChartLabels -> {Placed[{\"Before\", \"After\"}, Below], Placed[{\"Training / seen\", \"Held-out / never seen\"}, Above]},
+  ChartStyle -> {RGBColor[0.82, 0.28, 0.23], RGBColor[0.14, 0.58, 0.35]},
+  PlotLabel -> \"Exact-match counts: fine-tuning helps seen examples, not held-out facts\",
+  AxesLabel -> {None, \"Correct answers\"},
+  ImageSize -> 620,
+  PlotRange -> {0, summary[\"training_total\"]}
 ]", "Input"]
 
 }, Open]],
 
 Cell[CellGroupData[{
 
-Cell["3. Explore individual real questions and answers", "Section"],
+Cell["3. Outcome map: all questions at once", "Section"],
 
-Cell["Pick any real question below (16 it trained on, 2 it never saw) and compare the base model's answer against the fine-tuned model's answer, side by side, against the real report excerpt the reference answer actually comes from -- so you can physically read the source and confirm the answer is really there, not just take the reference value's word for it.", "Text"],
+Cell["This compact map makes the pattern visible without clicking through examples one by one. Green means the answer exactly contained the reference wording. The recall columns show partial word overlap with the real answer, which helps separate total misses from near misses.", "Text"],
 
-Cell["shortInstruction[instr_] := If[StringContainsQ[instr, \"present operations\", IgnoreCase -> True], \"Present Ops\", \"Activity Planned\"]
-labelFor[ex_] := (If[ex[\"group\"] === \"training\", \"[Training] \", \"[Held-out] \"] <> shortInstruction[ex[\"instruction\"]] <> \" -- \" <> ex[\"report_context\"])
-optionsList = Table[i -> labelFor[examplesList[[i]]], {i, Length[examplesList]}];
+Cell["Grid[
+  Prepend[
+    Table[
+      {
+        Style[\"#\" <> ToString[i], GrayLevel[0.35]],
+        Style[groupLabel[examplesList[[i]][\"group\"]], 11],
+        \"Report #\" <> examplesList[[i]][\"report_number\"],
+        questionIcon[examplesList[[i]][\"question_type\"]],
+        statusCell[examplesList[[i]][\"base_matched\"]],
+        statusCell[examplesList[[i]][\"finetuned_matched\"]],
+        NumberForm[recallValue[examplesList[[i]], \"base\"], {3, 2}],
+        NumberForm[recallValue[examplesList[[i]], \"finetuned\"], {3, 2}],
+        Style[examplesList[[i]][\"failure_category\"], 10, GrayLevel[0.25]]
+      },
+      {i, Length[examplesList]}
+    ],
+    {Style[\"Row\", Bold], Style[\"Set\", Bold], Style[\"Report\", Bold], Style[\"Question\", Bold], Style[\"Before\", Bold], Style[\"After\", Bold], Style[\"Before recall\", Bold], Style[\"After recall\", Bold], Style[\"Reading\", Bold]}
+  ],
+  Alignment -> Left,
+  Dividers -> {None, {True, True}},
+  Spacings -> {1.2, .7},
+  Background -> {None, {RGBColor[0.92, 0.92, 0.88], None}}
+]", "Input"],
+
+Cell["ListPlot[
+  {
+    Table[{i, recallValue[examplesList[[i]], \"base\"]}, {i, Length[examplesList]}],
+    Table[{i, recallValue[examplesList[[i]], \"finetuned\"]}, {i, Length[examplesList]}]
+  },
+  PlotLegends -> {\"Before fine-tuning\", \"After fine-tuning\"},
+  PlotStyle -> {RGBColor[0.82, 0.28, 0.23], RGBColor[0.14, 0.58, 0.35]},
+  Filling -> Axis,
+  Frame -> True,
+  FrameLabel -> {\"Example number\", \"Expected-token recall\"},
+  PlotLabel -> \"Partial overlap exposes wins, misses, and memorized wrong patterns\",
+  ImageSize -> 640,
+  PlotRange -> {-0.05, 1.05},
+  Epilog -> {
+    Dashed, GrayLevel[0.5],
+    Line[{{Length[trainingExamples] + .5, -0.05}, {Length[trainingExamples] + .5, 1.05}}],
+    Text[Style[\"held-out\", 11, GrayLevel[0.35]], {Length[trainingExamples] + 1.3, .92}]
+  }
+]", "Input"]
+
+}, Open]],
+
+Cell[CellGroupData[{
+
+Cell["4. Answer microscope", "Section"],
+
+Cell["Pick any real question. Highlighted words are tokens that also appear in the reference answer. This turns the before/after comparison into something you can read visually: generic explanations, exact copied successes, and confident wrong template reuse look very different.", "Text"],
+
+Cell["optionsList = Table[i -> exampleLabel[examplesList[[i]]], {i, Length[examplesList]}];
+
 Manipulate[
- Module[{ex = examplesList[[i]]},
+  Module[{ex = examplesList[[i]]},
+    Column[{
+      Framed[
+        Grid[{
+          {Style[\"Question\", Bold, 13], ex[\"instruction\"]},
+          {Style[\"Context\", Bold, 13], ex[\"report_context\"]},
+          {Style[\"Set\", Bold, 13], groupLabel[ex[\"group\"]]},
+          {Style[\"Outcome\", Bold, 13], Row[{\"Before \", statusCell[ex[\"base_matched\"]], Spacer[12], \"After \", statusCell[ex[\"finetuned_matched\"]]}]}
+        }, Alignment -> Left, Spacings -> {1.2, .75}],
+        Background -> RGBColor[0.97, 0.97, 0.95],
+        FrameStyle -> RGBColor[0.82, 0.82, 0.78],
+        RoundingRadius -> 6,
+        FrameMargins -> 12
+      ],
+
+      Style[\"Source report excerpt\", Bold, 14],
+      Panel[Pane[Style[ex[\"snippet\"], FontFamily -> \"Courier\", FontSize -> 12], {680, 145}, Scrollbars -> True]],
+
+      Style[\"Reference answer\", Bold, 14],
+      Framed[Style[ex[\"expected\"], 13, RGBColor[0.1, 0.1, 0.1]], Background -> RGBColor[0.94, 0.96, 1.0], FrameStyle -> RGBColor[0.75, 0.80, 0.90], FrameMargins -> 10],
+
+      Grid[
+        {
+          {
+            Style[\"Base model before fine-tuning\", Bold, RGBColor[0.65, 0.12, 0.12]],
+            Style[\"Fine-tuned model after fine-tuning\", Bold, RGBColor[0.05, 0.40, 0.22]]
+          },
+          {
+            Panel[highlightedAnswer[ex[\"base_model_answer\"], ex[\"expected\"]], ImageSize -> 340],
+            Panel[highlightedAnswer[ex[\"finetuned_model_answer\"], ex[\"expected\"]], ImageSize -> 340]
+          },
+          {
+            Row[{\"Expected-token recall: \", NumberForm[recallValue[ex, \"base\"], {3, 2}], \" | Jaccard: \", NumberForm[overlapValue[ex, \"base\"], {3, 2}]}],
+            Row[{\"Expected-token recall: \", NumberForm[recallValue[ex, \"finetuned\"], {3, 2}], \" | Jaccard: \", NumberForm[overlapValue[ex, \"finetuned\"], {3, 2}]}]
+          }
+        },
+        Alignment -> Left,
+        Spacings -> {2, 1},
+        Dividers -> Center
+      ]
+    }, Spacings -> 1.2]
+  ],
+  {{i, 1, \"Pick a real question\"}, optionsList},
+  ControlPlacement -> Top
+]", "Input"]
+
+}, Open]],
+
+Cell[CellGroupData[{
+
+Cell["5. Failure patterns", "Section"],
+
+Cell["The failures after fine-tuning are the most important teaching examples. They show that the fine-tuned model can sound more domain-specific while still pulling the wrong remembered pattern into a new report context.", "Text"],
+
+Cell["failedAfter = Select[examplesList, ! TrueQ[#[\"finetuned_matched\"]] &];
+failureOptions = Table[i -> exampleLabel[failedAfter[[i]]] <> \" | \" <> failedAfter[[i]][\"failure_category\"], {i, Length[failedAfter]}];
+
+Manipulate[
+  Module[{ex = failedAfter[[i]]},
+    Column[{
+      Framed[
+        Column[{
+          Style[ex[\"failure_category\"], 16, Bold, RGBColor[0.65, 0.15, 0.12]],
+          Style[exampleLabel[ex], 12, GrayLevel[0.25]]
+        }],
+        Background -> RGBColor[1.0, 0.95, 0.92],
+        FrameStyle -> RGBColor[0.90, 0.68, 0.60],
+        FrameMargins -> 12,
+        RoundingRadius -> 6
+      ],
+      Grid[
+        {
+          {Style[\"Expected from report\", Bold], Panel[Pane[ex[\"expected\"], {620, Automatic}]]},
+          {Style[\"Fine-tuned answer\", Bold], Panel[Pane[highlightedAnswer[ex[\"finetuned_model_answer\"], ex[\"expected\"]], {620, Automatic}]]},
+          {Style[\"What to notice\", Bold], If[ex[\"group\"] === \"held_out\",
+              \"The model never saw this report during training. Fine-tuning alone did not give it factual access to the held-out report.\",
+              \"The answer is now domain-shaped, but it is the wrong report pattern. This is more convincing than the base model, and therefore more dangerous.\"
+            ]}
+        },
+        Alignment -> Left,
+        Spacings -> {1.2, 1}
+      ]
+    }, Spacings -> 1.2]
+  ],
+  {{i, 1, \"Post-fine-tune failure\"}, failureOptions},
+  ControlPlacement -> Top
+]", "Input"]
+
+}, Open]],
+
+Cell[CellGroupData[{
+
+Cell["6. Why retrieval comes next", "Section"],
+
+Cell["This Chapter 5 notebook deliberately stops at fine-tuning, but the visual result points toward Chapter 9: when the report was never in training, the model needs a retrieval step to find the relevant source text before answering.", "Text"],
+
+Cell["heldOutPanel = Framed[
   Column[{
-    Style[\"Question\", Bold, 14],
-    Panel[Column[{Style[ex[\"instruction\"], Bold], ex[\"report_context\"]}]],
-    Style[\"Source report excerpt (the report's own real text)\", Bold, 14],
-    Panel[Pane[Style[ex[\"snippet\"], FontFamily -> \"Courier\", FontSize -> 12],
-      {560, 150}, Scrollbars -> True]],
-    Style[\"Reference answer (extracted from the excerpt above)\", Bold, 14],
-    Panel[ex[\"expected\"]],
+    Style[\"Held-out report #37 remains unsolved by fine-tuning alone\", 15, Bold],
+    \"Fine-tuning changed the model's style and made many seen examples exact. It did not make unseen report facts available inside the weights.\",
+    \"Next visual extension: add a third answer lane for Fine-tuned + retrieval, with the retrieved source chunk shown beside the generated answer.\"
+  }, Spacings -> .8],
+  Background -> RGBColor[0.95, 0.97, 1.0],
+  FrameStyle -> RGBColor[0.70, 0.78, 0.90],
+  FrameMargins -> 14,
+  RoundingRadius -> 6
+];
+
+If[Length[heldOutExamples] > 0,
+  Column[{
+    heldOutPanel,
     Grid[
-     {
-      {Style[\"Base model -- before fine-tuning\", Bold, Darker[Red]],
-       Style[\"Fine-tuned model -- after fine-tuning\", Bold, Darker[Green]]},
-      {Panel[Style[ex[\"base_model_answer\"],
-         If[TrueQ[ex[\"base_matched\"]], Darker[Green], Darker[Red]]]],
-       Panel[Style[ex[\"finetuned_model_answer\"],
-         If[TrueQ[ex[\"finetuned_matched\"]], Darker[Green], Darker[Red]]]]},
-      {If[TrueQ[ex[\"base_matched\"]], \"matched the real answer\", \"did not match\"],
-       If[TrueQ[ex[\"finetuned_matched\"]], \"matched the real answer\", \"did not match\"]}
-     },
-     Alignment -> Left, Spacings -> {2, 1}, Dividers -> Center
+      Prepend[
+        Table[
+          {
+            \"Report #\" <> ex[\"report_number\"],
+            ex[\"question_type\"],
+            statusCell[ex[\"finetuned_matched\"]],
+            shortAnswer[ex[\"expected\"], 75],
+            shortAnswer[ex[\"finetuned_model_answer\"], 75]
+          },
+          {ex, heldOutExamples}
+        ],
+        {Style[\"Report\", Bold], Style[\"Question\", Bold], Style[\"Fine-tuned\", Bold], Style[\"Reference\", Bold], Style[\"Fine-tuned answer\", Bold]}
+      ],
+      Alignment -> Left,
+      Spacings -> {1.2, .8},
+      Dividers -> {None, {True, True}}
     ]
-   }]
- ],
- {{i, 1, \"Pick a real question\"}, optionsList},
- ControlPlacement -> Top
+  }, Spacings -> 1.2],
+  heldOutPanel
 ]", "Input"]
 
 }, Open]],

@@ -23,7 +23,7 @@ set.
 | File | What it is |
 |---|---|
 | `export_before_after.py` | Python script that generates the real before/after data (needs `book/.venv` and a real Chapter 5 checkpoint) |
-| `data/before_after_examples.json` | The exported data — 16 real training examples + 2 real held-out examples, each with the question, the report's real reference answer, the actual report excerpt that answer comes from (so you can visually confirm it's really there), the base model's real answer, and the fine-tuned model's real answer |
+| `data/before_after_examples.json` | The exported data — 16 real training examples + 2 real held-out examples, each with the question, the report's real reference answer, source excerpt, model answers, exact-match flags, report metadata, token-overlap metrics, and failure category |
 | `FineTuning_Before_After_Explorer.nb` | The notebook itself |
 
 ## Prerequisites
@@ -49,10 +49,19 @@ a paid license to try.
    front end.
 2. Evaluate the notebook top to bottom (`Shift+Enter` on each input
    cell, or **Evaluate Notebook** from the Evaluation menu).
-3. Use the dropdown in Section 3 to step through all 18 real questions
-   — 16 the model trained on, 2 it never saw — and compare the base
+3. Start with the executive view and outcome map to see the whole
+   before/after pattern at once: fine-tuning moves the seen training
+   examples from `0/16` to `13/16`, while the held-out report remains
+   `0/2`.
+4. Use the answer microscope to step through all 18 real questions —
+   16 the model trained on, 2 it never saw — and compare the base
    model's answer, the fine-tuned model's answer, and the report's
-   actual reference text side by side.
+   actual reference text side by side. Shared words are highlighted so
+   exact successes, partial overlaps, and convincing wrong answers are
+   easier to see.
+5. Use the failure-pattern view to focus only on the examples that
+   still fail after fine-tuning. These are the most useful teaching
+   cases because they show why evaluation and retrieval matter.
 
 The notebook loads `data/before_after_examples.json` using
 `NotebookDirectory[]`, so it works regardless of where you've cloned
@@ -77,20 +86,20 @@ python mathematica/export_before_after.py
 ## Scope
 
 This notebook covers Chapter 5's fine-tuning effect specifically — the
-book's first, simplest before/after comparison. It doesn't cover
-retrieval (Chapter 9), traceability (Chapter 10), the full evaluation
-harness (Chapter 11), or drift detection (Chapter 12); those stay in
-the book and the Streamlit companion app.
+book's first, simplest before/after comparison. It now includes a short
+"why retrieval comes next" view, but it still does not run Chapter 9
+retrieval, Chapter 10 traceability, the full Chapter 11 evaluation
+harness, or Chapter 12 drift detection; those stay in the book and the
+Streamlit companion app.
 
 ## A note on verification
 
 This notebook's Wolfram Language code was written from language
 knowledge rather than executed against a live Wolfram kernel — no
-kernel was available in the environment it was built in. The Python
-export script *was* actually run, and `data/before_after_examples.json`
-reflects a real local run against this repository's real checkpoint
-(reproducing the book's own `13/16` trained / `0/2` held-out result
-exactly). The notebook itself has since been opened and evaluated
-successfully in a real Wolfram front end by the author. If you still
-hit an issue opening or evaluating it, please open one in the
-companion repository.
+configured kernel was available in the environment where this version
+was edited. The Python export script *was* syntax-checked, and
+`data/before_after_examples.json` reflects a real local run against
+this repository's real checkpoint (reproducing the book's own `13/16`
+trained / `0/2` held-out result exactly). If you hit an issue opening
+or evaluating the notebook, please open one in the companion
+repository.

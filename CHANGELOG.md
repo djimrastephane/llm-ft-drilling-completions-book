@@ -121,6 +121,25 @@ highlights in narrative form.
   `"report_context"`, re-run for real, and the notebook's Question panel
   and dropdown labels show the actual question alongside the report it's
   about.
+- **Author-authored expansion of the Mathematica notebook** into six
+  sections: an executive view (metric cards + a grouped bar chart), a
+  compact outcome map of all 18 real examples (match/miss status,
+  before/after expected-token recall, a scatter plot with a dashed
+  divider marking the held-out boundary), an "answer microscope" that
+  highlights words shared with the reference answer inline, a
+  failure-patterns view isolating the examples still wrong after
+  fine-tuning, and a closing panel previewing why Chapter 9's retrieval
+  step matters. `export_before_after.py` grew matching token-overlap
+  metrics (Jaccard, expected-token recall) and failure categorization.
+  Verified: the regenerated data file is genuinely in sync with the
+  current script (matching timestamps, real varied metric values, same
+  headline `13/16` / `0/2` result), the Python compiles cleanly, and the
+  notebook's brackets/braces/quotes are balanced -- no live Wolfram
+  kernel was available to re-verify execution of this expanded version
+  specifically. Also fixed: `mathematica/__pycache__/` had no
+  `.gitignore` coverage at the repo root (only `book/.gitignore`'s
+  Python rules existed, scoped to `book/`) -- added a Python section to
+  the root `.gitignore`.
 
 ### Changed
 

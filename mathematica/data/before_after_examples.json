@@ -19,7 +19,25 @@
       "base_model_answer": "The report you've provided appears to be for a well called \"FORGE 16A [78]-32\" and it is dated October 22, 2020. The specific details of what operations were reported are not explicitly stated in your message. However, based",
       "base_matched": false,
       "finetuned_model_answer": "RIGGING UP WITH FRONTIER CREWS AND SUPERVISION AND JW JONES TRUCKING",
-      "finetuned_matched": true
+      "finetuned_matched": true,
+      "report_number": "3",
+      "report_date": "2020-10-22",
+      "question_type": "Present Ops",
+      "base_metrics": {
+        "answer_token_count": 40,
+        "expected_token_count": 11,
+        "shared_token_count": 1,
+        "jaccard_overlap": 0.020833333333333332,
+        "expected_token_recall": 0.1
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 11,
+        "expected_token_count": 11,
+        "shared_token_count": 10,
+        "jaccard_overlap": 1.0,
+        "expected_token_recall": 1.0
+      },
+      "failure_category": "Exact match after fine-tuning"
     },
     {
       "group": "training",
@@ -30,7 +48,25 @@
       "base_model_answer": "The text you provided appears to be part of an email or communication about a project called \"FORGE 16A\" and it mentions a report with the number \"#3\". However, without more context about what this refers to specifically (such as its purpose or details), I can't provide any",
       "base_matched": false,
       "finetuned_model_answer": "CONTINUE BUILDING CURVE TO 65\u00b0",
-      "finetuned_matched": false
+      "finetuned_matched": false,
+      "report_number": "3",
+      "report_date": "2020-10-22",
+      "question_type": "Activity Planned",
+      "base_metrics": {
+        "answer_token_count": 49,
+        "expected_token_count": 12,
+        "shared_token_count": 2,
+        "jaccard_overlap": 0.03773584905660377,
+        "expected_token_recall": 0.18181818181818182
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 5,
+        "expected_token_count": 12,
+        "shared_token_count": 1,
+        "jaccard_overlap": 0.06666666666666667,
+        "expected_token_recall": 0.09090909090909091
+      },
+      "failure_category": "Partial wording overlap, wrong answer"
     },
     {
       "group": "training",
@@ -41,7 +77,25 @@
       "base_model_answer": "The report you've provided appears to be for a well called \"FORGE 16A [78]-32\" and it is dated November 7, 2020. The specific details of what was reported in this well operation are not explicitly stated in your message. However",
       "base_matched": false,
       "finetuned_model_answer": "Drilling Ahead 4552",
-      "finetuned_matched": true
+      "finetuned_matched": true,
+      "report_number": "19",
+      "report_date": "2020-11-07",
+      "question_type": "Present Ops",
+      "base_metrics": {
+        "answer_token_count": 42,
+        "expected_token_count": 3,
+        "shared_token_count": 0,
+        "jaccard_overlap": 0.0,
+        "expected_token_recall": 0.0
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 3,
+        "expected_token_count": 3,
+        "shared_token_count": 3,
+        "jaccard_overlap": 1.0,
+        "expected_token_recall": 1.0
+      },
+      "failure_category": "Exact match after fine-tuning"
     },
     {
       "group": "training",
@@ -52,7 +106,25 @@
       "base_model_answer": "The text you provided appears to be from an online forum or discussion board where someone has posted their progress on a project called \"FORGE 16A.\" The post indicates that the person has completed Report #19 for the date of November 7, 2020.\n\nWithout more",
       "base_matched": false,
       "finetuned_model_answer": "Trip out of hole, Trip back in hole start drilling",
-      "finetuned_matched": true
+      "finetuned_matched": true,
+      "report_number": "19",
+      "report_date": "2020-11-07",
+      "question_type": "Activity Planned",
+      "base_metrics": {
+        "answer_token_count": 45,
+        "expected_token_count": 10,
+        "shared_token_count": 1,
+        "jaccard_overlap": 0.020833333333333332,
+        "expected_token_recall": 0.125
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 10,
+        "expected_token_count": 10,
+        "shared_token_count": 8,
+        "jaccard_overlap": 1.0,
+        "expected_token_recall": 1.0
+      },
+      "failure_category": "Exact match after fine-tuning"
     },
     {
       "group": "training",
@@ -63,7 +135,25 @@
       "base_model_answer": "The report you've provided appears to be for a well called \"FORGE 16A [78]-32\" and it is dated November 24, 2020. The specific details of what operations were reported on this well are not explicitly stated in your message.",
       "base_matched": false,
       "finetuned_model_answer": "PIPE FREE, TRIP OUT OF HOLE FOR BHA INSPECTION",
-      "finetuned_matched": false
+      "finetuned_matched": false,
+      "report_number": "36",
+      "report_date": "2020-11-24",
+      "question_type": "Present Ops",
+      "base_metrics": {
+        "answer_token_count": 41,
+        "expected_token_count": 19,
+        "shared_token_count": 0,
+        "jaccard_overlap": 0.0,
+        "expected_token_recall": 0.0
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 9,
+        "expected_token_count": 19,
+        "shared_token_count": 0,
+        "jaccard_overlap": 0.0,
+        "expected_token_recall": 0.0
+      },
+      "failure_category": "Wrong memorized pattern"
     },
     {
       "group": "training",
@@ -74,7 +164,25 @@
       "base_model_answer": "The text you provided appears to be from an online forum or discussion board where someone has posted their progress on a project called \"Forge 16A\" with the report number 36 and the date of November 24, 2020. Without more context about what Forge ",
       "base_matched": false,
       "finetuned_model_answer": "CONTINUE BUILDING CURVE TO 65\u00b0",
-      "finetuned_matched": true
+      "finetuned_matched": true,
+      "report_number": "36",
+      "report_date": "2020-11-24",
+      "question_type": "Activity Planned",
+      "base_metrics": {
+        "answer_token_count": 44,
+        "expected_token_count": 5,
+        "shared_token_count": 1,
+        "jaccard_overlap": 0.022222222222222223,
+        "expected_token_recall": 0.2
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 5,
+        "expected_token_count": 5,
+        "shared_token_count": 5,
+        "jaccard_overlap": 1.0,
+        "expected_token_recall": 1.0
+      },
+      "failure_category": "Exact match after fine-tuning"
     },
     {
       "group": "training",
@@ -85,7 +193,25 @@
       "base_model_answer": "The report you've provided appears to be for a well called \"FORGE 16A [78]-32\" and it is dated November 26, 2020. The specific details of what operations were reported are not explicitly stated in your message. However, based",
       "base_matched": false,
       "finetuned_model_answer": "PIPE FREE, TRIP OUT OF HOLE FOR BHA INSPECTION",
-      "finetuned_matched": true
+      "finetuned_matched": true,
+      "report_number": "38",
+      "report_date": "2020-11-26",
+      "question_type": "Present Ops",
+      "base_metrics": {
+        "answer_token_count": 40,
+        "expected_token_count": 9,
+        "shared_token_count": 2,
+        "jaccard_overlap": 0.043478260869565216,
+        "expected_token_recall": 0.2222222222222222
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 9,
+        "expected_token_count": 9,
+        "shared_token_count": 9,
+        "jaccard_overlap": 1.0,
+        "expected_token_recall": 1.0
+      },
+      "failure_category": "Exact match after fine-tuning"
     },
     {
       "group": "training",
@@ -96,7 +222,25 @@
       "base_model_answer": "The text you provided appears to be from an online forum or discussion board where someone has posted their progress on a project called \"Forge 16A\" with the report number #38 and the date of November 26, 2020. Without more context about what Forge ",
       "base_matched": false,
       "finetuned_model_answer": "INSPECT BHA, TRIP IN HOLE DRILL CURVE",
-      "finetuned_matched": true
+      "finetuned_matched": true,
+      "report_number": "38",
+      "report_date": "2020-11-26",
+      "question_type": "Activity Planned",
+      "base_metrics": {
+        "answer_token_count": 44,
+        "expected_token_count": 7,
+        "shared_token_count": 0,
+        "jaccard_overlap": 0.0,
+        "expected_token_recall": 0.0
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 7,
+        "expected_token_count": 7,
+        "shared_token_count": 7,
+        "jaccard_overlap": 1.0,
+        "expected_token_recall": 1.0
+      },
+      "failure_category": "Exact match after fine-tuning"
     },
     {
       "group": "training",
@@ -107,7 +251,25 @@
       "base_model_answer": "The report you've provided appears to be for a well called \"FORGE 16A [78]-32\" and it is dated November 27, 2020. The specific details of what operations were reported are not explicitly stated in your message. However, based",
       "base_matched": false,
       "finetuned_model_answer": "Drilling Curve",
-      "finetuned_matched": true
+      "finetuned_matched": true,
+      "report_number": "39",
+      "report_date": "2020-11-27",
+      "question_type": "Present Ops",
+      "base_metrics": {
+        "answer_token_count": 40,
+        "expected_token_count": 2,
+        "shared_token_count": 0,
+        "jaccard_overlap": 0.0,
+        "expected_token_recall": 0.0
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 2,
+        "expected_token_count": 2,
+        "shared_token_count": 2,
+        "jaccard_overlap": 1.0,
+        "expected_token_recall": 1.0
+      },
+      "failure_category": "Exact match after fine-tuning"
     },
     {
       "group": "training",
@@ -118,7 +280,25 @@
       "base_model_answer": "The text you provided appears to be from an online forum or discussion board where someone has posted their progress on a project called \"Forge 16A\" with the report number #39 and the date of November 27, 2020. Without more context about what Forge ",
       "base_matched": false,
       "finetuned_model_answer": "Drill Curve.",
-      "finetuned_matched": true
+      "finetuned_matched": true,
+      "report_number": "39",
+      "report_date": "2020-11-27",
+      "question_type": "Activity Planned",
+      "base_metrics": {
+        "answer_token_count": 44,
+        "expected_token_count": 2,
+        "shared_token_count": 0,
+        "jaccard_overlap": 0.0,
+        "expected_token_recall": 0.0
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 2,
+        "expected_token_count": 2,
+        "shared_token_count": 2,
+        "jaccard_overlap": 1.0,
+        "expected_token_recall": 1.0
+      },
+      "failure_category": "Exact match after fine-tuning"
     },
     {
       "group": "training",
@@ -129,7 +309,25 @@
       "base_model_answer": "The report you've provided appears to be for a well called \"FORGE 16A [78]-32\" and it is dated December 6, 2020. The report number is 48. However, without more context or specific details from the report itself",
       "base_matched": false,
       "finetuned_model_answer": "CIRCULATE FOR TEMPERATURE",
-      "finetuned_matched": false
+      "finetuned_matched": false,
+      "report_number": "48",
+      "report_date": "2020-12-06",
+      "question_type": "Present Ops",
+      "base_metrics": {
+        "answer_token_count": 39,
+        "expected_token_count": 5,
+        "shared_token_count": 0,
+        "jaccard_overlap": 0.0,
+        "expected_token_recall": 0.0
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 3,
+        "expected_token_count": 5,
+        "shared_token_count": 0,
+        "jaccard_overlap": 0.0,
+        "expected_token_recall": 0.0
+      },
+      "failure_category": "Wrong memorized pattern"
     },
     {
       "group": "training",
@@ -140,7 +338,25 @@
       "base_model_answer": "The text you provided appears to be from an online forum or discussion board where someone has posted their progress on a project called \"FORGE 16A\" with the report number #48 and the date of December 6, 2020. Without more context about what this refers",
       "base_matched": false,
       "finetuned_model_answer": "PICK UP PACKER, TRIP IN HOLE, SET PACKER, PERFORM XLOT,",
-      "finetuned_matched": true
+      "finetuned_matched": true,
+      "report_number": "48",
+      "report_date": "2020-12-06",
+      "question_type": "Activity Planned",
+      "base_metrics": {
+        "answer_token_count": 45,
+        "expected_token_count": 10,
+        "shared_token_count": 0,
+        "jaccard_overlap": 0.0,
+        "expected_token_recall": 0.0
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 10,
+        "expected_token_count": 10,
+        "shared_token_count": 9,
+        "jaccard_overlap": 1.0,
+        "expected_token_recall": 1.0
+      },
+      "failure_category": "Exact match after fine-tuning"
     },
     {
       "group": "training",
@@ -151,7 +367,25 @@
       "base_model_answer": "The report you've provided appears to be for a well called \"FORGE 16A [78]-32\" and it is dated December 7, 2020. The report number is 49. However, without more context or specific details from the report itself",
       "base_matched": false,
       "finetuned_model_answer": "CIRCULATE FOR TEMPERATURE",
-      "finetuned_matched": true
+      "finetuned_matched": true,
+      "report_number": "49",
+      "report_date": "2020-12-07",
+      "question_type": "Present Ops",
+      "base_metrics": {
+        "answer_token_count": 39,
+        "expected_token_count": 3,
+        "shared_token_count": 1,
+        "jaccard_overlap": 0.027777777777777776,
+        "expected_token_recall": 0.3333333333333333
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 3,
+        "expected_token_count": 3,
+        "shared_token_count": 3,
+        "jaccard_overlap": 1.0,
+        "expected_token_recall": 1.0
+      },
+      "failure_category": "Exact match after fine-tuning"
     },
     {
       "group": "training",
@@ -162,7 +396,25 @@
       "base_model_answer": "The text you provided appears to be from an online forum or discussion board where someone has posted their progress on a project called \"FORGE 16A\" with the report number #49 and the date of December 7, 2020. Without more context about what this refers",
       "base_matched": false,
       "finetuned_model_answer": "FISHING OPERATIONS",
-      "finetuned_matched": true
+      "finetuned_matched": true,
+      "report_number": "49",
+      "report_date": "2020-12-07",
+      "question_type": "Activity Planned",
+      "base_metrics": {
+        "answer_token_count": 45,
+        "expected_token_count": 2,
+        "shared_token_count": 0,
+        "jaccard_overlap": 0.0,
+        "expected_token_recall": 0.0
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 2,
+        "expected_token_count": 2,
+        "shared_token_count": 2,
+        "jaccard_overlap": 1.0,
+        "expected_token_recall": 1.0
+      },
+      "failure_category": "Exact match after fine-tuning"
     },
     {
       "group": "training",
@@ -173,7 +425,25 @@
       "base_model_answer": "The report you've provided appears to be for a well called \"FORGE 16A [78]-32\" and it is dated December 8, 2020. The report number is 50. However, without more context or specific details from the report itself",
       "base_matched": false,
       "finetuned_model_answer": "TRIP IN HOLE WITH DIRECTIONAL BHA",
-      "finetuned_matched": true
+      "finetuned_matched": true,
+      "report_number": "50",
+      "report_date": "2020-12-08",
+      "question_type": "Present Ops",
+      "base_metrics": {
+        "answer_token_count": 39,
+        "expected_token_count": 6,
+        "shared_token_count": 0,
+        "jaccard_overlap": 0.0,
+        "expected_token_recall": 0.0
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 6,
+        "expected_token_count": 6,
+        "shared_token_count": 6,
+        "jaccard_overlap": 1.0,
+        "expected_token_recall": 1.0
+      },
+      "failure_category": "Exact match after fine-tuning"
     },
     {
       "group": "training",
@@ -184,7 +454,25 @@
       "base_model_answer": "The text you provided appears to be from an online forum or discussion board where someone has posted their progress on a project called \"FORGE 16A\" with the report number #50 and the date of December 8, 2020. Without more context about what this refers",
       "base_matched": false,
       "finetuned_model_answer": "CONTINUE TRIP IN HOLE, DRILL AHEAD",
-      "finetuned_matched": true
+      "finetuned_matched": true,
+      "report_number": "50",
+      "report_date": "2020-12-08",
+      "question_type": "Activity Planned",
+      "base_metrics": {
+        "answer_token_count": 45,
+        "expected_token_count": 6,
+        "shared_token_count": 0,
+        "jaccard_overlap": 0.0,
+        "expected_token_recall": 0.0
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 6,
+        "expected_token_count": 6,
+        "shared_token_count": 6,
+        "jaccard_overlap": 1.0,
+        "expected_token_recall": 1.0
+      },
+      "failure_category": "Exact match after fine-tuning"
     },
     {
       "group": "held_out",
@@ -195,7 +483,25 @@
       "base_model_answer": "The report you've provided appears to be for a well called \"FORGE 16A [78]-32\" and it is dated November 25, 2020. The specific details of what operations were reported on this well are not explicitly stated in your message.",
       "base_matched": false,
       "finetuned_model_answer": "PIPE FREE, TRIP OUT OF HOLE FOR BHA INSPECTION",
-      "finetuned_matched": false
+      "finetuned_matched": false,
+      "report_number": "37",
+      "report_date": "2020-11-25",
+      "question_type": "Present Ops",
+      "base_metrics": {
+        "answer_token_count": 41,
+        "expected_token_count": 7,
+        "shared_token_count": 1,
+        "jaccard_overlap": 0.022222222222222223,
+        "expected_token_recall": 0.14285714285714285
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 9,
+        "expected_token_count": 7,
+        "shared_token_count": 0,
+        "jaccard_overlap": 0.0,
+        "expected_token_recall": 0.0
+      },
+      "failure_category": "Held-out generalization gap"
     },
     {
       "group": "held_out",
@@ -206,7 +512,25 @@
       "base_model_answer": "The text you provided appears to be from an online forum or discussion board where someone has posted their progress on a project called \"Forge 16A\" with the report number #37 and the date of November 25, 2020. Without more context about what Forge ",
       "base_matched": false,
       "finetuned_model_answer": "CONTINUE BUILDING CURVE TO 65\u00b0",
-      "finetuned_matched": false
+      "finetuned_matched": false,
+      "report_number": "37",
+      "report_date": "2020-11-25",
+      "question_type": "Activity Planned",
+      "base_metrics": {
+        "answer_token_count": 44,
+        "expected_token_count": 12,
+        "shared_token_count": 0,
+        "jaccard_overlap": 0.0,
+        "expected_token_recall": 0.0
+      },
+      "finetuned_metrics": {
+        "answer_token_count": 5,
+        "expected_token_count": 12,
+        "shared_token_count": 1,
+        "jaccard_overlap": 0.0625,
+        "expected_token_recall": 0.08333333333333333
+      },
+      "failure_category": "Held-out generalization gap"
     }
   ]
 }

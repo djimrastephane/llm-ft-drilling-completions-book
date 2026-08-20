@@ -46,6 +46,58 @@ ADAPTER_DIR = BOOK_ROOT / "checkpoints" / "chapter_05_lora"
 OUTPUT_PATH = Path(__file__).resolve().parent / "data" / "before_after_examples.json"
 
 
+def tokens(text: str) -> list[str]:
+    """Simple visible-token metric for notebook visuals.
+
+    Exact-match remains the book's authoritative Chapter 5 score; these
+    overlap-style values only help readers see partial movement.
+    """
+    return re.findall(r"[A-Za-z0-9]+", text.lower())
+
+
+def token_metrics(answer: str, expected: str) -> dict[str, float | int]:
+    answer_tokens = tokens(answer)
+    expected_tokens = tokens(expected)
+    answer_set = set(answer_tokens)
+    expected_set = set(expected_tokens)
+    shared = answer_set & expected_set
+    union = answer_set | expected_set
+    return {
+        "answer_token_count": len(answer_tokens),
+        "expected_token_count": len(expected_tokens),
+        "shared_token_count": len(shared),
+        "jaccard_overlap": len(shared) / len(union) if union else 0.0,
+        "expected_token_recall": len(shared) / len(expected_set) if expected_set else 0.0,
+    }
+
+
+def report_number(report_context: str) -> str:
+    match = re.search(r"Report\s+#(\d+)", report_context)
+    return match.group(1) if match else "?"
+
+
+def report_date(report_context: str) -> str:
+    match = re.search(r"Date:\s*([0-9-]+)", report_context)
+    return match.group(1) if match else ""
+
+
+def question_type(instruction: str) -> str:
+    if "present operations" in instruction.lower():
+        return "Present Ops"
+    return "Activity Planned"
+
+
+def failure_category(row: dict) -> str:
+    if row["finetuned_matched"]:
+        return "Exact match after fine-tuning"
+    if row["group"] == "held_out":
+        return "Held-out generalization gap"
+    metrics = row["finetuned_metrics"]
+    if metrics["expected_token_recall"] == 0:
+        return "Wrong memorized pattern"
+    return "Partial wording overlap, wrong answer"
+
+
 def report_snippet(text: str) -> str:
     """The real, contiguous block of the report's own first-page text
     spanning both fields this book turns into training examples --
@@ -105,6 +157,12 @@ def merge_finetuned(rows: list[dict], finetuned_results: list[dict]) -> None:
     for row, r in zip(rows, finetuned_results):
         row["finetuned_model_answer"] = r["base_model_answer"]
         row["finetuned_matched"] = r["matched_expected"]
+        row["report_number"] = report_number(row["report_context"])
+        row["report_date"] = report_date(row["report_context"])
+        row["question_type"] = question_type(row["instruction"])
+        row["base_metrics"] = token_metrics(row["base_model_answer"], row["expected"])
+        row["finetuned_metrics"] = token_metrics(row["finetuned_model_answer"], row["expected"])
+        row["failure_category"] = failure_category(row)
 
 
 def main() -> None:

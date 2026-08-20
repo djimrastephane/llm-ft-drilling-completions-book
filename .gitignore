@@ -1,1 +1,6 @@
 .DS_Store
+
+# Python (book/ has its own .gitignore for its own tree; this covers
+# top-level Python, e.g. mathematica/export_before_after.py)
+__pycache__/
+*.pyc
