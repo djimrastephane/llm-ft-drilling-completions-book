@@ -222,6 +222,14 @@ highlights in narrative form.
   already-cropped `*_readme.jpg` versions instead of generating new
   assets -- same files the README already uses, same fix, no new
   images needed.
+- **`book/README.md` was missing the Troubleshooting Guide link** that
+  the root README and `index.qmd` both already had. Checked for other
+  gaps left by this session's changes (roadmap diagram, screenshot
+  swap, acknowledgements rewrite) and found this was the only one --
+  `book/README.md` shares the same badge/intro structure as the root
+  README and is exactly where a reader browsing into `book/` on GitHub
+  lands, so it needed the same link. Added right under the badges,
+  matching the root README's placement.
 
 ## [1.0.0] - 2026-08-19
 

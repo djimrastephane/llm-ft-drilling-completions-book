@@ -5,6 +5,8 @@
 [![Code tests macOS](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/tests-macos.yml)
 [![Publish book to GitHub Pages](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml/badge.svg)](https://github.com/djimrastephane/llm-ft-drilling-completions-book/actions/workflows/publish.yml)
 
+[Troubleshooting Guide](../TROUBLESHOOTING.md)
+
 Companion source for the book of the same name — a hands-on,
 build-as-you-go guide that teaches drilling and completions engineers,
 assuming no prior programming experience, how to adapt a private, local
