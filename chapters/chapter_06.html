@@ -678,7 +678,7 @@ Report #70 (2020-12-28), present_operations: "CIRCULATE FOR TEMPERATURE"</code><
 <section id="expected-output" class="level2" data-number="6.9">
 <h2 data-number="6.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">6.9</span> Expected Output</h2>
 <p>A status (<code>ok</code> or <code>unrecognized_format</code>) attached to every report.</p>
-<div id="583fc7d1" class="cell" data-execution_count="1">
+<div id="dfe38169" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -739,7 +739,7 @@ Failed: ['FORGE-16A-78-32_Completion_003_2021-01-06.pdf']</code></pre>
 <section id="expected-output-1" class="level2" data-number="6.14">
 <h2 data-number="6.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">6.14</span> Expected Output</h2>
 <p>Every field value that appears on more than one report, with the report numbers involved.</p>
-<div id="c1ceabef" class="cell" data-execution_count="2">
+<div id="471c432c" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> defaultdict</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -790,7 +790,7 @@ Duplicate activity_planned values:
 <section id="expected-output-2" class="level2" data-number="6.19">
 <h2 data-number="6.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">6.19</span> Expected Output</h2>
 <p>Each duplicate group labeled <code>consecutive</code> or <code>needs_review</code>, plus a final summary.</p>
-<div id="d15ba21b" class="cell" data-execution_count="3">
+<div id="2eaf1f07" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> classify_duplicate(rpt_nums: <span class="bu">list</span>[<span class="bu">int</span>]) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    gaps <span class="op">=</span> [b <span class="op">-</span> a <span class="cf">for</span> a, b <span class="kw">in</span> <span class="bu">zip</span>(rpt_nums, rpt_nums[<span class="dv">1</span>:])]</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"consecutive"</span> <span class="cf">if</span> <span class="bu">all</span>(gap <span class="op">==</span> <span class="dv">1</span> <span class="cf">for</span> gap <span class="kw">in</span> gaps) <span class="cf">else</span> <span class="st">"needs_review"</span></span>
