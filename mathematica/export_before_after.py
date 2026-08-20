@@ -18,6 +18,7 @@ Usage:
 """
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -34,26 +35,64 @@ from peft import PeftModel  # noqa: E402
 
 from baseline_prompting import run_baseline  # noqa: E402
 from build_training_examples import (  # noqa: E402
+    FIELD_PATTERNS,
     HELD_OUT_REPORT,
     SAMPLE_SET_DIR,
     build_examples_for_report,
-    build_training_examples,
+    extract_text,
 )
 
 ADAPTER_DIR = BOOK_ROOT / "checkpoints" / "chapter_05_lora"
 OUTPUT_PATH = Path(__file__).resolve().parent / "data" / "before_after_examples.json"
 
 
-def to_notebook_rows(results: list[dict], group: str) -> list[dict]:
+def report_snippet(text: str) -> str:
+    """The real, contiguous block of the report's own first-page text
+    spanning both fields this book turns into training examples --
+    lets a reader visually confirm each expected answer is actually
+    there in context, not just an isolated extracted value.
+    """
+    present_match = re.search(FIELD_PATTERNS["present_operations"], text)
+    activity_match = re.search(FIELD_PATTERNS["activity_planned"], text)
+    if not (present_match and activity_match):
+        return text.strip()
+    return text[present_match.start() : activity_match.end()].strip()
+
+
+def build_examples_with_snippets(sample_dir: Path, exclude: str | None = None) -> list[dict]:
+    """Same real report-by-report loop as build_training_examples() (sorted
+    glob, skip an unrecognized field layout, skip `exclude` if given), but
+    also attaches each report's real source snippet to its examples.
+    """
+    examples = []
+    for pdf_path in sorted(sample_dir.glob("*.pdf")):
+        if exclude and pdf_path.name == exclude:
+            continue
+        report_examples = build_examples_for_report(pdf_path)
+        if not report_examples:
+            continue
+        snippet = report_snippet(extract_text(pdf_path))
+        for example in report_examples:
+            example["snippet"] = snippet
+        examples.extend(report_examples)
+    return examples
+
+
+def to_notebook_rows(source_examples: list[dict], results: list[dict], group: str) -> list[dict]:
+    # run_baseline()'s own ask_baseline() builds a fresh result dict from
+    # only instruction/input/output, so it drops the "snippet" key added
+    # in build_examples_with_snippets() above -- pull it back from the
+    # original examples, zipped by the same order run_baseline preserves.
     return [
         {
             "group": group,
             "question": r["input"],
             "expected": r["expected"],
+            "snippet": source["snippet"],
             "base_model_answer": r["base_model_answer"],
             "base_matched": r["matched_expected"],
         }
-        for r in results
+        for source, r in zip(source_examples, results)
     ]
 
 
@@ -73,15 +112,23 @@ def main() -> None:
     print("Loading base model...")
     base_model, tokenizer = load_model_and_tokenizer(MODEL_NAME)
 
-    training_examples = build_training_examples()
+    training_examples = build_examples_with_snippets(SAMPLE_SET_DIR, exclude=HELD_OUT_REPORT)
+
     held_out_examples = build_examples_for_report(SAMPLE_SET_DIR / HELD_OUT_REPORT)
+    held_out_snippet = report_snippet(extract_text(SAMPLE_SET_DIR / HELD_OUT_REPORT))
+    for example in held_out_examples:
+        example["snippet"] = held_out_snippet
+
     print(f"{len(training_examples)} training examples, {len(held_out_examples)} held-out examples")
 
     print("Running base model on both sets (before fine-tuning)...")
     training_before = run_baseline(base_model, tokenizer, training_examples)
     held_out_before = run_baseline(base_model, tokenizer, held_out_examples)
 
-    rows = to_notebook_rows(training_before, "training") + to_notebook_rows(held_out_before, "held_out")
+    rows = (
+        to_notebook_rows(training_examples, training_before, "training")
+        + to_notebook_rows(held_out_examples, held_out_before, "held_out")
+    )
 
     print(f"Loading fine-tuned checkpoint from {ADAPTER_DIR}...")
     lora_model = PeftModel.from_pretrained(base_model, ADAPTER_DIR)

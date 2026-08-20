@@ -94,6 +94,23 @@ highlights in narrative form.
   during development, so its Wolfram Language syntax is unverified
   beyond a mechanical bracket/quote-balance check -- the README says so
   explicitly rather than claiming it's confirmed working.
+- **The Mathematica notebook now shows each real report excerpt an
+  answer comes from, not just the isolated extracted value** --
+  author-requested, so a reader can physically read the source and
+  confirm the reference answer is really there rather than trusting the
+  extraction. `export_before_after.py` now captures, per example, the
+  real contiguous block of the report's own first-page text spanning
+  `PRESENT OPERATIONS:` through `ACTIVITY PLANNED:` (reusing
+  `build_training_examples.py`'s own `FIELD_PATTERNS` and
+  `extract_text`, not new extraction logic). Re-run for real, and
+  verified directly -- the real reference answer is a genuine substring
+  of the real snippet, checked for both a training example and the
+  held-out example. `FineTuning_Before_After_Explorer.nb`'s explorer
+  section now shows this excerpt in a scrollable panel between the
+  question and the reference answer. Separately, the notebook itself
+  has now been opened and evaluated successfully in a real Wolfram
+  front end by the author, confirming the previous entry's syntax risk
+  didn't materialize.
 
 ### Changed
 

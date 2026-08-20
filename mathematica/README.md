@@ -23,7 +23,7 @@ set.
 | File | What it is |
 |---|---|
 | `export_before_after.py` | Python script that generates the real before/after data (needs `book/.venv` and a real Chapter 5 checkpoint) |
-| `data/before_after_examples.json` | The exported data — 16 real training examples + 2 real held-out examples, each with the question, the report's real reference answer, the base model's real answer, and the fine-tuned model's real answer |
+| `data/before_after_examples.json` | The exported data — 16 real training examples + 2 real held-out examples, each with the question, the report's real reference answer, the actual report excerpt that answer comes from (so you can visually confirm it's really there), the base model's real answer, and the fine-tuned model's real answer |
 | `FineTuning_Before_After_Explorer.nb` | The notebook itself |
 
 ## Prerequisites
@@ -85,11 +85,12 @@ the book and the Streamlit companion app.
 ## A note on verification
 
 This notebook's Wolfram Language code was written from language
-knowledge, not executed against a live Wolfram kernel — no kernel was
-available in the environment this was built in. The Python export
-script *was* actually run, and `data/before_after_examples.json`
+knowledge rather than executed against a live Wolfram kernel — no
+kernel was available in the environment it was built in. The Python
+export script *was* actually run, and `data/before_after_examples.json`
 reflects a real local run against this repository's real checkpoint
 (reproducing the book's own `13/16` trained / `0/2` held-out result
-exactly). If anything in the notebook itself doesn't open or evaluate
-cleanly on your end, please open an issue — it hasn't been confirmed
-against a real front end yet.
+exactly). The notebook itself has since been opened and evaluated
+successfully in a real Wolfram front end by the author. If you still
+hit an issue opening or evaluating it, please open one in the
+companion repository.
