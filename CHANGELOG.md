@@ -76,6 +76,24 @@ highlights in narrative form.
   it (and, since it didn't exist yet, a link to the companion
   repository itself) under `index.qmd`'s "Companion repository"
   section, verified with a local `quarto render index.qmd`.
+- **A new top-level `mathematica/` folder**: an optional Wolfram
+  Language companion notebook, separate from `book/app/`'s Streamlit
+  app, for readers who'd rather explore Chapter 5's fine-tuning result
+  interactively in Mathematica. `export_before_after.py` reuses this
+  book's own real functions (`code/chapter_01/load_local_model.py`,
+  `code/chapter_02/build_training_examples.py`,
+  `code/chapter_03/baseline_prompting.py`) and the real trained adapter
+  at `book/checkpoints/chapter_05_lora` to generate real base-vs-fine-
+  tuned answers on the real training and held-out questions -- actually
+  run, not just written, reproducing the book's own headline result
+  exactly (`0/16 -> 13/16` trained, `0/2 -> 0/2` held-out) from a fresh
+  local run today. `FineTuning_Before_After_Explorer.nb` loads that
+  real data and lets a reader step through all 18 real questions with a
+  `Manipulate`-driven dropdown, plus a real before/after bar chart. No
+  Wolfram kernel was available to actually execute the notebook itself
+  during development, so its Wolfram Language syntax is unverified
+  beyond a mechanical bracket/quote-balance check -- the README says so
+  explicitly rather than claiming it's confirmed working.
 
 ### Changed
 

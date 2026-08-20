@@ -1,0 +1,78 @@
+Notebook[{
+
+Cell["Fine-Tuning Before/After Explorer", "Title"],
+
+Cell["Fine-Tuning Local LLM for Drilling & Completions -- companion notebook", "Subtitle"],
+
+Cell["This notebook lets you interactively explore real answers from this book's own base model and its Chapter 5 LoRA fine-tuned checkpoint, side by side, on the exact real questions and reports Chapter 5 itself uses. Nothing here is invented: every question, reference answer, and model answer below comes from mathematica/export_before_after.py, which reuses this book's own real functions (code/chapter_01, code/chapter_02, code/chapter_03) and the real trained adapter at book/checkpoints/chapter_05_lora. Re-running the export script regenerates this data fresh from a real local run -- it is not a fixed, hand-picked example set.", "Text"],
+
+Cell[CellGroupData[{
+
+Cell["1. Load the real exported data", "Section"],
+
+Cell["data = Import[FileNameJoin[{NotebookDirectory[], \"data\", \"before_after_examples.json\"}], \"RawJSON\"];
+summary = data[\"summary\"];
+examplesList = data[\"examples\"];
+Length[examplesList]", "Input"]
+
+}, Open]],
+
+Cell[CellGroupData[{
+
+Cell["2. Real exact-match counts, before vs after fine-tuning", "Section"],
+
+Cell["This reproduces the book's own headline Chapter 5 result -- 0/16 to 13/16 on the examples it trained on, 0/2 to 0/2 on a report it never saw -- computed fresh from the exported data, not hardcoded.", "Text"],
+
+Cell["BarChart[
+ {
+  {summary[\"training_before\"], summary[\"training_after\"]},
+  {summary[\"held_out_before\"], summary[\"held_out_after\"]}
+ },
+ ChartLabels -> {\"Training (seen in fine-tuning)\", \"Held-out (never seen)\"},
+ ChartLegends -> {\"Before fine-tuning\", \"After fine-tuning\"},
+ PlotLabel -> \"Real exact-match counts -- Chapter 5 LoRA fine-tune\",
+ AxesLabel -> {None, \"Correct answers\"},
+ ImageSize -> 520
+]", "Input"]
+
+}, Open]],
+
+Cell[CellGroupData[{
+
+Cell["3. Explore individual real questions and answers", "Section"],
+
+Cell["Pick any real question below (16 it trained on, 2 it never saw) and compare the base model's answer against the fine-tuned model's answer, side by side, against the real report text.", "Text"],
+
+Cell["labelFor[ex_] := (If[ex[\"group\"] === \"training\", \"[Training] \", \"[Held-out] \"] <> StringTake[ex[\"question\"], UpTo[70]])
+optionsList = Table[i -> labelFor[examplesList[[i]]], {i, Length[examplesList]}];
+Manipulate[
+ Module[{ex = examplesList[[i]]},
+  Column[{
+    Style[\"Question\", Bold, 14],
+    Panel[ex[\"question\"]],
+    Style[\"Reference answer (real report text)\", Bold, 14],
+    Panel[ex[\"expected\"]],
+    Grid[
+     {
+      {Style[\"Base model -- before fine-tuning\", Bold, Darker[Red]],
+       Style[\"Fine-tuned model -- after fine-tuning\", Bold, Darker[Green]]},
+      {Panel[Style[ex[\"base_model_answer\"],
+         If[TrueQ[ex[\"base_matched\"]], Darker[Green], Darker[Red]]]],
+       Panel[Style[ex[\"finetuned_model_answer\"],
+         If[TrueQ[ex[\"finetuned_matched\"]], Darker[Green], Darker[Red]]]]},
+      {If[TrueQ[ex[\"base_matched\"]], \"matched the real answer\", \"did not match\"],
+       If[TrueQ[ex[\"finetuned_matched\"]], \"matched the real answer\", \"did not match\"]}
+     },
+     Alignment -> Left, Spacings -> {2, 1}, Dividers -> Center
+    ]
+   }]
+ ],
+ {{i, 1, \"Pick a real question\"}, optionsList},
+ ControlPlacement -> Top
+]", "Input"]
+
+}, Open]],
+
+Cell["To regenerate this data yourself -- for example after retraining Chapter 5's checkpoint, or against your own reports -- run \"python mathematica/export_before_after.py\" from the repository root, with book/.venv active. See mathematica/README.md for details and prerequisites.", "Text"]
+
+}]
