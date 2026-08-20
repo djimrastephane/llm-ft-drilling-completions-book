@@ -683,7 +683,7 @@ Time: 03:30-06:00               -&gt; Production Casing Run Csg &amp; Cement Rig
 <section id="expected-output" class="level2" data-number="11.9">
 <h2 data-number="11.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">11.9</span> Expected Output</h2>
 <p>A list of real instruction/input/output examples, one per timeline entry the held-out report actually contains.</p>
-<div id="059adfda" class="cell" data-execution_count="1">
+<div id="cc4452a4" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_held_out_eval_set() <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">dict</span>]:</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    examples, _artifacts_filtered <span class="op">=</span> build_timeline_examples_for_report(FULL_SET_DIR <span class="op">/</span> HELD_OUT_REPORT)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> examples</span>
@@ -721,7 +721,7 @@ Time: 03:30-06:00               -&gt; Production Casing Run Csg &amp; Cement Rig
 <section id="expected-output-1" class="level2" data-number="11.14">
 <h2 data-number="11.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">11.14</span> Expected Output</h2>
 <p>Every example scored both ways: a strict pass/fail and a 0–1 partial credit score.</p>
-<div id="b4b8ae7d" class="cell" data-execution_count="2">
+<div id="1e655057" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> exact_match(generated: <span class="bu">str</span>, expected: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> expected.strip().lower() <span class="kw">in</span> generated.strip().lower()</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -776,7 +776,7 @@ Average overlap score: 0.17</code></pre>
 <section id="expected-output-2" class="level2" data-number="11.19">
 <h2 data-number="11.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">11.19</span> Expected Output</h2>
 <p>A perplexity score for each model on the same real text.</p>
-<div id="b7583fc4" class="cell" data-execution_count="3">
+<div id="35d63463" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
