@@ -43,13 +43,14 @@ Cell["3. Explore individual real questions and answers", "Section"],
 
 Cell["Pick any real question below (16 it trained on, 2 it never saw) and compare the base model's answer against the fine-tuned model's answer, side by side, against the real report excerpt the reference answer actually comes from -- so you can physically read the source and confirm the answer is really there, not just take the reference value's word for it.", "Text"],
 
-Cell["labelFor[ex_] := (If[ex[\"group\"] === \"training\", \"[Training] \", \"[Held-out] \"] <> StringTake[ex[\"question\"], UpTo[70]])
+Cell["shortInstruction[instr_] := If[StringContainsQ[instr, \"present operations\", IgnoreCase -> True], \"Present Ops\", \"Activity Planned\"]
+labelFor[ex_] := (If[ex[\"group\"] === \"training\", \"[Training] \", \"[Held-out] \"] <> shortInstruction[ex[\"instruction\"]] <> \" -- \" <> ex[\"report_context\"])
 optionsList = Table[i -> labelFor[examplesList[[i]]], {i, Length[examplesList]}];
 Manipulate[
  Module[{ex = examplesList[[i]]},
   Column[{
     Style[\"Question\", Bold, 14],
-    Panel[ex[\"question\"]],
+    Panel[Column[{Style[ex[\"instruction\"], Bold], ex[\"report_context\"]}]],
     Style[\"Source report excerpt (the report's own real text)\", Bold, 14],
     Panel[Pane[Style[ex[\"snippet\"], FontFamily -> \"Courier\", FontSize -> 12],
       {560, 150}, Scrollbars -> True]],

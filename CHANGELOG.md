@@ -111,6 +111,16 @@ highlights in narrative form.
   has now been opened and evaluated successfully in a real Wolfram
   front end by the author, confirming the previous entry's syntax risk
   didn't materialize.
+- **The notebook's Question panel was only showing the report context
+  (well/report/date), not the actual question being asked** --
+  author-caught. `ask_baseline()`'s real result already carries both
+  `instruction` (the real question, e.g. "What are the present
+  operations reported on this well?") and `input` (the well/report/date
+  context) -- `export_before_after.py` was only exporting the latter as
+  `"question"`. Now exports both as `"instruction"` and
+  `"report_context"`, re-run for real, and the notebook's Question panel
+  and dropdown labels show the actual question alongside the report it's
+  about.
 
 ### Changed
 

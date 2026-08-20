@@ -83,10 +83,15 @@ def to_notebook_rows(source_examples: list[dict], results: list[dict], group: st
     # only instruction/input/output, so it drops the "snippet" key added
     # in build_examples_with_snippets() above -- pull it back from the
     # original examples, zipped by the same order run_baseline preserves.
+    # "instruction" + "input" together are the real prompt build_prompt()
+    # sends the model (see baseline_prompting.py) -- both are kept here so
+    # the notebook can show the actual question, not just the report
+    # context it's asked about.
     return [
         {
             "group": group,
-            "question": r["input"],
+            "instruction": r["instruction"],
+            "report_context": r["input"],
             "expected": r["expected"],
             "snippet": source["snippet"],
             "base_model_answer": r["base_model_answer"],
