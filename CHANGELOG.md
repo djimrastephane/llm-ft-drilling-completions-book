@@ -190,6 +190,18 @@ highlights in narrative form.
   pages" framing also undercounted by one (omitted Model Playground
   from both the count and its bulleted page list) -- corrected there
   too.
+- **Rewrote `book/acknowledgements.qmd`**, author-provided text. Frames
+  the reports themselves (short entries like "POOH to change BHA due to
+  erratic torque" carrying decisions and context invisible to a
+  general-purpose model) rather than only the tooling, credits the
+  open-source community for local/private AI generally rather than
+  naming a fixed library list, addresses "every drilling, completions,
+  and operations engineer" by name instead of "every reader," and
+  matches the AI-assistance disclosure wording to the root README's own
+  recently-revised version (engineering direction and final decisions
+  as the author's; AI assisted with drafting/editing/documentation/
+  verification; AI-assisted work reviewed against real data before
+  acceptance). Verified with a local `quarto render acknowledgements.qmd`.
 
 ### Fixed
 

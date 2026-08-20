@@ -4,23 +4,27 @@ This book exists because drilling and completions reports capture far
 more than operational summaries. Behind short entries such as "POOH to
 change BHA due to erratic torque" sit decisions, experience, and
 operational context that are obvious to the engineers involved in the
-operation but often invisible to a general-purpose model that has never
-seen anything like it.
+operation but invisible to standard AI systems that have never seen
+field data.
 
-Thanks are due to the open-source communities behind the tools this book
-relies on throughout: Python, Quarto, Jupyter, PyTorch, Hugging Face
-Transformers, PEFT, and the broader open-weight model ecosystem. None of
-the engineering in this book would be reproducible without them.
+This work depends on the global open-source community, whose open
+models, software, and shared research make it possible to run powerful
+AI tools locally and securely on a standard work laptop, without
+sending proprietary data to the cloud.
 
-Finally, thanks to every reader working through this material on their
-own operational data. If you find an error, a fine-tuning claim that
-doesn't hold up under evaluation, or a chapter that assumes something it
-shouldn't, please open an issue in the companion repository —
-corrections from practitioners are what keep a book like this honest.
+Finally, thanks to every drilling, completions, and operations engineer
+working through this material. You do not need to be a software
+developer or data scientist to apply these methods. If you find an
+error, test a method on your operational data that yields unexpected
+results, or find a section that assumes too much technical background,
+please reach out via the book's companion website. Feedback from
+practitioners in the field is what keeps a guide like this practical
+and honest.
 
-The ideas, engineering examples, educational approach, and technical
-validation presented in this book are the author's. AI tools, including
-Claude, were used throughout the project to assist with code generation,
-editing, documentation, and iterative review. All engineering decisions,
-implementation choices, and final content remain the responsibility of
+The engineering direction, domain interpretation, educational approach,
+and final technical decisions are the author's. AI tools, including
+Claude, were used throughout the project to assist with drafting,
+editing, documentation, and technical verification. All AI-assisted
+work was reviewed and validated against actual operational datasets and
+repeatable workflows. Responsibility for the final content remains with
 the author.
