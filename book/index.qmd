@@ -78,6 +78,16 @@ the problem it solves, never before. The goal of this book isn't to turn
 you into a machine learning researcher. It's to make you capable of
 building and trusting a private, local, domain-specific model.
 
+One expectation worth setting early: this book's own code is written
+and tested against one real report format (Utah FORGE's Daily Drilling
+Report). There is no single format across operators, contractors, and
+basins, so the goal here isn't to hand you a tool that already expects
+your archive's layout — it's to teach you the pipeline stage by stage,
+on real data, well enough that adapting each stage to your own reports
+is a rewrite you understand, not a mystery you're stuck on. See
+[Appendix C](appendix/appendix_c_known_limitations.qmd) once you've
+finished the book for exactly where that adaptation work starts.
+
 ## What you will build
 
 | Chapter | You will be able to... |
@@ -135,7 +145,11 @@ case in plain terms — and its limits.
   control and inspectability versus vendor support and maintenance.
 - **Known limits.** Fine-tuning teaches style and domain patterns; it is
   not a substitute for retrieval when the model needs to cite a specific,
-  current document verbatim — Chapter 9 covers combining the two.
+  current document verbatim — Chapter 9 covers combining the two. See
+  [Appendix C](appendix/appendix_c_known_limitations.qmd) for five
+  concrete gaps — from brittle report parsing to a faithfulness check
+  that misses a reversed operation — worth checking before you point
+  this pipeline at your own archive.
 
 This supports an engineer's judgment; it doesn't replace it. A more
 fluent model is only as good as the review process around how its

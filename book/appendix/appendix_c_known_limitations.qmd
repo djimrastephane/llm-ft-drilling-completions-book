@@ -1,0 +1,138 @@
+# Appendix C: Known Limitations {#sec-appendix-c .unnumbered}
+
+This book's one non-negotiable rule is that a stated result comes from
+a real run of this book's own code, not an estimate. The same standard
+applies to limitations: everything below is something you can see for
+yourself by reading the referenced script or rerunning the referenced
+chapter, not a hypothetical concern.
+
+Two of these are already called out where they happen — in Chapter
+8's and Chapter 10's own Production Reality or Field Notes sections —
+because that's where a reader hits them first. They're repeated here,
+gathered with three that aren't discussed elsewhere in the book, so
+you have one place to check before pointing this pipeline at your own
+archive.
+
+None of these are treated as bugs to quietly fix and forget. There is
+no single report format across operators, contractors, and basins, so
+no fixed set of extraction patterns, thresholds, or one small model
+could honestly claim to be a finished, one-size-fits-all solution. This
+book's actual goal is to give you the working knowledge to build and
+adapt your own pipeline — this list is the specific starting point for
+that adaptation work, not a warning to wait for a future version that
+removes it.
+
+## C.1 Report parsing breaks on a new report layout (Chapters 2 and 7)
+
+Chapter 2's and Chapter 7's extraction scripts both work the same way
+a spreadsheet macro that looks for a value two cells to the right of
+the label "WELL NAME:" works: reliable as long as every report is laid
+out exactly the same way, and silently wrong or empty the moment it
+isn't.
+
+`code/chapter_02/build_training_examples.py` looks for labels like
+`WELL NAME:`, `PRESENT OPERATIONS:`, and `ACTIVITY PLANNED:` at fixed
+positions in the report text — its own docstring says so directly:
+*"Only handles the 'DAILY DRILLING REPORT' field layout."* A completion
+report, which uses different field labels entirely, isn't handled by
+the main chapter at all — it's left to the challenge exercise.
+`code/chapter_07/format_training_chunks.py` has the same shape: its
+timeline extraction looks for a literal `TIME BREAKDOWN` header and a
+fixed column order.
+
+**What this means for you:** if your own archive spans multiple
+operators, contractors, or hand-written morning reports — each with
+its own layout — expect to write a new set of label patterns per
+format before Chapter 2's or Chapter 7's scripts will extract anything
+useful. Neither script attempts to detect or adapt to a layout it
+wasn't written for.
+
+## C.2 The faithfulness check compares words, not meaning (Chapter 10)
+
+Chapter 10's `faithfulness_score` checks whether an answer's words show
+up somewhere in the source text it's supposed to be grounded in — like
+a word search, not a careful read of the sentence. It counts matching
+vocabulary; it has no notion of which word is doing the work in a
+sentence, so two short, common, opposite words can both "match" equally
+well.
+
+Chapter 10's own Field Notes catch this in a real run: report `#49`'s
+grounded answer read *"Trip out of hole with fishing bha"* and scored
+`0.80` faithfulness — well above the chapter's `0.5` threshold — against
+a source that actually says *"Pick up Fishing BHA # 33 and trip in hole
+to 7,996'"*. The direction is reversed and the specific depth is
+dropped, and the score doesn't notice, because `"trip"`, `"fishing"`,
+and `"bha"` all matched; only `"in"` versus `"out"` — the one word that
+actually changes the meaning — flipped.
+
+**What this means for you:** a high faithfulness score tells you an
+answer's vocabulary came from the right report. It does not tell you
+the answer's claims are correct. Any check built on this method will
+have the same blind spot for a reversed direction, a flipped
+up/down or in/out call, or a swapped number, whenever the rest of the
+sentence's wording stays similar — exactly the class of error most
+likely to matter on a real well.
+
+## C.3 CPU training times don't demonstrate production scale (Chapters 8 and 13)
+
+Every training run in this book is deliberately sized to finish on a
+standard laptop with no dedicated GPU: Chapter 8's full multi-epoch run
+over 669 examples takes about 30-35 minutes on CPU, and Chapter 13's
+small continuous update — 2 epochs over 179 new examples — takes about
+20-25 minutes on CPU. Both are demo-scale by design, not a benchmark of
+what a production archive would take.
+
+**What this means for you:** this book never measures, and doesn't
+claim to know, how long a multi-epoch run over a full company archive
+of thousands of reports would take on CPU alone, or how often a
+Chapter-13-style continuous update could realistically run against new
+reports on a standard corporate laptop. A dedicated GPU — mentioned in
+Chapter 5 as an optional speedup (`model.to("cuda")`), never
+benchmarked anywhere in this book — is the likely answer at real scale,
+but that combination isn't something this book's own code has actually
+run and measured.
+
+## C.4 Resuming a checkpoint forgets the optimizer's memory (Chapters 8 and 13)
+
+Training uses an optimizer (Adam) that keeps a running memory of how
+each weight has been moving recently — similar to a mechanic
+remembering roughly how much force a bolt needed last time, so the next
+turn on it is smoother than starting from scratch. Chapter 8's
+`save_checkpoint`/`load_checkpoint` functions save and reload the
+model's trained weights, but not that running memory — it exists only
+in the computer's memory while training runs, and is gone the moment
+training stops, whether that's a real crash or a deliberate pause. The
+chapter's own Production Reality section says so directly: *"this
+simple version doesn't persist Adam's momentum across a resume, only
+the model weights."*
+
+Chapter 13's continuous fine-tuning reuses these same two functions
+unchanged, so every scheduled update carries the same gap.
+
+**What this means for you:** expect a small amount of extra training
+noise — a temporary bump right after training resumes, before it
+settles back into a smooth improvement — every time a paused or crashed
+run is picked back up, and every time Chapter 13's continuous update
+runs against a fresh checkpoint. It's a real, measured cost of this
+version's simplicity, not a bug; a production setup would checkpoint
+and restore that optimizer memory too.
+
+## C.5 Everything in this book is tested on one small model (Chapters 1-13)
+
+Every chapter from Chapter 1 onward loads the same base model,
+`Qwen2.5-1.5B-Instruct`, chosen specifically because it fine-tunes on
+CPU in the timeframes above — a deliberate choice matched to the
+hardware check in Part 0, not a claim that it's the best model for
+this job. `requirements.txt` installs `bitsandbytes`, the package
+needed for QLoRA (fine-tuning a compressed, lower-memory copy of a
+larger model — see Appendix B's glossary), but no chapter script in
+this book actually loads a quantized model.
+
+**What this means for you:** whether a larger model — 7B or 14B
+parameters, fine-tuned with QLoRA instead of this book's plain LoRA —
+would learn this same operational vocabulary better, more slowly, or
+with different failure patterns on the same report archive is a real,
+open question this book doesn't answer. If your own use case can afford
+the extra memory and slower iteration a bigger model requires, that
+comparison is worth running yourself; this book's code is not set up to
+run it for you.

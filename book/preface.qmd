@@ -99,3 +99,17 @@ point this book's code at your own organisation's reports instead, do
 not commit them to a public repository, and see
 [Appendix A](appendix/appendix_a_environment_setup.qmd) for a
 data-handling checklist.
+
+One thing that does *not* generalise automatically: Chapter 2's and
+Chapter 7's extraction code reads specific field labels at specific
+positions in Utah FORGE's own report layout. There is no single "Daily
+Drilling Report" format across operators, contractors, and basins, so
+that extraction code will need rewriting — new labels, new patterns —
+against your own archive's actual layout before anything downstream of
+it works. That adaptation is not a gap to route around; it is the point.
+This book teaches you the full pipeline end to end, on one real dataset,
+so you have the understanding to rebuild each stage against your own
+data — not a drop-in tool that already expects it. See [Appendix
+C](appendix/appendix_c_known_limitations.qmd) for this and four other
+concrete places this book's code is scoped to what it was actually
+tested against.

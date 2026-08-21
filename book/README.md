@@ -88,7 +88,8 @@ book/
     ├── appendix_a3_pycharm.qmd             PyCharm Community guide
     ├── appendix_a4_positron.qmd            Positron guide
     ├── appendix_a5_terminal.qmd            Terminal-only guide
-    └── appendix_b_glossary.qmd             Drilling, completions & fine-tuning terms
+    ├── appendix_b_glossary.qmd             Drilling, completions & fine-tuning terms
+    └── appendix_c_known_limitations.qmd    Five concrete gaps in this book's own code
 ```
 
 ## Chapter map

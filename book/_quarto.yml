@@ -57,6 +57,7 @@ book:
         - appendix/appendix_a4_positron.qmd
         - appendix/appendix_a5_terminal.qmd
         - appendix/appendix_b_glossary.qmd
+        - appendix/appendix_c_known_limitations.qmd
 
     - references.qmd
 

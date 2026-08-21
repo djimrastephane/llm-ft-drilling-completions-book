@@ -141,6 +141,50 @@ highlights in narrative form.
   Python rules existed, scoped to `book/`) -- added a Python section to
   the root `.gitignore`.
 
+- **New `book/appendix/appendix_c_known_limitations.qmd`**, added after
+  reviewing feedback from an oil and gas professional against this
+  book's own code and chapters. Verified each of the five claims before
+  writing it up: Chapter 2's and Chapter 7's field-extraction regexes
+  are hardcoded to Utah FORGE's own report layout
+  (`build_training_examples.py`'s `FIELD_PATTERNS`,
+  `format_training_chunks.py`'s `TIMELINE_SECTION_PATTERN`); Chapter
+  10's `faithfulness_score` is a plain unigram word-overlap check, and
+  its own Field Notes already contain a real case where this scores
+  `0.80` on an answer that says "trip out of hole" against a source
+  that says "trip in hole" -- opposite meaning, high score; Chapter 8's
+  ~30-35 minute and Chapter 13's ~20-25 minute CPU training runs are
+  both demo-scale, with no benchmark anywhere in this book of a
+  production-sized archive or a dedicated GPU; Chapter 8's
+  `load_checkpoint`/`save_checkpoint` (reused unchanged by Chapter 13)
+  restore only LoRA adapter weights, not AdamW's momentum/variance
+  state, a gap already named in Chapter 8's own Production Reality
+  section; and every chapter loads one model,
+  `Qwen/Qwen2.5-1.5B-Instruct` -- `requirements.txt` installs
+  `bitsandbytes` for optional QLoRA, but no chapter script actually
+  loads a quantized model, so how a larger quantized model would behave
+  on this same corpus is a genuinely open question. Two of the five
+  were already documented in their own chapter (Ch. 8, Ch. 10) and are
+  repeated here for one place to check; three (regex brittleness,
+  CPU-scale training time, single-model scope) weren't discussed
+  anywhere in the book before this. Wired into `_quarto.yml`'s
+  Appendices part, linked from `index.qmd`'s "Known limits" bullet, and
+  added to both READMEs' folder trees and the root README's chapter
+  status table.
+- **Made explicit, in four places, that this book's code targets Utah
+  FORGE's report format specifically and isn't a plug-and-play tool for
+  an arbitrary archive.** Prompted by the same review: the existing "A
+  note on data" section in `preface.qmd` claimed the *technique*
+  generalises to a confidential archive without qualifying that Chapter
+  2's and Chapter 7's specific extraction code does not -- now
+  clarified, with a pointer to Appendix C.1. The same expectation is
+  now set in `index.qmd`'s "Who this book is for" section, the root
+  README's "Who This Book Is For" section, and Appendix C's own intro,
+  each framing this as the book's actual goal (teaching the pipeline
+  well enough to rebuild each stage against your own data) rather than
+  a shortcoming to wait out. Verified with a full local `quarto render`
+  after each round of edits -- HTML and PDF both build cleanly and
+  every new cross-link to Appendix C resolves.
+
 ### Changed
 
 - **Rewrote the "A Note on AI-Assisted Development" disclosure.** The

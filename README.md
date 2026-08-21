@@ -243,6 +243,16 @@ If you've ever wanted a model that actually understands your rig-floor
 shorthand and your operator's reporting style — instead of a generic
 chatbot — this book is for you.
 
+One expectation worth setting up front: this repository's code is
+written and tested against one real report format (Utah FORGE's Daily
+Drilling Report). There's no single report layout across operators,
+contractors, and basins, so this isn't a plug-and-play tool for
+whatever your own archive looks like — it's a complete, working example
+of every pipeline stage, built so you understand each one well enough
+to adapt it to your own reports afterward. See [Appendix
+C](book/appendix/appendix_c_known_limitations.qmd) for exactly where
+that adaptation work starts.
+
 ## Who This Book Is Not For
 
 This book is probably not for you if:
@@ -445,6 +455,7 @@ behind this repository's `main` branch.
 | ✅ | Appendix A: Environment Setup | — | [./book/appendix](book/appendix) |
 | ✅ | Appendices A1–A5: Jupyter / VS Code / PyCharm / Positron / Terminal-only | — | [./book/appendix](book/appendix) |
 | ✅ | [Appendix B: Drilling, Completions & Fine-Tuning Glossary](book/appendix/appendix_b_glossary.qmd) | — | [appendix_b_glossary.qmd](book/appendix/appendix_b_glossary.qmd) |
+| ✅ | [Appendix C: Known Limitations](book/appendix/appendix_c_known_limitations.qmd) | — | [appendix_c_known_limitations.qmd](book/appendix/appendix_c_known_limitations.qmd) |
 
 Every ✅ chapter ships with working, tested code and a companion
 notebook — see [Automated Tests](#automated-tests) below. Every quoted
@@ -578,6 +589,11 @@ about on their own:
 - [`book/appendix/appendix_b_glossary.qmd`](book/appendix/appendix_b_glossary.qmd)
   covers drilling, completions, and fine-tuning terminology used
   throughout the book.
+- [`book/appendix/appendix_c_known_limitations.qmd`](book/appendix/appendix_c_known_limitations.qmd)
+  gathers five concrete, code-verified gaps — from report parsing that
+  breaks on a new layout to a faithfulness check that misses a reversed
+  operation — worth reading before adapting this pipeline to a real
+  operating archive.
 
 ## Questions, Feedback, and Contributing to This Repository
 
