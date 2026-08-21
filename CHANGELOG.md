@@ -184,6 +184,17 @@ highlights in narrative form.
   a shortcoming to wait out. Verified with a full local `quarto render`
   after each round of edits -- HTML and PDF both build cleanly and
   every new cross-link to Appendix C resolves.
+- **Appendix C.6: the base model's fixed tokenizer splits oilfield
+  shorthand apart**, added after a follow-up round of review comments
+  verified against the actual chapter. Chapter 4's own tokenizer script
+  already shows this in a real run -- `'BHA' -> 2 token(s): ['B',
+  'HA']` -- and its Production Reality section already names the fix
+  this book doesn't take: training or extending a custom tokenizer
+  (with a resized embedding table) instead of fine-tuning on top of the
+  generic one. Chapter 5's fine-tuning never touches the tokenizer, so
+  the gap persists through every later chapter. Re-verified with a full
+  local `quarto render` -- HTML and PDF both build cleanly, C.6's
+  heading and cross-links resolve.
 
 ### Changed
 

@@ -6,12 +6,12 @@ applies to limitations: everything below is something you can see for
 yourself by reading the referenced script or rerunning the referenced
 chapter, not a hypothetical concern.
 
-Two of these are already called out where they happen — in Chapter
-8's and Chapter 10's own Production Reality or Field Notes sections —
-because that's where a reader hits them first. They're repeated here,
-gathered with three that aren't discussed elsewhere in the book, so
-you have one place to check before pointing this pipeline at your own
-archive.
+Three of these are already called out where they happen — in Chapter
+4's, Chapter 8's, and Chapter 10's own Production Reality or Field
+Notes sections — because that's where a reader hits them first. They're
+repeated here, gathered with three that aren't discussed elsewhere in
+the book, so you have one place to check before pointing this pipeline
+at your own archive.
 
 None of these are treated as bugs to quietly fix and forget. There is
 no single report format across operators, contractors, and basins, so
@@ -136,3 +136,32 @@ open question this book doesn't answer. If your own use case can afford
 the extra memory and slower iteration a bigger model requires, that
 comparison is worth running yourself; this book's code is not set up to
 run it for you.
+
+## C.6 The tokenizer's fixed vocabulary splits oilfield shorthand apart (Chapter 4)
+
+A model doesn't read whole words — it breaks text into pieces from a
+fixed list decided when the base model was built, the same way a
+pre-printed form only has boxes for words someone anticipated. Chapter
+4 shows this splitting `'BHA'` into two meaningless pieces, `['B',
+'HA']`, with no more connection to "bottom hole assembly" than those
+two letters carry on their own — a real result from that chapter's own
+tokenizer script.
+
+Chapter 4's own Production Reality section already names the fix this
+book doesn't take: *"a production system dealing with truly nonstandard
+shorthand... sometimes trains or extends a custom tokenizer instead of
+just fine-tuning on top of a generic one; that's a heavier, rarer move
+this book doesn't cover."* Chapter 5's fine-tuning never touches the
+tokenizer itself, only the model's weights, so this split is present in
+every chapter that follows.
+
+**What this means for you:** the fine-tuned model in this book still
+reads your operator's shorthand as arbitrary letter fragments, not as
+a term it has a dedicated slot for — Chapter 4's own embedding check
+shows it can still learn a useful association between `'BHA'` and
+"bottom hole assembly" without a dedicated token, but that's a
+different, weaker fix than giving the term its own vocabulary entry. If
+your archive leans on internal codes or shorthand severe enough that
+this isn't good enough, adding new tokens and resizing the model's
+embedding table to match is the heavier step this book doesn't walk
+through.
