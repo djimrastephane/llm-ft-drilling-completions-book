@@ -1,16 +1,16 @@
 # Welcome {.unnumbered}
 
-Every rig produces a paper trail, and every operator has a way of writing
-things down that a general-purpose chatbot has never seen: shorthand,
-local conventions, the specific judgment calls your team makes that
-never show up in a public dataset. Ask a general local model a real
-drilling or completions question and you'll often get something fluent,
-confident, and subtly wrong — right vocabulary, wrong operational
-instinct.
+Every operator has its own language on the rig. Morning report
+shorthand, internal asset codes, and practical field judgment calls
+rarely show up in public data. When you ask a general-purpose AI a
+complex drilling or completions question, the result is often polished
+and plausible, yet subtly wrong: the right textbook terms, but the
+wrong wellsite logic.
 
-Fine-tuning fixes that, but only if you do it deliberately: with the
-right training data, the right method, and a way to prove the result
-actually improved instead of just changed.
+Fine-tuning fixes this, but it cannot be treated as a black box.
+Success requires high-quality operational data, the right training
+strategy, and clear validation metrics to prove the model genuinely
+improved rather than just shifted its phrasing.
 
 This book builds, from scratch and in plain Python, a fine-tuned local
 language model purpose-built for drilling and completions engineering —
