@@ -195,6 +195,46 @@ highlights in narrative form.
   the gap persists through every later chapter. Re-verified with a full
   local `quarto render` -- HTML and PDF both build cleanly, C.6's
   heading and cross-links resolve.
+- **Explicit safety warning on Chapter 10's faithfulness score**,
+  prompted by the observation that field engineers rely heavily on
+  automated summaries for safety-critical handovers, so this metric's
+  educational-baseline status needed to be unmissable, not just
+  implied. Added a new `.callout-important` (a first in this book --
+  every other chapter uses `.callout-warning` for Field Notes) directly
+  under Chapter 10 Step 1's Production Reality section, a matching
+  Key takeaways bullet, a matching callout in Appendix C.2, and an added
+  clause on `index.qmd`'s "Known limits" bullet (also corrected from
+  "five" to "six" gaps, to account for Appendix C.6) -- all reusing the
+  chapter's own real, already-verified number: report `#49`'s reversed
+  "trip in/out of hole" answer scored `0.80`, comfortably above the
+  chapter's own `0.5` threshold. Verified with a full local `quarto
+  render` -- HTML and PDF both build cleanly, and both new callouts
+  render as `.callout-important` blocks with their title and body text
+  intact.
+- **Strengthened Appendix C.1's regex-brittleness entry with a real
+  third chapter and an explicit callout on the coding-skill gap it
+  implies.** Checked whether Chapter 6 belonged alongside Chapters 2
+  and 7 and confirmed it does: `code/chapter_06/data_quality_gate.py`
+  imports and runs Chapter 2's `extract_fields`/`extract_text`
+  unchanged, and Chapter 6's own Production Reality section already
+  names the same fixed-layout assumption at full archive scale (`75/76`
+  reports extracted cleanly on this single-operator archive; *"a
+  production quality gate would need a library of layout patterns, not
+  one regex per field"*). Also found that Chapter 2's and Chapter 7's
+  own Production Reality sections already call out this same limitation
+  in their own words -- moved C.1 into the appendix intro's
+  already-documented count (now four of six, not three) rather than
+  leaving it miscounted as new. Added a new `.callout-important`
+  ("This is where a coding background starts to matter") naming
+  `re.compile(r"...")` editing directly and stating plainly that this
+  step requires real programming ability the rest of the book doesn't
+  assume -- prompted by the observation that a reader with zero coding
+  background will struggle to adapt these patterns to their own
+  company's differently-formatted `TIME BREAKDOWN`/`OPERATIONS` tables.
+  Extended the matching `preface.qmd` paragraph to name Chapter 6 too
+  and fixed its stale "four other" cross-reference to "five other."
+  Verified with a full local `quarto render` -- HTML and PDF both build
+  cleanly, and the new callout and all cited numbers render correctly.
 
 ### Changed
 

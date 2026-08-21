@@ -6,12 +6,12 @@ applies to limitations: everything below is something you can see for
 yourself by reading the referenced script or rerunning the referenced
 chapter, not a hypothetical concern.
 
-Three of these are already called out where they happen — in Chapter
-4's, Chapter 8's, and Chapter 10's own Production Reality or Field
-Notes sections — because that's where a reader hits them first. They're
-repeated here, gathered with three that aren't discussed elsewhere in
-the book, so you have one place to check before pointing this pipeline
-at your own archive.
+Four of these are already called out where they happen — in Chapter
+2's, Chapter 4's, Chapter 6's, Chapter 7's, Chapter 8's, and Chapter
+10's own Production Reality or Field Notes sections — because that's
+where a reader hits them first. They're repeated here, gathered with
+two that aren't discussed elsewhere in the book, so you have one place
+to check before pointing this pipeline at your own archive.
 
 None of these are treated as bugs to quietly fix and forget. There is
 no single report format across operators, contractors, and basins, so
@@ -22,30 +22,65 @@ adapt your own pipeline — this list is the specific starting point for
 that adaptation work, not a warning to wait for a future version that
 removes it.
 
-## C.1 Report parsing breaks on a new report layout (Chapters 2 and 7)
+## C.1 Report parsing breaks on a new report layout (Chapters 2, 6, and 7)
 
 Chapter 2's and Chapter 7's extraction scripts both work the same way
 a spreadsheet macro that looks for a value two cells to the right of
 the label "WELL NAME:" works: reliable as long as every report is laid
 out exactly the same way, and silently wrong or empty the moment it
-isn't.
+isn't. Chapter 6's data-quality gate doesn't add a new regex of its
+own, but it imports and runs Chapter 2's `extract_fields`/`extract_text`
+unchanged, so this same fixed-layout assumption is what it's actually
+checking against the whole 76-report archive.
 
 `code/chapter_02/build_training_examples.py` looks for labels like
 `WELL NAME:`, `PRESENT OPERATIONS:`, and `ACTIVITY PLANNED:` at fixed
-positions in the report text — its own docstring says so directly:
-*"Only handles the 'DAILY DRILLING REPORT' field layout."* A completion
+positions in the report text using Python's `re.compile(r"...")`
+pattern-matching syntax — its own docstring says so directly: *"Only
+handles the 'DAILY DRILLING REPORT' field layout."* A completion
 report, which uses different field labels entirely, isn't handled by
 the main chapter at all — it's left to the challenge exercise.
 `code/chapter_07/format_training_chunks.py` has the same shape: its
 timeline extraction looks for a literal `TIME BREAKDOWN` header and a
-fixed column order.
+fixed column order. Both chapters' own Production Reality sections
+already say this plainly: Chapter 2's calls it "a specific, fixed field
+layout — the one every `Drilling_NNN` report in this archive happens to
+share," and Chapter 7's calls it "the same kind of assumption that
+breaks the moment a different operator's report template shows up."
+
+Chapter 6 puts a real number on how well that assumption held, at full
+archive scale, on this one archive: `75/76` reports extracted cleanly,
+with the single failure being the same completion-report layout
+mismatch Chapter 2 already knew about. Chapter 6's own Production
+Reality section is explicit that this number is a property of this
+specific archive, not a guarantee: *"This archive comes from a single
+well, a single operator's report template, over a few months. A
+multi-well, multi-operator archive would show a much lower pass rate
+here... A production quality gate would need a library of layout
+patterns, not one regex per field."*
+
+::: {.callout-important title="This is where a coding background starts to matter"}
+This book is written for a reader with no prior programming
+experience, and every chapter up to this adaptation step is written to
+hold that promise. This step doesn't. Editing a `re.compile(r"...")`
+pattern to match a different `TIME BREAKDOWN` or `OPERATIONS` table
+layout — figuring out which characters in the pattern are literal text
+and which are wildcards, then testing it against real report text until
+it matches correctly — is a genuine programming task, not a
+find-and-replace. If your company's daily drilling reports format these
+sections differently from Utah FORGE's, expect this to be the point
+where you need either to build real comfort with Python's `re` module
+first, or bring in someone who already has it, before Chapter 2's or
+Chapter 7's scripts will extract anything useful from your own
+archive.
+:::
 
 **What this means for you:** if your own archive spans multiple
 operators, contractors, or hand-written morning reports — each with
 its own layout — expect to write a new set of label patterns per
-format before Chapter 2's or Chapter 7's scripts will extract anything
-useful. Neither script attempts to detect or adapt to a layout it
-wasn't written for.
+format before Chapter 2's, Chapter 6's, or Chapter 7's scripts will
+extract anything useful. None of the three attempts to detect or adapt
+to a layout it wasn't written for.
 
 ## C.2 The faithfulness check compares words, not meaning (Chapter 10)
 
@@ -72,6 +107,19 @@ have the same blind spot for a reversed direction, a flipped
 up/down or in/out call, or a swapped number, whenever the rest of the
 sentence's wording stays similar — exactly the class of error most
 likely to matter on a real well.
+
+::: {.callout-important title="An educational baseline, not a safety check"}
+This is the limitation most worth taking seriously if you're
+considering this pipeline for anything beyond learning. `faithfulness_score`
+is a teaching tool for understanding what "grounded" does and doesn't
+guarantee — it has not been validated as a safety system, and field
+engineers who lean on automated summaries for safety-critical shift
+handovers should never treat a passing score here as a substitute for
+a qualified person reading the actual source. Report `#49`'s reversed
+"trip in/out of hole" case above scored `0.80`, well past this
+chapter's own `0.5` threshold — proof this check can pass exactly the
+kind of error that matters most on a live well.
+:::
 
 ## C.3 CPU training times don't demonstrate production scale (Chapters 8 and 13)
 

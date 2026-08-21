@@ -206,6 +206,20 @@ real entailment or fact-verification model; this chapter's version is
 deliberately simple enough to read every line of and trust what it's
 actually measuring.
 
+::: {.callout-important title="This is a teaching tool, not a safety check"}
+`faithfulness_score` exists so you can see, in code you can read start
+to finish, what "grounded" does and doesn't guarantee — it is not
+validated for deciding whether an automated answer is safe to act on. A
+field engineer relying on a model-generated summary for a shift
+handover cannot treat a high score here as a stand-in for reading the
+source report. Field Notes below is the proof: a genuinely dangerous
+reversal — the report said *trip in hole*, the answer said *trip out of
+hole* — still scored `0.80`, comfortably above this chapter's own `0.5`
+threshold. Use this score as a prompt for a qualified person to go
+check the source, never as an unsupervised pass/fail on a live well
+operation.
+:::
+
 ### Step 2: Keep only the sources an answer is actually traceable to
 
 ## What problem are we solving?
@@ -417,6 +431,12 @@ flags "no real evidence used" as unfaithful in general.
 - The same check that catches a wrong-source hallucination also
   correctly flags a fully un-grounded answer as unfaithful — it isn't
   narrowly tuned to one failure mode.
+- This chapter's faithfulness score is an educational baseline, not a
+  validated safety system — report `#49`'s reversed-direction answer
+  scored `0.80` all the same. It must never be used as an unsupervised
+  safety check on live well operations; a qualified person checking the
+  actual source stays the real safeguard, especially for a handover
+  summary someone might act on.
 
 ## Repository files
 

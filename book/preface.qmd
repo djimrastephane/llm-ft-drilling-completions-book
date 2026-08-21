@@ -102,14 +102,18 @@ data-handling checklist.
 
 One thing that does *not* generalise automatically: Chapter 2's and
 Chapter 7's extraction code reads specific field labels at specific
-positions in Utah FORGE's own report layout. There is no single "Daily
-Drilling Report" format across operators, contractors, and basins, so
-that extraction code will need rewriting — new labels, new patterns —
-against your own archive's actual layout before anything downstream of
-it works. That adaptation is not a gap to route around; it is the point.
-This book teaches you the full pipeline end to end, on one real dataset,
-so you have the understanding to rebuild each stage against your own
-data — not a drop-in tool that already expects it. See [Appendix
-C](appendix/appendix_c_known_limitations.qmd) for this and four other
-concrete places this book's code is scoped to what it was actually
-tested against.
+positions in Utah FORGE's own report layout, and Chapter 6's data
+quality gate runs that same extraction code unchanged over the full
+archive. There is no single "Daily Drilling Report" format across
+operators, contractors, and basins, so that extraction code will need
+rewriting — new labels, new patterns — against your own archive's
+actual layout before anything downstream of it works. Doing that
+rewrite means editing regular-expression patterns directly, which is a
+real programming task even though the rest of this book doesn't assume
+you can do one yet. That adaptation is not a gap to route around; it is
+the point. This book teaches you the full pipeline end to end, on one
+real dataset, so you have the understanding to rebuild each stage
+against your own data — not a drop-in tool that already expects it. See
+[Appendix C](appendix/appendix_c_known_limitations.qmd) for this and
+five other concrete places this book's code is scoped to what it was
+actually tested against.

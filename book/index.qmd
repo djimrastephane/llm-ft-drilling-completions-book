@@ -146,10 +146,13 @@ case in plain terms — and its limits.
 - **Known limits.** Fine-tuning teaches style and domain patterns; it is
   not a substitute for retrieval when the model needs to cite a specific,
   current document verbatim — Chapter 9 covers combining the two. See
-  [Appendix C](appendix/appendix_c_known_limitations.qmd) for five
+  [Appendix C](appendix/appendix_c_known_limitations.qmd) for six
   concrete gaps — from brittle report parsing to a faithfulness check
   that misses a reversed operation — worth checking before you point
-  this pipeline at your own archive.
+  this pipeline at your own archive. That faithfulness check in
+  particular is a teaching tool, not a validated safety system — never
+  use it, unsupervised, as the check on whether a live-well handover
+  summary is safe to act on.
 
 This supports an engineer's judgment; it doesn't replace it. A more
 fluent model is only as good as the review process around how its
