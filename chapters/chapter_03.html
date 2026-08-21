@@ -505,6 +505,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Appendix B: Drilling, Completions &amp; Fine-Tuning Glossary</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_c_known_limitations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix C: Known Limitations</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
@@ -752,7 +758,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output" class="level2" data-number="3.10">
 <h2 data-number="3.10" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">3.10</span> Expected Output</h2>
 <p>A plain-text prompt string, with no trace of the expected answer.</p>
-<div id="e3a1d9c5" class="cell" data-execution_count="1">
+<div id="39d60942" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -800,7 +806,7 @@ Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22</code></pre>
 <section id="expected-output-1" class="level2" data-number="3.15">
 <h2 data-number="3.15" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">3.15</span> Expected Output</h2>
 <p>A dictionary recording the question, the hidden expected answer, the model’s actual answer, and whether they matched.</p>
-<div id="6449d733" class="cell" data-execution_count="2">
+<div id="71b1b235" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ask_baseline(model, tokenizer, example: <span class="bu">dict</span>, max_new_tokens: <span class="bu">int</span> <span class="op">=</span> <span class="dv">60</span>) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    prompt <span class="op">=</span> build_prompt(example)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    answer <span class="op">=</span> generate_reply(model, tokenizer, prompt, max_new_tokens<span class="op">=</span>max_new_tokens)</span>
@@ -850,7 +856,7 @@ Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22</code></pre>
 <section id="expected-output-2" class="level2" data-number="3.20">
 <h2 data-number="3.20" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">3.20</span> Expected Output</h2>
 <p>A summary line reporting how many of the 16 answers matched, and a saved <code>.jsonl</code> file with one result per question.</p>
-<div id="a03d118d" class="cell" data-execution_count="3">
+<div id="54a12010" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>TRAINING_BASELINE_OUTPUT_PATH <span class="op">=</span> BOOK_ROOT <span class="op">/</span> <span class="st">"datasets"</span> <span class="op">/</span> <span class="st">"training_examples"</span> <span class="op">/</span> <span class="st">"training_baseline_results.jsonl"</span></span>

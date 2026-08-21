@@ -505,6 +505,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Appendix B: Drilling, Completions &amp; Fine-Tuning Glossary</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_c_known_limitations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix C: Known Limitations</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
@@ -688,7 +694,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output" class="level2" data-number="8.9">
 <h2 data-number="8.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">8.9</span> Expected Output</h2>
 <p>669 training examples; the held-out report’s own timeline entries, built separately.</p>
-<div id="e6d1c091" class="cell" data-execution_count="1">
+<div id="1ae4bb3e" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -733,7 +739,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output-1" class="level2" data-number="8.14">
 <h2 data-number="8.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">8.14</span> Expected Output</h2>
 <p>One <code>checkpoint_N/</code> directory and one new row in <code>metrics.csv</code> per epoch.</p>
-<div id="927e5f98" class="cell" data-execution_count="2">
+<div id="77aaddaf" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> csv</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
@@ -827,7 +833,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output-2" class="level2" data-number="8.19">
 <h2 data-number="8.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">8.19</span> Expected Output</h2>
 <p>Training resumes from the saved epoch, and the loss continues falling from where it left off rather than restarting from scratch.</p>
-<div id="4bbc67f5" class="cell" data-execution_count="3">
+<div id="d194bc63" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> peft <span class="im">import</span> PeftModel</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>

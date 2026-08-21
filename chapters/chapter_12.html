@@ -505,6 +505,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Appendix B: Drilling, Completions &amp; Fine-Tuning Glossary</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendix/appendix_c_known_limitations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix C: Known Limitations</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
@@ -666,7 +672,7 @@ checkpoint_1 -&gt; checkpoint_2: exact_match=unchanged  avg_overlap=regressed  p
 <section id="expected-output" class="level2" data-number="12.9">
 <h2 data-number="12.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">12.9</span> Expected Output</h2>
 <p>One dictionary per version: exact-match count, average overlap score, and perplexity.</p>
-<div id="af53fdeb" class="cell" data-execution_count="1">
+<div id="3c714cc5" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> summarize_version(model, tokenizer, eval_set: <span class="bu">list</span>[<span class="bu">dict</span>]) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    results <span class="op">=</span> evaluate(model, tokenizer, eval_set)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    texts <span class="op">=</span> [e[<span class="st">"output"</span>] <span class="cf">for</span> e <span class="kw">in</span> eval_set]</span>
@@ -701,7 +707,7 @@ checkpoint_1 -&gt; checkpoint_2: exact_match=unchanged  avg_overlap=regressed  p
 <section id="expected-output-1" class="level2" data-number="12.14">
 <h2 data-number="12.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">12.14</span> Expected Output</h2>
 <p>A direction per metric — <code>improved</code>, <code>regressed</code>, or <code>unchanged</code>.</p>
-<div id="0a5206ba" class="cell" data-execution_count="2">
+<div id="f61ed909" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> compare_versions(before: <span class="bu">dict</span>, after: <span class="bu">dict</span>) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> direction(before_value, after_value, lower_is_better<span class="op">=</span><span class="va">False</span>):</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> after_value <span class="op">==</span> before_value:</span>
@@ -741,7 +747,7 @@ checkpoint_1 -&gt; checkpoint_2: exact_match=unchanged  avg_overlap=regressed  p
 <section id="expected-output-2" class="level2" data-number="12.19">
 <h2 data-number="12.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">12.19</span> Expected Output</h2>
 <p>A summary per checkpoint, and a direction comparison for every consecutive pair.</p>
-<div id="d0724d69" class="cell" data-execution_count="3">
+<div id="6c90493f" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>summaries <span class="op">=</span> {}</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> checkpoint_dir <span class="kw">in</span> checkpoints:</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    model, tokenizer <span class="op">=</span> load_version(checkpoint_dir)</span>

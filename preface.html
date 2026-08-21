@@ -524,6 +524,12 @@ div.csl-indent {
  <span class="menu-text">Appendix B: Drilling, Completions &amp; Fine-Tuning Glossary</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix/appendix_c_known_limitations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix C: Known Limitations</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
@@ -605,6 +611,7 @@ div.csl-indent {
 <h2 class="anchored" data-anchor-id="a-note-on-data">A note on data</h2>
 <p>Daily drilling and completions reports are typically operationally sensitive and confidential — which is exactly why this book reuses the same source as the author’s previous book on retrieval: real, publicly available Daily Drilling and completion reports from <strong>Utah FORGE</strong>, a Department of Energy-funded enhanced geothermal system research well (FORGE 16A(78)-32). No anonymisation was applied, because none was needed. See <code>book/datasets/README.md</code> for the exact layout and policy.</p>
 <p>That said, the <em>technique</em> in this book generalises directly to a confidential archive: everything from Chapter 6 onward — data quality gates, evaluation, drift detection — exists precisely because production training data is messier and more sensitive than this public one. If you point this book’s code at your own organisation’s reports instead, do not commit them to a public repository, and see <a href="./appendix/appendix_a_environment_setup.html">Appendix A</a> for a data-handling checklist.</p>
+<p>One thing that does <em>not</em> generalise automatically: Chapter 2’s and Chapter 7’s extraction code reads specific field labels at specific positions in Utah FORGE’s own report layout. There is no single “Daily Drilling Report” format across operators, contractors, and basins, so that extraction code will need rewriting — new labels, new patterns — against your own archive’s actual layout before anything downstream of it works. That adaptation is not a gap to route around; it is the point. This book teaches you the full pipeline end to end, on one real dataset, so you have the understanding to rebuild each stage against your own data — not a drop-in tool that already expects it. See <a href="./appendix/appendix_c_known_limitations.html">Appendix C</a> for this and four other concrete places this book’s code is scoped to what it was actually tested against.</p>
 
 
 <!-- -->
@@ -1204,7 +1211,21 @@ Matthes, Eric. 2023. <em>Python Crash Course: A Hands-on, Project-Based Introduc
 <span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>point this book's code at your own organisation's reports instead, do</span>
 <span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>not commit them to a public repository, and see</span>
 <span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Appendix A</span><span class="co">](appendix/appendix_a_environment_setup.qmd)</span> for a</span>
-<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>data-handling checklist.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>data-handling checklist.</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>One thing that does *not* generalise automatically: Chapter 2's and</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>Chapter 7's extraction code reads specific field labels at specific</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>positions in Utah FORGE's own report layout. There is no single "Daily</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>Drilling Report" format across operators, contractors, and basins, so</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>that extraction code will need rewriting — new labels, new patterns —</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>against your own archive's actual layout before anything downstream of</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>it works. That adaptation is not a gap to route around; it is the point.</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>This book teaches you the full pipeline end to end, on one real dataset,</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>so you have the understanding to rebuild each stage against your own</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>data — not a drop-in tool that already expects it. See [Appendix</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>C](appendix/appendix_c_known_limitations.qmd) for this and four other</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>concrete places this book's code is scoped to what it was actually</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>tested against.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
