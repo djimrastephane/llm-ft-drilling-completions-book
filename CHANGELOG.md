@@ -268,6 +268,24 @@ highlights in narrative form.
   correctly reports `"improved"` when perplexity happens to also drop,
   which an existing test already covered). All five pass, and the full
   `pytest -v -m "not slow"` suite (72 tests) passes with no regressions.
+- **A sixth test, closing the audit's Final Question follow-up**: the
+  audit's own answer to "under what conditions could this software give
+  a believable but physically incorrect answer?" named one gap the five
+  tests above don't touch -- a report in a genuinely different layout
+  being silently mis-parsed rather than rejected or flagged.
+  `test_chapter_02.py::test_extract_fields_does_not_partially_match_an_unrelated_document`
+  feeds `extract_fields` a synthetic, entirely unrelated document (a
+  monthly production summary, none of this book's DDR field labels) and
+  confirms every field comes back `None` rather than accidentally
+  satisfying one or two patterns by coincidence -- the sharper risk
+  behind that gap, since Chapter 2's and Chapter 6's existing tests only
+  demonstrated correct rejection on a real *differently-labeled* DDR
+  (the completion report), not on a document with no DDR structure at
+  all. This all-or-nothing result is exactly what Chapter 2's
+  `build_examples_for_report` and Chapter 6's `build_archive_records`
+  status classification both key off of to reject a known-bad layout
+  outright. Full `pytest -v -m "not slow"` suite (73 tests) passes with
+  no regressions.
 
 ### Changed
 

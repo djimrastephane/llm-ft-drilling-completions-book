@@ -41,6 +41,31 @@ def test_build_examples_for_report_returns_two_examples():
         assert "2020-11-26" in example["input"]
 
 
+def test_extract_fields_does_not_partially_match_an_unrelated_document():
+    # A real risk for a regex-based extractor: a differently-structured
+    # document could accidentally satisfy one or two field patterns by
+    # coincidence and get silently treated as a valid, if partial, DDR --
+    # rather than being rejected outright. None of these patterns should
+    # match text that never uses this book's expected field labels at all.
+    unrelated_text = (
+        "MONTHLY PRODUCTION SUMMARY\n"
+        "Field: Uintah Basin\n"
+        "Operator: Some Other Company\n"
+        "Report Number: 12\n"
+        "Gross oil (bbl): 1,204\n"
+        "Notes: routine reporting, no incidents.\n"
+    )
+
+    fields = extract_fields(unrelated_text)
+
+    assert all(value is None for value in fields.values())
+    # This all-or-nothing result is exactly what build_examples_for_report
+    # (below) and Chapter 6's build_archive_records status classification
+    # both key off of to reject a known-bad layout outright, instead of
+    # silently training on -- or passing the quality gate with -- garbage
+    # fields pulled from a document this book was never meant to handle.
+
+
 def test_build_examples_for_report_skips_unrecognized_layout():
     # The completion report uses different field labels ("Present Ops:",
     # "Next 24 Hours:") than the drilling-report patterns this chapter's
