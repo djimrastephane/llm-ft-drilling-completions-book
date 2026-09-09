@@ -10,8 +10,10 @@ Chapter 8's ~30-minute script).
 """
 
 import math
+from types import SimpleNamespace
 
 import pytest
+import torch
 
 from eval_finetuned_model import build_held_out_eval_set, evaluate, exact_match, perplexity
 from hybrid_rag_finetune import latest_checkpoint
@@ -29,6 +31,35 @@ def test_build_held_out_eval_set_returns_real_examples_from_report_37():
 def test_exact_match_is_case_insensitive_substring_check():
     assert exact_match("Trip out of hole with BHA #18.", "trip out of hole") is True
     assert exact_match("Circulate to cool the tools.", "trip out of hole") is False
+
+
+class _FixedLossModel:
+    """Stands in for a real model, returning a pre-set loss per call so the
+    averaging-before-exponentiating arithmetic -- not model behavior -- is
+    what's under test.
+    """
+
+    def __init__(self, losses):
+        self._losses = iter(losses)
+
+    def __call__(self, input_ids, labels):
+        return SimpleNamespace(loss=torch.tensor(next(self._losses)))
+
+
+def _fixed_input_ids_tokenizer(text, return_tensors="pt"):
+    return {"input_ids": torch.tensor([[1, 2, 3]])}
+
+
+def test_perplexity_averages_loss_before_exponentiating():
+    # Hand-computed: mean loss (0.0 + 2.0) / 2 = 1.0 -> exp(1.0).
+    model = _FixedLossModel([0.0, 2.0])
+
+    result = perplexity(model, _fixed_input_ids_tokenizer, ["text one", "text two"])
+
+    assert result == pytest.approx(math.exp(1.0))
+    # Averaging perplexities directly instead (the wrong order) would give
+    # a different, larger answer -- guard against that regression too.
+    assert result != pytest.approx((math.exp(0.0) + math.exp(2.0)) / 2)
 
 
 @pytest.fixture(scope="module")

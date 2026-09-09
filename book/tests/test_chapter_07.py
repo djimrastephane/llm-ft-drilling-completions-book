@@ -34,6 +34,18 @@ def test_chunk_text_splits_at_word_boundaries_not_mid_word():
     assert " ".join(chunks) == text
 
 
+def test_chunk_text_can_exceed_max_chars_for_a_single_unspaced_long_token():
+    # Known edge case, not a regression: the length guard only fires when
+    # the current chunk is already non-empty, so one token longer than
+    # max_chars is still emitted whole rather than split mid-word.
+    long_token = "a" * 400
+
+    chunks = chunk_text(long_token, max_chars=300)
+
+    assert chunks == [long_token]
+    assert len(chunks[0]) > 300
+
+
 def test_contains_cid_artifact_detects_undecoded_glyphs():
     assert contains_cid_artifact("Time(cid:0)WOB(K) Rotary") is True
     assert contains_cid_artifact("Normal operational text") is False

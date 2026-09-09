@@ -49,6 +49,20 @@ def test_retrieve_returns_k_results_ranked_by_score():
     assert results[0]["score"] >= results[1]["score"]
 
 
+def test_bm25_score_increases_with_term_frequency_and_zero_overlap_scores_zero():
+    corpus = [
+        {"report_num": 1, "from_time": "06:00", "to_time": "07:00", "text": "circulate circulate circulate for temperature control"},
+        {"report_num": 2, "from_time": "06:00", "to_time": "07:00", "text": "circulate to cool the tools briefly"},
+        {"report_num": 3, "from_time": "06:00", "to_time": "07:00", "text": "trip out of hole with BHA"},
+    ]
+    bm25 = build_bm25_index(corpus)
+
+    by_report = {r["report_num"]: r["score"] for r in retrieve("circulate", corpus, bm25, k=3)}
+
+    assert by_report[1] > by_report[2] > by_report[3]
+    assert by_report[3] == 0.0  # zero term overlap scores at the BM25 floor, not just "low"
+
+
 def test_build_grounded_prompt_includes_instruction_input_and_sources():
     retrieved = [{"report_num": 5, "from_time": "10:00", "to_time": "11:00", "text": "trip out of hole"}]
 

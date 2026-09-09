@@ -235,6 +235,39 @@ highlights in narrative form.
   and fixed its stale "four other" cross-reference to "five other."
   Verified with a full local `quarto render` -- HTML and PDF both build
   cleanly, and the new callout and all cited numbers render correctly.
+- **Five analytical-benchmark tests for the book's numeric/statistical
+  code**, closing the one real gap found by an independent engineering
+  QA/QC audit of this repo (the audit also checked, and confirmed, that
+  every equation already implemented -- perplexity, cosine similarity,
+  BM25 retrieval, the Chapter 10 faithfulness score, the Chapter 12
+  drift comparator -- was correct, and that every specific drilling-data
+  number quoted in the book's prose matches its source PDF byte-for-byte).
+  Unlike the existing integration-style tests, which run each chapter's
+  real function against real report data and check the result matches a
+  known real run, these feed a hand-computed input and assert the
+  textbook-correct output, independent of what the pipeline currently
+  produces: `test_chapter_11.py::test_perplexity_averages_loss_before_exponentiating`
+  (a fake fixed-loss model confirms `eval_finetuned_model.perplexity`
+  averages loss, not perplexity itself, before the one final `exp`) --
+  `test_chapter_09.py::test_bm25_score_increases_with_term_frequency_and_zero_overlap_scores_zero`
+  (a synthetic 3-document corpus confirms BM25 score ordering and that
+  zero term overlap scores exactly `0.0`, not just "low") --
+  `test_chapter_10.py::test_faithfulness_score_is_always_bounded_between_0_and_1`
+  (six answer/source pairs, including an all-stopwords answer and a
+  punctuation-only answer, confirm the score never leaves `[0, 1]` and
+  is never `NaN`) -- `test_chapter_07.py::test_chunk_text_can_exceed_max_chars_for_a_single_unspaced_long_token`
+  (documents, rather than silently leaves unverified, the one MINOR
+  finding the audit raised: a single token longer than
+  `MAX_CHUNK_CHARS` with no spaces is still emitted as its own oversized
+  chunk, since `chunk_text`'s length guard only fires once the current
+  chunk is non-empty -- harmless for real DDR prose, confirmed
+  unreachable in the current 86-report archive) -- and
+  `test_chapter_12.py::test_compare_versions_higher_after_perplexity_is_regressed`
+  (confirms `detect_model_drift.compare_versions`'s one inverted
+  better-direction metric flips to `"regressed"`, not just that it
+  correctly reports `"improved"` when perplexity happens to also drop,
+  which an existing test already covered). All five pass, and the full
+  `pytest -v -m "not slow"` suite (72 tests) passes with no regressions.
 
 ### Changed
 

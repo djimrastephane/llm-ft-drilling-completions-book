@@ -43,6 +43,16 @@ def test_compare_versions_higher_exact_match_is_improved():
     assert compare_versions(before, after)["exact_match"] == "improved"
 
 
+def test_compare_versions_higher_after_perplexity_is_regressed():
+    # Perplexity is the one metric here where lower is better -- confirm
+    # the direction flips correctly, not just that it's "improved" when
+    # after happens to also be lower (already covered above).
+    before = {"exact_match": 0, "avg_overlap": 0.35, "perplexity": 25.0}
+    after = {"exact_match": 0, "avg_overlap": 0.35, "perplexity": 28.0}
+
+    assert compare_versions(before, after)["perplexity"] == "regressed"
+
+
 @pytest.fixture(scope="module")
 def latest_run_checkpoints():
     runs = sorted(CHECKPOINTS_DIR.glob("run_*"))

@@ -9,6 +9,8 @@ won't have run Chapter 8's ~30-minute script).
     pytest -v -m "not slow"
 """
 
+import math
+
 import pytest
 
 from hybrid_rag_finetune import (
@@ -56,6 +58,21 @@ def test_faithfulness_score_is_partial_for_partly_supported_answer():
     score = faithfulness_score("trip out of hole with fishing bha", "pick up fishing bha and trip in hole")
 
     assert 0.0 < score < 1.0
+
+
+def test_faithfulness_score_is_always_bounded_between_0_and_1():
+    pairs = [
+        ("circulate to cool the tools", "circulate to cool the directional tools at depth"),
+        ("fishing operations with BHA 33", "drilling ahead with new bit at surface"),
+        ("", "some source text"),
+        ("trip out of hole with fishing bha", "pick up fishing bha and trip in hole"),
+        ("what happened on this well during this time window", "circulate to cool the tools"),  # all stopwords
+        ("!!! *** ###", "circulate to cool the tools"),  # no content words survive punctuation stripping
+    ]
+    for answer, source in pairs:
+        score = faithfulness_score(answer, source)
+        assert 0.0 <= score <= 1.0
+        assert not math.isnan(score)
 
 
 @pytest.fixture(scope="module")
