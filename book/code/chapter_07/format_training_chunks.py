@@ -68,6 +68,10 @@ def chunk_text(text: str, max_chars: int = MAX_CHUNK_CHARS) -> list[str]:
     chunks, current, current_len = [], [], 0
     for word in words:
         added_len = len(word) + (1 if current else 0)
+        # Guard only fires once `current` already holds a word, so a
+        # single word longer than max_chars on its own is emitted whole,
+        # not split mid-word -- see test_chunk_text_can_exceed_max_chars_
+        # for_a_single_unspaced_long_token.
         if current and current_len + added_len > max_chars:
             chunks.append(" ".join(current))
             current, current_len = [], 0

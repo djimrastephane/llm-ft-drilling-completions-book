@@ -286,6 +286,27 @@ highlights in narrative form.
   status classification both key off of to reject a known-bad layout
   outright. Full `pytest -v -m "not slow"` suite (73 tests) passes with
   no regressions.
+- **Closed the audit's two remaining `CANNOT VERIFY` items (P2/P3 of its
+  correction plan) with real numbers instead of leaving them
+  reasoned-but-unconfirmed.** E6 (a single unspaced word longer than
+  `MAX_CHUNK_CHARS` would be emitted as its own oversized chunk):
+  scanned every word in every timeline entry across all 75
+  successfully-extracted reports in the full archive (14,868 words
+  total) -- the longest single word is 36 characters (a
+  `(cid:0)`-artifact token in Report #21), nowhere near the 300-char
+  ceiling, so this edge case is confirmed unreachable in this archive,
+  not just unlikely. E9 (`finetune_at_scale.py`'s `epoch_loss /
+  len(examples)` has no zero-guard): traced both real call sites --
+  Chapter 8's `main()` always passes the full 669-example set, and
+  Chapter 13 splits it into 490 ("current") and 179 ("new") examples by
+  report-number cutoff, both already asserted against the real archive
+  in `test_chapter_13.py` -- neither can produce an empty list from the
+  shipped, fixed 76-report dataset; only a reader editing
+  `CUTOFF_REPORT_NUM` or supplying their own near-empty dataset could
+  reach it. Also added a one-line comment in
+  `code/chapter_07/format_training_chunks.py`'s `chunk_text` explaining
+  the E6 guard's non-obvious condition, pointing at the test that
+  documents it.
 
 ### Changed
 
