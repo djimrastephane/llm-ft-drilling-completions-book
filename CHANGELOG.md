@@ -307,6 +307,24 @@ highlights in narrative form.
   `code/chapter_07/format_training_chunks.py`'s `chunk_text` explaining
   the E6 guard's non-obvious condition, pointing at the test that
   documents it.
+- **Closed the audit's last open item -- Chapter 7's "example indexing"
+  historical bug -- with `git log -p` instead of leaving it
+  reasoned-but-unconfirmed.** `format_training_chunks.py`'s full commit
+  history shows only a scaffold placeholder, the single "Draft Chapter
+  7" commit that wrote the entire current `parse_timeline_entries` in
+  one shot, and this audit's own comment-only commit -- no distinct
+  buggy version of that function was ever committed. Cross-checking that
+  commit's message against Chapter 7's own checkpoint line ("Caught a
+  real PDF-extraction artifact before it reached training") identifies
+  what CLAUDE.md's referenced catch actually was: the `(cid:N)`
+  undecoded-glyph artifact filter, not an off-by-one in the span
+  arithmetic -- the same real-issue-caught-while-drafting pattern as the
+  Chapter 9 "retrieval-query design" catch named next to it. Published
+  the full audit -- equation inventory, engineering-data provenance
+  findings, the six merged tests, and this closure -- as a public
+  reference issue:
+  [#88](https://github.com/djimrastephane/llm-ft-drilling-completions-book/issues/88)
+  (closed; a completed record, not an open action item).
 
 ### Changed
 
