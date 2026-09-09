@@ -479,6 +479,16 @@ highlights in narrative form.
   README and is exactly where a reader browsing into `book/` on GitHub
   lands, so it needed the same link. Added right under the badges,
   matching the root README's placement.
+- **Two completed GitHub issues were left open even though the work
+  they tracked had already shipped**, drifting the tracker out of sync
+  again after the 2026-08-18 cleanup (see that entry below). `#87`
+  ("Response to reviewer feedback: Known Limitations") documented all
+  eight reviewer points already addressed in Appendix C -- its own body
+  said so. `#88` (the engineering QA/QC audit published this session)
+  was a completed reference record, not an action item, from the moment
+  it was opened. Closed both with a comment explaining why, matching
+  this repo's own habit of closing each issue in the same session that
+  finishes the underlying work.
 
 ## [1.0.0] - 2026-08-19
 
