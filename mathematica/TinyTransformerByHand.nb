@@ -1,0 +1,3716 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 15.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       154,          7]
+NotebookDataLength[    150832,       3706]
+NotebookOptionsPosition[    128373,       3341]
+NotebookOutlinePosition[    128803,       3358]
+CellTagsIndexPosition[    128760,       3355]
+WindowTitle->TinyTransformerByHand
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Can We Calculate a Transformer by Hand?", "Title",ExpressionUUID->"5ba09387-2d50-41f8-8187-663119f52345"],
+
+Cell["\<\
+A tiny transformer language model, worked entirely by hand \[LongDash] from \
+\"run casing\" to a probability for \"shoe\"\
+\>", "Subtitle",ExpressionUUID->"7d25a35d-4e63-4618-ae79-f9063e321e67"],
+
+Cell["\<\
+Modern language models contain billions of parameters and perform trillions \
+of arithmetic operations per response. Nobody reproduces that by hand, and \
+nobody needs to \[LongDash] but the arithmetic itself is not exotic. It is \
+addition, multiplication, exponentials, and logarithms, arranged in a \
+particular pattern called a transformer.
+
+This notebook shrinks that pattern down until every number fits on a sheet of \
+paper. I use a vocabulary of 6 words, sequences of 2 tokens, and an embedding \
+dimension of 2. The whole model has a few dozen parameters. Every matrix \
+multiplication, every softmax, every gradient below can be checked with a \
+calculator.
+
+The example is a drilling/completions phrase: given the two-word input \"run \
+casing\", the model should predict that the next word is \"shoe\" (as in a \
+casing shoe). This is a toy transformer LANGUAGE model \[LongDash] not an \
+LLM, and not any kind of reproduction of ChatGPT or similar production \
+systems. Its only job is to make the mechanics of attention, softmax, loss, \
+and gradient descent completely visible.\
+\>", "Text",
+ CellChangeTimes->{{3.9967490997185907`*^9, 
+  3.996749100672472*^9}},ExpressionUUID->"3f94e1a8-9945-4f71-8e3d-\
+2897d2e0e3ee"],
+
+Cell[CellGroupData[{
+
+Cell["The shape of the calculation", "Subsection",ExpressionUUID->"a48dedec-1be4-4845-808d-3f0a6e649aa9"],
+
+Cell["\<\
+Here is the full pipeline we are about to compute, start to finish. Every \
+arrow below corresponds to a section of this notebook and an explicit matrix \
+or vector calculation.\
+\>", "Text",ExpressionUUID->"9d4ebbc7-e964-4df2-b18d-9bf4b1c026a9"],
+
+Cell["\<\
+\"run casing\"
+    \[DownArrow]
+Token IDs                    (Section 2)
+    \[DownArrow]
+Embeddings                   (Section 3)
+    \[DownArrow]
+Q, K, V                      (Section 4)
+    \[DownArrow]
+Scaled dot-product attention  (Sections 5-8)
+    \[DownArrow]
+Output representation        (Section 8)
+    \[DownArrow]
+Logits                       (Section 9)
+    \[DownArrow]
+Softmax probabilities        (Section 10)
+    \[DownArrow]
+Prediction: \"shoe\"?
+    \[DownArrow]
+Cross-entropy loss           (Section 11)
+    \[DownArrow]
+Gradient                     (Section 12)
+    \[DownArrow]
+Weight update                (Section 13)
+    \[DownArrow]
+New prediction                (Section 14)\
+\>", "Program",ExpressionUUID->"84466a5b-e6d4-44ac-914f-f9934448403c"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["What this notebook is \[LongDash] and is not", "Subsection",ExpressionUUID->"76892847-457d-4b58-8b7f-88d6878e3dcf"],
+
+Cell["\<\
+This is a transformer: the same attention-then-project pattern used by real \
+language models, reduced to a size a person can compute by hand. It is a \
+language model in the narrow technical sense of Section 1 below: something \
+that assigns probabilities to \"what word comes next\". It is not an LLM (a \
+large language model with billions of parameters trained on enormous text \
+corpora), and it is not ChatGPT, Claude, or any production system. Treat \
+every number in this notebook as belonging to a teaching-sized toy, not a \
+scaled-down copy of a real product.\
+\>", "Text",ExpressionUUID->"e9633408-78df-42c7-8eef-d4a65239eeaa"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["What we left out, and why that is fine here", "Subsection",ExpressionUUID->"df14f2cc-ee40-4dbd-8b5c-e5775457ba0d"],
+
+Cell["\<\
+LayerNorm \[LongDash] real transformers rescale activations between steps to \
+keep training stable across many layers. With one block and tens of \
+parameters, there is nothing to destabilize.\
+\>", "Item",ExpressionUUID->"f462ccbc-091c-4f9c-b021-3a9105f2cf47"],
+
+Cell["\<\
+Residual (skip) connections \[LongDash] these help gradients flow through \
+many stacked layers. We only have one layer, so there is no long path for a \
+gradient to vanish along.\
+\>", "Item",ExpressionUUID->"d1fb7c54-7f7f-410e-b343-852ed0d55a2d"],
+
+Cell["\<\
+Dropout \[LongDash] a regularizer that fights overfitting on large datasets. \
+We have exactly one training example, so overfitting is not the concern; \
+transparency is.\
+\>", "Item",ExpressionUUID->"d3565a6b-ba64-4e34-aa7d-32d8820f7378"],
+
+Cell["\<\
+Multi-head attention \[LongDash] real models run several attention \
+computations in parallel and combine them. One head already shows the \
+complete mechanism; a second head would only duplicate arithmetic without \
+adding a new idea.\
+\>", "Item",ExpressionUUID->"70abd356-d57c-4d1c-b040-b6d405f1a9fa"],
+
+Cell["\<\
+A large feed-forward network inside the block \[LongDash] omitted so that the \
+output projection (Section 9) is the only place logits are produced, keeping \
+the path from attention output to prediction short and traceable.\
+\>", "Item",ExpressionUUID->"006bf8c6-3ed2-484c-92a0-3402b6a9bd91"],
+
+Cell["\<\
+Positional encodings \[LongDash] with only 2 positions and a causal mask that \
+already distinguishes \"first token\" from \"second token\", an explicit \
+position signal would add notation without adding insight.\
+\>", "Item",ExpressionUUID->"979a9b30-03d8-466b-82f1-2e668f93c1c1"],
+
+Cell["\<\
+Every one of these choices trades realism for transparency. Section 16 \
+returns to this trade-off explicitly.\
+\>", "Text",ExpressionUUID->"d9735ffa-5717-4f65-91f3-4783b3c88c53"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["1. The Prediction Problem", "Section",ExpressionUUID->"2dc9385c-4c6a-4b1d-9005-8367b293adea"],
+
+Cell["\<\
+Given the two-word phrase:
+
+\"run casing\"
+
+we want the model to predict the single most likely next word. In this \
+drilling/completions example, the correct next word is:
+
+\"shoe\"
+
+(as in a casing shoe, the equipment run on the bottom of a casing string).
+
+In plain language, a language model's job is to compute:
+
+P(next token | previous tokens)
+
+\[LongDash] read as \"the probability of the next token, given the tokens \
+that came before it.\" The model does not know English, drilling engineering, \
+or anything else. It only manipulates numbers derived from the input tokens, \
+and those numbers happen to be arranged so that, after training, the right \
+answer gets a high probability and everything else gets a low one. The rest \
+of this notebook computes that probability distribution for \"run casing\" \
+explicitly, one arithmetic step at a time, then shows how a single training \
+update changes it.\
+\>", "Text",ExpressionUUID->"3fed41a5-8b94-489f-8ac1-443410cb0545"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["2. Vocabulary and Token IDs", "Section",ExpressionUUID->"19c42f4a-484b-4f0a-a3ad-e41d3bdceb45"],
+
+Cell["\<\
+Computers do not work with words directly. The first step of any language \
+model is to fix a vocabulary \[LongDash] a finite list of tokens the model \
+knows about \[LongDash] and give every token an ID number (its position in \
+the list). Any text the model sees must be built out of these tokens; \
+anything outside the vocabulary simply cannot be represented.
+
+Our vocabulary has 6 tokens: a beginning-of-sequence marker, three \
+drilling-related words, one more drilling-related word, and an \
+end-of-sequence marker.\
+\>", "Text",ExpressionUUID->"4875c9c9-28c4-4089-bef5-86ffcbc2026c"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Vocabulary", " ", "=", " ", 
+   RowBox[{"{", 
+    RowBox[{"\"\<<BOS>\>\"", ",", " ", "\"\<run\>\"", ",", 
+     " ", "\"\<casing\>\"", ",", " ", "\"\<shoe\>\"", ",", 
+     " ", "\"\<cement\>\"", ",", " ", "\"\<<EOS>\>\""}], "}"}]}], ";"}], "\n", 
+ RowBox[{"Grid", "[", 
+  RowBox[{
+   RowBox[{"Prepend", "[", 
+    RowBox[{
+     RowBox[{"Transpose", "[", 
+      RowBox[{"{", 
+       RowBox[{"Vocabulary", ",", " ", 
+        RowBox[{"Range", "[", 
+         RowBox[{"Length", "[", "Vocabulary", "]"}], "]"}]}], "}"}], "]"}], ",",
+      " ", 
+     RowBox[{"{", 
+      RowBox[{"\"\<Token\>\"", ",", " ", "\"\<Token ID\>\""}], "}"}]}], "]"}],
+    ",", "\n", "  ", 
+   RowBox[{"Frame", " ", "->", " ", "All"}], ",", " ", 
+   RowBox[{"Background", " ", "->", " ", 
+    RowBox[{"{", 
+     RowBox[{"None", ",", " ", 
+      RowBox[{"{", 
+       RowBox[{"LightGray", ",", " ", "None"}], "}"}]}], "}"}]}]}], 
+  "]"}]}], "Input",
+ CellLabel->"In[1]:=",ExpressionUUID->"5d24ce0e-596c-4ced-8a88-460b1afacac5"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"\<\"Token\"\>", "\<\"Token ID\"\>"},
+    {"\<\"<BOS>\"\>", "1"},
+    {"\<\"run\"\>", "2"},
+    {"\<\"casing\"\>", "3"},
+    {"\<\"shoe\"\>", "4"},
+    {"\<\"cement\"\>", "5"},
+    {"\<\"<EOS>\"\>", "6"}
+   },
+   AutoDelete->False,
+   GridBoxBackground->{"Columns" -> {{None}}, "Rows" -> {
+       GrayLevel[0.85], None}},
+   GridBoxFrame->{"Columns" -> {{True}}, "Rows" -> {{True}}},
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+  "Grid"]], "Output",
+ CellChangeTimes->{3.996747453920336*^9},
+ CellLabel->"Out[2]=",ExpressionUUID->"b6418874-1bc0-4665-8577-d12e628d92a1"]
+}, Open  ]],
+
+Cell["\<\
+Our input phrase \"run casing\" is a sequence of two tokens. Looking up each \
+word's position in the list above turns the phrase into a list of token IDs:\
+\>", "Text",ExpressionUUID->"0a6ee300-1a53-422b-bd1a-95a142f5c8a5"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"inputTokens", " ", "=", " ", 
+   RowBox[{"{", 
+    RowBox[{"\"\<run\>\"", ",", " ", "\"\<casing\>\""}], "}"}]}], ";"}], "\n", 
+ RowBox[{"tokenIDs", " ", "=", " ", 
+  RowBox[{"Flatten", "[", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Position", "[", 
+      RowBox[{"Vocabulary", ",", " ", "#"}], "]"}], " ", "&"}], " ", "/@", 
+    " ", "inputTokens"}], "]"}]}]}], "Input",
+ CellLabel->"In[3]:=",ExpressionUUID->"604a8f21-fae5-4fe2-b9e3-7f39460d6f29"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"2", ",", "3"}], "}"}]], "Output",
+ CellChangeTimes->{3.9967474540654793`*^9},
+ CellLabel->"Out[4]=",ExpressionUUID->"a3687fb1-61ee-4ef2-b584-18c15149daa1"]
+}, Open  ]],
+
+Cell["\<\
+So \"run casing\" becomes {2, 3}: \"run\" is token 2 and \"casing\" is token \
+3. From this point on, the model never sees the words \"run\" or \"casing\" \
+again \[LongDash] only the numbers 2 and 3, and (next) the vectors those \
+numbers point to.\
+\>", "Text",ExpressionUUID->"680df650-90a5-4127-b29f-c3685c8324c7"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["3. Embedding Lookup", "Section",ExpressionUUID->"7811da34-882e-4b96-83da-af7af6cd504a"],
+
+Cell["\<\
+A token ID like 2 is just a label \[LongDash] it carries no information about \
+meaning or similarity between words. An embedding replaces each token ID with \
+a vector of numbers (here, a vector of length 2) that the model can actually \
+do arithmetic with. In a real model these vectors are learned from data and \
+have hundreds of dimensions; here we fix them by hand, with dimension 2, so \
+every coordinate can be inspected directly.
+
+Below is the full embedding table: one row per vocabulary token, one column \
+per embedding dimension.\
+\>", "Text",ExpressionUUID->"fe843dd9-d81f-4eaf-8dd7-ddb627c7f820"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"EmbeddingMatrix", " ", "=", " ", 
+   RowBox[{"{", "\n", "  ", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"0", ",", " ", "0"}], "}"}], ",", "   ", 
+     RowBox[{"(*", " ", 
+      RowBox[{"<", "BOS", ">"}], "  ", "*)"}], "\n", "  ", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", " ", "0"}], "}"}], ",", "   ", 
+     RowBox[{"(*", " ", "run", "    ", "*)"}], "\n", "  ", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", " ", "1"}], "}"}], ",", "   ", 
+     RowBox[{"(*", " ", "casing", " ", "*)"}], "\n", "  ", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", " ", "1"}], "}"}], ",", "   ", 
+     RowBox[{"(*", " ", "shoe", "   ", "*)"}], "\n", "  ", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"-", "1"}], ",", " ", "1"}], "}"}], ",", "  ", 
+     RowBox[{"(*", " ", "cement", " ", "*)"}], "\n", "  ", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", " ", 
+       RowBox[{"-", "1"}]}], "}"}]}], "   ", 
+    RowBox[{"(*", " ", 
+     RowBox[{"<", "EOS", ">"}], "  ", "*)"}], "\n", "}"}]}], ";"}], "\n", 
+ RowBox[{"Grid", "[", 
+  RowBox[{
+   RowBox[{"Prepend", "[", 
+    RowBox[{
+     RowBox[{"Transpose", "[", 
+      RowBox[{"{", 
+       RowBox[{"Vocabulary", ",", " ", "EmbeddingMatrix"}], "}"}], "]"}], ",",
+      " ", 
+     RowBox[{"{", 
+      RowBox[{"\"\<Token\>\"", ",", " ", "\"\<Embedding\>\""}], "}"}]}], 
+    "]"}], ",", "\n", "  ", 
+   RowBox[{"Frame", " ", "->", " ", "All"}], ",", " ", 
+   RowBox[{"Background", " ", "->", " ", 
+    RowBox[{"{", 
+     RowBox[{"None", ",", " ", 
+      RowBox[{"{", 
+       RowBox[{"LightGray", ",", " ", "None"}], "}"}]}], "}"}]}]}], 
+  "]"}]}], "Input",
+ CellLabel->"In[5]:=",ExpressionUUID->"e16eca72-27ae-435e-8ceb-006243464382"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"\<\"Token\"\>", "\<\"Embedding\"\>"},
+    {"\<\"<BOS>\"\>", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "0"}], "}"}]},
+    {"\<\"run\"\>", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", "0"}], "}"}]},
+    {"\<\"casing\"\>", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "1"}], "}"}]},
+    {"\<\"shoe\"\>", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", "1"}], "}"}]},
+    {"\<\"cement\"\>", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"-", "1"}], ",", "1"}], "}"}]},
+    {"\<\"<EOS>\"\>", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", 
+       RowBox[{"-", "1"}]}], "}"}]}
+   },
+   AutoDelete->False,
+   GridBoxBackground->{"Columns" -> {{None}}, "Rows" -> {
+       GrayLevel[0.85], None}},
+   GridBoxFrame->{"Columns" -> {{True}}, "Rows" -> {{True}}},
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+  "Grid"]], "Output",
+ CellChangeTimes->{3.9967474540674057`*^9},
+ CellLabel->"Out[6]=",ExpressionUUID->"25666447-9c5d-4f77-a29e-0a79390f8f61"]
+}, Open  ]],
+
+Cell["\<\
+\"run\" is deliberately set to {1, 0} and \"casing\" to {0, 1} \[LongDash] \
+the two simplest possible distinct vectors in 2 dimensions. Selecting the \
+rows for our input tokens {2, 3} builds the input matrix X: row 1 is the \
+embedding of position 1 (\"run\"), row 2 is the embedding of position 2 \
+(\"casing\"), and the 2 columns are the 2 embedding dimensions.\
+\>", "Text",ExpressionUUID->"416a4a53-f983-498d-8f1b-6a2f6c12446b"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"X", " ", "=", " ", 
+   RowBox[{"EmbeddingMatrix", "[", 
+    RowBox[{"[", "tokenIDs", "]"}], "]"}]}], ";"}], "\n", 
+ RowBox[{"MatrixForm", "[", "X", "]"}]}], "Input",
+ CellLabel->"In[7]:=",ExpressionUUID->"682d106e-c061-494d-b297-5c174c249e8a"],
+
+Cell[BoxData[
+ TagBox[
+  RowBox[{"(", "\[NoBreak]", GridBox[{
+     {"1", "0"},
+     {"0", "1"}
+    },
+    GridBoxAlignment->{"Columns" -> {{Center}}, "Rows" -> {{Baseline}}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.7]}, 
+        Offset[0.27999999999999997`]}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}}], "\[NoBreak]", ")"}],
+  Function[BoxForm`e$, 
+   MatrixForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{3.996747454072998*^9},
+ CellLabel->
+  "Out[8]//MatrixForm=",ExpressionUUID->"c75d8cc3-2ee6-4343-b610-\
+9ca52a1150a4"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Dimensions", "[", "X", "]"}]], "Input",
+ CellLabel->"In[9]:=",ExpressionUUID->"02c827e3-d1b8-4368-838c-dc09f29e0d79"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"2", ",", "2"}], "}"}]], "Output",
+ CellChangeTimes->{3.9967474540752487`*^9},
+ CellLabel->"Out[9]=",ExpressionUUID->"cb1da70d-bf7e-4d5f-ba2b-7359962018f4"]
+}, Open  ]],
+
+Cell["\<\
+X is 2\[Times]2: 2 rows because our sequence has 2 tokens, 2 columns because \
+our embedding dimension is 2. Because \"run\" and \"casing\" happen to be the \
+two standard unit vectors, X is exactly the 2\[Times]2 identity matrix \
+\[LongDash] a convenient coincidence that will make the next multiplications \
+easy to check by hand, without changing what the multiplication means.\
+\>", "Text",ExpressionUUID->"26dba138-9441-4beb-a0db-e15c16d9b66c"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["4. Query, Key, and Value Matrices", "Section",ExpressionUUID->"db9b335f-3274-460c-9568-8116f780352a"],
+
+Cell["\<\
+Attention compares positions to each other using three vectors derived from \
+each position's embedding, called the query, key, and value. These are just \
+names for the results of three ordinary matrix multiplications \[LongDash] \
+there is no decision-making or comparison happening yet, only arithmetic that \
+sets up the comparison in Section 5.
+
+We fix three 2\[Times]2 weight matrices, WQ, WK, WV, by hand:\
+\>", "Text",ExpressionUUID->"8fb578f0-9859-4547-a026-48b278bc9d2f"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"WQ", " ", "=", " ", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"1", ",", " ", "0"}], "}"}], ",", " ", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", " ", "1"}], "}"}]}], "}"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"WK", " ", "=", " ", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"1", ",", " ", "1"}], "}"}], ",", " ", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", " ", "1"}], "}"}]}], "}"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"WV", " ", "=", " ", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"1", ",", " ", "0"}], "}"}], ",", " ", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", " ", "1"}], "}"}]}], "}"}]}], ";"}], "\n", 
+ RowBox[{"Row", "[", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"MatrixForm", "[", "WQ", "]"}], ",", " ", "\"\<      \>\"", ",", 
+    " ", 
+    RowBox[{"MatrixForm", "[", "WK", "]"}], ",", " ", "\"\<      \>\"", ",", 
+    " ", 
+    RowBox[{"MatrixForm", "[", "WV", "]"}]}], "}"}], "]"}]}], "Input",
+ CellLabel->"In[10]:=",ExpressionUUID->"4a043668-a4f0-422f-b0cf-5eb03af013c0"],
+
+Cell[BoxData[
+ TemplateBox[{
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1", "0"}, {"1", "1"}}, RowSpacings -> 1, ColumnSpacings -> 1,
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+      ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]], "\"      \"", 
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1", "1"}, {"0", "1"}}, RowSpacings -> 1, ColumnSpacings -> 1,
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+      ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]], "\"      \"", 
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1", "0"}, {"0", "1"}}, RowSpacings -> 1, ColumnSpacings -> 1,
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+      ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]]},
+  "RowDefault"]], "Output",
+ CellChangeTimes->{3.996747454080777*^9},
+ CellLabel->"Out[13]=",ExpressionUUID->"61cc26c5-4e82-4278-9f14-578e45ac6a44"]
+}, Open  ]],
+
+Cell["\<\
+Query Q = X . WQ. Each row of Q is a row of X (a token's embedding) \
+multiplied against the columns of WQ, entry-by-entry sum of products \
+\[LongDash] ordinary matrix multiplication:\
+\>", "Text",ExpressionUUID->"49f41177-ec7f-4a9b-8037-1f3373b4504d"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Q", " ", "=", " ", 
+   RowBox[{"X", ".", "WQ"}]}], ";"}], "\n", 
+ RowBox[{"Row", "[", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"MatrixForm", "[", "X", "]"}], ",", " ", "\"\<   .   \>\"", ",", 
+    " ", 
+    RowBox[{"MatrixForm", "[", "WQ", "]"}], ",", " ", "\"\<   =   \>\"", ",", 
+    " ", 
+    RowBox[{"MatrixForm", "[", "Q", "]"}]}], "}"}], "]"}]}], "Input",
+ CellLabel->"In[14]:=",ExpressionUUID->"dfa6d2d6-45f5-481e-b61d-628803978fd0"],
+
+Cell[BoxData[
+ TemplateBox[{
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1", "0"}, {"0", "1"}}, RowSpacings -> 1, ColumnSpacings -> 1,
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+      ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]], "\"   .   \"", 
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1", "0"}, {"1", "1"}}, RowSpacings -> 1, ColumnSpacings -> 1,
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+      ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]], "\"   =   \"", 
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1", "0"}, {"1", "1"}}, RowSpacings -> 1, ColumnSpacings -> 1,
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+      ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]]},
+  "RowDefault"]], "Output",
+ CellChangeTimes->{3.996747454082818*^9},
+ CellLabel->"Out[15]=",ExpressionUUID->"f54392bd-40e3-487f-9674-c4f8fa1be5c4"]
+}, Open  ]],
+
+Cell["Key K = X . WK, computed the same way:", "Text",ExpressionUUID->"ccda2dab-3b72-47ab-a1e1-bfe05ca75a1c"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"K", " ", "=", " ", 
+   RowBox[{"X", ".", "WK"}]}], ";"}], "\n", 
+ RowBox[{"Row", "[", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"MatrixForm", "[", "X", "]"}], ",", " ", "\"\<   .   \>\"", ",", 
+    " ", 
+    RowBox[{"MatrixForm", "[", "WK", "]"}], ",", " ", "\"\<   =   \>\"", ",", 
+    " ", 
+    RowBox[{"MatrixForm", "[", "K", "]"}]}], "}"}], "]"}]}], "Input",
+ CellLabel->"In[16]:=",ExpressionUUID->"a30a1caf-c1c7-45ec-9851-cc95209d38d3"],
+
+Cell[BoxData[
+ TemplateBox[{
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1", "0"}, {"0", "1"}}, RowSpacings -> 1, ColumnSpacings -> 1,
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+      ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]], "\"   .   \"", 
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1", "1"}, {"0", "1"}}, RowSpacings -> 1, ColumnSpacings -> 1,
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+      ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]], "\"   =   \"", 
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1", "1"}, {"0", "1"}}, RowSpacings -> 1, ColumnSpacings -> 1,
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+      ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]]},
+  "RowDefault"]], "Output",
+ CellChangeTimes->{3.9967474540883427`*^9},
+ CellLabel->"Out[17]=",ExpressionUUID->"f9f6a9b9-5678-44e8-b59e-56a667b68669"]
+}, Open  ]],
+
+Cell["Value V = X . WV, computed the same way:", "Text",ExpressionUUID->"37c55928-6e61-41b7-a320-586a166b7f89"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"V", " ", "=", " ", 
+   RowBox[{"X", ".", "WV"}]}], ";"}], "\n", 
+ RowBox[{"Row", "[", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"MatrixForm", "[", "X", "]"}], ",", " ", "\"\<   .   \>\"", ",", 
+    " ", 
+    RowBox[{"MatrixForm", "[", "WV", "]"}], ",", " ", "\"\<   =   \>\"", ",", 
+    " ", 
+    RowBox[{"MatrixForm", "[", "V", "]"}]}], "}"}], "]"}]}], "Input",
+ CellLabel->"In[18]:=",ExpressionUUID->"d0d726b3-aaaa-402b-b7f2-760e8d0bfff5"],
+
+Cell[BoxData[
+ TemplateBox[{
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1", "0"}, {"0", "1"}}, RowSpacings -> 1, ColumnSpacings -> 1,
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+      ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]], "\"   .   \"", 
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1", "0"}, {"0", "1"}}, RowSpacings -> 1, ColumnSpacings -> 1,
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+      ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]], "\"   =   \"", 
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1", "0"}, {"0", "1"}}, RowSpacings -> 1, ColumnSpacings -> 1,
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+      ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]]},
+  "RowDefault"]], "Output",
+ CellChangeTimes->{3.996747454090437*^9},
+ CellLabel->"Out[19]=",ExpressionUUID->"db91a610-c225-4820-aabe-eacc3a6a8152"]
+}, Open  ]],
+
+Cell["\<\
+Because X is the identity matrix (Section 3), each product above equals the \
+corresponding weight matrix exactly (Q = WQ, K = WK, V = WV). You can verify \
+this by hand: row 1 of X, {1,0}, times WQ picks out row 1 of WQ; row 2, \
+{0,1}, picks out row 2. With a less convenient X the arithmetic is the same, \
+just less obviously so.\
+\>", "Text",ExpressionUUID->"d9cb1b1a-431d-4191-879c-4166622b9026"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["5. Attention Scores", "Section",ExpressionUUID->"e79bb574-535e-4e94-936c-813ded478d72"],
+
+Cell["\<\
+To measure how much position 2 should attend to position 1 (and to itself), \
+we compare Q to K using a matrix product: Q . Transpose[K]. Each entry (i, j) \
+of the result is the dot product of query i with key j \[LongDash] a single \
+number summarizing how well they align.\
+\>", "Text",ExpressionUUID->"b43cd784-a6ad-4de3-a6a3-dd7bae2433d4"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"rawScores", " ", "=", " ", 
+   RowBox[{"Q", ".", 
+    RowBox[{"Transpose", "[", "K", "]"}]}]}], ";"}], "\n", 
+ RowBox[{"Row", "[", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"MatrixForm", "[", "Q", "]"}], ",", " ", "\"\<   .   \>\"", ",", 
+    " ", 
+    RowBox[{"MatrixForm", "[", 
+     RowBox[{"Transpose", "[", "K", "]"}], "]"}], ",", " ", "\"\<   =   \>\"",
+     ",", " ", 
+    RowBox[{"MatrixForm", "[", "rawScores", "]"}]}], "}"}], "]"}]}], "Input",
+ CellLabel->"In[20]:=",ExpressionUUID->"0f5aa31a-77c4-49eb-af29-2fbede1fd9bb"],
+
+Cell[BoxData[
+ TemplateBox[{
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1", "0"}, {"1", "1"}}, RowSpacings -> 1, ColumnSpacings -> 1,
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+      ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]], "\"   .   \"", 
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1", "0"}, {"1", "1"}}, RowSpacings -> 1, ColumnSpacings -> 1,
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+      ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]], "\"   =   \"", 
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1", "0"}, {"2", "1"}}, RowSpacings -> 1, ColumnSpacings -> 1,
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+      ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]]},
+  "RowDefault"]], "Output",
+ CellChangeTimes->{3.996747454095748*^9},
+ CellLabel->"Out[21]=",ExpressionUUID->"3d24ab89-e992-40f3-8535-05dfbf2ea2a0"]
+}, Open  ]],
+
+Cell["\<\
+Before using these numbers, we scale them down by Sqrt[d], where d = 2 is the \
+embedding dimension. Why: as d grows, dot products of random vectors tend to \
+grow larger in magnitude purely because more terms are being added up, which \
+would push the softmax in Section 7 toward extremely peaked (near one-hot) \
+outputs and make training unstable. Dividing by Sqrt[d] keeps the scores in a \
+stable, comparable range regardless of dimension.\
+\>", "Text",ExpressionUUID->"6cdb57f6-d613-4a6e-afab-387b53cc2519"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"d", " ", "=", " ", "2"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"scaledScores", " ", "=", " ", 
+   RowBox[{"N", "[", 
+    RowBox[{"rawScores", "/", 
+     RowBox[{"Sqrt", "[", "d", "]"}]}], "]"}]}], ";"}], "\n", 
+ RowBox[{"MatrixForm", "[", "scaledScores", "]"}]}], "Input",
+ CellLabel->"In[22]:=",ExpressionUUID->"162adeb4-9690-4c59-a2e4-34db3194bf80"],
+
+Cell[BoxData[
+ TagBox[
+  RowBox[{"(", "\[NoBreak]", GridBox[{
+     {"0.7071067811865475`", "0.`"},
+     {"1.4142135623730951`", "0.7071067811865475`"}
+    },
+    GridBoxAlignment->{"Columns" -> {{Center}}, "Rows" -> {{Baseline}}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.7]}, 
+        Offset[0.27999999999999997`]}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}}], "\[NoBreak]", ")"}],
+  Function[BoxForm`e$, 
+   MatrixForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{3.996747454097995*^9},
+ CellLabel->
+  "Out[24]//MatrixForm=",ExpressionUUID->"a597b663-43bf-451e-9635-\
+0627cef3bc39"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["6. Causal Mask", "Section",ExpressionUUID->"9400ddb1-ab68-4cf6-aa08-b0f3dbce077b"],
+
+Cell["\<\
+This is a next-token predictor: for every position, we ask it to predict the \
+token that comes after that position. If position 1 (\"run\") were allowed to \
+look at position 2 (\"casing\") while trying to predict what comes after \
+\"run\", it would effectively be allowed to see part of the very continuation \
+it is supposed to predict \[LongDash] not a fair test, and not how the model \
+will be used at inference time, one token at a time.
+
+A causal mask enforces this: position i may attend only to positions j \
+\[LessEqual] i. We implement the mask by replacing every disallowed (future) \
+entry with -\[Infinity], so that after the softmax in Section 7 those \
+positions receive exactly zero attention weight.\
+\>", "Text",ExpressionUUID->"2b3a3dfe-d5ef-4b3d-8ffb-a69ea49e6bd5"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"maskedScores", " ", "=", " ", 
+   RowBox[{"{", "\n", "  ", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"scaledScores", "[", 
+        RowBox[{"[", 
+         RowBox[{"1", ",", " ", "1"}], "]"}], "]"}], ",", " ", 
+       RowBox[{"-", "Infinity"}]}], "}"}], ",", "        ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+       RowBox[{"position", " ", "1", " ", 
+        RowBox[{"(", "\"\<run\>\"", ")"}]}], ":", " ", 
+       RowBox[{"position", " ", "2", " ", "is", " ", "masked"}]}], " ", 
+      "*)"}], "\n", "  ", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"scaledScores", "[", 
+        RowBox[{"[", 
+         RowBox[{"2", ",", " ", "1"}], "]"}], "]"}], ",", " ", 
+       RowBox[{"scaledScores", "[", 
+        RowBox[{"[", 
+         RowBox[{"2", ",", " ", "2"}], "]"}], "]"}]}], "}"}]}], "  ", 
+    RowBox[{"(*", " ", 
+     RowBox[{
+      RowBox[{"position", " ", "2", " ", 
+       RowBox[{"(", "\"\<casing\>\"", ")"}]}], ":", " ", 
+      RowBox[{"both", " ", "positions", " ", "allowed"}]}], " ", "*)"}], "\n",
+     "}"}]}], ";"}], "\n", 
+ RowBox[{"MatrixForm", "[", "maskedScores", "]"}]}], "Input",
+ CellLabel->"In[25]:=",ExpressionUUID->"4a18c0f3-3e99-429e-a8da-d6188193ff8a"],
+
+Cell[BoxData[
+ TagBox[
+  RowBox[{"(", "\[NoBreak]", GridBox[{
+     {"0.7071067811865475`", 
+      RowBox[{"-", "\[Infinity]"}]},
+     {"1.4142135623730951`", "0.7071067811865475`"}
+    },
+    GridBoxAlignment->{"Columns" -> {{Center}}, "Rows" -> {{Baseline}}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.7]}, 
+        Offset[0.27999999999999997`]}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}}], "\[NoBreak]", ")"}],
+  Function[BoxForm`e$, 
+   MatrixForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{3.9967474541032553`*^9},
+ CellLabel->
+  "Out[26]//MatrixForm=",ExpressionUUID->"c378d3eb-4b49-40a0-af6c-\
+0ff5297ab054"]
+}, Open  ]],
+
+Cell["\<\
+Compare this to the unmasked scaledScores above: only the top-right entry \
+changed, from a finite number to -\[Infinity]. That single entry is exactly \
+the score for \"position 1 attending to position 2\" \[LongDash] the one \
+comparison a causal, left-to-right model is never allowed to make. Position 2 \
+keeps both of its entries, because when predicting the token after \
+\"casing\", the model is entitled to use everything up to and including \
+\"casing\".\
+\>", "Text",ExpressionUUID->"0b5ff5bf-4dd7-4ff9-b6ad-46ad86b38c06"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["7. Softmax", "Section",ExpressionUUID->"9cbbce4d-6fa6-4d50-92f2-23e46d63fca1"],
+
+Cell["\<\
+Attention scores need to become a probability distribution \[LongDash] \
+non-negative numbers that sum to 1 \[LongDash] so they can be used as weights \
+in Section 8. Softmax does this:
+
+Softmax[z_i] = Exp[z_i] / Sum[Exp[z_j], {j}]
+
+Every score is exponentiated (so all results are positive), then divided by \
+the sum of all the exponentials in that row (so the row sums to exactly 1). \
+Let's do this by hand for row 2 (the \"casing\" row), the one with two real \
+numbers to compare:\
+\>", "Text",ExpressionUUID->"56291b84-3b05-4cef-abcf-0a60698a2762"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"row2", " ", "=", " ", 
+   RowBox[{"maskedScores", "[", 
+    RowBox[{"[", "2", "]"}], "]"}]}], ";"}], "\n", 
+ RowBox[{"exps", " ", "=", " ", 
+  RowBox[{"Exp", "[", "row2", "]"}]}]}], "Input",
+ CellLabel->"In[27]:=",ExpressionUUID->"5b3ed1a5-3e5a-44f8-b1e8-a45ee6509f22"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"4.1132503787829275`", ",", "2.028114981647472`"}], "}"}]], "Output",\
+
+ CellChangeTimes->{3.996747454105163*^9},
+ CellLabel->"Out[28]=",ExpressionUUID->"ebcf7dd9-eb12-4bc4-a5a8-1d28c423eccf"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"sumExps", " ", "=", " ", 
+  RowBox[{"Total", "[", "exps", "]"}]}]], "Input",
+ CellLabel->"In[29]:=",ExpressionUUID->"9a30458d-e93e-4dca-ace3-4fcf699bf4d8"],
+
+Cell[BoxData["6.1413653604304`"], "Output",
+ CellChangeTimes->{3.996747454110076*^9},
+ CellLabel->"Out[29]=",ExpressionUUID->"33670950-74fe-4fec-9743-fa0a7d2ef9ae"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"softmaxRow2", " ", "=", " ", 
+  RowBox[{"exps", "/", "sumExps"}]}]], "Input",
+ CellLabel->"In[30]:=",ExpressionUUID->"fb5be867-011d-476d-8a0c-57de8528e93e"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"0.669761549326657`", ",", "0.33023845067334306`"}], 
+  "}"}]], "Output",
+ CellChangeTimes->{3.996747454111952*^9},
+ CellLabel->"Out[30]=",ExpressionUUID->"fd371eff-3016-4d04-965d-9b992304f3ba"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Total", "[", "softmaxRow2", "]"}]], "Input",
+ CellLabel->"In[31]:=",ExpressionUUID->"e5891e08-3e70-473f-929e-184e3c39c438"],
+
+Cell[BoxData["1.`"], "Output",
+ CellChangeTimes->{3.9967474541135817`*^9},
+ CellLabel->"Out[31]=",ExpressionUUID->"5c4f8f6d-c661-485d-89bd-2e97dbf55f3e"]
+}, Open  ]],
+
+Cell["\<\
+The two exponentials are ~4.113 and ~2.028; dividing each by their sum ~6.141 \
+gives probabilities ~0.670 and ~0.330, which do sum to 1 (up to \
+floating-point rounding). Now apply the same formula, row by row, to the \
+whole masked score matrix (row 1 is trivial: exp[x]/exp[x] = 1 for the only \
+allowed entry, and 0 for the masked one):\
+\>", "Text",ExpressionUUID->"fb4ec268-1ca3-47ff-9819-00188325a15e"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"SoftmaxRow", "[", "row_", "]"}], " ", ":=", " ", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"finite", ",", " ", "m", ",", " ", "ex"}], "}"}], ",", "\n", 
+     "   ", 
+     RowBox[{
+      RowBox[{"finite", " ", "=", " ", 
+       RowBox[{"Select", "[", 
+        RowBox[{"row", ",", " ", 
+         RowBox[{
+          RowBox[{"#", " ", ">", " ", 
+           RowBox[{"-", "Infinity"}]}], " ", "&"}]}], "]"}]}], ";", "\n", 
+      "   ", 
+      RowBox[{"m", " ", "=", " ", 
+       RowBox[{"Max", "[", "finite", "]"}]}], ";", "\n", "   ", 
+      RowBox[{"ex", " ", "=", " ", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"#", " ", ">", " ", 
+            RowBox[{"-", "Infinity"}]}], ",", " ", 
+           RowBox[{"Exp", "[", 
+            RowBox[{"#", " ", "-", " ", "m"}], "]"}], ",", " ", "0"}], "]"}], 
+         " ", "&"}], " ", "/@", " ", "row"}]}], ";", "\n", "   ", 
+      RowBox[{"ex", "/", 
+       RowBox[{"Total", "[", "ex", "]"}]}]}]}], "\n", "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"attentionWeights", " ", "=", " ", 
+   RowBox[{"SoftmaxRow", " ", "/@", " ", "maskedScores"}]}], ";"}], "\n", 
+ RowBox[{"MatrixForm", "[", "attentionWeights", "]"}]}], "Input",
+ CellLabel->"In[32]:=",ExpressionUUID->"3cc3d363-2dcc-4d21-9422-3ba22d10dd45"],
+
+Cell[BoxData[
+ TagBox[
+  RowBox[{"(", "\[NoBreak]", GridBox[{
+     {"1.`", "0.`"},
+     {"0.6697615493266569`", "0.330238450673343`"}
+    },
+    GridBoxAlignment->{"Columns" -> {{Center}}, "Rows" -> {{Baseline}}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.7]}, 
+        Offset[0.27999999999999997`]}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}}], "\[NoBreak]", ")"}],
+  Function[BoxForm`e$, 
+   MatrixForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{3.996747454115452*^9},
+ CellLabel->
+  "Out[34]//MatrixForm=",ExpressionUUID->"8178d41d-7b36-481e-bc33-\
+72afb6209744"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Total", " ", "/@", " ", "attentionWeights"}]], "Input",
+ CellLabel->"In[35]:=",ExpressionUUID->"210bcc66-210d-477d-bd43-15a903857328"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"1.`", ",", "0.9999999999999999`"}], "}"}]], "Output",
+ CellChangeTimes->{3.996747454120277*^9},
+ CellLabel->"Out[35]=",ExpressionUUID->"369f6dca-93e3-4479-bc1e-77f73934673d"]
+}, Open  ]],
+
+Cell["\<\
+Both rows sum to 1, confirming attentionWeights is a valid pair of \
+probability distributions. Row 1 is {1, 0}: position 1 puts all of its \
+attention on itself, because the causal mask left it no other choice. Row 2 \
+is approximately {0.670, 0.330}: position 2 splits its attention mostly onto \
+position 1 (\"run\"), with some weight on itself.\
+\>", "Text",ExpressionUUID->"76e01916-617f-477b-93a8-291144ab98ba"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["8. Weighted Values", "Section",ExpressionUUID->"409220e5-0e00-4ec6-87b9-373af9079714"],
+
+Cell["\<\
+Attention weights tell us how much to blend the value vectors of each \
+position. The blend itself is one more matrix multiplication:
+
+AttentionOutput = AttentionWeights . V\
+\>", "Text",ExpressionUUID->"8990e19f-4f51-4e02-b597-7f5ffb9f1d52"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"attentionOutput", " ", "=", " ", 
+   RowBox[{"attentionWeights", ".", "V"}]}], ";"}], "\n", 
+ RowBox[{"Row", "[", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"MatrixForm", "[", "attentionWeights", "]"}], ",", 
+    " ", "\"\<   .   \>\"", ",", " ", 
+    RowBox[{"MatrixForm", "[", "V", "]"}], ",", " ", "\"\<   =   \>\"", ",", 
+    " ", 
+    RowBox[{"MatrixForm", "[", "attentionOutput", "]"}]}], "}"}], 
+  "]"}]}], "Input",
+ CellLabel->"In[36]:=",ExpressionUUID->"1a263b4a-8764-4f8f-a48e-61a1512ea3bc"],
+
+Cell[BoxData[
+ TemplateBox[{
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1.`", "0.`"}, {"0.6697615493266569`", "0.330238450673343`"}},
+        RowSpacings -> 1, ColumnSpacings -> 1, RowAlignments -> Baseline, 
+       ColumnAlignments -> Center], "\[NoBreak]", ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]], "\"   .   \"", 
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1", "0"}, {"0", "1"}}, RowSpacings -> 1, ColumnSpacings -> 1,
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+      ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]], "\"   =   \"", 
+   TagBox[
+    RowBox[{"(", "\[NoBreak]", 
+      GridBox[{{"1.`", "0.`"}, {"0.6697615493266569`", "0.330238450673343`"}},
+        RowSpacings -> 1, ColumnSpacings -> 1, RowAlignments -> Baseline, 
+       ColumnAlignments -> Center], "\[NoBreak]", ")"}], 
+    Function[BoxForm`e$, 
+     MatrixForm[BoxForm`e$]]]},
+  "RowDefault"]], "Output",
+ CellChangeTimes->{3.996747454121949*^9},
+ CellLabel->"Out[37]=",ExpressionUUID->"9c13c0a3-7982-4100-b873-81c37acea65e"]
+}, Open  ]],
+
+Cell["\<\
+Row 1 of the result equals V's row 1 exactly (\"run\"'s own value vector), \
+since row 1 of attentionWeights was {1,0}. Row 2 is a genuine blend: about \
+67% of V's row 1 plus 33% of V's row 2. This row \[LongDash] the \
+representation built at position 2, after mixing in information from position \
+1 under the causal mask \[LongDash] is what we use to predict the token that \
+comes after \"casing\":\
+\>", "Text",ExpressionUUID->"f39236eb-c3a1-47fb-bb1b-b1116d9ec7e1"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"h", " ", "=", " ", 
+  RowBox[{"attentionOutput", "[", 
+   RowBox[{"[", "2", "]"}], "]"}]}]], "Input",
+ CellLabel->"In[38]:=",ExpressionUUID->"732eb7c9-764a-4da1-a6c1-d45cd5bdda5e"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"0.6697615493266569`", ",", "0.330238450673343`"}], "}"}]], "Output",\
+
+ CellChangeTimes->{3.9967474541267653`*^9},
+ CellLabel->"Out[38]=",ExpressionUUID->"6e120dd8-2004-4595-8d58-25020c96d90f"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["9. Output Projection and Logits", "Section",ExpressionUUID->"7f90bbcc-84e7-4c78-98c0-450f8fe596da"],
+
+Cell["\<\
+h is a length-2 vector, but we need a score for every one of the 6 vocabulary \
+tokens. The output projection matrix WOut (2 rows \[Times] 6 columns, one \
+column per vocabulary token) does that conversion:
+
+Logits = h . WOut\
+\>", "Text",ExpressionUUID->"02073108-673e-4c77-9a81-5614cc5dbbd7"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"WOut", " ", "=", " ", 
+   RowBox[{"{", "\n", "  ", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"0", ",", " ", "1", ",", " ", "0", ",", "  ", "1", ",", " ", 
+       RowBox[{"-", "1"}], ",", "  ", "0"}], "}"}], ",", "\n", "  ", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", " ", "0", ",", " ", "1", ",", " ", 
+       RowBox[{"-", "1"}], ",", "  ", "0", ",", " ", 
+       RowBox[{"-", "1"}]}], "}"}]}], "\n", "}"}]}], ";"}], "\n", 
+ RowBox[{"MatrixForm", "[", "WOut", "]"}]}], "Input",
+ CellLabel->"In[39]:=",ExpressionUUID->"ae9df04e-f7e0-4342-bb00-038cbfc89aac"],
+
+Cell[BoxData[
+ TagBox[
+  RowBox[{"(", "\[NoBreak]", GridBox[{
+     {"0", "1", "0", "1", 
+      RowBox[{"-", "1"}], "0"},
+     {"0", "0", "1", 
+      RowBox[{"-", "1"}], "0", 
+      RowBox[{"-", "1"}]}
+    },
+    GridBoxAlignment->{"Columns" -> {{Center}}, "Rows" -> {{Baseline}}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.7]}, 
+        Offset[0.27999999999999997`]}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}}], "\[NoBreak]", ")"}],
+  Function[BoxForm`e$, 
+   MatrixForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{3.996747454128433*^9},
+ CellLabel->
+  "Out[40]//MatrixForm=",ExpressionUUID->"2a75ad83-91b9-4331-9e61-\
+a92cb8c8798e"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"logits", " ", "=", " ", 
+   RowBox[{"h", ".", "WOut"}]}], ";"}], "\n", 
+ RowBox[{"Grid", "[", 
+  RowBox[{
+   RowBox[{"Prepend", "[", 
+    RowBox[{
+     RowBox[{"Transpose", "[", 
+      RowBox[{"{", 
+       RowBox[{"Vocabulary", ",", " ", 
+        RowBox[{"N", "[", 
+         RowBox[{"logits", ",", " ", "4"}], "]"}]}], "}"}], "]"}], ",", " ", 
+     RowBox[{"{", 
+      RowBox[{"\"\<Token\>\"", ",", " ", "\"\<Logit\>\""}], "}"}]}], "]"}], ",",
+    "\n", "  ", 
+   RowBox[{"Frame", " ", "->", " ", "All"}], ",", " ", 
+   RowBox[{"Background", " ", "->", " ", 
+    RowBox[{"{", 
+     RowBox[{"None", ",", " ", 
+      RowBox[{"{", 
+       RowBox[{"LightGray", ",", " ", "None"}], "}"}]}], "}"}]}]}], 
+  "]"}]}], "Input",
+ CellLabel->"In[41]:=",ExpressionUUID->"e79186e2-22ae-4b40-b7be-90c33a86019c"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"\<\"Token\"\>", "\<\"Logit\"\>"},
+    {"\<\"<BOS>\"\>", "0.`"},
+    {"\<\"run\"\>", "0.6697615493266569`"},
+    {"\<\"casing\"\>", "0.330238450673343`"},
+    {"\<\"shoe\"\>", "0.33952309865331387`"},
+    {"\<\"cement\"\>", 
+     RowBox[{"-", "0.6697615493266569`"}]},
+    {"\<\"<EOS>\"\>", 
+     RowBox[{"-", "0.330238450673343`"}]}
+   },
+   AutoDelete->False,
+   GridBoxBackground->{"Columns" -> {{None}}, "Rows" -> {
+       GrayLevel[0.85], None}},
+   GridBoxFrame->{"Columns" -> {{True}}, "Rows" -> {{True}}},
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+  "Grid"]], "Output",
+ CellChangeTimes->{3.996747454130188*^9},
+ CellLabel->"Out[42]=",ExpressionUUID->"0ffa2076-9ed2-47a8-add6-e63a379bf3ce"]
+}, Open  ]],
+
+Cell["\<\
+These are logits, not probabilities: they can be negative (cement, <EOS>), \
+they do not sum to 1, and by themselves they only rank tokens relative to \
+each other. \"shoe\" and \"run\" currently have the two largest logits, with \
+\"shoe\" barely behind. The next section turns these into an actual \
+probability distribution.\
+\>", "Text",ExpressionUUID->"2bdfb607-cea4-4891-8e0b-fe1a385035db"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["10. Next-Token Probabilities", "Section",ExpressionUUID->"cbd46456-b814-4675-8645-9d696cd49024"],
+
+Cell["\<\
+We apply the same softmax formula from Section 7, this time to all 6 logits \
+at once:\
+\>", "Text",ExpressionUUID->"2055628e-8a33-4ff0-abfe-dc3f42ec955a"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Softmax2", "[", "z_", "]"}], " ", ":=", " ", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"m", " ", "=", " ", 
+        RowBox[{"Max", "[", "z", "]"}]}], ",", " ", "ex"}], "}"}], ",", " ", 
+     RowBox[{
+      RowBox[{"ex", " ", "=", " ", 
+       RowBox[{"Exp", "[", 
+        RowBox[{"z", " ", "-", " ", "m"}], "]"}]}], ";", " ", 
+      RowBox[{"ex", "/", 
+       RowBox[{"Total", "[", "ex", "]"}]}]}]}], "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"probabilities", " ", "=", " ", 
+   RowBox[{"Softmax2", "[", "logits", "]"}]}], ";"}], "\n", 
+ RowBox[{"Grid", "[", 
+  RowBox[{
+   RowBox[{"Prepend", "[", 
+    RowBox[{
+     RowBox[{"Transpose", "[", 
+      RowBox[{"{", 
+       RowBox[{"Vocabulary", ",", " ", 
+        RowBox[{"N", "[", 
+         RowBox[{"logits", ",", " ", "4"}], "]"}], ",", " ", 
+        RowBox[{"N", "[", 
+         RowBox[{"probabilities", ",", " ", "4"}], "]"}]}], "}"}], "]"}], ",",
+      "\n", "   ", 
+     RowBox[{"{", 
+      RowBox[{"\"\<Token\>\"", ",", " ", "\"\<Logit\>\"", ",", 
+       " ", "\"\<Probability\>\""}], "}"}]}], "]"}], ",", " ", 
+   RowBox[{"Frame", " ", "->", " ", "All"}], ",", " ", 
+   RowBox[{"Background", " ", "->", " ", 
+    RowBox[{"{", 
+     RowBox[{"None", ",", " ", 
+      RowBox[{"{", 
+       RowBox[{"LightGray", ",", " ", "None"}], "}"}]}], "}"}]}]}], 
+  "]"}]}], "Input",
+ CellLabel->"In[43]:=",ExpressionUUID->"516740b7-314f-413a-9e7b-be9273ffa1f8"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"\<\"Token\"\>", "\<\"Logit\"\>", "\<\"Probability\"\>"},
+    {"\<\"<BOS>\"\>", "0.`", "0.1432678734957869`"},
+    {"\<\"run\"\>", "0.6697615493266569`", "0.2799126719101499`"},
+    {"\<\"casing\"\>", "0.330238450673343`", "0.19932857023087475`"},
+    {"\<\"shoe\"\>", "0.33952309865331387`", "0.20118788401804047`"},
+    {"\<\"cement\"\>", 
+     RowBox[{"-", "0.6697615493266569`"}], "0.0733288830260368`"},
+    {"\<\"<EOS>\"\>", 
+     RowBox[{"-", "0.330238450673343`"}], "0.10297411731911124`"}
+   },
+   AutoDelete->False,
+   GridBoxBackground->{"Columns" -> {{None}}, "Rows" -> {
+       GrayLevel[0.85], None}},
+   GridBoxFrame->{"Columns" -> {{True}}, "Rows" -> {{True}}},
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+  "Grid"]], "Output",
+ CellChangeTimes->{3.996747454132094*^9},
+ CellLabel->"Out[45]=",ExpressionUUID->"1b6f77c8-682f-41c5-9aaf-f4c82c21580f"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Total", "[", "probabilities", "]"}]], "Input",
+ CellLabel->"In[46]:=",ExpressionUUID->"fa51e200-52c8-4d00-8ce6-ba193d5ab4c2"],
+
+Cell[BoxData["1.`"], "Output",
+ CellChangeTimes->{3.996747454137*^9},
+ CellLabel->"Out[46]=",ExpressionUUID->"49228b7d-30d4-45d6-b108-776f63a4e007"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"BarChart", "[", 
+  RowBox[{"probabilities", ",", " ", 
+   RowBox[{"ChartLabels", " ", "->", " ", "Vocabulary"}], ",", " ", 
+   RowBox[{"ChartStyle", " ", "->", " ", "\"\<Pastel\>\""}], ",", "\n", "  ", 
+   
+   RowBox[{
+   "PlotLabel", " ", "->", 
+    " ", "\"\<P(next token | \\\"run casing\\\") \[LongDash] before \
+training\>\""}], ",", " ", 
+   RowBox[{"ImageSize", " ", "->", " ", "420"}]}], "]"}]], "Input",
+ CellLabel->"In[47]:=",ExpressionUUID->"6e8a5dee-6799-4049-86c0-15547f82f33f"],
+
+Cell[BoxData[
+ GraphicsBox[{
+   {Opacity[0], 
+    PointBox[{{0.43075018208302984`, 0.}, {6.451201747997087, 0.}}]}, {{}, 
+    {RGBColor[1., 0.835, 0.25], EdgeForm[{Opacity[0.6579999999999999], 
+     Thickness[Small]}], 
+     {RGBColor[0.761959, 0.470832, 0.940597], EdgeForm[{Opacity[
+      0.6579999999999999], Thickness[Small]}], 
+      TagBox[
+       TooltipBox[
+        TagBox[
+         TagBox[
+          DynamicBox[{
+            FEPrivate`If[
+             CurrentValue["MouseOver"], 
+             EdgeForm[{
+               GrayLevel[0.5], 
+               AbsoluteThickness[1.5], 
+               Opacity[0.66]}], {}, {}], 
+            
+            RectangleBox[{0.5487982520029133, 0.}, {1.4512017479970867`, 
+             0.1432678734957869}, "RoundingRadius" -> 0]},
+           
+           ImageSizeCache->{{29.680105452107316`, 87.26228197472554}, {
+            0.25165252281874473`, 119.78792640031728`}}],
+          "DelayedMouseEffectStyle"],
+         StatusArea[#, 0.1432678734957869]& ,
+         TagBoxNote->"0.1432678734957869"],
+        StyleBox["0.1432678734957869`", {}, StripOnInput -> False]],
+       Annotation[#, 
+        Style[0.1432678734957869, {}], "Tooltip"]& ]}, 
+     {RGBColor[0.8750956, 0.6580038, 0.746929], EdgeForm[{Opacity[
+      0.6579999999999999], Thickness[Small]}], 
+      TagBox[
+       TooltipBox[
+        TagBox[
+         TagBox[
+          DynamicBox[{
+            FEPrivate`If[
+             CurrentValue["MouseOver"], 
+             EdgeForm[{
+               GrayLevel[0.5], 
+               AbsoluteThickness[1.5], 
+               Opacity[0.66]}], {}, {}], 
+            
+            RectangleBox[{1.5487982520029133`, 0.}, {2.4512017479970867`, 
+             0.2799126719101499}, "RoundingRadius" -> 0]},
+           
+           ImageSizeCache->{{92.93581841865681, 
+            150.51799494127505`}, {-113.28173951476197`, 
+            119.78792640031728`}}],
+          "DelayedMouseEffectStyle"],
+         StatusArea[#, 0.2799126719101499]& ,
+         TagBoxNote->"0.2799126719101499"],
+        StyleBox["0.2799126719101499`", {}, StripOnInput -> False]],
+       Annotation[#, 
+        Style[0.2799126719101499, {}], "Tooltip"]& ]}, 
+     {RGBColor[0.9440982, 0.7955892, 0.5942686], EdgeForm[{Opacity[
+      0.6579999999999999], Thickness[Small]}], 
+      TagBox[
+       TooltipBox[
+        TagBox[
+         TagBox[
+          DynamicBox[{
+            FEPrivate`If[
+             CurrentValue["MouseOver"], 
+             EdgeForm[{
+               GrayLevel[0.5], 
+               AbsoluteThickness[1.5], 
+               Opacity[0.66]}], {}, {}], 
+            
+            RectangleBox[{2.5487982520029133`, 0.}, {3.4512017479970867`, 
+             0.19932857023087475`}, "RoundingRadius" -> 0]},
+           
+           ImageSizeCache->{{156.1915313852063, 
+            213.77370790782456`}, {-46.32722303030758, 119.78792640031728`}}],
+          
+          "DelayedMouseEffectStyle"],
+         StatusArea[#, 0.19932857023087475`]& ,
+         TagBoxNote->"0.19932857023087475"],
+        StyleBox["0.19932857023087475`", {}, StripOnInput -> False]],
+       Annotation[#, 
+        Style[0.19932857023087475`, {}], "Tooltip"]& ]}, 
+     {RGBColor[0.9537862, 0.937389, 0.6180996], EdgeForm[{Opacity[
+      0.6579999999999999], Thickness[Small]}], 
+      TagBox[
+       TooltipBox[
+        TagBox[
+         TagBox[
+          DynamicBox[{
+            FEPrivate`If[
+             CurrentValue["MouseOver"], 
+             EdgeForm[{
+               GrayLevel[0.5], 
+               AbsoluteThickness[1.5], 
+               Opacity[0.66]}], {}, {}], 
+            
+            RectangleBox[{3.5487982520029133`, 0.}, {4.451201747997087, 
+             0.20118788401804047`}, "RoundingRadius" -> 0]},
+           
+           ImageSizeCache->{{219.4472443517558, 
+            277.02942087437407`}, {-47.87206193796246, 119.78792640031728`}}],
+          
+          "DelayedMouseEffectStyle"],
+         StatusArea[#, 0.20118788401804047`]& ,
+         TagBoxNote->"0.20118788401804047"],
+        StyleBox["0.20118788401804047`", {}, StripOnInput -> False]],
+       Annotation[#, 
+        Style[0.20118788401804047`, {}], "Tooltip"]& ]}, 
+     {RGBColor[0.7952328000000001, 0.8988539999999999, 0.8302508], EdgeForm[{
+      Opacity[0.6579999999999999], Thickness[Small]}], 
+      TagBox[
+       TooltipBox[
+        TagBox[
+         TagBox[
+          DynamicBox[{
+            FEPrivate`If[
+             CurrentValue["MouseOver"], 
+             EdgeForm[{
+               GrayLevel[0.5], 
+               AbsoluteThickness[1.5], 
+               Opacity[0.66]}], {}, {}], 
+            
+            RectangleBox[{4.548798252002913, 0.}, {5.451201747997087, 
+             0.0733288830260368}, "RoundingRadius" -> 0]},
+           
+           ImageSizeCache->{{282.7029573183053, 340.28513384092355`}, {
+            58.36151777825408, 119.78792640031728`}}],
+          "DelayedMouseEffectStyle"],
+         StatusArea[#, 0.0733288830260368]& ,
+         TagBoxNote->"0.0733288830260368"],
+        StyleBox["0.0733288830260368`", {}, StripOnInput -> False]],
+       Annotation[#, 
+        Style[0.0733288830260368, {}], "Tooltip"]& ]}, 
+     {RGBColor[0.431296, 0.709773, 0.927077], EdgeForm[{Opacity[
+      0.6579999999999999], Thickness[Small]}], 
+      TagBox[
+       TooltipBox[
+        TagBox[
+         TagBox[
+          DynamicBox[{
+            FEPrivate`If[
+             CurrentValue["MouseOver"], 
+             EdgeForm[{
+               GrayLevel[0.5], 
+               AbsoluteThickness[1.5], 
+               Opacity[0.66]}], {}, {}], 
+            
+            RectangleBox[{5.548798252002913, 0.}, {6.451201747997087, 
+             0.10297411731911124`}, "RoundingRadius" -> 0]},
+           
+           ImageSizeCache->{{345.9586702848548, 403.54084680747303`}, {
+            33.73032767004888, 119.78792640031728`}}],
+          "DelayedMouseEffectStyle"],
+         StatusArea[#, 0.10297411731911124`]& ,
+         TagBoxNote->"0.10297411731911124"],
+        StyleBox["0.10297411731911124`", {}, StripOnInput -> False]],
+       Annotation[#, 
+        Style[0.10297411731911124`, {}], 
+        "Tooltip"]& ]}}, {}, {}}, {}, {}, {}, {}, 
+   StyleBox[
+    StyleBox[{
+      {Thickness[Tiny], 
+       LineBox[{{0.43075018208302984`, 0.}, {6.5716107793153675`, 0.}}], 
+       StyleBox[{}, "GraphicsLabel",
+        StripOnInput->False]}, 
+      StyleBox[{
+        {Thickness[Tiny], 
+         LineBox[{{0.5487982520029133, 0.}, 
+           Offset[{-1.102182119232618*^-15, -6.}, {0.5487982520029133, 0.}]}],
+          LineBox[{{6.451201747997087, 0.}, 
+           Offset[{-1.102182119232618*^-15, -6.}, {6.451201747997087, 
+            0.}]}], {{}, {}, {}, {}, {}, {}, {
+           LineBox[{{1.4512017479970867`, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {1.4512017479970867`, 
+              0.}]}], LineBox[{{1.5487982520029133`, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {1.5487982520029133`, 
+              0.}]}], LineBox[{{2.4512017479970867`, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {2.4512017479970867`, 
+              0.}]}], LineBox[{{2.5487982520029133`, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {2.5487982520029133`, 
+              0.}]}], LineBox[{{3.4512017479970867`, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {3.4512017479970867`, 
+              0.}]}], LineBox[{{3.5487982520029133`, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {3.5487982520029133`, 
+              0.}]}], LineBox[{{4.451201747997087, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {4.451201747997087, 
+              0.}]}], LineBox[{{4.548798252002913, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {4.548798252002913, 
+              0.}]}], LineBox[{{5.451201747997087, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {5.451201747997087, 
+              0.}]}], LineBox[{{5.548798252002913, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {5.548798252002913, 
+              0.}]}]}, {}}}, 
+        StyleBox[
+         {Thickness[Tiny], 
+          InsetBox["\<\"<BOS>\"\>", Offset[{0, -2}, {1., 0.}], NCache[
+           ImageScaled[{Rational[1, 2], 1}], ImageScaled[{0.5, 1}]], 
+           Automatic, {1, 0}], 
+          InsetBox["\<\"run\"\>", Offset[{0, -2}, {2., 0.}], NCache[
+           ImageScaled[{Rational[1, 2], 1}], ImageScaled[{0.5, 1}]], 
+           Automatic, {1, 0}], 
+          InsetBox["\<\"casing\"\>", Offset[{0, -2}, {3., 0.}], NCache[
+           ImageScaled[{Rational[1, 2], 1}], ImageScaled[{0.5, 1}]], 
+           Automatic, {1, 0}], 
+          InsetBox["\<\"shoe\"\>", Offset[{0, -2}, {4., 0.}], NCache[
+           ImageScaled[{Rational[1, 2], 1}], ImageScaled[{0.5, 1}]], 
+           Automatic, {1, 0}], 
+          InsetBox["\<\"cement\"\>", Offset[{0, -2}, {5., 0.}], NCache[
+           ImageScaled[{Rational[1, 2], 1}], ImageScaled[{0.5, 1}]], 
+           Automatic, {1, 0}], 
+          InsetBox["\<\"<EOS>\"\>", Offset[{0, -2}, {6., 0.}], NCache[
+           ImageScaled[{Rational[1, 2], 1}], ImageScaled[{0.5, 1}]], 
+           Automatic, {1, 0}]}, "GraphicsLabel",
+         StripOnInput->False]}, "GraphicsTicks",
+       StripOnInput->False]},
+     Antialiasing->False], "GraphicsAxes",
+    StripOnInput->False]},
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  Axes->{False, True},
+  AxesLabel->{None, None},
+  AxesOrigin->{0.43075018208302984`, 0.},
+  CoordinatesToolOptions:>{"DisplayFunction" -> ({
+      Identity[
+       Part[#, 1]], 
+      Identity[
+       Part[#, 2]]}& ), "CopiedValueFunction" -> ({
+      Identity[
+       Part[#, 1]], 
+      Identity[
+       Part[#, 2]]}& )},
+  DefaultBaseStyle->{"PlotGraphics", "Graphics"},
+  DisplayFunction->Identity,
+  FrameLabel->{{None, None}, {None, None}},
+  FrameTicks->{{Automatic, Automatic}, {Automatic, Automatic}},
+  GridLines->{None, None},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  ImageSize->420,
+  PlotInteractivity:>True,
+  PlotLabel->FormBox[
+   "\"P(next token | \\\"run casing\\\") \[LongDash] before training\"", 
+    TraditionalForm],
+  PlotRange->{{All, All}, {All, All}},
+  PlotRangePadding->{{
+     Scaled[0.02], 
+     Scaled[0.02]}, {
+     Scaled[0.02], 
+     Scaled[0.05]}},
+  Ticks->{None, Automatic}]], "Output",
+ CellChangeTimes->{3.996747454368396*^9},
+ CellLabel->"Out[47]=",ExpressionUUID->"ac036083-3c40-495f-a3da-bcba8aea6154"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"targetIndex", " ", "=", " ", 
+   RowBox[{"First", "[", 
+    RowBox[{"Flatten", "[", 
+     RowBox[{"Position", "[", 
+      RowBox[{"Vocabulary", ",", " ", "\"\<shoe\>\""}], "]"}], "]"}], "]"}]}],
+   ";"}], "\n", 
+ RowBox[{
+  RowBox[{"predictedIndex", " ", "=", " ", 
+   RowBox[{"First", "[", 
+    RowBox[{"Ordering", "[", 
+     RowBox[{"probabilities", ",", " ", 
+      RowBox[{"-", "1"}]}], "]"}], "]"}]}], ";"}], "\n", 
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"\"\<target\>\"", " ", "->", " ", 
+    RowBox[{"Vocabulary", "[", 
+     RowBox[{"[", "targetIndex", "]"}], "]"}]}], ",", " ", 
+   RowBox[{"\"\<predicted (highest probability)\>\"", " ", "->", " ", 
+    RowBox[{"Vocabulary", "[", 
+     RowBox[{"[", "predictedIndex", "]"}], "]"}]}]}], "}"}]}], "Input",
+ CellLabel->"In[48]:=",ExpressionUUID->"e21cccf7-9170-4807-ba95-948014acf351"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"\<\"target\"\>", "\[Rule]", "\<\"shoe\"\>"}], ",", 
+   RowBox[{"\<\"predicted (highest probability)\"\>", 
+    "\[Rule]", "\<\"run\"\>"}]}], "}"}]], "Output",
+ CellChangeTimes->{3.996747454376177*^9},
+ CellLabel->"Out[50]=",ExpressionUUID->"4c1236cd-9784-469b-8f2f-83d7778ab191"]
+}, Open  ]],
+
+Cell["\<\
+Before any training, the model's highest-probability guess is \"run\" \
+(~28.0%), not the correct answer \"shoe\" (~20.1%, third-highest). That \
+mismatch between prediction and target is exactly what training will correct \
+in Sections 11-14.\
+\>", "Text",ExpressionUUID->"75903632-4b61-477e-9ac9-296d0fe6b261"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["11. Cross-Entropy Loss", "Section",ExpressionUUID->"e25c69c8-a33f-4473-906f-36622a1973db"],
+
+Cell["\<\
+We need a single number that measures how wrong this prediction was, given \
+that the true next token is \"shoe\". Cross-entropy loss for a single example \
+is:
+
+Loss = -Log[P(correct token)]
+
+Plain-language reading: if the model had assigned probability 1 to the \
+correct token, -Log[1] = 0 \[LongDash] no loss, a perfect prediction. As the \
+assigned probability shrinks toward 0, -Log[p] grows without bound \
+\[LongDash] a heavy penalty for confidently ruling out the right answer. It \
+is not a distance or an error bar; it is a measure of \"how surprised the \
+model should be\" about the true answer, in the specific sense used \
+throughout information theory and statistics.\
+\>", "Text",ExpressionUUID->"4ba5c84c-81da-4033-9b88-8408e1b881d9"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"pShoe", " ", "=", " ", 
+  RowBox[{"probabilities", "[", 
+   RowBox[{"[", "targetIndex", "]"}], "]"}]}]], "Input",
+ CellLabel->"In[51]:=",ExpressionUUID->"884ff305-33f8-4832-8fef-f59d22ac5a45"],
+
+Cell[BoxData["0.20118788401804047`"], "Output",
+ CellChangeTimes->{3.996747454381716*^9},
+ CellLabel->"Out[51]=",ExpressionUUID->"9d78abfe-16f3-4319-8e1d-8158014d15b4"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"loss", " ", "=", " ", 
+  RowBox[{"-", 
+   RowBox[{"Log", "[", "pShoe", "]"}]}]}]], "Input",
+ CellLabel->"In[52]:=",ExpressionUUID->"35634922-3211-4338-808e-2661391ecd8c"],
+
+Cell[BoxData["1.603516061167974`"], "Output",
+ CellChangeTimes->{3.996747454385186*^9},
+ CellLabel->"Out[52]=",ExpressionUUID->"0f186df8-16a6-4fe2-b085-e4f00ef69c55"]
+}, Open  ]],
+
+Cell["\<\
+P(\"shoe\") \[TildeEqual] 0.2012, so the loss is -Log[0.2012] \[TildeEqual] \
+1.604. Section 14 will show this number falling after one training update.\
+\>", "Text",ExpressionUUID->"8503dcd2-cbbd-4d27-b4d3-531632e7ac34"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["12. One Training Step", "Section",ExpressionUUID->"6b04aaab-afbb-4bb6-9c93-27bf6d138706"],
+
+Cell["\<\
+We now tell the model the true answer was \"shoe\", and ask: how should the \
+parameters change to make that outcome more likely next time? The first step \
+is the gradient of the loss with respect to the logits \[LongDash] a vector \
+that says, for every vocabulary token, how a tiny increase in that token's \
+logit would change the loss.
+
+For softmax followed by cross-entropy loss specifically, this gradient has a \
+famously simple closed form that we state and then verify numerically instead \
+of re-deriving the calculus from scratch:
+
+dL/dlogits = probabilities - oneHotTarget
+
+where oneHotTarget is a vector of all zeros except a 1 in the position of the \
+correct token.\
+\>", "Text",ExpressionUUID->"9ebe6e4d-1bbb-4d79-80bb-f1f42019abcb"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"oneHot", " ", "=", " ", 
+  RowBox[{"ReplacePart", "[", 
+   RowBox[{
+    RowBox[{"ConstantArray", "[", 
+     RowBox[{"0", ",", " ", "6"}], "]"}], ",", " ", 
+    RowBox[{"targetIndex", " ", "->", " ", "1"}]}], "]"}]}]], "Input",
+ CellLabel->"In[53]:=",ExpressionUUID->"c7430881-ec55-469b-b012-267a6fb49f88"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"0", ",", "0", ",", "0", ",", "1", ",", "0", ",", "0"}], 
+  "}"}]], "Output",
+ CellChangeTimes->{3.996747454387168*^9},
+ CellLabel->"Out[53]=",ExpressionUUID->"1424a4a0-2452-4fd6-91fc-13089314a6ed"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"dLogits", " ", "=", " ", 
+  RowBox[{"probabilities", " ", "-", " ", "oneHot"}]}]], "Input",
+ CellLabel->"In[54]:=",ExpressionUUID->"1aab8716-3411-4170-a555-db5aacc96182"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+  "0.1432678734957869`", ",", "0.2799126719101499`", ",", 
+   "0.19932857023087475`", ",", 
+   RowBox[{"-", "0.7988121159819596`"}], ",", "0.0733288830260368`", ",", 
+   "0.10297411731911124`"}], "}"}]], "Output",
+ CellChangeTimes->{3.996747454388858*^9},
+ CellLabel->"Out[54]=",ExpressionUUID->"f5c94e92-f2f6-4141-a5ae-0790ea615190"]
+}, Open  ]],
+
+Cell["\<\
+Every entry of dLogits is positive except the one for \"shoe\", which is \
+negative (\[TildeEqual] -0.799). Read plainly: increasing any wrong token's \
+logit would increase the loss (positive entries), while increasing \"shoe\"'s \
+logit would decrease the loss (its one negative entry) \[LongDash] exactly \
+the correction we want.\
+\>", "Text",ExpressionUUID->"718f8e5f-11bd-41dd-962a-7c1dc64bf2a0"],
+
+Cell[CellGroupData[{
+
+Cell["Gradient of the output weights", "Subsection",ExpressionUUID->"56501aa3-b7f6-4e31-a298-5ec4715cf472"],
+
+Cell["\<\
+The chain rule extends this one step further, back through Logits = h . WOut, \
+to the weights themselves. Because logits are a linear function of WOut, the \
+gradient with respect to WOut is simply the outer product of h (what \
+multiplied WOut to produce the logits) and dLogits (how the loss responds to \
+each logit):
+
+dWOut = Outer[Times, h, dLogits]\
+\>", "Text",ExpressionUUID->"528898a5-6952-44da-b9be-f8de10659890"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"dWOut", " ", "=", " ", 
+   RowBox[{"Outer", "[", 
+    RowBox[{"Times", ",", " ", "h", ",", " ", "dLogits"}], "]"}]}], ";"}], "\n", 
+ RowBox[{"MatrixForm", "[", 
+  RowBox[{"N", "[", 
+   RowBox[{"dWOut", ",", " ", "4"}], "]"}], "]"}]}], "Input",
+ CellLabel->"In[55]:=",ExpressionUUID->"be23dba8-1d81-40a4-a003-56d9934b9c91"],
+
+Cell[BoxData[
+ TagBox[
+  RowBox[{"(", "\[NoBreak]", GridBox[{
+     {"0.09595531292127371`", "0.1874747448147062`", "0.133502612022898`", 
+      RowBox[{"-", "0.5350136404209823`"}], "0.04911286630591159`", 
+      "0.06896810435619288`"},
+     {"0.04731256057451317`", "0.09243792709544368`", "0.06582595820797672`", 
+      
+      RowBox[{"-", "0.26379847556097713`"}], "0.024216016720125192`", 
+      "0.03400601296291835`"}
+    },
+    GridBoxAlignment->{"Columns" -> {{Center}}, "Rows" -> {{Baseline}}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.7]}, 
+        Offset[0.27999999999999997`]}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}}], "\[NoBreak]", ")"}],
+  Function[BoxForm`e$, 
+   MatrixForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{3.996747454390554*^9},
+ CellLabel->
+  "Out[56]//MatrixForm=",ExpressionUUID->"8d1d0b01-7961-41cc-a504-\
+6f5e69b8d407"]
+}, Open  ]],
+
+Cell["\<\
+Each entry dWOut[[i,j]] says how much loss would change per unit increase of \
+WOut[[i,j]]. Column 4 (\"shoe\") is the only column with negative entries \
+\[LongDash] increasing either weight feeding \"shoe\"'s logit would lower the \
+loss.\
+\>", "Text",ExpressionUUID->"5a91e41e-d0a7-47d4-a83c-df40f6041f2b"],
+
+Cell[CellGroupData[{
+
+Cell["Checking the gradient numerically (finite differences)", "Subsubsection",ExpressionUUID->"485e45ea-1a14-4f51-a93c-89ea29033c95"],
+
+Cell["\<\
+As a sanity check that this formula is really the slope of the loss \
+\[LongDash] not just a formula we are asserting \[LongDash] we nudge a single \
+weight, WOut[[1,4]], by a tiny amount \[Epsilon] = 10^-6, recompute the loss \
+from scratch, and compare the resulting slope estimate to the analytic \
+gradient above:\
+\>", "Text",ExpressionUUID->"2bd58e8a-e37a-451d-8c79-3b4b103c700d"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"eps", " ", "=", " ", 
+   RowBox[{"10", "^", 
+    RowBox[{"-", "6"}]}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"WOutPerturbed", " ", "=", " ", "WOut"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"WOutPerturbed", "[", 
+    RowBox[{"[", 
+     RowBox[{"1", ",", " ", "4"}], "]"}], "]"}], " ", "=", " ", 
+   RowBox[{
+    RowBox[{"WOutPerturbed", "[", 
+     RowBox[{"[", 
+      RowBox[{"1", ",", " ", "4"}], "]"}], "]"}], " ", "+", " ", "eps"}]}], 
+  ";"}], "\n", 
+ RowBox[{
+  RowBox[{"logitsPerturbed", " ", "=", " ", 
+   RowBox[{"h", ".", "WOutPerturbed"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"probsPerturbed", " ", "=", " ", 
+   RowBox[{"Softmax2", "[", "logitsPerturbed", "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"lossPerturbed", " ", "=", " ", 
+   RowBox[{"-", 
+    RowBox[{"Log", "[", 
+     RowBox[{"probsPerturbed", "[", 
+      RowBox[{"[", "targetIndex", "]"}], "]"}], "]"}]}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"numericSlope", " ", "=", " ", 
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{"lossPerturbed", " ", "-", " ", "loss"}], ")"}], "/", "eps"}]}], 
+  ";"}], "\n", 
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"\"\<numeric slope (finite difference)\>\"", " ", "->", " ", 
+    "numericSlope"}], ",", " ", 
+   RowBox[{"\"\<analytic dWOut[[1,4]]\>\"", " ", "->", " ", 
+    RowBox[{"dWOut", "[", 
+     RowBox[{"[", 
+      RowBox[{"1", ",", " ", "4"}], "]"}], "]"}]}]}], "}"}]}], "Input",
+ CellLabel->"In[57]:=",ExpressionUUID->"dd602c57-4e74-48d0-916a-ef90ec2d53a4"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"\<\"numeric slope (finite difference)\"\>", "\[Rule]", 
+    RowBox[{"-", "0.5350136043080767`"}]}], ",", 
+   RowBox[{"\<\"analytic dWOut[[1,4]]\"\>", "\[Rule]", 
+    RowBox[{"-", "0.5350136404209823`"}]}]}], "}"}]], "Output",
+ CellChangeTimes->{3.9967474543988934`*^9},
+ CellLabel->"Out[64]=",ExpressionUUID->"f799a248-e161-4893-ae73-952e0d31bd43"]
+}, Open  ]],
+
+Cell["\<\
+The two numbers agree to about 6 significant figures, which is exactly the \
+agreement we'd expect from a first-order finite-difference approximation with \
+\[Epsilon] = 10^-6. The closed-form gradient is correct, not just asserted.\
+\>", "Text",ExpressionUUID->"e0cb9b1c-1993-4b5c-887c-458291b18a12"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["What has \[LongDash] and has not \[LongDash] been updated", "Subsection",ExpressionUUID->"473b7d25-ca94-4cae-9329-aaae7887eca6"],
+
+Cell["\<\
+This training step computes and applies a gradient only for WOut, the output \
+projection. WQ, WK, WV, and the embeddings are left unchanged in this \
+demonstration. That is a deliberate scope limit, not an oversight: \
+propagating the gradient further back, through the softmax attention weights \
+and into Q, K, V and the embeddings, is mathematically possible (ordinary \
+chain rule) but requires differentiating through the attention softmax \
+itself, whose Jacobian is more involved than the softmax-cross-entropy \
+shortcut used above. Rather than gloss over that complexity, we stop the \
+hand-worked gradient at the output layer, where every number above can still \
+be checked with a calculator, and leave further backpropagation as an \
+optional, clearly marked extension below.\
+\>", "Text",ExpressionUUID->"4a394695-3851-4a2a-8236-5e2e349cb6d9"],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Optional / advanced: continuing backpropagation through attention\
+\>", "Subsubsection",ExpressionUUID->"6102c146-998b-43d5-996b-909a300d57bb"],
+
+Cell["\<\
+For a reader who wants to go further: the same chain rule keeps applying. \
+dL/dh = dLogits . Transpose[WOut] tells you how the loss responds to the \
+attention output h; from there, h = attentionWeights . V lets you get a \
+gradient with respect to V directly (another outer product, just like dWOut \
+above). Going further still, into the attention weights themselves, requires \
+the Jacobian of the softmax function (a matrix, not a simple subtraction, \
+because every output of a softmax depends on every input), and then one more \
+chain-rule step through Q . Transpose[K] to reach WQ and WK. Each of these \
+steps is ordinary calculus, but the notation gets noticeably heavier for no \
+new conceptual payoff beyond what dWOut above already demonstrates: gradients \
+are computed by multiplying local slopes together, moving backward through \
+the same operations used going forward. This notebook stops here by design; \
+treat this paragraph as a map for further exploration, not as a claim that \
+we've hand-derived it in this notebook.\
+\>", "Text",ExpressionUUID->"ab1256a7-3620-47b2-9445-477b80beead0"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["13. Gradient Descent Update", "Section",ExpressionUUID->"1a097f15-32fa-4527-a85a-0ab00a91e773"],
+
+Cell["\<\
+Gradient descent nudges every weight a small step in the direction that \
+reduces the loss \[LongDash] opposite the gradient, since the gradient points \
+toward increasing loss. With a learning rate of 2 (a plain, simple number \
+chosen so the effect of one step is easy to see):
+
+W_new = W_old - learningRate \[Times] gradient\
+\>", "Text",ExpressionUUID->"07743001-a765-4199-9734-c8d9c193373a"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"learningRate", " ", "=", " ", "2"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"WOutNew", " ", "=", " ", 
+   RowBox[{"WOut", " ", "-", " ", 
+    RowBox[{"learningRate", "*", "dWOut"}]}]}], ";"}], "\n", 
+ RowBox[{"MatrixForm", "[", 
+  RowBox[{"N", "[", 
+   RowBox[{"WOutNew", ",", " ", "4"}], "]"}], "]"}]}], "Input",
+ CellLabel->"In[65]:=",ExpressionUUID->"fefc4db6-cbc0-44e2-9c11-e6aefa9b401f"],
+
+Cell[BoxData[
+ TagBox[
+  RowBox[{"(", "\[NoBreak]", GridBox[{
+     {
+      RowBox[{"-", "0.19191062584254742`"}], "0.6250505103705877`", 
+      RowBox[{"-", "0.267005224045796`"}], "2.0700272808419644`", 
+      RowBox[{"-", "1.0982257326118232`"}], 
+      RowBox[{"-", "0.13793620871238577`"}]},
+     {
+      RowBox[{"-", "0.09462512114902634`"}], 
+      RowBox[{"-", "0.18487585419088737`"}], "0.8683480835840466`", 
+      RowBox[{"-", "0.47240304887804574`"}], 
+      RowBox[{"-", "0.048432033440250384`"}], 
+      RowBox[{"-", "1.0680120259258368`"}]}
+    },
+    GridBoxAlignment->{"Columns" -> {{Center}}, "Rows" -> {{Baseline}}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.7]}, 
+        Offset[0.27999999999999997`]}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}}], "\[NoBreak]", ")"}],
+  Function[BoxForm`e$, 
+   MatrixForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{3.996747454402618*^9},
+ CellLabel->
+  "Out[67]//MatrixForm=",ExpressionUUID->"489694f8-aa6d-426f-a1b1-\
+cfac1e01bbbc"]
+}, Open  ]],
+
+Cell["\<\
+Every entry changed, since dWOut had no exact zeros, but the changes are not \
+uniform. Column 4 (\"shoe\") moved the most, and in the direction that \
+increases its logit:\
+\>", "Text",ExpressionUUID->"ca749d2d-4fbc-4205-bfd3-ad6e61d52105"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"MatrixForm", "[", 
+  RowBox[{"N", "[", 
+   RowBox[{
+    RowBox[{"WOutNew", " ", "-", " ", "WOut"}], ",", " ", "4"}], "]"}], 
+  "]"}]], "Input",
+ CellLabel->"In[68]:=",ExpressionUUID->"f200838c-f96e-4679-bcb1-cedf8bb18142"],
+
+Cell[BoxData[
+ TagBox[
+  RowBox[{"(", "\[NoBreak]", GridBox[{
+     {
+      RowBox[{"-", "0.19191062584254742`"}], 
+      RowBox[{"-", "0.3749494896294123`"}], 
+      RowBox[{"-", "0.267005224045796`"}], "1.0700272808419644`", 
+      RowBox[{"-", "0.09822573261182321`"}], 
+      RowBox[{"-", "0.13793620871238577`"}]},
+     {
+      RowBox[{"-", "0.09462512114902634`"}], 
+      RowBox[{"-", "0.18487585419088737`"}], 
+      RowBox[{"-", "0.13165191641595342`"}], "0.5275969511219543`", 
+      RowBox[{"-", "0.048432033440250384`"}], 
+      RowBox[{"-", "0.06801202592583677`"}]}
+    },
+    GridBoxAlignment->{"Columns" -> {{Center}}, "Rows" -> {{Baseline}}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.7]}, 
+        Offset[0.27999999999999997`]}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}}], "\[NoBreak]", ")"}],
+  Function[BoxForm`e$, 
+   MatrixForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{3.996747454404338*^9},
+ CellLabel->
+  "Out[68]//MatrixForm=",ExpressionUUID->"c483dda7-8e1f-4c6a-8e55-\
+a468ceab5349"]
+}, Open  ]],
+
+Cell["\<\
+Column 4 shows the two largest-magnitude changes in the entire matrix (+2.070 \
+and +0.528 relative to the old weights), both positive \[LongDash] a direct, \
+visible consequence of \"shoe\" being the one column of dLogits that was \
+negative.\
+\>", "Text",ExpressionUUID->"9e12ce4b-3d22-4607-9288-8e8d177dca18"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["14. Run the Model Again", "Section",ExpressionUUID->"62fd91e2-d6ed-4f46-a280-69678bccf88f"],
+
+Cell["\<\
+Q, K, V, and the attention output h did not change (Section 12), so we can \
+reuse h directly and only recompute the last two steps, Logits and Softmax, \
+with the updated WOutNew:\
+\>", "Text",ExpressionUUID->"99c49a7e-95f7-4988-85ad-f3057cc38620"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"logitsNew", " ", "=", " ", 
+   RowBox[{"h", ".", "WOutNew"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"probabilitiesNew", " ", "=", " ", 
+   RowBox[{"Softmax2", "[", "logitsNew", "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"pShoeNew", " ", "=", " ", 
+   RowBox[{"probabilitiesNew", "[", 
+    RowBox[{"[", "targetIndex", "]"}], "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"lossNew", " ", "=", " ", 
+   RowBox[{"-", 
+    RowBox[{"Log", "[", "pShoeNew", "]"}]}]}], ";"}], "\n", 
+ RowBox[{"Grid", "[", 
+  RowBox[{
+   RowBox[{"{", "\n", "   ", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"\"\<\>\"", ",", " ", "\"\<Before training\>\"", ",", 
+       " ", "\"\<After training\>\""}], "}"}], ",", "\n", "   ", 
+     RowBox[{"{", 
+      RowBox[{"\"\<P(\\\"shoe\\\")\>\"", ",", " ", 
+       RowBox[{"N", "[", 
+        RowBox[{"pShoe", ",", " ", "4"}], "]"}], ",", " ", 
+       RowBox[{"N", "[", 
+        RowBox[{"pShoeNew", ",", " ", "4"}], "]"}]}], "}"}], ",", "\n", "   ", 
+     RowBox[{"{", 
+      RowBox[{"\"\<Loss\>\"", ",", " ", 
+       RowBox[{"N", "[", 
+        RowBox[{"loss", ",", " ", "4"}], "]"}], ",", " ", 
+       RowBox[{"N", "[", 
+        RowBox[{"lossNew", ",", " ", "4"}], "]"}]}], "}"}], ",", "\n", "   ", 
+     
+     RowBox[{"{", 
+      RowBox[{"\"\<Predicted token\>\"", ",", " ", 
+       RowBox[{"Vocabulary", "[", 
+        RowBox[{"[", "predictedIndex", "]"}], "]"}], ",", "\n", "     ", 
+       RowBox[{"Vocabulary", "[", 
+        RowBox[{"[", 
+         RowBox[{"First", "[", 
+          RowBox[{"Ordering", "[", 
+           RowBox[{"probabilitiesNew", ",", " ", 
+            RowBox[{"-", "1"}]}], "]"}], "]"}], "]"}], "]"}]}], "}"}]}], "\n",
+     "   ", "}"}], ",", " ", 
+   RowBox[{"Frame", " ", "->", " ", "All"}], ",", " ", 
+   RowBox[{"Background", " ", "->", " ", 
+    RowBox[{"{", 
+     RowBox[{"None", ",", " ", 
+      RowBox[{"{", 
+       RowBox[{"LightGray", ",", " ", "None", ",", " ", "None"}], "}"}]}], 
+     "}"}]}], ",", "\n", "  ", 
+   RowBox[{"Dividers", " ", "->", " ", "All"}]}], "]"}]}], "Input",
+ CellLabel->"In[69]:=",ExpressionUUID->"1dd000f3-dcc8-4463-956a-a482020fd54b"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"\<\"\"\>", "\<\"Before training\"\>", "\<\"After training\"\>"},
+    {"\<\"P(\\\"shoe\\\")\"\>", "0.20118788401804047`", "0.4315420030983588`"},
+    {"\<\"Loss\"\>", "1.603516061167974`", "0.8403904311373163`"},
+    {"\<\"Predicted token\"\>", "\<\"run\"\>", "\<\"shoe\"\>"}
+   },
+   AutoDelete->False,
+   GridBoxBackground->{"Columns" -> {{None}}, "Rows" -> {
+       GrayLevel[0.85], None, None}},
+   GridBoxDividers->{"Columns" -> {{True}}, "Rows" -> {{True}}},
+   GridBoxFrame->{"Columns" -> {{True}}, "Rows" -> {{True}}},
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+  "Grid"]], "Output",
+ CellChangeTimes->{3.9967474544097033`*^9},
+ CellLabel->"Out[73]=",ExpressionUUID->"232d4951-1685-4d8b-ab9b-ed4447233112"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"\"\<P(shoe) increased?\>\"", " ", "->", " ", 
+    RowBox[{"pShoeNew", " ", ">", " ", "pShoe"}]}], ",", " ", 
+   RowBox[{"\"\<Loss decreased?\>\"", " ", "->", " ", 
+    RowBox[{"lossNew", " ", "<", " ", "loss"}]}]}], "}"}]], "Input",
+ CellLabel->"In[74]:=",ExpressionUUID->"25ad202e-1188-4990-9b40-bba474c0122a"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"\<\"P(shoe) increased?\"\>", "\[Rule]", "True"}], ",", 
+   RowBox[{"\<\"Loss decreased?\"\>", "\[Rule]", "True"}]}], "}"}]], "Output",\
+
+ CellChangeTimes->{3.996747454411851*^9},
+ CellLabel->"Out[74]=",ExpressionUUID->"f01fe271-a2a4-419a-bbb9-cf70738535aa"]
+}, Open  ]],
+
+Cell["\<\
+Both checks come back True, computed \[LongDash] not assumed. P(\"shoe\") \
+rose from \[TildeEqual] 0.201 to \[TildeEqual] 0.432, and the loss fell from \
+\[TildeEqual] 1.604 to \[TildeEqual] 0.840. The predicted \
+(highest-probability) token flips from \"run\" before training to \"shoe\" \
+after \[LongDash] one gradient step was enough to change the model's top \
+guess for this single example.\
+\>", "Text",ExpressionUUID->"710f4a6e-09c5-41b2-96f8-a1c8ba8589f5"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"BarChart", "[", 
+  RowBox[{"probabilitiesNew", ",", " ", 
+   RowBox[{"ChartLabels", " ", "->", " ", "Vocabulary"}], ",", " ", 
+   RowBox[{"ChartStyle", " ", "->", " ", "\"\<Pastel\>\""}], ",", "\n", "  ", 
+   
+   RowBox[{
+   "PlotLabel", " ", "->", 
+    " ", "\"\<P(next token | \\\"run casing\\\") \[LongDash] after training\>\
+\""}], ",", " ", 
+   RowBox[{"ImageSize", " ", "->", " ", "420"}]}], "]"}]], "Input",
+ CellLabel->"In[75]:=",ExpressionUUID->"0fbe6879-7ecd-4bf6-9945-ebe66810d965"],
+
+Cell[BoxData[
+ GraphicsBox[{
+   {Opacity[0], 
+    PointBox[{{0.43075018208302984`, 0.}, {6.451201747997087, 0.}}]}, {{}, 
+    {RGBColor[1., 0.835, 0.25], EdgeForm[{Opacity[0.6579999999999999], 
+     Thickness[Small]}], 
+     {RGBColor[0.761959, 0.470832, 0.940597], EdgeForm[{Opacity[
+      0.6579999999999999], Thickness[Small]}], 
+      TagBox[
+       TooltipBox[
+        TagBox[
+         TagBox[
+          DynamicBox[{
+            FEPrivate`If[
+             CurrentValue["MouseOver"], 
+             EdgeForm[{
+               GrayLevel[0.5], 
+               AbsoluteThickness[1.5], 
+               Opacity[0.66]}], {}, {}], 
+            
+            RectangleBox[{0.5487982520029133, 0.}, {1.4512017479970867`, 
+             0.10746472009441255`}, "RoundingRadius" -> 0]},
+           
+           ImageSizeCache->{{24.223311406364022`, 82.60607847924479}, {
+            62.278605120866956`, 121.50653165711935`}}],
+          "DelayedMouseEffectStyle"],
+         StatusArea[#, 0.10746472009441255`]& ,
+         TagBoxNote->"0.10746472009441255"],
+        StyleBox["0.10746472009441255`", {}, StripOnInput -> False]],
+       Annotation[#, 
+        Style[0.10746472009441255`, {}], "Tooltip"]& ]}, 
+     {RGBColor[0.8750956, 0.6580038, 0.746929], EdgeForm[{Opacity[
+      0.6579999999999999], Thickness[Small]}], 
+      TagBox[
+       TooltipBox[
+        TagBox[
+         TagBox[
+          DynamicBox[{
+            FEPrivate`If[
+             CurrentValue["MouseOver"], 
+             EdgeForm[{
+               GrayLevel[0.5], 
+               AbsoluteThickness[1.5], 
+               Opacity[0.66]}], {}, {}], 
+            
+            RectangleBox[{1.5487982520029133`, 0.}, {2.4512017479970867`, 
+             0.18028293945157225`}, "RoundingRadius" -> 0]},
+           
+           ImageSizeCache->{{88.36620018042802, 146.7489672533088}, {
+            22.48449377761939, 121.50653165711935`}}],
+          "DelayedMouseEffectStyle"],
+         StatusArea[#, 0.18028293945157225`]& ,
+         TagBoxNote->"0.18028293945157225"],
+        StyleBox["0.18028293945157225`", {}, StripOnInput -> False]],
+       Annotation[#, 
+        Style[0.18028293945157225`, {}], "Tooltip"]& ]}, 
+     {RGBColor[0.9440982, 0.7955892, 0.5942686], EdgeForm[{Opacity[
+      0.6579999999999999], Thickness[Small]}], 
+      TagBox[
+       TooltipBox[
+        TagBox[
+         TagBox[
+          DynamicBox[{
+            FEPrivate`If[
+             CurrentValue["MouseOver"], 
+             EdgeForm[{
+               GrayLevel[0.5], 
+               AbsoluteThickness[1.5], 
+               Opacity[0.66]}], {}, {}], 
+            
+            RectangleBox[{2.5487982520029133`, 0.}, {3.4512017479970867`, 
+             0.14045370227104717`}, "RoundingRadius" -> 0]},
+           
+           ImageSizeCache->{{152.50908895449203`, 210.8918560273728}, {
+            44.250600022327944`, 121.50653165711935`}}],
+          "DelayedMouseEffectStyle"],
+         StatusArea[#, 0.14045370227104717`]& ,
+         TagBoxNote->"0.14045370227104717"],
+        StyleBox["0.14045370227104717`", {}, StripOnInput -> False]],
+       Annotation[#, 
+        Style[0.14045370227104717`, {}], "Tooltip"]& ]}, 
+     {RGBColor[0.9537862, 0.937389, 0.6180996], EdgeForm[{Opacity[
+      0.6579999999999999], Thickness[Small]}], 
+      TagBox[
+       TooltipBox[
+        TagBox[
+         TagBox[
+          DynamicBox[{
+            FEPrivate`If[
+             CurrentValue["MouseOver"], 
+             EdgeForm[{
+               GrayLevel[0.5], 
+               AbsoluteThickness[1.5], 
+               Opacity[0.66]}], {}, {}], 
+            
+            RectangleBox[{3.5487982520029133`, 0.}, {4.451201747997087, 
+             0.4315420030983588}, "RoundingRadius" -> 0]},
+           
+           ImageSizeCache->{{216.65197772855603`, 
+            275.03474480143683`}, {-114.82497688821687`, 
+            121.50653165711935`}}],
+          "DelayedMouseEffectStyle"],
+         StatusArea[#, 0.4315420030983588]& ,
+         TagBoxNote->"0.4315420030983588"],
+        StyleBox["0.4315420030983588`", {}, StripOnInput -> False]],
+       Annotation[#, 
+        Style[0.4315420030983588, {}], "Tooltip"]& ]}, 
+     {RGBColor[0.7952328000000001, 0.8988539999999999, 0.8302508], EdgeForm[{
+      Opacity[0.6579999999999999], Thickness[Small]}], 
+      TagBox[
+       TooltipBox[
+        TagBox[
+         TagBox[
+          DynamicBox[{
+            FEPrivate`If[
+             CurrentValue["MouseOver"], 
+             EdgeForm[{
+               GrayLevel[0.5], 
+               AbsoluteThickness[1.5], 
+               Opacity[0.66]}], {}, {}], 
+            
+            RectangleBox[{4.548798252002913, 0.}, {5.451201747997087, 
+             0.059465857966289726`}, "RoundingRadius" -> 0]},
+           
+           ImageSizeCache->{{280.79486650262004`, 339.1776335755008}, {
+            88.50929409867845, 121.50653165711935`}}],
+          "DelayedMouseEffectStyle"],
+         StatusArea[#, 0.059465857966289726`]& ,
+         TagBoxNote->"0.059465857966289726"],
+        StyleBox["0.059465857966289726`", {}, StripOnInput -> False]],
+       Annotation[#, 
+        Style[0.059465857966289726`, {}], "Tooltip"]& ]}, 
+     {RGBColor[0.431296, 0.709773, 0.927077], EdgeForm[{Opacity[
+      0.6579999999999999], Thickness[Small]}], 
+      TagBox[
+       TooltipBox[
+        TagBox[
+         TagBox[
+          DynamicBox[{
+            FEPrivate`If[
+             CurrentValue["MouseOver"], 
+             EdgeForm[{
+               GrayLevel[0.5], 
+               AbsoluteThickness[1.5], 
+               Opacity[0.66]}], {}, {}], 
+            
+            RectangleBox[{5.548798252002913, 0.}, {6.451201747997087, 
+             0.08079077711831964}, "RoundingRadius" -> 0]},
+           
+           ImageSizeCache->{{344.937755276684, 403.32052234956484`}, {
+            76.85553196863546, 121.50653165711935`}}],
+          "DelayedMouseEffectStyle"],
+         StatusArea[#, 0.08079077711831964]& ,
+         TagBoxNote->"0.08079077711831964"],
+        StyleBox["0.08079077711831964`", {}, StripOnInput -> False]],
+       Annotation[#, 
+        Style[0.08079077711831964, {}], 
+        "Tooltip"]& ]}}, {}, {}}, {}, {}, {}, {}, 
+   StyleBox[
+    StyleBox[{
+      {Thickness[Tiny], 
+       LineBox[{{0.43075018208302984`, 0.}, {6.5716107793153675`, 0.}}], 
+       StyleBox[{}, "GraphicsLabel",
+        StripOnInput->False]}, 
+      StyleBox[{
+        {Thickness[Tiny], 
+         LineBox[{{0.5487982520029133, 0.}, 
+           Offset[{-1.102182119232618*^-15, -6.}, {0.5487982520029133, 0.}]}],
+          LineBox[{{6.451201747997087, 0.}, 
+           Offset[{-1.102182119232618*^-15, -6.}, {6.451201747997087, 
+            0.}]}], {{}, {}, {}, {}, {}, {}, {
+           LineBox[{{1.4512017479970867`, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {1.4512017479970867`, 
+              0.}]}], LineBox[{{1.5487982520029133`, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {1.5487982520029133`, 
+              0.}]}], LineBox[{{2.4512017479970867`, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {2.4512017479970867`, 
+              0.}]}], LineBox[{{2.5487982520029133`, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {2.5487982520029133`, 
+              0.}]}], LineBox[{{3.4512017479970867`, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {3.4512017479970867`, 
+              0.}]}], LineBox[{{3.5487982520029133`, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {3.5487982520029133`, 
+              0.}]}], LineBox[{{4.451201747997087, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {4.451201747997087, 
+              0.}]}], LineBox[{{4.548798252002913, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {4.548798252002913, 
+              0.}]}], LineBox[{{5.451201747997087, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {5.451201747997087, 
+              0.}]}], LineBox[{{5.548798252002913, 0.}, 
+             Offset[{-7.347880794884119*^-16, -4.}, {5.548798252002913, 
+              0.}]}]}, {}}}, 
+        StyleBox[
+         {Thickness[Tiny], 
+          InsetBox["\<\"<BOS>\"\>", Offset[{0, -2}, {1., 0.}], NCache[
+           ImageScaled[{Rational[1, 2], 1}], ImageScaled[{0.5, 1}]], 
+           Automatic, {1, 0}], 
+          InsetBox["\<\"run\"\>", Offset[{0, -2}, {2., 0.}], NCache[
+           ImageScaled[{Rational[1, 2], 1}], ImageScaled[{0.5, 1}]], 
+           Automatic, {1, 0}], 
+          InsetBox["\<\"casing\"\>", Offset[{0, -2}, {3., 0.}], NCache[
+           ImageScaled[{Rational[1, 2], 1}], ImageScaled[{0.5, 1}]], 
+           Automatic, {1, 0}], 
+          InsetBox["\<\"shoe\"\>", Offset[{0, -2}, {4., 0.}], NCache[
+           ImageScaled[{Rational[1, 2], 1}], ImageScaled[{0.5, 1}]], 
+           Automatic, {1, 0}], 
+          InsetBox["\<\"cement\"\>", Offset[{0, -2}, {5., 0.}], NCache[
+           ImageScaled[{Rational[1, 2], 1}], ImageScaled[{0.5, 1}]], 
+           Automatic, {1, 0}], 
+          InsetBox["\<\"<EOS>\"\>", Offset[{0, -2}, {6., 0.}], NCache[
+           ImageScaled[{Rational[1, 2], 1}], ImageScaled[{0.5, 1}]], 
+           Automatic, {1, 0}]}, "GraphicsLabel",
+         StripOnInput->False]}, "GraphicsTicks",
+       StripOnInput->False]},
+     Antialiasing->False], "GraphicsAxes",
+    StripOnInput->False]},
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  Axes->{False, True},
+  AxesLabel->{None, None},
+  AxesOrigin->{0.43075018208302984`, 0.},
+  CoordinatesToolOptions:>{"DisplayFunction" -> ({
+      Identity[
+       Part[#, 1]], 
+      Identity[
+       Part[#, 2]]}& ), "CopiedValueFunction" -> ({
+      Identity[
+       Part[#, 1]], 
+      Identity[
+       Part[#, 2]]}& )},
+  DefaultBaseStyle->{"PlotGraphics", "Graphics"},
+  DisplayFunction->Identity,
+  FrameLabel->{{None, None}, {None, None}},
+  FrameTicks->{{Automatic, Automatic}, {Automatic, Automatic}},
+  GridLines->{None, None},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  ImageSize->420,
+  PlotInteractivity:>True,
+  PlotLabel->FormBox[
+   "\"P(next token | \\\"run casing\\\") \[LongDash] after training\"", 
+    TraditionalForm],
+  PlotRange->{{All, All}, {All, All}},
+  PlotRangePadding->{{
+     Scaled[0.02], 
+     Scaled[0.02]}, {
+     Scaled[0.02], 
+     Scaled[0.05]}},
+  Ticks->{None, Automatic}]], "Output",
+ CellChangeTimes->{3.9967474544297237`*^9},
+ CellLabel->"Out[75]=",ExpressionUUID->"a3a78c60-2d0b-4f99-acf8-21cd6ee84914"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["15. What Just Happened?", "Section",ExpressionUUID->"2a211b55-f8f3-432c-87c4-77f0b60cb8eb"],
+
+Cell["\<\
+The forward pass turned \"run casing\" into a full probability distribution \
+over the vocabulary (Sections 2-10).\
+\>", "Item",ExpressionUUID->"dfc947d4-4c86-46e6-86ff-8cf9b4da07c3"],
+
+Cell["\<\
+We told the model the correct next token was \"shoe\", and cross-entropy loss \
+measured exactly how wrong its distribution was (Section 11).\
+\>", "Item",ExpressionUUID->"8765adc6-67c7-4912-bf52-ca6ead932efe"],
+
+Cell["\<\
+The gradient measured how each parameter of WOut would affect that loss if \
+nudged (Section 12), and we checked that gradient numerically rather than \
+taking it on faith.\
+\>", "Item",ExpressionUUID->"f2a28c9b-c170-41a2-8936-67058ebac2a9"],
+
+Cell["\<\
+Gradient descent moved every weight a small step opposite its gradient \
+(Section 13).\
+\>", "Item",ExpressionUUID->"be5bb138-6b75-43e3-865d-9dde96733f3e"],
+
+Cell["\<\
+Running the identical input, \"run casing\", through the updated weights \
+produced a different, better distribution: higher P(\"shoe\"), lower loss \
+(Section 14).\
+\>", "Item",ExpressionUUID->"8b29271e-2d70-4800-b7ac-49d0f37eb313"],
+
+Cell["\<\
+That loop \[LongDash] predict, measure error, compute gradient, update \
+weights, predict again \[LongDash] is the numerical core of how transformer \
+language models learn. Real training repeats it millions or billions of \
+times, over enormous datasets, updating every parameter in the network (not \
+just an output projection), with additional machinery (Section 16) layered on \
+top. This notebook does not claim that a single hand-worked update on one \
+example captures everything about training a real model \[LongDash] only that \
+the arithmetic at the heart of it is exactly this.\
+\>", "Text",ExpressionUUID->"13318658-a030-4cb7-9b42-db4f5419149a"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["16. Scale Comparison", "Section",ExpressionUUID->"4e846386-0f94-4626-96ae-ad4570fbc04d"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Grid", "[", 
+  RowBox[{
+   RowBox[{"{", "\n", "   ", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"\"\<\>\"", ",", " ", "\"\<Toy model (this notebook)\>\"", ",", 
+       " ", "\"\<A modern pretrained language model\>\""}], "}"}], ",", "\n", 
+     "   ", 
+     RowBox[{"{", 
+      RowBox[{"\"\<Vocabulary size\>\"", ",", " ", "\"\<~6 tokens\>\"", ",", 
+       " ", "\"\<tens of thousands to ~1,000,000+ tokens\>\""}], "}"}], ",", 
+     "\n", "   ", 
+     RowBox[{"{", 
+      RowBox[{"\"\<Embedding dimension\>\"", ",", " ", "\"\<2\>\"", ",", 
+       " ", "\"\<hundreds to tens of thousands\>\""}], "}"}], ",", "\n", 
+     "   ", 
+     RowBox[{"{", 
+      RowBox[{"\"\<Attention heads\>\"", ",", " ", "\"\<1\>\"", ",", 
+       " ", "\"\<dozens, run in parallel per layer\>\""}], "}"}], ",", "\n", 
+     "   ", 
+     RowBox[{"{", 
+      RowBox[{"\"\<Transformer blocks\>\"", ",", " ", "\"\<1\>\"", ",", 
+       " ", "\"\<dozens to over 100, stacked\>\""}], "}"}], ",", "\n", "   ", 
+     
+     RowBox[{"{", 
+      RowBox[{"\"\<Parameters\>\"", ",", " ", "\"\<tens\>\"", ",", 
+       " ", "\"\<billions, sometimes hundreds of billions\>\""}], "}"}], ",", 
+     "\n", "   ", 
+     RowBox[{"{", 
+      RowBox[{"\"\<Training examples\>\"", ",", " ", "\"\<1\>\"", ",", 
+       " ", "\"\<trillions of tokens\>\""}], "}"}], ",", "\n", "   ", 
+     RowBox[{"{", 
+      RowBox[{"\"\<Training updates\>\"", ",", 
+       " ", "\"\<1 (shown by hand)\>\"", ",", 
+       " ", "\"\<millions to billions\>\""}], "}"}]}], "\n", "   ", "}"}], ",",
+    " ", 
+   RowBox[{"Frame", " ", "->", " ", "All"}], ",", " ", 
+   RowBox[{"Background", " ", "->", " ", 
+    RowBox[{"{", 
+     RowBox[{"None", ",", " ", 
+      RowBox[{"{", 
+       RowBox[{"LightGray", ",", " ", "None"}], "}"}]}], "}"}]}], ",", " ", 
+   RowBox[{"Dividers", " ", "->", " ", "All"}]}], "]"}]], "Input",
+ CellLabel->"In[76]:=",ExpressionUUID->"42cc2533-205c-4ac4-99cf-abbdf7486e71"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"\<\"\"\>", "\<\"Toy model (this notebook)\"\>", "\<\"A modern \
+pretrained language model\"\>"},
+    {"\<\"Vocabulary size\"\>", "\<\"~6 tokens\"\>", "\<\"tens of thousands \
+to ~1,000,000+ tokens\"\>"},
+    {"\<\"Embedding dimension\"\>", "\<\"2\"\>", "\<\"hundreds to tens of \
+thousands\"\>"},
+    {"\<\"Attention heads\"\>", "\<\"1\"\>", "\<\"dozens, run in parallel per \
+layer\"\>"},
+    {"\<\"Transformer blocks\"\>", "\<\"1\"\>", "\<\"dozens to over 100, \
+stacked\"\>"},
+    {"\<\"Parameters\"\>", "\<\"tens\"\>", "\<\"billions, sometimes hundreds \
+of billions\"\>"},
+    {"\<\"Training examples\"\>", "\<\"1\"\>", "\<\"trillions of \
+tokens\"\>"},
+    {"\<\"Training updates\"\>", "\<\"1 (shown by hand)\"\>", "\<\"millions \
+to billions\"\>"}
+   },
+   AutoDelete->False,
+   GridBoxBackground->{"Columns" -> {{None}}, "Rows" -> {
+       GrayLevel[0.85], None}},
+   GridBoxDividers->{"Columns" -> {{True}}, "Rows" -> {{True}}},
+   GridBoxFrame->{"Columns" -> {{True}}, "Rows" -> {{True}}},
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+  "Grid"]], "Output",
+ CellChangeTimes->{3.996747454433341*^9},
+ CellLabel->"Out[76]=",ExpressionUUID->"c5daebe1-05d5-48f4-9005-38018336d22d"]
+}, Open  ]],
+
+Cell["\<\
+The arithmetic did not suddenly become magic. The scale became enormous. \
+Every quantity in the right-hand column is produced by the same handful of \
+operations used above \[LongDash] matrix multiplication, softmax, \
+cross-entropy, gradients, gradient descent \[LongDash] repeated over far more \
+parameters, far more data, and far more training steps, and (per Section 16's \
+introduction and Section \"What we left out\" above) combined with additional \
+architectural components we deliberately omitted here: LayerNorm, residual \
+connections, multi-head attention, larger feed-forward networks, positional \
+encodings, and more. A real system is not simply this exact toy multiplied \
+larger \[LongDash] it is this mechanism plus those additional pieces, at a \
+scale where hand computation is impossible and was never the goal.\
+\>", "Text",ExpressionUUID->"524ea778-4b58-4734-b317-2abbe83c2d57"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Interactive: What Happens If I Change This Number?", "Section",ExpressionUUID->"b21583c7-2853-40cd-bf58-a544d89e98d2"],
+
+Cell["\<\
+The three controls below let you perturb the trained model along three \
+different axes: the learning rate used for the update, one specific output \
+weight (WOut[[1,4]], the weight from h's first coordinate into \"shoe\"'s \
+logit, before any training update is applied), and one specific embedding \
+coordinate (the second coordinate of \"casing\"'s embedding, which feeds \
+directly into X, Q, K, V, and everything downstream). Moving any slider \
+recomputes the entire forward pass from scratch and redraws the attention \
+weights, the next-token probability bar chart, P(\"shoe\"), and the loss.\
+\>", "Text",ExpressionUUID->"96471ce9-d527-4025-8aab-a29674d4065a"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Manipulate", "[", "\n", "  ", 
+  RowBox[{
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "emb", ",", " ", "xLoc", ",", " ", "qLoc", ",", " ", "kLoc", ",", " ", 
+       "vLoc", ",", " ", "rawLoc", ",", " ", "scaledLoc", ",", " ", 
+       "maskedLoc", ",", " ", "attnLoc", ",", "\n", "    ", "attnOutLoc", ",",
+        " ", "hLoc", ",", " ", "wOutLoc", ",", " ", "logitsLoc", ",", " ", 
+       "probsLoc", ",", " ", "pShoeLoc", ",", " ", "lossLoc"}], "}"}], ",", 
+     "\n", "   ", 
+     RowBox[{
+      RowBox[{"emb", " ", "=", " ", "EmbeddingMatrix"}], ";", "\n", "   ", 
+      RowBox[{
+       RowBox[{"emb", "[", 
+        RowBox[{"[", 
+         RowBox[{"3", ",", " ", "2"}], "]"}], "]"}], " ", "=", " ", 
+       "casingCoord2"}], ";", "\n", "   ", 
+      RowBox[{"xLoc", " ", "=", " ", 
+       RowBox[{"emb", "[", 
+        RowBox[{"[", "tokenIDs", "]"}], "]"}]}], ";", "\n", "   ", 
+      RowBox[{"qLoc", " ", "=", " ", 
+       RowBox[{"xLoc", ".", "WQ"}]}], ";", " ", 
+      RowBox[{"kLoc", " ", "=", " ", 
+       RowBox[{"xLoc", ".", "WK"}]}], ";", " ", 
+      RowBox[{"vLoc", " ", "=", " ", 
+       RowBox[{"xLoc", ".", "WV"}]}], ";", "\n", "   ", 
+      RowBox[{"rawLoc", " ", "=", " ", 
+       RowBox[{"qLoc", ".", 
+        RowBox[{"Transpose", "[", "kLoc", "]"}]}]}], ";", "\n", "   ", 
+      RowBox[{"scaledLoc", " ", "=", " ", 
+       RowBox[{"N", "[", 
+        RowBox[{"rawLoc", "/", 
+         RowBox[{"Sqrt", "[", "2", "]"}]}], "]"}]}], ";", "\n", "   ", 
+      RowBox[{"maskedLoc", " ", "=", " ", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"scaledLoc", "[", 
+            RowBox[{"[", 
+             RowBox[{"1", ",", " ", "1"}], "]"}], "]"}], ",", " ", 
+           RowBox[{"-", "Infinity"}]}], "}"}], ",", " ", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"scaledLoc", "[", 
+            RowBox[{"[", 
+             RowBox[{"2", ",", " ", "1"}], "]"}], "]"}], ",", " ", 
+           RowBox[{"scaledLoc", "[", 
+            RowBox[{"[", 
+             RowBox[{"2", ",", " ", "2"}], "]"}], "]"}]}], "}"}]}], "}"}]}], ";",
+       "\n", "   ", 
+      RowBox[{"attnLoc", " ", "=", " ", 
+       RowBox[{"SoftmaxRow", " ", "/@", " ", "maskedLoc"}]}], ";", "\n", 
+      "   ", 
+      RowBox[{"attnOutLoc", " ", "=", " ", 
+       RowBox[{"attnLoc", ".", "vLoc"}]}], ";", "\n", "   ", 
+      RowBox[{"hLoc", " ", "=", " ", 
+       RowBox[{"attnOutLoc", "[", 
+        RowBox[{"[", "2", "]"}], "]"}]}], ";", "\n", "   ", 
+      RowBox[{"wOutLoc", " ", "=", " ", "WOut"}], ";", "\n", "   ", 
+      RowBox[{
+       RowBox[{"wOutLoc", "[", 
+        RowBox[{"[", 
+         RowBox[{"1", ",", " ", "4"}], "]"}], "]"}], " ", "=", " ", 
+       "wOut14"}], ";", "\n", "   ", 
+      RowBox[{"logitsLoc", " ", "=", " ", 
+       RowBox[{"hLoc", ".", "wOutLoc"}]}], ";", "\n", "   ", 
+      RowBox[{"probsLoc", " ", "=", " ", 
+       RowBox[{"Softmax2", "[", "logitsLoc", "]"}]}], ";", "\n", "   ", 
+      RowBox[{"pShoeLoc", " ", "=", " ", 
+       RowBox[{"probsLoc", "[", 
+        RowBox[{"[", "targetIndex", "]"}], "]"}]}], ";", "\n", "   ", 
+      RowBox[{"lossLoc", " ", "=", " ", 
+       RowBox[{"-", 
+        RowBox[{"Log", "[", "pShoeLoc", "]"}]}]}], ";", "\n", "   ", 
+      RowBox[{"Column", "[", 
+       RowBox[{"{", "\n", "     ", 
+        RowBox[{
+         RowBox[{"Grid", "[", 
+          RowBox[{"{", 
+           RowBox[{"{", 
+            
+            RowBox[{"\"\<attention weights (row 2, \\\"casing\\\")\>\"", ",", 
+             "\n", "        ", 
+             RowBox[{"NumberForm", "[", 
+              RowBox[{
+               RowBox[{"attnLoc", "[", 
+                RowBox[{"[", "2", "]"}], "]"}], ",", " ", 
+               RowBox[{"{", 
+                RowBox[{"4", ",", " ", "3"}], "}"}]}], "]"}]}], "}"}], "}"}], 
+          "]"}], ",", "\n", "     ", 
+         RowBox[{"BarChart", "[", 
+          RowBox[{"probsLoc", ",", " ", 
+           RowBox[{"ChartLabels", " ", "->", " ", "Vocabulary"}], ",", " ", 
+           RowBox[{"ChartStyle", " ", "->", " ", "\"\<Pastel\>\""}], ",", 
+           "\n", "      ", 
+           RowBox[{"PlotRange", " ", "->", " ", 
+            RowBox[{"{", 
+             RowBox[{"0", ",", " ", "1"}], "}"}]}], ",", " ", 
+           RowBox[{"ImageSize", " ", "->", " ", "380"}]}], "]"}], ",", "\n", 
+         "     ", 
+         RowBox[{"Grid", "[", 
+          RowBox[{
+           RowBox[{"{", "\n", "       ", 
+            RowBox[{
+             RowBox[{"{", 
+              RowBox[{"\"\<P(\\\"shoe\\\")\>\"", ",", " ", 
+               RowBox[{"NumberForm", "[", 
+                RowBox[{"pShoeLoc", ",", " ", 
+                 RowBox[{"{", 
+                  RowBox[{"5", ",", " ", "4"}], "}"}]}], "]"}]}], "}"}], ",", 
+             "\n", "       ", 
+             RowBox[{"{", 
+              RowBox[{"\"\<Loss\>\"", ",", " ", 
+               RowBox[{"NumberForm", "[", 
+                RowBox[{"lossLoc", ",", " ", 
+                 RowBox[{"{", 
+                  RowBox[{"5", ",", " ", "4"}], "}"}]}], "]"}]}], "}"}]}], 
+            "\n", "       ", "}"}], ",", " ", 
+           RowBox[{"Frame", " ", "->", " ", "All"}]}], "]"}]}], "\n", "     ",
+         "}"}], "]"}]}]}], "\n", "   ", "]"}], ",", "\n", "  ", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "learningRateM", ",", " ", "2", ",", 
+       " ", "\"\<learning rate (unused above, shown for Section 13 intuition)\
+\>\""}], "}"}], ",", " ", "0", ",", " ", "4", ",", " ", "0.1"}], "}"}], ",", 
+   "\n", "  ", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "wOut14", ",", " ", "1", ",", 
+       " ", "\"\<WOut[[1,4]]  (weight feeding \\\"shoe\\\"'s logit)\>\""}], 
+      "}"}], ",", " ", 
+     RowBox[{"-", "3"}], ",", " ", "3", ",", " ", "0.1"}], "}"}], ",", "\n", 
+   "  ", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "casingCoord2", ",", " ", "1", ",", 
+       " ", "\"\<casing embedding, 2nd coordinate\>\""}], "}"}], ",", " ", 
+     RowBox[{"-", "2"}], ",", " ", "2", ",", " ", "0.1"}], "}"}]}], "\n", 
+  "  ", "]"}]], "Input",
+ CellLabel->"In[77]:=",ExpressionUUID->"0d375096-557a-4356-b005-ea6df1cd9496"],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`casingCoord2$$ = 
+    1.1, $CellContext`learningRateM$$ = 3.2, $CellContext`wOut14$$ = -1.5, 
+    Typeset`show$$ = True, Typeset`bookmarkList$$ = {}, 
+    Typeset`bookmarkMode$$ = "Menu", Typeset`animator$$, Typeset`animvar$$ = 
+    1, Typeset`name$$ = "\"untitled\"", Typeset`specs$$ = {{{
+       Hold[$CellContext`learningRateM$$], 2, 
+       "learning rate (unused above, shown for Section 13 intuition)"}, 0, 4, 
+      0.1, ControlType -> Manipulator}, {{
+       Hold[$CellContext`wOut14$$], 1, 
+       "WOut[[1,4]]  (weight feeding \"shoe\"'s logit)"}, -3, 3, 0.1, 
+      ControlType -> Manipulator}, {{
+       Hold[$CellContext`casingCoord2$$], 1, 
+       "casing embedding, 2nd coordinate"}, -2, 2, 0.1, ControlType -> 
+      Manipulator}}, Typeset`size$$ = {
+    384.285078125, {147.52118238529613`, 153.25311597904613`}}, 
+    Typeset`update$$ = 0, Typeset`initDone$$, Typeset`skipInitDone$$ = True, 
+    Typeset`keyframeActionsQ$$ = False, Typeset`keyframeList$$ = {}}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, 
+      "Variables" :> {$CellContext`casingCoord2$$ = 
+        1, $CellContext`learningRateM$$ = 2, $CellContext`wOut14$$ = 1}, 
+      "ControllerVariables" :> {}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$, Typeset`keyframeActionsQ$$, 
+        Typeset`keyframeList$$}, "Body" :> 
+      Module[{$CellContext`emb$, $CellContext`xLoc$, $CellContext`qLoc$, \
+$CellContext`kLoc$, $CellContext`vLoc$, $CellContext`rawLoc$, \
+$CellContext`scaledLoc$, $CellContext`maskedLoc$, $CellContext`attnLoc$, \
+$CellContext`attnOutLoc$, $CellContext`hLoc$, $CellContext`wOutLoc$, \
+$CellContext`logitsLoc$, $CellContext`probsLoc$, $CellContext`pShoeLoc$, \
+$CellContext`lossLoc$}, $CellContext`emb$ = $CellContext`EmbeddingMatrix; 
+        Part[$CellContext`emb$, 3, 
+           2] = $CellContext`casingCoord2$$; $CellContext`xLoc$ = 
+         Part[$CellContext`emb$, $CellContext`tokenIDs]; $CellContext`qLoc$ = 
+         Dot[$CellContext`xLoc$, $CellContext`WQ]; $CellContext`kLoc$ = 
+         Dot[$CellContext`xLoc$, $CellContext`WK]; $CellContext`vLoc$ = 
+         Dot[$CellContext`xLoc$, $CellContext`WV]; $CellContext`rawLoc$ = 
+         Dot[$CellContext`qLoc$, 
+           Transpose[$CellContext`kLoc$]]; $CellContext`scaledLoc$ = 
+         N[$CellContext`rawLoc$/Sqrt[2]]; $CellContext`maskedLoc$ = {{
+            Part[$CellContext`scaledLoc$, 1, 1], -Infinity}, {
+            Part[$CellContext`scaledLoc$, 2, 1], 
+            Part[$CellContext`scaledLoc$, 2, 2]}}; $CellContext`attnLoc$ = 
+         Map[$CellContext`SoftmaxRow, $CellContext`maskedLoc$]; \
+$CellContext`attnOutLoc$ = 
+         Dot[$CellContext`attnLoc$, $CellContext`vLoc$]; $CellContext`hLoc$ = 
+         Part[$CellContext`attnOutLoc$, 
+           2]; $CellContext`wOutLoc$ = $CellContext`WOut; 
+        Part[$CellContext`wOutLoc$, 1, 
+           4] = $CellContext`wOut14$$; $CellContext`logitsLoc$ = 
+         Dot[$CellContext`hLoc$, $CellContext`wOutLoc$]; \
+$CellContext`probsLoc$ = $CellContext`Softmax2[$CellContext`logitsLoc$]; \
+$CellContext`pShoeLoc$ = 
+         Part[$CellContext`probsLoc$, $CellContext`targetIndex]; \
+$CellContext`lossLoc$ = -Log[$CellContext`pShoeLoc$]; Column[{
+           Grid[{{"attention weights (row 2, \"casing\")", 
+              NumberForm[
+               Part[$CellContext`attnLoc$, 2], {4, 3}]}}], 
+           
+           BarChart[$CellContext`probsLoc$, 
+            ChartLabels -> $CellContext`Vocabulary, ChartStyle -> "Pastel", 
+            PlotRange -> {0, 1}, ImageSize -> 380], 
+           Grid[{{"P(\"shoe\")", 
+              NumberForm[$CellContext`pShoeLoc$, {5, 4}]}, {"Loss", 
+              NumberForm[$CellContext`lossLoc$, {5, 4}]}}, Frame -> All]}]], 
+      "Specifications" :> {{{$CellContext`learningRateM$$, 2, 
+          "learning rate (unused above, shown for Section 13 intuition)"}, 0, 
+         4, 0.1}, {{$CellContext`wOut14$$, 1, 
+          "WOut[[1,4]]  (weight feeding \"shoe\"'s logit)"}, -3, 3, 
+         0.1}, {{$CellContext`casingCoord2$$, 1, 
+          "casing embedding, 2nd coordinate"}, -2, 2, 0.1}}, "Options" :> {}, 
+      "DefaultOptions" :> {}],
+     ImageSizeCache->{
+      505.91701171875, {224.79169894328766`, 230.52363253703766`}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UndoTrackedVariables:>{Typeset`show$$, Typeset`bookmarkMode$$},
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{3.996747454445953*^9},
+ CellLabel->"Out[77]=",ExpressionUUID->"81068ef7-500b-46f6-ab0f-452139b0370e"]
+}, Open  ]],
+
+Cell["\<\
+Try pushing wOut14 higher: P(\"shoe\") should rise, and the loss should fall, \
+mirroring exactly what one gradient step did automatically in Sections 12-14. \
+Try moving the casing embedding coordinate away from its original value of 1: \
+because \"casing\"'s embedding feeds X, Q, K, V, and the attention weights, \
+this single number reaches every stage of the computation, not just the last \
+one.\
+\>", "Text",ExpressionUUID->"1dd3226b-4eee-4f85-aac7-7bc7efd89869"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Try It Without Mathematica", "Section",ExpressionUUID->"8f0e1a01-5b40-4d99-b6aa-d63d2426a1a6"],
+
+Cell["\<\
+Everything below can be reproduced with paper, a pencil, and a calculator \
+with e^x and ln buttons. All of the given values below were introduced \
+earlier in this notebook \[LongDash] nothing here is new.\
+\>", "Text",ExpressionUUID->"ef16cb50-18c6-404f-8ec2-57394bb9ff71"],
+
+Cell[CellGroupData[{
+
+Cell["Given", "Subsection",ExpressionUUID->"feeb16d9-67df-4a4a-9f4b-2b384bf37e26"],
+
+Cell["\<\
+Vocabulary (token : ID)
+  <BOS>:1   run:2   casing:3   shoe:4   cement:5   <EOS>:6
+
+Input tokens: \"run\", \"casing\"  ->  token IDs {2, 3}
+Target token: \"shoe\"  ->  token ID 4
+
+Embeddings (token -> vector):
+  run    -> (1, 0)
+  casing -> (0, 1)
+
+X = | 1  0 |        WQ = | 1  0 |     WK = | 1  1 |     WV = | 1  0 |
+    | 0  1 |             | 1  1 |          | 0  1 |          | 0  1 |
+
+WOut = |  0   1   0   1  -1   0 |
+       |  0   0   1  -1   0  -1 |
+      (columns, in order: <BOS>, run, casing, shoe, cement, <EOS>)
+
+d (embedding dimension, for scaling) = 2
+Learning rate = 2\
+\>", "Program",ExpressionUUID->"77eb6361-027e-4222-b989-a5c111415b2e"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Fill in the blanks", "Subsection",ExpressionUUID->"581ae767-e109-4b51-b36d-046676c85b1d"],
+
+Cell["\<\
+Q = ______              K = ______              V = ______
+
+Q . Transpose[K] = ______
+
+Scaled scores  =  (Q . Transpose[K]) / Sqrt[2]  =  ______
+
+Masked scores (position 1 cannot see position 2; replace that entry with -\
+\[Infinity]) = ______
+
+Attention probabilities (softmax each row of the masked scores) = ______
+
+Attention output = Attention probabilities . V = ______
+  (take row 2 of this \[LongDash] call it h \[LongDash] this is what predicts \
+the token after \"casing\")
+
+Logits = h . WOut = ______   (6 numbers, one per vocabulary token)
+
+Softmax the logits  ->  Probabilities = ______
+
+P(\"shoe\") = ______   (the probability entry for token 4)
+
+Loss = -Log[ P(\"shoe\") ] = ______\
+\>", "Program",ExpressionUUID->"ec84ab41-080e-45e0-9b95-525ed69b2d87"],
+
+Cell["\<\
+Check your work against Sections 4, 5, 6, 7, 8, 9, 10, and 11 above, which \
+compute exactly these quantities and display every intermediate step. \
+HAND_CALCULATION.md (in this project folder) reproduces this same worksheet \
+as a plain-text file you can print.\
+\>", "Text",ExpressionUUID->"b6fef3d5-8a05-43ae-a032-4c39c16e3fc1"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Appendix A: Automated Verification", "Section",ExpressionUUID->"57415912-c66f-4b39-b77a-386176e59cd9"],
+
+Cell["\<\
+Before trusting any of the numbers above, we check them programmatically: \
+every matrix has the dimensions it should, every softmax row sums to 1, the \
+causal mask actually zeroes out the disallowed attention weight, the target \
+probability is pulled from the correct index, cross-entropy is computed \
+correctly, the gradient has the right shape and the right sign, the updated \
+weights are actually different from the old ones and are actually used for \
+the second forward pass, and \[LongDash] the two claims this whole notebook \
+depends on \[LongDash] P(\"shoe\") increases and the loss decreases after the \
+one training step. This cell loads TinyTransformerByHand.wl (the standalone \
+reference implementation shipped alongside this notebook) and runs its full \
+check suite.\
+\>", "Text",ExpressionUUID->"3576a9e0-d876-4fcd-91a8-234d3379ba01"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"notebookDir", " ", "=", " ", 
+   RowBox[{"Quiet", "[", 
+    RowBox[{"NotebookDirectory", "[", "]"}], "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"If", "[", 
+   RowBox[{
+    RowBox[{"!", " ", 
+     RowBox[{"StringQ", "[", "notebookDir", "]"}]}], ",", " ", 
+    RowBox[{"notebookDir", " ", "=", " ", 
+     RowBox[{"Directory", "[", "]"}]}]}], "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"SetDirectory", "[", "notebookDir", "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"Quiet", "[", 
+   RowBox[{
+    RowBox[{"Get", "[", "\"\<TinyTransformerByHand.wl\>\"", "]"}], ",", " ", 
+    RowBox[{"{", 
+     RowBox[{"General", "::", "shdw"}], "}"}]}], "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"TinyTransformerByHand`RunAllChecks", "[", "]"}], ";"}]}], "Input",
+ CellLabel->"In[78]:=",ExpressionUUID->"3732ed55-4383-4f37-9057-22b62f7f109b"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData["\<\"=== TinyTransformerByHand verification ===\"\>"], "Print",
+ CellChangeTimes->{3.996747454554593*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"85a8f213-269a-4095-8951-15cab340af4d"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", "\[InvisibleSpace]", "\<\"X is 2x2\"\>"}],
+  SequenceForm["  [PASS] ", "X is 2x2"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.996747454555134*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"8fd8ce3b-214f-4bc1-ada0-b3402c793991"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", "\[InvisibleSpace]", "\<\"Q is 2x2\"\>"}],
+  SequenceForm["  [PASS] ", "Q is 2x2"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.996747454555509*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"f72fae3e-4c13-4147-aac4-bf52768dd26d"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", "\[InvisibleSpace]", "\<\"K is 2x2\"\>"}],
+  SequenceForm["  [PASS] ", "K is 2x2"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.996747454555719*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"8e461296-5936-44e8-ad92-2383d3012b67"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", "\[InvisibleSpace]", "\<\"V is 2x2\"\>"}],
+  SequenceForm["  [PASS] ", "V is 2x2"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.996747454555922*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"3f7f69e3-ecc2-446e-965a-bf7e20bbfaaf"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"Attention weights are 2x2\"\>"}],
+  SequenceForm["  [PASS] ", "Attention weights are 2x2"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9967474545561237`*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"73a6bf5d-cef6-4fcb-b08d-227e29ba89d8"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"Attention output is 2x2\"\>"}],
+  SequenceForm["  [PASS] ", "Attention output is 2x2"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9967474545563383`*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"39fcc4ec-a9c9-4ce1-ad84-13dbd8a5bac9"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", "\[InvisibleSpace]", "\<\"h is length 2\"\>"}],
+  
+  SequenceForm["  [PASS] ", "h is length 2"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9967474545565434`*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"bf38c836-83c9-4003-b4ae-65da53ec5f8b"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"Logits is length 6\"\>"}],
+  SequenceForm["  [PASS] ", "Logits is length 6"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.996747454556747*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"abb3d6fc-9127-4514-9593-9923efd37b95"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"Probabilities is length 6\"\>"}],
+  SequenceForm["  [PASS] ", "Probabilities is length 6"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9967474545569572`*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"7ce52393-8290-4e55-8a71-8534db6a843a"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"dLogits is length 6\"\>"}],
+  SequenceForm["  [PASS] ", "dLogits is length 6"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.99674745455717*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"db6c8173-ffb7-4f4a-a875-b8c380a748e2"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", "\[InvisibleSpace]", "\<\"dWOut is 2x6\"\>"}],
+  SequenceForm["  [PASS] ", "dWOut is 2x6"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.996747454557379*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"b6388011-c8d9-469d-b72d-3f2b8ac9418d"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"Attention row 1 sums to 1\"\>"}],
+  SequenceForm["  [PASS] ", "Attention row 1 sums to 1"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9967474545575857`*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"1cc06d15-9676-4934-b817-91acc6ce3c87"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"Attention row 2 sums to 1\"\>"}],
+  SequenceForm["  [PASS] ", "Attention row 2 sums to 1"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.99674745455779*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"ead68885-acf4-4fa8-aea3-dc514a35dc07"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"Output probabilities sum to 1\"\>"}],
+  SequenceForm["  [PASS] ", "Output probabilities sum to 1"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.996747454558003*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"5d26f989-f2b1-4ab3-a77d-6da3303f38ce"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"Causal mask: position 1 cannot see position \
+2\"\>"}],
+  SequenceForm["  [PASS] ", "Causal mask: position 1 cannot see position 2"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.99674745455823*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"757f1954-909a-46b3-b25d-c1901bae783b"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"Causal mask: position 2 CAN see position 1\"\>"}],
+  SequenceForm["  [PASS] ", "Causal mask: position 2 CAN see position 1"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9967474545584507`*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"ba26ae5a-219b-4f73-baff-0b792391401b"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"Target index points to \\\"shoe\\\"\"\>"}],
+  SequenceForm["  [PASS] ", "Target index points to \"shoe\""],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9967474545586567`*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"84ffdf9e-c71d-4317-a280-0f7467c11509"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"P(shoe) equals \
+Probabilities[[TargetIndex]]\"\>"}],
+  SequenceForm["  [PASS] ", "P(shoe) equals Probabilities[[TargetIndex]]"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.996747454558868*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"44af002d-110f-4a90-936c-838538c22864"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"Loss equals -Log[P(shoe)]\"\>"}],
+  SequenceForm["  [PASS] ", "Loss equals -Log[P(shoe)]"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9967474545591097`*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"cee844c8-f49f-4b01-a4c8-2d61b1e0e0f2"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"Loss is positive\"\>"}],
+  SequenceForm["  [PASS] ", "Loss is positive"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.996747454559334*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"e3514413-ccd2-4d69-905b-baed372ae75d"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"dLogits sums to ~0\"\>"}],
+  SequenceForm["  [PASS] ", "dLogits sums to ~0"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.996747454559535*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"d5b92e7e-1bdc-40f0-8bf9-50aa0ad896cb"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"dLogits is negative only at the target \
+index\"\>"}],
+  SequenceForm["  [PASS] ", "dLogits is negative only at the target index"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.996747454559759*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"d23855bd-53f9-4e5b-8109-4119669494bb"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"Update formula matches W - lr*grad\"\>"}],
+  SequenceForm["  [PASS] ", "Update formula matches W - lr*grad"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.99674745455998*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"d3ebb855-f20a-4d11-b90d-c6b2d8633b08"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"Updated weights actually differ from old weights\
+\"\>"}],
+  SequenceForm[
+  "  [PASS] ", "Updated weights actually differ from old weights"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.996747454560206*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"89e3d5a8-d6e9-457e-ba56-1d82a868368f"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"Updated model actually uses updated WOut (logits \
+changed)\"\>"}],
+  SequenceForm[
+  "  [PASS] ", "Updated model actually uses updated WOut (logits changed)"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.996747454560421*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"2d37928c-edaf-4576-b270-aa8c3a013808"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"P(shoe) increases after the update\"\>"}],
+  SequenceForm["  [PASS] ", "P(shoe) increases after the update"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.996747454560652*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"b01e7165-bc92-41b6-ab32-4c04d874fc63"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"  [PASS] \"\>", 
+   "\[InvisibleSpace]", "\<\"Loss decreases after the update\"\>"}],
+  SequenceForm["  [PASS] ", "Loss decreases after the update"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.996747454560884*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"3a58ab44-9426-4c63-a85d-59686b437223"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ALL CHECKS PASSED (\"\>", "\[InvisibleSpace]", "27", 
+   "\[InvisibleSpace]", "\<\" checks)\"\>"}],
+  SequenceForm["ALL CHECKS PASSED (", 27, " checks)"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9967474545610943`*^9},
+ CellLabel->
+  "During evaluation of \
+In[78]:=",ExpressionUUID->"bd7d2c52-f1aa-49a2-a41b-265b5c978f09"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Appendix B: Optional Cross-Check With a Built-In Function", "Section",ExpressionUUID->"db3e0674-43a3-43b1-b4ad-deec489e6bae"],
+
+Cell["\<\
+As a final, optional sanity check \[LongDash] and only as a cross-check, \
+never as a replacement for the manual derivation above \[LongDash] we compare \
+our hand-written softmax against Mathematica's built-in Softmax function \
+applied to the same logits. This notebook does not use NetChain, NetGraph, \
+NetTrain, Predict, or Classify anywhere; Softmax here is an ordinary numeric \
+function, not a neural-network abstraction, and we use it only to confirm \
+agreement with Sections 7 and 10, not to compute anything new.\
+\>", "Text",ExpressionUUID->"af0102d8-3ddb-40a6-98a1-966c8f6360ed"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"builtInProbabilities", " ", "=", " ", 
+   RowBox[{"Softmax", "[", "logits", "]"}]}], ";"}], "\n", 
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"\"\<our manual softmax\>\"", " ", "->", " ", 
+    RowBox[{"N", "[", 
+     RowBox[{"probabilities", ",", " ", "6"}], "]"}]}], ",", " ", 
+   RowBox[{"\"\<built-in Softmax[]\>\"", " ", "->", " ", 
+    RowBox[{"N", "[", 
+     RowBox[{"builtInProbabilities", ",", " ", "6"}], "]"}]}], ",", "\n", 
+   "  ", 
+   RowBox[{"\"\<agree?\>\"", " ", "->", " ", 
+    RowBox[{
+     RowBox[{"Max", "[", 
+      RowBox[{"Abs", "[", 
+       RowBox[{"probabilities", " ", "-", " ", "builtInProbabilities"}], 
+       "]"}], "]"}], " ", "<", " ", 
+     RowBox[{"10", "^", 
+      RowBox[{"-", "10"}]}]}]}]}], "}"}]}], "Input",
+ CellLabel->"In[83]:=",ExpressionUUID->"2303a174-ed2f-4da5-9111-4a40b1cfae64"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"\<\"our manual softmax\"\>", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{
+     "0.1432678734957869`", ",", "0.2799126719101499`", ",", 
+      "0.19932857023087475`", ",", "0.20118788401804047`", ",", 
+      "0.0733288830260368`", ",", "0.10297411731911124`"}], "}"}]}], ",", 
+   RowBox[{"\<\"built-in Softmax[]\"\>", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{
+     "0.1432678734957869`", ",", "0.2799126719101499`", ",", 
+      "0.19932857023087475`", ",", "0.20118788401804047`", ",", 
+      "0.0733288830260368`", ",", "0.10297411731911124`"}], "}"}]}], ",", 
+   RowBox[{"\<\"agree?\"\>", "\[Rule]", "True"}]}], "}"}]], "Output",
+ CellChangeTimes->{3.99674745456299*^9},
+ CellLabel->"Out[84]=",ExpressionUUID->"f90ebbdf-e9b9-497f-9e01-832e2a29d9cc"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{4, Automatic}, {Automatic, 4}},
+WindowTitle->"TinyTransformerByHand",
+FrontEndVersion->"15.0 for Mac OS X ARM (64-bit) (July 2, 2026)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"abf89a7b-2b07-45b9-ab0f-7918493e37a1"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[611, 23, 111, 0, 96, "Title",ExpressionUUID->"5ba09387-2d50-41f8-8187-663119f52345"],
+Cell[725, 25, 205, 3, 52, "Subtitle",ExpressionUUID->"7d25a35d-4e63-4618-ae79-f9063e321e67"],
+Cell[933, 30, 1245, 22, 186, "Text",ExpressionUUID->"3f94e1a8-9945-4f71-8e3d-2897d2e0e3ee"],
+Cell[CellGroupData[{
+Cell[2203, 56, 105, 0, 53, "Subsection",ExpressionUUID->"a48dedec-1be4-4845-808d-3f0a6e649aa9"],
+Cell[2311, 58, 256, 4, 33, "Text",ExpressionUUID->"9d4ebbc7-e964-4df2-b18d-9bf4b1c026a9"],
+Cell[2570, 64, 783, 26, 434, "Program",ExpressionUUID->"84466a5b-e6d4-44ac-914f-f9934448403c"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3390, 95, 121, 0, 53, "Subsection",ExpressionUUID->"76892847-457d-4b58-8b7f-88d6878e3dcf"],
+Cell[3514, 97, 649, 9, 77, "Text",ExpressionUUID->"e9633408-78df-42c7-8eef-d4a65239eeaa"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[4200, 111, 120, 0, 53, "Subsection",ExpressionUUID->"df14f2cc-ee40-4dbd-8b5c-e5775457ba0d"],
+Cell[4323, 113, 272, 4, 30, "Item",ExpressionUUID->"f462ccbc-091c-4f9c-b021-3a9105f2cf47"],
+Cell[4598, 119, 258, 4, 30, "Item",ExpressionUUID->"d1fb7c54-7f7f-410e-b343-852ed0d55a2d"],
+Cell[4859, 125, 249, 4, 30, "Item",ExpressionUUID->"d3565a6b-ba64-4e34-aa7d-32d8820f7378"],
+Cell[5111, 131, 314, 5, 50, "Item",ExpressionUUID->"70abd356-d57c-4d1c-b040-b6d405f1a9fa"],
+Cell[5428, 138, 303, 4, 30, "Item",ExpressionUUID->"006bf8c6-3ed2-484c-92a0-3402b6a9bd91"],
+Cell[5734, 144, 292, 4, 30, "Item",ExpressionUUID->"979a9b30-03d8-466b-82f1-2e668f93c1c1"],
+Cell[6029, 150, 189, 3, 33, "Text",ExpressionUUID->"d9735ffa-5717-4f65-91f3-4783b3c88c53"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6255, 158, 99, 0, 66, "Section",ExpressionUUID->"2dc9385c-4c6a-4b1d-9005-8367b293adea"],
+Cell[6357, 160, 993, 24, 383, "Text",ExpressionUUID->"3fed41a5-8b94-489f-8ac1-443410cb0545"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7387, 189, 101, 0, 66, "Section",ExpressionUUID->"19c42f4a-484b-4f0a-a3ad-e41d3bdceb45"],
+Cell[7491, 191, 601, 10, 99, "Text",ExpressionUUID->"4875c9c9-28c4-4089-bef5-86ffcbc2026c"],
+Cell[CellGroupData[{
+Cell[8117, 205, 1027, 27, 70, "Input",ExpressionUUID->"5d24ce0e-596c-4ced-8a88-460b1afacac5"],
+Cell[9147, 234, 638, 17, 145, "Output",ExpressionUUID->"b6418874-1bc0-4665-8577-d12e628d92a1"]
+}, Open  ]],
+Cell[9800, 254, 234, 3, 33, "Text",ExpressionUUID->"0a6ee300-1a53-422b-bd1a-95a142f5c8a5"],
+Cell[CellGroupData[{
+Cell[10059, 261, 482, 12, 49, "Input",ExpressionUUID->"604a8f21-fae5-4fe2-b9e3-7f39460d6f29"],
+Cell[10544, 275, 195, 4, 33, "Output",ExpressionUUID->"a3687fb1-61ee-4ef2-b584-18c15149daa1"]
+}, Open  ]],
+Cell[10754, 282, 328, 5, 33, "Text",ExpressionUUID->"680df650-90a5-4127-b29f-c3685c8324c7"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[11119, 292, 93, 0, 66, "Section",ExpressionUUID->"7811da34-882e-4b96-83da-af7af6cd504a"],
+Cell[11215, 294, 621, 10, 99, "Text",ExpressionUUID->"fe843dd9-d81f-4eaf-8dd7-ddb627c7f820"],
+Cell[CellGroupData[{
+Cell[11861, 308, 1702, 45, 213, "Input",ExpressionUUID->"e16eca72-27ae-435e-8ceb-006243464382"],
+Cell[13566, 355, 1005, 31, 145, "Output",ExpressionUUID->"25666447-9c5d-4f77-a29e-0a79390f8f61"]
+}, Open  ]],
+Cell[14586, 389, 444, 6, 55, "Text",ExpressionUUID->"416a4a53-f983-498d-8f1b-6a2f6c12446b"],
+Cell[CellGroupData[{
+Cell[15055, 399, 279, 6, 49, "Input",ExpressionUUID->"682d106e-c061-494d-b297-5c174c249e8a"],
+Cell[15337, 407, 619, 19, 59, "Output",ExpressionUUID->"c75d8cc3-2ee6-4343-b610-9ca52a1150a4"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[15993, 431, 141, 2, 29, "Input",ExpressionUUID->"02c827e3-d1b8-4368-838c-dc09f29e0d79"],
+Cell[16137, 435, 195, 4, 33, "Output",ExpressionUUID->"cb1da70d-bf7e-4d5f-ba2b-7359962018f4"]
+}, Open  ]],
+Cell[16347, 442, 460, 6, 55, "Text",ExpressionUUID->"26dba138-9441-4beb-a0db-e15c16d9b66c"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[16844, 453, 107, 0, 66, "Section",ExpressionUUID->"db9b335f-3274-460c-9568-8116f780352a"],
+Cell[16954, 455, 491, 8, 99, "Text",ExpressionUUID->"8fb578f0-9859-4547-a026-48b278bc9d2f"],
+Cell[CellGroupData[{
+Cell[17470, 467, 1086, 33, 90, "Input",ExpressionUUID->"4a043668-a4f0-422f-b0cf-5eb03af013c0"],
+Cell[18559, 502, 1024, 25, 46, "Output",ExpressionUUID->"61cc26c5-4e82-4278-9f14-578e45ac6a44"]
+}, Open  ]],
+Cell[19598, 530, 263, 4, 33, "Text",ExpressionUUID->"49f41177-ec7f-4a9b-8037-1f3373b4504d"],
+Cell[CellGroupData[{
+Cell[19886, 538, 476, 12, 49, "Input",ExpressionUUID->"dfa6d2d6-45f5-481e-b61d-628803978fd0"],
+Cell[20365, 552, 1026, 25, 46, "Output",ExpressionUUID->"f54392bd-40e3-487f-9674-c4f8fa1be5c4"]
+}, Open  ]],
+Cell[21406, 580, 109, 0, 33, "Text",ExpressionUUID->"ccda2dab-3b72-47ab-a1e1-bfe05ca75a1c"],
+Cell[CellGroupData[{
+Cell[21540, 584, 476, 12, 49, "Input",ExpressionUUID->"a30a1caf-c1c7-45ec-9851-cc95209d38d3"],
+Cell[22019, 598, 1028, 25, 46, "Output",ExpressionUUID->"f9f6a9b9-5678-44e8-b59e-56a667b68669"]
+}, Open  ]],
+Cell[23062, 626, 111, 0, 33, "Text",ExpressionUUID->"37c55928-6e61-41b7-a320-586a166b7f89"],
+Cell[CellGroupData[{
+Cell[23198, 630, 476, 12, 49, "Input",ExpressionUUID->"d0d726b3-aaaa-402b-b7f2-760e8d0bfff5"],
+Cell[23677, 644, 1026, 25, 46, "Output",ExpressionUUID->"db91a610-c225-4820-aabe-eacc3a6a8152"]
+}, Open  ]],
+Cell[24718, 672, 412, 6, 55, "Text",ExpressionUUID->"d9cb1b1a-431d-4191-879c-4166622b9026"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[25167, 683, 93, 0, 66, "Section",ExpressionUUID->"e79bb574-535e-4e94-936c-813ded478d72"],
+Cell[25263, 685, 354, 5, 55, "Text",ExpressionUUID->"b43cd784-a6ad-4de3-a6a3-dd7bae2433d4"],
+Cell[CellGroupData[{
+Cell[25642, 694, 567, 14, 49, "Input",ExpressionUUID->"0f5aa31a-77c4-49eb-af29-2fbede1fd9bb"],
+Cell[26212, 710, 1026, 25, 46, "Output",ExpressionUUID->"3d24ab89-e992-40f3-8535-05dfbf2ea2a0"]
+}, Open  ]],
+Cell[27253, 738, 523, 7, 55, "Text",ExpressionUUID->"6cdb57f6-d613-4a6e-afab-387b53cc2519"],
+Cell[CellGroupData[{
+Cell[27801, 749, 384, 9, 70, "Input",ExpressionUUID->"162adeb4-9690-4c59-a2e4-34db3194bf80"],
+Cell[28188, 760, 676, 19, 59, "Output",ExpressionUUID->"a597b663-43bf-451e-9635-0627cef3bc39"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[28913, 785, 88, 0, 66, "Section",ExpressionUUID->"9400ddb1-ab68-4cf6-aa08-b0f3dbce077b"],
+Cell[29004, 787, 798, 12, 121, "Text",ExpressionUUID->"2b3a3dfe-d5ef-4b3d-8ffb-a69ea49e6bd5"],
+Cell[CellGroupData[{
+Cell[29827, 803, 1238, 32, 111, "Input",ExpressionUUID->"4a18c0f3-3e99-429e-a8da-d6188193ff8a"],
+Cell[31068, 837, 708, 20, 59, "Output",ExpressionUUID->"c378d3eb-4b49-40a0-af6c-0ff5297ab054"]
+}, Open  ]],
+Cell[31791, 860, 542, 8, 55, "Text",ExpressionUUID->"0b5ff5bf-4dd7-4ff9-b6ad-46ad86b38c06"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[32370, 873, 84, 0, 66, "Section",ExpressionUUID->"9cbbce4d-6fa6-4d50-92f2-23e46d63fca1"],
+Cell[32457, 875, 565, 11, 143, "Text",ExpressionUUID->"56291b84-3b05-4cef-abcf-0a60698a2762"],
+Cell[CellGroupData[{
+Cell[33047, 890, 305, 7, 49, "Input",ExpressionUUID->"5b3ed1a5-3e5a-44f8-b1e8-a45ee6509f22"],
+Cell[33355, 899, 231, 5, 33, "Output",ExpressionUUID->"ebcf7dd9-eb12-4bc4-a5a8-1d28c423eccf"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[33623, 909, 179, 3, 29, "Input",ExpressionUUID->"9a30458d-e93e-4dca-ace3-4fcf699bf4d8"],
+Cell[33805, 914, 164, 2, 33, "Output",ExpressionUUID->"33670950-74fe-4fec-9743-fa0a7d2ef9ae"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[34006, 921, 180, 3, 29, "Input",ExpressionUUID->"fb5be867-011d-476d-8a0c-57de8528e93e"],
+Cell[34189, 926, 233, 5, 33, "Output",ExpressionUUID->"fd371eff-3016-4d04-965d-9b992304f3ba"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[34459, 936, 147, 2, 29, "Input",ExpressionUUID->"e5891e08-3e70-473f-929e-184e3c39c438"],
+Cell[34609, 940, 153, 2, 33, "Output",ExpressionUUID->"5c4f8f6d-c661-485d-89bd-2e97dbf55f3e"]
+}, Open  ]],
+Cell[34777, 945, 419, 6, 55, "Text",ExpressionUUID->"fb4ec268-1ca3-47ff-9819-00188325a15e"],
+Cell[CellGroupData[{
+Cell[35221, 955, 1376, 35, 172, "Input",ExpressionUUID->"3cc3d363-2dcc-4d21-9422-3ba22d10dd45"],
+Cell[36600, 992, 659, 19, 59, "Output",ExpressionUUID->"8178d41d-7b36-481e-bc33-72afb6209744"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[37296, 1016, 158, 2, 29, "Input",ExpressionUUID->"210bcc66-210d-477d-bd43-15a903857328"],
+Cell[37457, 1020, 214, 4, 33, "Output",ExpressionUUID->"369f6dca-93e3-4479-bc1e-77f73934673d"]
+}, Open  ]],
+Cell[37686, 1027, 427, 6, 55, "Text",ExpressionUUID->"76e01916-617f-477b-93a8-291144ab98ba"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[38150, 1038, 92, 0, 66, "Section",ExpressionUUID->"409220e5-0e00-4ec6-87b9-373af9079714"],
+Cell[38245, 1040, 252, 5, 77, "Text",ExpressionUUID->"8990e19f-4f51-4e02-b597-7f5ffb9f1d52"],
+Cell[CellGroupData[{
+Cell[38522, 1049, 535, 13, 49, "Input",ExpressionUUID->"1a263b4a-8764-4f8f-a48e-61a1512ea3bc"],
+Cell[39060, 1064, 1106, 25, 46, "Output",ExpressionUUID->"9c13c0a3-7982-4100-b873-81c37acea65e"]
+}, Open  ]],
+Cell[40181, 1092, 482, 7, 55, "Text",ExpressionUUID->"f39236eb-c3a1-47fb-bb1b-b1116d9ec7e1"],
+Cell[CellGroupData[{
+Cell[40688, 1103, 204, 4, 29, "Input",ExpressionUUID->"732eb7c9-764a-4da1-a6c1-d45cd5bdda5e"],
+Cell[40895, 1109, 233, 5, 33, "Output",ExpressionUUID->"6e120dd8-2004-4595-8d58-25020c96d90f"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[41177, 1120, 105, 0, 66, "Section",ExpressionUUID->"7f90bbcc-84e7-4c78-98c0-450f8fe596da"],
+Cell[41285, 1122, 304, 6, 77, "Text",ExpressionUUID->"02073108-673e-4c77-9a81-5614cc5dbbd7"],
+Cell[CellGroupData[{
+Cell[41614, 1132, 598, 13, 111, "Input",ExpressionUUID->"ae9df04e-f7e0-4342-bb00-038cbfc89aac"],
+Cell[42215, 1147, 726, 22, 59, "Output",ExpressionUUID->"2a75ad83-91b9-4331-9e61-a92cb8c8798e"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[42978, 1174, 832, 23, 70, "Input",ExpressionUUID->"e79186e2-22ae-4b40-b7be-90c33a86019c"],
+Cell[43813, 1199, 769, 19, 145, "Output",ExpressionUUID->"0ffa2076-9ed2-47a8-add6-e63a379bf3ce"]
+}, Open  ]],
+Cell[44597, 1221, 406, 6, 55, "Text",ExpressionUUID->"2bdfb607-cea4-4891-8e0b-fe1a385035db"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[45040, 1232, 102, 0, 66, "Section",ExpressionUUID->"cbd46456-b814-4675-8645-9d696cd49024"],
+Cell[45145, 1234, 165, 3, 33, "Text",ExpressionUUID->"2055628e-8a33-4ff0-abfe-dc3f42ec955a"],
+Cell[CellGroupData[{
+Cell[45335, 1241, 1498, 41, 90, "Input",ExpressionUUID->"516740b7-314f-413a-9e7b-be9273ffa1f8"],
+Cell[46836, 1284, 933, 19, 145, "Output",ExpressionUUID->"1b6f77c8-682f-41c5-9aaf-f4c82c21580f"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[47806, 1308, 149, 2, 29, "Input",ExpressionUUID->"fa51e200-52c8-4d00-8ce6-ba193d5ab4c2"],
+Cell[47958, 1312, 148, 2, 33, "Output",ExpressionUUID->"49228b7d-30d4-45d6-b108-776f63a4e007"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[48143, 1319, 515, 11, 49, "Input",ExpressionUUID->"6e8a5dee-6799-4049-86c0-15547f82f33f"],
+Cell[48661, 1332, 10390, 251, 290, "Output",ExpressionUUID->"ac036083-3c40-495f-a3da-bcba8aea6154"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[59088, 1588, 874, 22, 70, "Input",ExpressionUUID->"e21cccf7-9170-4807-ba95-948014acf351"],
+Cell[59965, 1612, 331, 7, 33, "Output",ExpressionUUID->"4c1236cd-9784-469b-8f2f-83d7778ab191"]
+}, Open  ]],
+Cell[60311, 1622, 322, 5, 55, "Text",ExpressionUUID->"75903632-4b61-477e-9ac9-296d0fe6b261"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[60670, 1632, 96, 0, 66, "Section",ExpressionUUID->"e25c69c8-a33f-4473-906f-36622a1973db"],
+Cell[60769, 1634, 762, 14, 164, "Text",ExpressionUUID->"4ba5c84c-81da-4033-9b88-8408e1b881d9"],
+Cell[CellGroupData[{
+Cell[61556, 1652, 216, 4, 29, "Input",ExpressionUUID->"884ff305-33f8-4832-8fef-f59d22ac5a45"],
+Cell[61775, 1658, 168, 2, 33, "Output",ExpressionUUID->"9d78abfe-16f3-4319-8e1d-8158014d15b4"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[61980, 1665, 194, 4, 29, "Input",ExpressionUUID->"35634922-3211-4338-808e-2661391ecd8c"],
+Cell[62177, 1671, 166, 2, 33, "Output",ExpressionUUID->"0f186df8-16a6-4fe2-b085-e4f00ef69c55"]
+}, Open  ]],
+Cell[62358, 1676, 231, 3, 33, "Text",ExpressionUUID->"8503dcd2-cbbd-4d27-b4d3-531632e7ac34"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[62626, 1684, 95, 0, 66, "Section",ExpressionUUID->"6b04aaab-afbb-4bb6-9c93-27bf6d138706"],
+Cell[62724, 1686, 760, 15, 186, "Text",ExpressionUUID->"9ebe6e4d-1bbb-4d79-80bb-f1f42019abcb"],
+Cell[CellGroupData[{
+Cell[63509, 1705, 329, 7, 29, "Input",ExpressionUUID->"c7430881-ec55-469b-b012-267a6fb49f88"],
+Cell[63841, 1714, 237, 5, 33, "Output",ExpressionUUID->"1424a4a0-2452-4fd6-91fc-13089314a6ed"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[64115, 1724, 194, 3, 29, "Input",ExpressionUUID->"1aab8716-3411-4170-a555-db5aacc96182"],
+Cell[64312, 1729, 374, 8, 33, "Output",ExpressionUUID->"f5c94e92-f2f6-4141-a5ae-0790ea615190"]
+}, Open  ]],
+Cell[64701, 1740, 412, 6, 55, "Text",ExpressionUUID->"718f8e5f-11bd-41dd-962a-7c1dc64bf2a0"],
+Cell[CellGroupData[{
+Cell[65138, 1750, 107, 0, 53, "Subsection",ExpressionUUID->"56501aa3-b7f6-4e31-a298-5ec4715cf472"],
+Cell[65248, 1752, 434, 8, 99, "Text",ExpressionUUID->"528898a5-6952-44da-b9be-f8de10659890"],
+Cell[CellGroupData[{
+Cell[65707, 1764, 358, 8, 49, "Input",ExpressionUUID->"be23dba8-1d81-40a4-a003-56d9934b9c91"],
+Cell[66068, 1774, 950, 24, 59, "Output",ExpressionUUID->"8d1d0b01-7961-41cc-a504-6f5e69b8d407"]
+}, Open  ]],
+Cell[67033, 1801, 319, 5, 33, "Text",ExpressionUUID->"5a91e41e-d0a7-47d4-a83c-df40f6041f2b"],
+Cell[CellGroupData[{
+Cell[67377, 1810, 134, 0, 43, "Subsubsection",ExpressionUUID->"485e45ea-1a14-4f51-a93c-89ea29033c95"],
+Cell[67514, 1812, 396, 6, 55, "Text",ExpressionUUID->"2bd58e8a-e37a-451d-8c79-3b4b103c700d"],
+Cell[CellGroupData[{
+Cell[67935, 1822, 1502, 43, 172, "Input",ExpressionUUID->"dd602c57-4e74-48d0-916a-ef90ec2d53a4"],
+Cell[69440, 1867, 400, 8, 33, "Output",ExpressionUUID->"f799a248-e161-4893-ae73-952e0d31bd43"]
+}, Open  ]],
+Cell[69855, 1878, 311, 4, 33, "Text",ExpressionUUID->"e0cb9b1c-1993-4b5c-887c-458291b18a12"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[70215, 1888, 134, 0, 53, "Subsection",ExpressionUUID->"473b7d25-ca94-4cae-9329-aaae7887eca6"],
+Cell[70352, 1890, 867, 12, 99, "Text",ExpressionUUID->"4a394695-3851-4a2a-8236-5e2e349cb6d9"],
+Cell[CellGroupData[{
+Cell[71244, 1906, 153, 2, 43, "Subsubsection",ExpressionUUID->"6102c146-998b-43d5-996b-909a300d57bb"],
+Cell[71400, 1910, 1122, 15, 121, "Text",ExpressionUUID->"ab1256a7-3620-47b2-9445-477b80beead0"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[72583, 1932, 101, 0, 66, "Section",ExpressionUUID->"1a097f15-32fa-4527-a85a-0ab00a91e773"],
+Cell[72687, 1934, 406, 7, 99, "Text",ExpressionUUID->"07743001-a765-4199-9734-c8d9c193373a"],
+Cell[CellGroupData[{
+Cell[73118, 1945, 423, 10, 70, "Input",ExpressionUUID->"fefc4db6-cbc0-44e2-9c11-e6aefa9b401f"],
+Cell[73544, 1957, 1080, 28, 59, "Output",ExpressionUUID->"489694f8-aa6d-426f-a1b1-cfac1e01bbbc"]
+}, Open  ]],
+Cell[74639, 1988, 251, 4, 33, "Text",ExpressionUUID->"ca749d2d-4fbc-4205-bfd3-ad6e61d52105"],
+Cell[CellGroupData[{
+Cell[74915, 1996, 246, 6, 29, "Input",ExpressionUUID->"f200838c-f96e-4679-bcb1-cedf8bb18142"],
+Cell[75164, 2004, 1104, 29, 59, "Output",ExpressionUUID->"c483dda7-8e1f-4c6a-8e55-a468ceab5349"]
+}, Open  ]],
+Cell[76283, 2036, 322, 5, 55, "Text",ExpressionUUID->"9e12ce4b-3d22-4607-9288-8e8d177dca18"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[76642, 2046, 97, 0, 66, "Section",ExpressionUUID->"62fd91e2-d6ed-4f46-a280-69678bccf88f"],
+Cell[76742, 2048, 259, 4, 33, "Text",ExpressionUUID->"99c49a7e-95f7-4988-85ad-f3057cc38620"],
+Cell[CellGroupData[{
+Cell[77026, 2056, 2142, 54, 254, "Input",ExpressionUUID->"1dd000f3-dcc8-4463-956a-a482020fd54b"],
+Cell[79171, 2112, 784, 15, 91, "Output",ExpressionUUID->"232d4951-1685-4d8b-ab9b-ed4447233112"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[79992, 2132, 363, 7, 29, "Input",ExpressionUUID->"25ad202e-1188-4990-9b40-bba474c0122a"],
+Cell[80358, 2141, 309, 7, 33, "Output",ExpressionUUID->"f01fe271-a2a4-419a-bbb9-cf70738535aa"]
+}, Open  ]],
+Cell[80682, 2151, 476, 7, 55, "Text",ExpressionUUID->"710f4a6e-09c5-41b2-96f8-a1c8ba8589f5"],
+Cell[CellGroupData[{
+Cell[81183, 2162, 517, 11, 49, "Input",ExpressionUUID->"0fbe6879-7ecd-4bf6-9945-ebe66810d965"],
+Cell[81703, 2175, 10385, 249, 293, "Output",ExpressionUUID->"a3a78c60-2d0b-4f99-acf8-21cd6ee84914"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[92137, 2430, 97, 0, 66, "Section",ExpressionUUID->"2a211b55-f8f3-432c-87c4-77f0b60cb8eb"],
+Cell[92237, 2432, 193, 3, 30, "Item",ExpressionUUID->"dfc947d4-4c86-46e6-86ff-8cf9b4da07c3"],
+Cell[92433, 2437, 220, 3, 30, "Item",ExpressionUUID->"8765adc6-67c7-4912-bf52-ca6ead932efe"],
+Cell[92656, 2442, 251, 4, 30, "Item",ExpressionUUID->"f2a28c9b-c170-41a2-8936-67058ebac2a9"],
+Cell[92910, 2448, 165, 3, 30, "Item",ExpressionUUID->"be5bb138-6b75-43e3-865d-9dde96733f3e"],
+Cell[93078, 2453, 243, 4, 30, "Item",ExpressionUUID->"8b29271e-2d70-4800-b7ac-49d0f37eb313"],
+Cell[93324, 2459, 668, 9, 77, "Text",ExpressionUUID->"13318658-a030-4cb7-9b42-db4f5419149a"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[94029, 2473, 94, 0, 66, "Section",ExpressionUUID->"4e846386-0f94-4626-96ae-ad4570fbc04d"],
+Cell[CellGroupData[{
+Cell[94148, 2477, 1953, 44, 213, "Input",ExpressionUUID->"42cc2533-205c-4ac4-99cf-abbdf7486e71"],
+Cell[96104, 2523, 1256, 27, 165, "Output",ExpressionUUID->"c5daebe1-05d5-48f4-9005-38018336d22d"]
+}, Open  ]],
+Cell[97375, 2553, 914, 12, 99, "Text",ExpressionUUID->"524ea778-4b58-4734-b317-2abbe83c2d57"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[98326, 2570, 124, 0, 66, "Section",ExpressionUUID->"b21583c7-2853-40cd-bf58-a544d89e98d2"],
+Cell[98453, 2572, 679, 9, 77, "Text",ExpressionUUID->"96471ce9-d527-4025-8aab-a29674d4065a"],
+Cell[CellGroupData[{
+Cell[99157, 2585, 6202, 149, 703, "Input",ExpressionUUID->"0d375096-557a-4356-b005-ea6df1cd9496"],
+Cell[105362, 2736, 5028, 91, 472, "Output",ExpressionUUID->"81068ef7-500b-46f6-ab0f-452139b0370e"]
+}, Open  ]],
+Cell[110405, 2830, 480, 7, 55, "Text",ExpressionUUID->"1dd3226b-4eee-4f85-aac7-7bc7efd89869"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[110922, 2842, 100, 0, 66, "Section",ExpressionUUID->"8f0e1a01-5b40-4d99-b6aa-d63d2426a1a6"],
+Cell[111025, 2844, 285, 4, 33, "Text",ExpressionUUID->"ef16cb50-18c6-404f-8ec2-57394bb9ff71"],
+Cell[CellGroupData[{
+Cell[111335, 2852, 82, 0, 53, "Subsection",ExpressionUUID->"feeb16d9-67df-4a4a-9f4b-2b384bf37e26"],
+Cell[111420, 2854, 666, 20, 337, "Program",ExpressionUUID->"77eb6361-027e-4222-b989-a5c111415b2e"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[112123, 2879, 95, 0, 53, "Subsection",ExpressionUUID->"581ae767-e109-4b51-b36d-046676c85b1d"],
+Cell[112221, 2881, 777, 23, 353, "Program",ExpressionUUID->"ec84ab41-080e-45e0-9b95-525ed69b2d87"],
+Cell[113001, 2906, 341, 5, 55, "Text",ExpressionUUID->"b6fef3d5-8a05-43ae-a032-4c39c16e3fc1"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[113391, 2917, 108, 0, 66, "Section",ExpressionUUID->"57415912-c66f-4b39-b77a-386176e59cd9"],
+Cell[113502, 2919, 866, 12, 99, "Text",ExpressionUUID->"3576a9e0-d876-4fcd-91a8-234d3379ba01"],
+Cell[CellGroupData[{
+Cell[114393, 2935, 853, 22, 111, "Input",ExpressionUUID->"3732ed55-4383-4f37-9057-22b62f7f109b"],
+Cell[CellGroupData[{
+Cell[115271, 2961, 223, 4, 23, "Print",ExpressionUUID->"85a8f213-269a-4095-8951-15cab340af4d"],
+Cell[115497, 2967, 325, 8, 23, "Print",ExpressionUUID->"8fd8ce3b-214f-4bc1-ada0-b3402c793991"],
+Cell[115825, 2977, 325, 8, 23, "Print",ExpressionUUID->"f72fae3e-4c13-4147-aac4-bf52768dd26d"],
+Cell[116153, 2987, 325, 8, 23, "Print",ExpressionUUID->"8e461296-5936-44e8-ad92-2383d3012b67"],
+Cell[116481, 2997, 325, 8, 23, "Print",ExpressionUUID->"3f7f69e3-ecc2-446e-965a-bf7e20bbfaaf"],
+Cell[116809, 3007, 365, 9, 23, "Print",ExpressionUUID->"73a6bf5d-cef6-4fcb-b08d-227e29ba89d8"],
+Cell[117177, 3018, 361, 9, 23, "Print",ExpressionUUID->"39fcc4ec-a9c9-4ce1-ad84-13dbd8a5bac9"],
+Cell[117541, 3029, 340, 9, 23, "Print",ExpressionUUID->"bf38c836-83c9-4003-b4ae-65da53ec5f8b"],
+Cell[117884, 3040, 349, 9, 23, "Print",ExpressionUUID->"abb3d6fc-9127-4514-9593-9923efd37b95"],
+Cell[118236, 3051, 365, 9, 23, "Print",ExpressionUUID->"7ce52393-8290-4e55-8a71-8534db6a843a"],
+Cell[118604, 3062, 350, 9, 23, "Print",ExpressionUUID->"db6c8173-ffb7-4f4a-a875-b8c380a748e2"],
+Cell[118957, 3073, 333, 8, 23, "Print",ExpressionUUID->"b6388011-c8d9-469d-b72d-3f2b8ac9418d"],
+Cell[119293, 3083, 365, 9, 23, "Print",ExpressionUUID->"1cc06d15-9676-4934-b817-91acc6ce3c87"],
+Cell[119661, 3094, 362, 9, 23, "Print",ExpressionUUID->"ead68885-acf4-4fa8-aea3-dc514a35dc07"],
+Cell[120026, 3105, 371, 9, 23, "Print",ExpressionUUID->"5d26f989-f2b1-4ab3-a77d-6da3303f38ce"],
+Cell[120400, 3116, 404, 10, 23, "Print",ExpressionUUID->"757f1954-909a-46b3-b25d-c1901bae783b"],
+Cell[120807, 3128, 399, 9, 23, "Print",ExpressionUUID->"ba26ae5a-219b-4f73-baff-0b792391401b"],
+Cell[121209, 3139, 381, 9, 23, "Print",ExpressionUUID->"84ffdf9e-c71d-4317-a280-0f7467c11509"],
+Cell[121593, 3150, 401, 10, 23, "Print",ExpressionUUID->"44af002d-110f-4a90-936c-838538c22864"],
+Cell[121997, 3162, 365, 9, 23, "Print",ExpressionUUID->"cee844c8-f49f-4b01-a4c8-2d61b1e0e0f2"],
+Cell[122365, 3173, 345, 9, 23, "Print",ExpressionUUID->"e3514413-ccd2-4d69-905b-baed372ae75d"],
+Cell[122713, 3184, 349, 9, 23, "Print",ExpressionUUID->"d5b92e7e-1bdc-40f0-8bf9-50aa0ad896cb"],
+Cell[123065, 3195, 403, 10, 23, "Print",ExpressionUUID->"d23855bd-53f9-4e5b-8109-4119669494bb"],
+Cell[123471, 3207, 380, 9, 23, "Print",ExpressionUUID->"d3ebb855-f20a-4d11-b90d-c6b2d8633b08"],
+Cell[123854, 3218, 414, 11, 23, "Print",ExpressionUUID->"89e3d5a8-d6e9-457e-ba56-1d82a868368f"],
+Cell[124271, 3231, 432, 11, 23, "Print",ExpressionUUID->"2d37928c-edaf-4576-b270-aa8c3a013808"],
+Cell[124706, 3244, 381, 9, 23, "Print",ExpressionUUID->"b01e7165-bc92-41b6-ab32-4c04d874fc63"],
+Cell[125090, 3255, 375, 9, 23, "Print",ExpressionUUID->"3a58ab44-9426-4c63-a85d-59686b437223"],
+Cell[125468, 3266, 382, 9, 23, "Print",ExpressionUUID->"bd7d2c52-f1aa-49a2-a41b-265b5c978f09"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[125911, 3282, 131, 0, 66, "Section",ExpressionUUID->"db3e0674-43a3-43b1-b4ad-deec489e6bae"],
+Cell[126045, 3284, 603, 8, 77, "Text",ExpressionUUID->"af0102d8-3ddb-40a6-98a1-966c8f6360ed"],
+Cell[CellGroupData[{
+Cell[126673, 3296, 854, 21, 70, "Input",ExpressionUUID->"2303a174-ed2f-4da5-9111-4a40b1cfae64"],
+Cell[127530, 3319, 803, 17, 33, "Output",ExpressionUUID->"f90ebbdf-e9b9-497f-9e01-832e2a29d9cc"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
+

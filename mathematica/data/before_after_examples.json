@@ -37,7 +37,14 @@
         "jaccard_overlap": 1.0,
         "expected_token_recall": 1.0
       },
-      "failure_category": "Exact match after fine-tuning"
+      "failure_category": "Exact match after fine-tuning",
+      "query_text": "What are the present operations reported on this well? Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.4934637712198267,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from. The generated base answer also stops mid-sentence, which shows the output was cut off by the generation limit rather than reaching a complete answer."
     },
     {
       "group": "training",
@@ -66,7 +73,14 @@
         "jaccard_overlap": 0.06666666666666667,
         "expected_token_recall": 0.09090909090909091
       },
-      "failure_category": "Partial wording overlap, wrong answer"
+      "failure_category": "Partial wording overlap, wrong answer",
+      "query_text": "What activity is planned next? Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.16273613872602985,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from. The generated base answer also stops mid-sentence, which shows the output was cut off by the generation limit rather than reaching a complete answer."
     },
     {
       "group": "training",
@@ -95,7 +109,14 @@
         "jaccard_overlap": 1.0,
         "expected_token_recall": 1.0
       },
-      "failure_category": "Exact match after fine-tuning"
+      "failure_category": "Exact match after fine-tuning",
+      "query_text": "What are the present operations reported on this well? Well: FORGE 16A [78]-32 | Report #19 | Date: 2020-11-07",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.4923659639173309,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from. The generated base answer also stops mid-sentence, which shows the output was cut off by the generation limit rather than reaching a complete answer."
     },
     {
       "group": "training",
@@ -124,7 +145,14 @@
         "jaccard_overlap": 1.0,
         "expected_token_recall": 1.0
       },
-      "failure_category": "Exact match after fine-tuning"
+      "failure_category": "Exact match after fine-tuning",
+      "query_text": "What activity is planned next? Well: FORGE 16A [78]-32 | Report #19 | Date: 2020-11-07",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.19528336647123581,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from. The generated base answer also stops mid-sentence, which shows the output was cut off by the generation limit rather than reaching a complete answer."
     },
     {
       "group": "training",
@@ -153,7 +181,14 @@
         "jaccard_overlap": 0.0,
         "expected_token_recall": 0.0
       },
-      "failure_category": "Wrong memorized pattern"
+      "failure_category": "Wrong memorized pattern",
+      "query_text": "What are the present operations reported on this well? Well: FORGE 16A [78]-32 | Report #36 | Date: 2020-11-24",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.6038596398555418,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from."
     },
     {
       "group": "training",
@@ -182,7 +217,14 @@
         "jaccard_overlap": 1.0,
         "expected_token_recall": 1.0
       },
-      "failure_category": "Exact match after fine-tuning"
+      "failure_category": "Exact match after fine-tuning",
+      "query_text": "What activity is planned next? Well: FORGE 16A [78]-32 | Report #36 | Date: 2020-11-24",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.3120188603766914,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from. The generated base answer also stops mid-sentence, which shows the output was cut off by the generation limit rather than reaching a complete answer."
     },
     {
       "group": "training",
@@ -211,7 +253,14 @@
         "jaccard_overlap": 1.0,
         "expected_token_recall": 1.0
       },
-      "failure_category": "Exact match after fine-tuning"
+      "failure_category": "Exact match after fine-tuning",
+      "query_text": "What are the present operations reported on this well? Well: FORGE 16A [78]-32 | Report #38 | Date: 2020-11-26",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.4934637712198267,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from. The generated base answer also stops mid-sentence, which shows the output was cut off by the generation limit rather than reaching a complete answer."
     },
     {
       "group": "training",
@@ -240,7 +289,14 @@
         "jaccard_overlap": 1.0,
         "expected_token_recall": 1.0
       },
-      "failure_category": "Exact match after fine-tuning"
+      "failure_category": "Exact match after fine-tuning",
+      "query_text": "What activity is planned next? Well: FORGE 16A [78]-32 | Report #38 | Date: 2020-11-26",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.3120188603766914,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from. The generated base answer also stops mid-sentence, which shows the output was cut off by the generation limit rather than reaching a complete answer."
     },
     {
       "group": "training",
@@ -269,7 +325,14 @@
         "jaccard_overlap": 1.0,
         "expected_token_recall": 1.0
       },
-      "failure_category": "Exact match after fine-tuning"
+      "failure_category": "Exact match after fine-tuning",
+      "query_text": "What are the present operations reported on this well? Well: FORGE 16A [78]-32 | Report #39 | Date: 2020-11-27",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.4934637712198267,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from. The generated base answer also stops mid-sentence, which shows the output was cut off by the generation limit rather than reaching a complete answer."
     },
     {
       "group": "training",
@@ -298,7 +361,14 @@
         "jaccard_overlap": 1.0,
         "expected_token_recall": 1.0
       },
-      "failure_category": "Exact match after fine-tuning"
+      "failure_category": "Exact match after fine-tuning",
+      "query_text": "What activity is planned next? Well: FORGE 16A [78]-32 | Report #39 | Date: 2020-11-27",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.3120188603766914,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from. The generated base answer also stops mid-sentence, which shows the output was cut off by the generation limit rather than reaching a complete answer."
     },
     {
       "group": "training",
@@ -327,7 +397,14 @@
         "jaccard_overlap": 0.0,
         "expected_token_recall": 0.0
       },
-      "failure_category": "Wrong memorized pattern"
+      "failure_category": "Wrong memorized pattern",
+      "query_text": "What are the present operations reported on this well? Well: FORGE 16A [78]-32 | Report #48 | Date: 2020-12-06",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.4099951888601959,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from. The generated base answer also stops mid-sentence, which shows the output was cut off by the generation limit rather than reaching a complete answer."
     },
     {
       "group": "training",
@@ -356,7 +433,14 @@
         "jaccard_overlap": 1.0,
         "expected_token_recall": 1.0
       },
-      "failure_category": "Exact match after fine-tuning"
+      "failure_category": "Exact match after fine-tuning",
+      "query_text": "What activity is planned next? Well: FORGE 16A [78]-32 | Report #48 | Date: 2020-12-06",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.2450490147049017,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from. The generated base answer also stops mid-sentence, which shows the output was cut off by the generation limit rather than reaching a complete answer."
     },
     {
       "group": "training",
@@ -385,7 +469,14 @@
         "jaccard_overlap": 1.0,
         "expected_token_recall": 1.0
       },
-      "failure_category": "Exact match after fine-tuning"
+      "failure_category": "Exact match after fine-tuning",
+      "query_text": "What are the present operations reported on this well? Well: FORGE 16A [78]-32 | Report #49 | Date: 2020-12-07",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.4099951888601959,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from. The generated base answer also stops mid-sentence, which shows the output was cut off by the generation limit rather than reaching a complete answer."
     },
     {
       "group": "training",
@@ -414,7 +505,14 @@
         "jaccard_overlap": 1.0,
         "expected_token_recall": 1.0
       },
-      "failure_category": "Exact match after fine-tuning"
+      "failure_category": "Exact match after fine-tuning",
+      "query_text": "What activity is planned next? Well: FORGE 16A [78]-32 | Report #49 | Date: 2020-12-07",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.2450490147049017,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from. The generated base answer also stops mid-sentence, which shows the output was cut off by the generation limit rather than reaching a complete answer."
     },
     {
       "group": "training",
@@ -443,7 +541,14 @@
         "jaccard_overlap": 1.0,
         "expected_token_recall": 1.0
       },
-      "failure_category": "Exact match after fine-tuning"
+      "failure_category": "Exact match after fine-tuning",
+      "query_text": "What are the present operations reported on this well? Well: FORGE 16A [78]-32 | Report #50 | Date: 2020-12-08",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.4099951888601959,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from. The generated base answer also stops mid-sentence, which shows the output was cut off by the generation limit rather than reaching a complete answer."
     },
     {
       "group": "training",
@@ -472,7 +577,14 @@
         "jaccard_overlap": 1.0,
         "expected_token_recall": 1.0
       },
-      "failure_category": "Exact match after fine-tuning"
+      "failure_category": "Exact match after fine-tuning",
+      "query_text": "What activity is planned next? Well: FORGE 16A [78]-32 | Report #50 | Date: 2020-12-08",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.2450490147049017,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from. The generated base answer also stops mid-sentence, which shows the output was cut off by the generation limit rather than reaching a complete answer."
     },
     {
       "group": "held_out",
@@ -501,7 +613,14 @@
         "jaccard_overlap": 0.0,
         "expected_token_recall": 0.0
       },
-      "failure_category": "Held-out generalization gap"
+      "failure_category": "Held-out generalization gap",
+      "query_text": "What are the present operations reported on this well? Well: FORGE 16A [78]-32 | Report #37 | Date: 2020-11-25",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.6038596398555418,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from."
     },
     {
       "group": "held_out",
@@ -530,7 +649,14 @@
         "jaccard_overlap": 0.0625,
         "expected_token_recall": 0.08333333333333333
       },
-      "failure_category": "Held-out generalization gap"
+      "failure_category": "Held-out generalization gap",
+      "query_text": "What activity is planned next? Well: FORGE 16A [78]-32 | Report #37 | Date: 2020-11-25",
+      "query_similarity": {
+        "query_to_reference": 0.0,
+        "query_to_base_answer": 0.3120188603766914,
+        "query_to_finetuned_answer": 0.0
+      },
+      "base_miss_explanation": "The base prompt only includes the well name, report number, date, and question. It does not include the report field containing the correct answer, so the base model has no source text to extract from. The generated base answer also stops mid-sentence, which shows the output was cut off by the generation limit rather than reaching a complete answer."
     }
   ]
 }

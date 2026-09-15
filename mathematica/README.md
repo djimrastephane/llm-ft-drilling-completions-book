@@ -23,7 +23,9 @@ set.
 | File | What it is |
 |---|---|
 | `export_before_after.py` | Python script that generates the real before/after data (needs `book/.venv` and a real Chapter 5 checkpoint) |
-| `data/before_after_examples.json` | The exported data — 16 real training examples + 2 real held-out examples, each with the question, the report's real reference answer, source excerpt, model answers, exact-match flags, report metadata, token-overlap metrics, and failure category |
+| `export_semantic_embeddings.py` | Optional advanced script that embeds the already-exported queries, reference answers, base answers, and fine-tuned answers with `all-MiniLM-L6-v2` |
+| `data/before_after_examples.json` | The exported data — 16 real training examples + 2 real held-out examples, each with the question, the report's real reference answer, source excerpt, model answers, exact-match flags, report metadata, token-overlap metrics, query-to-answer cosine similarities, base-miss explanations, and failure category |
+| `data/semantic_embedding_examples.json` | Optional semantic-embedding output, generated only if you run `export_semantic_embeddings.py` |
 | `FineTuning_Before_After_Explorer.nb` | The notebook itself |
 
 ## Prerequisites
@@ -49,17 +51,32 @@ a paid license to try.
    front end.
 2. Evaluate the notebook top to bottom (`Shift+Enter` on each input
    cell, or **Evaluate Notebook** from the Evaluation menu).
+   The input cells are collapsed by default so the notebook reads more
+   like an interactive visual report than a code listing.
 3. Start with the executive view and outcome map to see the whole
    before/after pattern at once: fine-tuning moves the seen training
    examples from `0/16` to `13/16`, while the held-out report remains
    `0/2`.
-4. Use the answer microscope to step through all 18 real questions —
+4. Read the guided examples next: one clean fine-tuning win and one
+   held-out failure show the main lesson without making you inspect
+   every row.
+5. Use the cosine-similarity view to see how much each answer reuses
+   the query wording. Treat this as a prompt-similarity signal, not a
+   correctness score: a wrong answer can still score high if it echoes
+   the question.
+6. If you generated the optional semantic embedding data, use the
+   advanced section to compare base-vs-reference and fine-tuned-vs-
+   reference meaning similarity, plus a 2D projection of queries,
+   references, and model answers.
+7. Use the answer microscope to step through all 18 real questions —
    16 the model trained on, 2 it never saw — and compare the base
    model's answer, the fine-tuned model's answer, and the report's
-   actual reference text side by side. Shared words are highlighted so
-   exact successes, partial overlaps, and convincing wrong answers are
-   easier to see.
-5. Use the failure-pattern view to focus only on the examples that
+   actual reference text side by side. The notebook also explains why
+   the base model missed: the query only contains report metadata, not
+   the report field holding the correct answer. Shared words are
+   highlighted so exact successes, partial overlaps, and convincing
+   wrong answers are easier to see.
+8. Use the failure-pattern view to focus only on the examples that
    still fail after fine-tuning. These are the most useful teaching
    cases because they show why evaluation and retrieval matter.
 
@@ -82,6 +99,18 @@ python code/chapter_05/first_lora_finetune.py   # only if checkpoints/chapter_05
 cd ..
 python mathematica/export_before_after.py
 ```
+
+To generate the optional semantic-embedding data used by the advanced
+notebook section:
+
+```bash
+python mathematica/export_semantic_embeddings.py
+```
+
+The first run may download `all-MiniLM-L6-v2` through
+`sentence-transformers`. This step is separate on purpose: the core
+before/after notebook stays fast and transparent, while the advanced
+section adds a meaning-similarity signal for readers who want it.
 
 ## Scope
 

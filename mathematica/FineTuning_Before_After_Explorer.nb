@@ -1,25 +1,116 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 15.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       154,          7]
+NotebookDataLength[    168991,       4733]
+NotebookOptionsPosition[    162846,       4608]
+NotebookOutlinePosition[    163292,       4626]
+CellTagsIndexPosition[    163249,       4623]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
 Notebook[{
 
-Cell["Fine-Tuning Before/After Explorer", "Title"],
+Cell[CellGroupData[{
+Cell["Fine-Tuning Before/After Explorer", "Title",ExpressionUUID->"68a98443-264e-4a87-9331-86bbf92efd8e"],
 
-Cell["Fine-Tuning Local LLM for Drilling & Completions -- companion notebook", "Subtitle"],
+Cell["\<\
+Fine-Tuning Local LLM for Drilling & Completions -- companion notebook\
+\>", "Subtitle",ExpressionUUID->"d33cfbd7-d95d-46cb-b592-e84a4e4a3ab9"],
 
-Cell["This notebook uses real exported answers from this book's own base model and Chapter 5 LoRA fine-tuned checkpoint. Its job is not just to show that fine-tuning changed answers, but to make the real pattern visible: the model learned many seen training examples, still failed the held-out report, and therefore later chapters need evaluation and retrieval.", "Text"],
+Cell["\<\
+This notebook uses real exported answers from this book's own base model and \
+Chapter 5 LoRA fine-tuned checkpoint. Its job is not just to show that \
+fine-tuning changed answers, but to make the real pattern visible: the model \
+learned many seen training examples, still failed the held-out report, and \
+therefore later chapters need evaluation and retrieval.\
+\>", "Text",ExpressionUUID->"29c92242-f1bd-467c-9327-7664950f20be"],
 
 Cell[CellGroupData[{
 
-Cell["1. Load the real exported data", "Section"],
+Cell[BoxData[
+ ToBoxes[
+  Framed[
+   Column[{
+     Style["Main takeaway", 16, Bold], 
+     Style[
+     "Fine-tuning helped the model reproduce answers from seen training \
+reports, but it did not give the model factual access to a report it never \
+saw. That is why the book moves next from fine-tuning to retrieval.", 13]}, 
+    Spacings -> 0.6], Background -> RGBColor[0.95, 0.97, 1.], FrameStyle -> 
+   RGBColor[0.7, 0.78, 0.9], FrameMargins -> 14, RoundingRadius -> 
+   6]]], "Input",
+ CellOpen->False,
+ CellLabel->"In[1]:=",ExpressionUUID->"28b39ccc-f66f-4065-bddd-2a19fb75cba5"],
 
-Cell["data = Import[FileNameJoin[{NotebookDirectory[], \"data\", \"before_after_examples.json\"}], \"RawJSON\"];
+Cell[BoxData[
+ FrameBox[
+  TagBox[GridBox[{
+     {
+      StyleBox["\<\"Main takeaway\"\>",
+       StripOnInput->False,
+       FontSize->16,
+       FontWeight->Bold]},
+     {
+      StyleBox["\<\"Fine-tuning helped the model reproduce answers from seen \
+training reports, but it did not give the model factual access to a report it \
+never saw. That is why the book moves next from fine-tuning to retrieval.\"\>",
+       StripOnInput->False,
+       FontSize->13]}
+    },
+    DefaultBaseStyle->"Column",
+    GridBoxAlignment->{"Columns" -> {{Left}}},
+    GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+    GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.6}}}],
+   "Column"],
+  Background->RGBColor[0.95, 0.97, 1.],
+  FrameMargins->14,
+  FrameStyle->RGBColor[0.7, 0.78, 0.9],
+  RoundingRadius->6,
+  StripOnInput->False]], "Output",
+ CellChangeTimes->{3.996229594635442*^9, 3.996231653343788*^9, 
+  3.996296225247698*^9},
+ CellLabel->"Out[1]=",ExpressionUUID->"744ee392-9598-4df7-bdf6-3c0f087ff6c5"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["1. Load the real exported data", "Section",ExpressionUUID->"ef53bd31-1933-4fe8-8104-29078802d099"],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+data = Import[FileNameJoin[{NotebookDirectory[], \"data\", \
+\"before_after_examples.json\"}], \"RawJSON\"];
 summary = data[\"summary\"];
 examplesList = data[\"examples\"];
 trainingExamples = Select[examplesList, #[\"group\"] === \"training\" &];
 heldOutExamples = Select[examplesList, #[\"group\"] === \"held_out\" &];
-Length[examplesList]", "Input"],
+Length[examplesList]\
+\>", "Input",
+ CellOpen->False,
+ CellLabel->"In[2]:=",ExpressionUUID->"097ac3a6-fccf-4137-bf38-207d33fce9f0"],
 
-Cell["Helper functions used by the visual sections below.", "Text"],
+Cell[BoxData["18"], "Output",
+ CellChangeTimes->{3.9962295947980623`*^9, 3.996231653388816*^9, 
+  3.996296225524432*^9},
+ CellLabel->"Out[7]=",ExpressionUUID->"729f1e26-122c-4d0e-b43f-5505fd695414"]
+}, Open  ]],
 
-Cell["ClearAll[groupLabel, statusCell, metricCard, tokenList, cleanToken, highlightedAnswer, shortAnswer, exampleLabel, questionIcon, recallValue, overlapValue];
+Cell["Helper functions used by the visual sections below.", "Text",ExpressionUUID->"5651f3e1-59ee-45e8-865c-34423b6e6370"],
+
+Cell["\<\
+ClearAll[groupLabel, statusCell, metricCard, tokenList, cleanToken, \
+highlightedAnswer, wrappedText, shortAnswer, exampleLabel, pointLabel, \
+questionIcon, recallValue, overlapValue, querySimilarity];
 
 groupLabel[\"training\"] := \"Training / seen\";
 groupLabel[\"held_out\"] := \"Held-out / never seen\";
@@ -31,14 +122,16 @@ questionIcon[q_] := q;
 
 statusCell[matched_] := Framed[
   Style[If[TrueQ[matched], \"MATCH\", \"MISS\"], Bold, 11, White],
-  Background -> If[TrueQ[matched], RGBColor[0.12, 0.55, 0.31], RGBColor[0.78, 0.20, 0.20]],
+  Background -> If[TrueQ[matched], RGBColor[0.12, 0.55, 0.31], RGBColor[0.78, \
+0.20, 0.20]],
   FrameStyle -> None,
   RoundingRadius -> 4,
   FrameMargins -> {{8, 8}, {3, 3}}
 ];
 
 metricCard[label_, value_, note_, color_] := Framed[
-  Column[{Style[label, 11, GrayLevel[0.35]], Style[value, 26, Bold, color], Style[note, 10, GrayLevel[0.35]]}, Spacings -> .35],
+  Column[{Style[label, 11, GrayLevel[0.35]], Style[value, 26, Bold, color], \
+Style[note, 10, GrayLevel[0.35]]}, Spacings -> .35],
   Background -> RGBColor[0.97, 0.97, 0.95],
   FrameStyle -> RGBColor[0.82, 0.82, 0.78],
   FrameMargins -> 12,
@@ -47,68 +140,478 @@ metricCard[label_, value_, note_, color_] := Framed[
 ];
 
 tokenList[text_] := ToLowerCase /@ StringCases[text, WordCharacter..];
-cleanToken[text_] := ToLowerCase @ StringJoin @ StringCases[text, WordCharacter..];
+cleanToken[text_] := ToLowerCase @ StringJoin @ StringCases[text, \
+WordCharacter..];
+
+wrappedText[text_, width_: 560] := Pane[
+  Style[text, 12, LineBreakWithin -> True],
+  {width, Automatic}
+];
 
 highlightedAnswer[answer_, expected_] := Module[
-  {expectedTokens = DeleteDuplicates[tokenList[expected]], parts},
-  parts = StringCases[answer, WhitespaceCharacter .. | Except[WhitespaceCharacter] ..];
+  {expectedTokens = DeleteDuplicates[tokenList[expected]], words, styledWords},
+  words = StringSplit[answer];
+  styledWords = If[MemberQ[expectedTokens, cleanToken[#]],
+      Style[#, Bold, RGBColor[0.05, 0.45, 0.22], Background -> RGBColor[0.88, \
+0.97, 0.90]],
+      Style[#, 12]
+    ] & /@ words;
   Pane[
-    Row[
-      If[MemberQ[expectedTokens, cleanToken[#]] && cleanToken[#] =!= \"\",
-        Style[#, Bold, RGBColor[0.05, 0.45, 0.22], Background -> RGBColor[0.88, 0.97, 0.90]],
-        #
-      ] & /@ parts
-    ],
+    Grid[Partition[styledWords, UpTo[7]], Alignment -> Left, Spacings -> \
+{.35, .25}],
     {560, Automatic}
   ]
 ];
 
-shortAnswer[text_, n_: 95] := If[StringLength[text] <= n, text, StringTake[text, n] <> \"...\"];
-recallValue[ex_, model_] := ex[model <> \"_metrics\"][\"expected_token_recall\"];
+shortAnswer[text_, n_: 95] := If[StringLength[text] <= n, text, \
+StringTake[text, n] <> \"...\"];
+recallValue[ex_, model_] := ex[model <> \"_metrics\"][\"expected_token_recall\
+\"];
 overlapValue[ex_, model_] := ex[model <> \"_metrics\"][\"jaccard_overlap\"];
+querySimilarity[ex_, key_] := ex[\"query_similarity\"][key];
 
-exampleLabel[ex_] := \"Report #\" <> ex[\"report_number\"] <> \" | \" <> ex[\"question_type\"] <> \" | \" <> groupLabel[ex[\"group\"]];", "Input"]
-
-}, Open]],
+exampleLabel[ex_] := \"Report #\" <> ex[\"report_number\"] <> \" | \" <> \
+ex[\"question_type\"] <> \" | \" <> groupLabel[ex[\"group\"]];
+pointLabel[ex_, model_] := exampleLabel[ex] <> \"\\n\" <> If[model === \"base\
+\", \"Before\", \"After\"] <> \" word overlap: \" <> \
+ToString[NumberForm[recallValue[ex, model], {3, 2}]];\
+\>", "Input",
+ CellOpen->False,
+ CellLabel->"In[8]:=",ExpressionUUID->"cc0fc931-ebb8-4d04-b139-c3e3345b49e6"]
+}, Open  ]],
 
 Cell[CellGroupData[{
 
-Cell["2. Executive view: what changed?", "Section"],
+Cell["2. Executive view: what changed?", "Section",ExpressionUUID->"3ec1dc07-6d50-41b5-ae28-e471f3b71f88"],
 
-Cell["The headline is intentionally split into seen training questions and a never-seen held-out report. This is the key distinction: fine-tuning improved recall on examples like the ones it studied, but it did not create a grounded memory of the held-out report.", "Text"],
+Cell["\<\
+The headline is intentionally split into seen training questions and a \
+never-seen held-out report. This is the key distinction: fine-tuning improved \
+word overlap on examples like the ones it studied, but it did not create a \
+grounded memory of the held-out report.\
+\>", "Text",ExpressionUUID->"eec4b619-cad4-4b2f-abc2-1c696e8af26a"],
 
-Cell["Grid[
+Cell[CellGroupData[{
+
+Cell["\<\
+Grid[
   {{
-    metricCard[\"Training before\", ToString[summary[\"training_before\"]] <> \"/\" <> ToString[summary[\"training_total\"]], \"base model exact matches\", RGBColor[0.75, 0.18, 0.18]],
-    metricCard[\"Training after\", ToString[summary[\"training_after\"]] <> \"/\" <> ToString[summary[\"training_total\"]], \"fine-tuned exact matches\", RGBColor[0.08, 0.47, 0.25]],
-    metricCard[\"Held-out before\", ToString[summary[\"held_out_before\"]] <> \"/\" <> ToString[summary[\"held_out_total\"]], \"never seen by training\", RGBColor[0.75, 0.18, 0.18]],
-    metricCard[\"Held-out after\", ToString[summary[\"held_out_after\"]] <> \"/\" <> ToString[summary[\"held_out_total\"]], \"still no exact matches\", RGBColor[0.75, 0.18, 0.18]]
+    metricCard[\"Training before\", ToString[summary[\"training_before\"]] <> \
+\"/\" <> ToString[summary[\"training_total\"]], \"base model exact matches\", \
+RGBColor[0.75, 0.18, 0.18]],
+    metricCard[\"Training after\", ToString[summary[\"training_after\"]] <> \
+\"/\" <> ToString[summary[\"training_total\"]], \"fine-tuned exact matches\", \
+RGBColor[0.08, 0.47, 0.25]],
+    metricCard[\"Held-out before\", ToString[summary[\"held_out_before\"]] <> \
+\"/\" <> ToString[summary[\"held_out_total\"]], \"never seen by training\", \
+RGBColor[0.75, 0.18, 0.18]],
+    metricCard[\"Held-out after\", ToString[summary[\"held_out_after\"]] <> \
+\"/\" <> ToString[summary[\"held_out_total\"]], \"still no exact matches\", \
+RGBColor[0.75, 0.18, 0.18]]
   }},
   Spacings -> {1.2, 1}
-]", "Input"],
+]\
+\>", "Input",
+ CellOpen->False,
+ CellLabel->"In[36]:=",ExpressionUUID->"331c8a62-c602-41a1-bbc9-14620e59469d"],
 
-Cell["BarChart[
+Cell[BoxData[
+ TagBox[GridBox[{
+    {
+     FrameBox[
+      TagBox[GridBox[{
+         {
+          StyleBox["\<\"Training before\"\>",
+           StripOnInput->False,
+           LineColor->GrayLevel[0.35],
+           FrontFaceColor->GrayLevel[0.35],
+           BackFaceColor->GrayLevel[0.35],
+           GraphicsColor->GrayLevel[0.35],
+           FontSize->11,
+           FontColor->GrayLevel[0.35]]},
+         {
+          StyleBox["\<\"0/16\"\>",
+           StripOnInput->False,
+           LineColor->RGBColor[0.75, 0.18, 0.18],
+           FrontFaceColor->RGBColor[0.75, 0.18, 0.18],
+           BackFaceColor->RGBColor[0.75, 0.18, 0.18],
+           GraphicsColor->RGBColor[0.75, 0.18, 0.18],
+           FontSize->26,
+           FontWeight->Bold,
+           FontColor->RGBColor[0.75, 0.18, 0.18]]},
+         {
+          StyleBox["\<\"base model exact matches\"\>",
+           StripOnInput->False,
+           LineColor->GrayLevel[0.35],
+           FrontFaceColor->GrayLevel[0.35],
+           BackFaceColor->GrayLevel[0.35],
+           GraphicsColor->GrayLevel[0.35],
+           FontSize->10,
+           FontColor->GrayLevel[0.35]]}
+        },
+        DefaultBaseStyle->"Column",
+        GridBoxAlignment->{"Columns" -> {{Left}}},
+        GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+        GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.35}}}],
+       "Column"],
+      Background->RGBColor[0.97, 0.97, 0.95],
+      FrameMargins->12,
+      FrameStyle->RGBColor[0.82, 0.82, 0.78],
+      ImageSize->170,
+      RoundingRadius->6,
+      StripOnInput->False], 
+     FrameBox[
+      TagBox[GridBox[{
+         {
+          StyleBox["\<\"Training after\"\>",
+           StripOnInput->False,
+           LineColor->GrayLevel[0.35],
+           FrontFaceColor->GrayLevel[0.35],
+           BackFaceColor->GrayLevel[0.35],
+           GraphicsColor->GrayLevel[0.35],
+           FontSize->11,
+           FontColor->GrayLevel[0.35]]},
+         {
+          StyleBox["\<\"13/16\"\>",
+           StripOnInput->False,
+           LineColor->RGBColor[0.08, 0.47, 0.25],
+           FrontFaceColor->RGBColor[0.08, 0.47, 0.25],
+           BackFaceColor->RGBColor[0.08, 0.47, 0.25],
+           GraphicsColor->RGBColor[0.08, 0.47, 0.25],
+           FontSize->26,
+           FontWeight->Bold,
+           FontColor->RGBColor[0.08, 0.47, 0.25]]},
+         {
+          StyleBox["\<\"fine-tuned exact matches\"\>",
+           StripOnInput->False,
+           LineColor->GrayLevel[0.35],
+           FrontFaceColor->GrayLevel[0.35],
+           BackFaceColor->GrayLevel[0.35],
+           GraphicsColor->GrayLevel[0.35],
+           FontSize->10,
+           FontColor->GrayLevel[0.35]]}
+        },
+        DefaultBaseStyle->"Column",
+        GridBoxAlignment->{"Columns" -> {{Left}}},
+        GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+        GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.35}}}],
+       "Column"],
+      Background->RGBColor[0.97, 0.97, 0.95],
+      FrameMargins->12,
+      FrameStyle->RGBColor[0.82, 0.82, 0.78],
+      ImageSize->170,
+      RoundingRadius->6,
+      StripOnInput->False], 
+     FrameBox[
+      TagBox[GridBox[{
+         {
+          StyleBox["\<\"Held-out before\"\>",
+           StripOnInput->False,
+           LineColor->GrayLevel[0.35],
+           FrontFaceColor->GrayLevel[0.35],
+           BackFaceColor->GrayLevel[0.35],
+           GraphicsColor->GrayLevel[0.35],
+           FontSize->11,
+           FontColor->GrayLevel[0.35]]},
+         {
+          StyleBox["\<\"0/2\"\>",
+           StripOnInput->False,
+           LineColor->RGBColor[0.75, 0.18, 0.18],
+           FrontFaceColor->RGBColor[0.75, 0.18, 0.18],
+           BackFaceColor->RGBColor[0.75, 0.18, 0.18],
+           GraphicsColor->RGBColor[0.75, 0.18, 0.18],
+           FontSize->26,
+           FontWeight->Bold,
+           FontColor->RGBColor[0.75, 0.18, 0.18]]},
+         {
+          StyleBox["\<\"never seen by training\"\>",
+           StripOnInput->False,
+           LineColor->GrayLevel[0.35],
+           FrontFaceColor->GrayLevel[0.35],
+           BackFaceColor->GrayLevel[0.35],
+           GraphicsColor->GrayLevel[0.35],
+           FontSize->10,
+           FontColor->GrayLevel[0.35]]}
+        },
+        DefaultBaseStyle->"Column",
+        GridBoxAlignment->{"Columns" -> {{Left}}},
+        GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+        GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.35}}}],
+       "Column"],
+      Background->RGBColor[0.97, 0.97, 0.95],
+      FrameMargins->12,
+      FrameStyle->RGBColor[0.82, 0.82, 0.78],
+      ImageSize->170,
+      RoundingRadius->6,
+      StripOnInput->False], 
+     FrameBox[
+      TagBox[GridBox[{
+         {
+          StyleBox["\<\"Held-out after\"\>",
+           StripOnInput->False,
+           LineColor->GrayLevel[0.35],
+           FrontFaceColor->GrayLevel[0.35],
+           BackFaceColor->GrayLevel[0.35],
+           GraphicsColor->GrayLevel[0.35],
+           FontSize->11,
+           FontColor->GrayLevel[0.35]]},
+         {
+          StyleBox["\<\"0/2\"\>",
+           StripOnInput->False,
+           LineColor->RGBColor[0.75, 0.18, 0.18],
+           FrontFaceColor->RGBColor[0.75, 0.18, 0.18],
+           BackFaceColor->RGBColor[0.75, 0.18, 0.18],
+           GraphicsColor->RGBColor[0.75, 0.18, 0.18],
+           FontSize->26,
+           FontWeight->Bold,
+           FontColor->RGBColor[0.75, 0.18, 0.18]]},
+         {
+          StyleBox["\<\"still no exact matches\"\>",
+           StripOnInput->False,
+           LineColor->GrayLevel[0.35],
+           FrontFaceColor->GrayLevel[0.35],
+           BackFaceColor->GrayLevel[0.35],
+           GraphicsColor->GrayLevel[0.35],
+           FontSize->10,
+           FontColor->GrayLevel[0.35]]}
+        },
+        DefaultBaseStyle->"Column",
+        GridBoxAlignment->{"Columns" -> {{Left}}},
+        GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+        GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.35}}}],
+       "Column"],
+      Background->RGBColor[0.97, 0.97, 0.95],
+      FrameMargins->12,
+      FrameStyle->RGBColor[0.82, 0.82, 0.78],
+      ImageSize->170,
+      RoundingRadius->6,
+      StripOnInput->False]}
+   },
+   AutoDelete->False,
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+   GridBoxSpacings->{"Columns" -> {{1.2}}, "Rows" -> {{1}}}],
+  "Grid"]], "Output",
+ CellChangeTimes->{3.996229594813748*^9, 3.996231653391995*^9, 
+  3.996296225539752*^9},
+ CellLabel->"Out[36]=",ExpressionUUID->"44048b88-1e0e-4955-9729-67dbbd43a63d"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+BarChart[
   {
     {summary[\"training_before\"], summary[\"training_after\"]},
     {summary[\"held_out_before\"], summary[\"held_out_after\"]}
   },
-  ChartLabels -> {Placed[{\"Before\", \"After\"}, Below], Placed[{\"Training / seen\", \"Held-out / never seen\"}, Above]},
+  ChartLabels -> {Placed[{\"Before\", \"After\"}, Below], Placed[{\"Training \
+/ seen\", \"Held-out / never seen\"}, Above]},
   ChartStyle -> {RGBColor[0.82, 0.28, 0.23], RGBColor[0.14, 0.58, 0.35]},
-  PlotLabel -> \"Exact-match counts: fine-tuning helps seen examples, not held-out facts\",
+  PlotLabel -> \"Exact-match counts: fine-tuning helps seen examples, not \
+held-out facts\",
   AxesLabel -> {None, \"Correct answers\"},
   ImageSize -> 620,
   PlotRange -> {0, summary[\"training_total\"]}
-]", "Input"]
+]\
+\>", "Input",
+ CellOpen->False,
+ CellLabel->"In[37]:=",ExpressionUUID->"4430c409-38f9-4a7c-bbd0-f49f6a6adce4"],
 
-}, Open]],
+Cell[BoxData[
+ GraphicsBox[{
+   {Opacity[0], 
+    PointBox[{{0.5381646030589948, 0.}, {5.061107064821559, 
+     0.}}]}, {{}, {{{}, {
+       {RGBColor[0.82, 0.28, 0.23], EdgeForm[{Opacity[0.6719999999999999], 
+        Thickness[Small]}], 
+        TagBox[
+         TooltipBox[
+          TagBox[
+           TagBox[
+            DynamicBox[{
+              FEPrivate`If[
+               CurrentValue["MouseOver"], 
+               EdgeForm[{
+                 GrayLevel[0.5], 
+                 AbsoluteThickness[1.5], 
+                 Opacity[0.66]}], {}, {}], 
+              
+              RectangleBox[{0.7439912600145666, 0.}, {1.64639475600874, 0.}, 
+               "RoundingRadius" -> 0]},
+             
+             ImageSizeCache->{{61.624643907703756`, 173.81754822007525`}, {
+              192.58791560077174`, 193.08791560077174`}}],
+            "DelayedMouseEffectStyle"],
+           StatusArea[#, 0]& ,
+           TagBoxNote->"0"],
+          StyleBox["0", {}, StripOnInput -> False]],
+         Annotation[#, 
+          Style[0, {}], "Tooltip"]& ]}, 
+       {RGBColor[0.14, 0.58, 0.35], EdgeForm[{Opacity[0.6719999999999999], 
+        Thickness[Small]}], 
+        TagBox[
+         TooltipBox[
+          TagBox[
+           TagBox[
+            DynamicBox[{
+              FEPrivate`If[
+               CurrentValue["MouseOver"], 
+               EdgeForm[{
+                 GrayLevel[0.5], 
+                 AbsoluteThickness[1.5], 
+                 Opacity[0.66]}], {}, {}], 
+              
+              RectangleBox[{1.7439912600145666`, 0.}, {2.64639475600874, 13.},
+                "RoundingRadius" -> 0]},
+             
+             ImageSizeCache->{{185.39732963884666`, 
+              297.5902339512182}, {-105.93724095165419`, 
+              193.08791560077174`}}],
+            "DelayedMouseEffectStyle"],
+           StatusArea[#, 13]& ,
+           TagBoxNote->"13"],
+          StyleBox["13", {}, StripOnInput -> False]],
+         Annotation[#, 
+          Style[13, {}], "Tooltip"]& ]}}, {}, {}}, {{}, {
+       {RGBColor[0.82, 0.28, 0.23], EdgeForm[{Opacity[0.6719999999999999], 
+        Thickness[Small]}], 
+        TagBox[
+         TooltipBox[
+          TagBox[
+           TagBox[
+            DynamicBox[{
+              FEPrivate`If[
+               CurrentValue["MouseOver"], 
+               EdgeForm[{
+                 GrayLevel[0.5], 
+                 AbsoluteThickness[1.5], 
+                 Opacity[0.66]}], {}, {}], 
+              
+              RectangleBox[{3.0367807720320465`, 0.}, {3.93918426802622, 0.}, 
+               "RoundingRadius" -> 0]},
+             
+             ImageSizeCache->{{345.4093596263038, 457.6022639386753}, {
+              192.58791560077174`, 193.08791560077174`}}],
+            "DelayedMouseEffectStyle"],
+           StatusArea[#, 0]& ,
+           TagBoxNote->"0"],
+          StyleBox["0", {}, StripOnInput -> False]],
+         Annotation[#, 
+          Style[0, {}], "Tooltip"]& ]}, 
+       {RGBColor[0.14, 0.58, 0.35], EdgeForm[{Opacity[0.6719999999999999], 
+        Thickness[Small]}], 
+        TagBox[
+         TooltipBox[
+          TagBox[
+           TagBox[
+            DynamicBox[{
+              FEPrivate`If[
+               CurrentValue["MouseOver"], 
+               EdgeForm[{
+                 GrayLevel[0.5], 
+                 AbsoluteThickness[1.5], 
+                 Opacity[0.66]}], {}, {}], 
+              
+              RectangleBox[{4.0367807720320465`, 0.}, {4.93918426802622, 0.}, 
+               "RoundingRadius" -> 0]},
+             
+             ImageSizeCache->{{469.1820453574467, 581.3749496698182}, {
+              192.58791560077174`, 193.08791560077174`}}],
+            "DelayedMouseEffectStyle"],
+           StatusArea[#, 0]& ,
+           TagBoxNote->"0"],
+          StyleBox["0", {}, StripOnInput -> False]],
+         Annotation[#, 
+          Style[0, {}], "Tooltip"]& ]}}, {}, {}}}, {}, {}}, {}, {
+    InsetBox["\<\"Training / seen\"\>", 
+     Offset[{0, 4}, {1.1951930080116533, 0.}], ImageScaled[{0.5, 0}]], 
+    InsetBox["\<\"Held-out / never seen\"\>", 
+     Offset[{0, 4}, {2.1951930080116533, 13.}], ImageScaled[{0.5, 0}]], 
+    InsetBox["\<\"Before\"\>", Offset[{0, -4}, {1.6951930080116533, 0.}], 
+     ImageScaled[{0.5, 1}]], 
+    InsetBox["\<\"Training / seen\"\>", 
+     Offset[{0, 4}, {3.4879825200291332, 0.}], ImageScaled[{0.5, 0}]], 
+    InsetBox["\<\"Held-out / never seen\"\>", 
+     Offset[{0, 4}, {4.487982520029133, 0.}], ImageScaled[{0.5, 0}]], 
+    InsetBox["\<\"After\"\>", Offset[{0, -4}, {3.9879825200291332, 0.}], 
+     ImageScaled[{0.5, 1}]]}, {}, {}, 
+   StyleBox[
+    StyleBox[{
+      {Thickness[Tiny], 
+       LineBox[{{0.5381646030589948, 0.}, {5.149127458120903, 0.}}], 
+       StyleBox[{}, "GraphicsLabel",
+        StripOnInput->False]}, 
+      StyleBox[{
+        {Thickness[Tiny], 
+         LineBox[{{0.7439912600145666, 0.}, 
+           Offset[{-1.102182119232618*^-15, -6.}, {0.7439912600145666, 0.}]}],
+          LineBox[{{4.93918426802622, 0.}, 
+           Offset[{-1.102182119232618*^-15, -6.}, {4.93918426802622, 
+            0.}]}], {{}, {}, {}, {}, {}, {}, {
+           LineBox[{{2.64639475600874, 0.}, 
+             Offset[{-1.102182119232618*^-15, -6.}, {2.64639475600874, 0.}]}],
+            LineBox[{{3.0367807720320465`, 0.}, 
+             Offset[{-1.102182119232618*^-15, -6.}, {3.0367807720320465`, 
+              0.}]}]}}}, 
+        StyleBox[{}, "GraphicsLabel",
+         StripOnInput->False]}, "GraphicsTicks",
+       StripOnInput->False]},
+     Antialiasing->False], "GraphicsAxes",
+    StripOnInput->False]},
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  Axes->{False, True},
+  AxesLabel->{None, 
+    FormBox[
+     TagBox["\"Correct answers\"", HoldForm], TraditionalForm]},
+  AxesOrigin->{0.5381646030589948, 0.},
+  CoordinatesToolOptions:>{"DisplayFunction" -> ({
+      Identity[
+       Part[#, 1]], 
+      Identity[
+       Part[#, 2]]}& ), "CopiedValueFunction" -> ({
+      Identity[
+       Part[#, 1]], 
+      Identity[
+       Part[#, 2]]}& )},
+  DefaultBaseStyle->{"PlotGraphics", "Graphics"},
+  DisplayFunction->Identity,
+  FrameLabel->{{None, None}, {None, None}},
+  FrameTicks->{{Automatic, Automatic}, {Automatic, Automatic}},
+  GridLines->{None, None},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  ImageSize->620,
+  PlotInteractivity:>True,
+  PlotLabel->FormBox[
+   "\"Exact-match counts: fine-tuning helps seen examples, not held-out facts\
+\"", TraditionalForm],
+  PlotRange->{{All, All}, {0, 16}},
+  PlotRangePadding->{{
+     Scaled[0.02], 
+     Scaled[0.02]}, {0, 0}},
+  Ticks->{None, Automatic}]], "Output",
+ CellChangeTimes->{3.996229595027464*^9, 3.9962316534108458`*^9, 
+  3.996296225566503*^9},
+ CellLabel->"Out[37]=",ExpressionUUID->"0220f069-e26c-448e-98cd-f5d7d582516e"]
+}, Open  ]]
+}, Open  ]],
 
 Cell[CellGroupData[{
 
-Cell["3. Outcome map: all questions at once", "Section"],
+Cell["3. Outcome map: all questions at once", "Section",ExpressionUUID->"a62570d6-dfff-423b-9fd0-a40508769838"],
 
-Cell["This compact map makes the pattern visible without clicking through examples one by one. Green means the answer exactly contained the reference wording. The recall columns show partial word overlap with the real answer, which helps separate total misses from near misses.", "Text"],
+Cell["\<\
+This compact map makes the pattern visible without clicking through examples \
+one by one. Green means the answer exactly contained the reference wording. \
+The word-overlap columns show how much of the correct answer's vocabulary \
+appears in each model answer, which helps separate total misses from near \
+misses.\
+\>", "Text",ExpressionUUID->"f75e989b-e815-4c8d-a83d-f77bffd53bd7"],
 
-Cell["Grid[
+Cell[CellGroupData[{
+
+Cell["\<\
+Grid[
   Prepend[
     Table[
       {
@@ -124,43 +627,3309 @@ Cell["Grid[
       },
       {i, Length[examplesList]}
     ],
-    {Style[\"Row\", Bold], Style[\"Set\", Bold], Style[\"Report\", Bold], Style[\"Question\", Bold], Style[\"Before\", Bold], Style[\"After\", Bold], Style[\"Before recall\", Bold], Style[\"After recall\", Bold], Style[\"Reading\", Bold]}
+    {Style[\"Row\", Bold], Style[\"Set\", Bold], Style[\"Report\", Bold], \
+Style[\"Question\", Bold], Style[\"Before\", Bold], Style[\"After\", Bold], \
+Style[\"Before word overlap\", Bold], Style[\"After word overlap\", Bold], \
+Style[\"Reading\", Bold]}
   ],
   Alignment -> Left,
   Dividers -> {None, {True, True}},
   Spacings -> {1.2, .7},
   Background -> {None, {RGBColor[0.92, 0.92, 0.88], None}}
-]", "Input"],
+]\
+\>", "Input",
+ CellOpen->False,
+ CellLabel->"In[38]:=",ExpressionUUID->"98717170-de84-4a62-9f0d-c27435851e58"],
 
-Cell["ListPlot[
+Cell[BoxData[
+ TagBox[GridBox[{
+    {
+     StyleBox["\<\"Row\"\>",
+      StripOnInput->False,
+      FontWeight->Bold], 
+     StyleBox["\<\"Set\"\>",
+      StripOnInput->False,
+      FontWeight->Bold], 
+     StyleBox["\<\"Report\"\>",
+      StripOnInput->False,
+      FontWeight->Bold], 
+     StyleBox["\<\"Question\"\>",
+      StripOnInput->False,
+      FontWeight->Bold], 
+     StyleBox["\<\"Before\"\>",
+      StripOnInput->False,
+      FontWeight->Bold], 
+     StyleBox["\<\"After\"\>",
+      StripOnInput->False,
+      FontWeight->Bold], 
+     StyleBox["\<\"Before word overlap\"\>",
+      StripOnInput->False,
+      FontWeight->Bold], 
+     StyleBox["\<\"After word overlap\"\>",
+      StripOnInput->False,
+      FontWeight->Bold], 
+     StyleBox["\<\"Reading\"\>",
+      StripOnInput->False,
+      FontWeight->Bold]},
+    {
+     StyleBox["\<\"#1\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #3\"\>", "\<\"Ops\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MATCH\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.12, 0.55, 0.31],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.10\"\>",
+        ShowStringCharacters->False],
+       0.1,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"1.00\"\>",
+        ShowStringCharacters->False],
+       1.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Exact match after fine-tuning\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#2\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #3\"\>", "\<\"Plan\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.18\"\>",
+        ShowStringCharacters->False],
+       0.18181818181818182`,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.09\"\>",
+        ShowStringCharacters->False],
+       0.09090909090909091,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Partial wording overlap, wrong answer\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#3\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #19\"\>", "\<\"Ops\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MATCH\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.12, 0.55, 0.31],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"1.00\"\>",
+        ShowStringCharacters->False],
+       1.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Exact match after fine-tuning\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#4\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #19\"\>", "\<\"Plan\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MATCH\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.12, 0.55, 0.31],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.13\"\>",
+        ShowStringCharacters->False],
+       0.125,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"1.00\"\>",
+        ShowStringCharacters->False],
+       1.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Exact match after fine-tuning\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#5\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #36\"\>", "\<\"Ops\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Wrong memorized pattern\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#6\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #36\"\>", "\<\"Plan\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MATCH\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.12, 0.55, 0.31],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.20\"\>",
+        ShowStringCharacters->False],
+       0.2,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"1.00\"\>",
+        ShowStringCharacters->False],
+       1.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Exact match after fine-tuning\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#7\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #38\"\>", "\<\"Ops\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MATCH\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.12, 0.55, 0.31],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.22\"\>",
+        ShowStringCharacters->False],
+       0.2222222222222222,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"1.00\"\>",
+        ShowStringCharacters->False],
+       1.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Exact match after fine-tuning\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#8\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #38\"\>", "\<\"Plan\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MATCH\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.12, 0.55, 0.31],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"1.00\"\>",
+        ShowStringCharacters->False],
+       1.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Exact match after fine-tuning\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#9\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #39\"\>", "\<\"Ops\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MATCH\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.12, 0.55, 0.31],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"1.00\"\>",
+        ShowStringCharacters->False],
+       1.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Exact match after fine-tuning\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#10\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #39\"\>", "\<\"Plan\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MATCH\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.12, 0.55, 0.31],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"1.00\"\>",
+        ShowStringCharacters->False],
+       1.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Exact match after fine-tuning\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#11\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #48\"\>", "\<\"Ops\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Wrong memorized pattern\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#12\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #48\"\>", "\<\"Plan\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MATCH\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.12, 0.55, 0.31],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"1.00\"\>",
+        ShowStringCharacters->False],
+       1.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Exact match after fine-tuning\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#13\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #49\"\>", "\<\"Ops\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MATCH\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.12, 0.55, 0.31],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.33\"\>",
+        ShowStringCharacters->False],
+       0.3333333333333333,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"1.00\"\>",
+        ShowStringCharacters->False],
+       1.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Exact match after fine-tuning\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#14\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #49\"\>", "\<\"Plan\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MATCH\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.12, 0.55, 0.31],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"1.00\"\>",
+        ShowStringCharacters->False],
+       1.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Exact match after fine-tuning\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#15\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #50\"\>", "\<\"Ops\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MATCH\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.12, 0.55, 0.31],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"1.00\"\>",
+        ShowStringCharacters->False],
+       1.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Exact match after fine-tuning\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#16\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #50\"\>", "\<\"Plan\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MATCH\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.12, 0.55, 0.31],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"1.00\"\>",
+        ShowStringCharacters->False],
+       1.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Exact match after fine-tuning\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#17\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Held-out / never seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #37\"\>", "\<\"Ops\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.14\"\>",
+        ShowStringCharacters->False],
+       0.14285714285714285`,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Held-out generalization gap\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#18\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Held-out / never seen\"\>",
+      StripOnInput->False,
+      FontSize->11], "\<\"Report #37\"\>", "\<\"Plan\"\>", 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     FrameBox[
+      StyleBox["\<\"MISS\"\>",
+       StripOnInput->False,
+       LineColor->GrayLevel[1],
+       FrontFaceColor->GrayLevel[1],
+       BackFaceColor->GrayLevel[1],
+       GraphicsColor->GrayLevel[1],
+       FontSize->11,
+       FontWeight->Bold,
+       FontColor->GrayLevel[1]],
+      Background->RGBColor[0.78, 0.2, 0.2],
+      FrameMargins->{{8, 8}, {3, 3}},
+      FrameStyle->None,
+      RoundingRadius->4,
+      StripOnInput->False], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.08\"\>",
+        ShowStringCharacters->False],
+       0.08333333333333333,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Held-out generalization gap\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]}
+   },
+   AutoDelete->False,
+   GridBoxAlignment->{"Columns" -> {{Left}}},
+   GridBoxBackground->{"Columns" -> {{None}}, "Rows" -> {
+       RGBColor[0.92, 0.92, 0.88], None}},
+   GridBoxDividers->{"Columns" -> {{None}}, "Rows" -> {True, True}},
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+   GridBoxSpacings->{"Columns" -> {{1.2}}, "Rows" -> {{0.7}}}],
+  "Grid"]], "Output",
+ CellChangeTimes->{3.9962295950395927`*^9, 3.996231653416918*^9, 
+  3.9962962255799837`*^9},
+ CellLabel->"Out[38]=",ExpressionUUID->"8dd3f25a-3771-4522-af52-fde089ce2e56"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+ListPlot[
   {
-    Table[{i, recallValue[examplesList[[i]], \"base\"]}, {i, Length[examplesList]}],
-    Table[{i, recallValue[examplesList[[i]], \"finetuned\"]}, {i, Length[examplesList]}]
+    Table[Tooltip[{i, recallValue[examplesList[[i]], \"base\"]}, \
+pointLabel[examplesList[[i]], \"base\"]], {i, Length[examplesList]}],
+    Table[Tooltip[{i, recallValue[examplesList[[i]], \"finetuned\"]}, \
+pointLabel[examplesList[[i]], \"finetuned\"]], {i, Length[examplesList]}]
   },
   PlotLegends -> {\"Before fine-tuning\", \"After fine-tuning\"},
   PlotStyle -> {RGBColor[0.82, 0.28, 0.23], RGBColor[0.14, 0.58, 0.35]},
   Filling -> Axis,
   Frame -> True,
-  FrameLabel -> {\"Example number\", \"Expected-token recall\"},
-  PlotLabel -> \"Partial overlap exposes wins, misses, and memorized wrong patterns\",
+  FrameLabel -> {\"Example number\", \"Correct-answer word overlap\"},
+  PlotLabel -> \"Partial overlap exposes wins, misses, and memorized wrong \
+patterns\",
   ImageSize -> 640,
   PlotRange -> {-0.05, 1.05},
   Epilog -> {
     Dashed, GrayLevel[0.5],
-    Line[{{Length[trainingExamples] + .5, -0.05}, {Length[trainingExamples] + .5, 1.05}}],
-    Text[Style[\"held-out\", 11, GrayLevel[0.35]], {Length[trainingExamples] + 1.3, .92}]
+    Line[{{Length[trainingExamples] + .5, -0.05}, {Length[trainingExamples] + \
+.5, 1.05}}],
+    Text[Style[\"held-out\", 11, GrayLevel[0.35]], {Length[trainingExamples] \
++ 1.3, .92}]
   }
-]", "Input"]
+]\
+\>", "Input",
+ CellOpen->False,
+ CellLabel->"In[39]:=",ExpressionUUID->"380900c3-4b1e-4991-ac8a-a5397b23545b"],
 
-}, Open]],
+Cell[BoxData[
+ TemplateBox[{
+   GraphicsBox[{{}, 
+     GraphicsComplexBox[CompressedData["
+1:eJxTTMoPSmViYGCIA2IQDQEf7GfNBIGd9lABBzfx2JKLrsehfA4HBhQgAOUf
+gMqLoMlLOEDMOwmVl3GQOV4IRGegfAU09UpofBU0vhoaXwONr+UQCgZXoebr
+oMnrofEN0PiGDpNUPIHoEFS/EZr8B3tUGhY+29HCByYvgMbHDB9UeRk0vgIa
+XwmNr4LGxxU+MHktNL4OGl8PjW+AxjdEM98IGt5b0cMFBtDU40o/MCCBxpdB
+45OaXjDTByqf1PSBKz3AAZo8qf5Ddx96eI/mz9H8icwnPn8CANpcg8U=
+      "], {{{}, {}, {}, {}, {}, {
+         Directive[
+          RGBColor[0.82, 0.28, 0.23], 
+          Opacity[0.3]], 
+         LineBox[{52, 1}], 
+         LineBox[{53, 2}], 
+         LineBox[{54, 4}], 
+         LineBox[{55, 6}], 
+         LineBox[{56, 7}], 
+         LineBox[{57, 13}], 
+         LineBox[{58, 17}]}, {}, {
+         Directive[
+          RGBColor[0.14, 0.58, 0.35], 
+          Opacity[0.3]], 
+         LineBox[{37, 19}], 
+         LineBox[{38, 20}], 
+         LineBox[{39, 21}], 
+         LineBox[{40, 22}], 
+         LineBox[{41, 24}], 
+         LineBox[{42, 25}], 
+         LineBox[{43, 26}], 
+         LineBox[{44, 27}], 
+         LineBox[{45, 28}], 
+         LineBox[{46, 30}], 
+         LineBox[{47, 31}], 
+         LineBox[{48, 32}], 
+         LineBox[{49, 33}], 
+         LineBox[{50, 34}], 
+         LineBox[{51, 36}]}}, {
+        TagBox[{
+          Directive[
+           PointSize[0.012833333333333334`], 
+           AbsoluteThickness[2], 
+           RGBColor[0.82, 0.28, 0.23]], 
+          
+          PointBox[{59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 
+           73, 74, 75, 76}]}, Annotation[#, "Charting`Private`Tag#1"]& ], 
+        TagBox[{
+          Directive[
+           PointSize[0.012833333333333334`], 
+           AbsoluteThickness[2], 
+           RGBColor[0.14, 0.58, 0.35]], 
+          
+          PointBox[{77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 
+           91, 92, 93, 94}]}, Annotation[#, "Charting`Private`Tag#2"]& ]}, {
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[59]}, 
+          "\"Report #3 | Present Ops | Training / seen\\nBefore word overlap: \
+0.10\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #3 | Present Ops | Training / seen\nBefore word overlap: \
+0.10", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[60]}, 
+          "\"Report #3 | Activity Planned | Training / seen\\nBefore word \
+overlap: 0.18\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #3 | Activity Planned | Training / seen\nBefore word \
+overlap: 0.18", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[61]}, 
+          "\"Report #19 | Present Ops | Training / seen\\nBefore word \
+overlap: 0.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #19 | Present Ops | Training / seen\nBefore word overlap: \
+0.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[62]}, 
+          "\"Report #19 | Activity Planned | Training / seen\\nBefore word \
+overlap: 0.13\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #19 | Activity Planned | Training / seen\nBefore word \
+overlap: 0.13", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[63]}, 
+          "\"Report #36 | Present Ops | Training / seen\\nBefore word \
+overlap: 0.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #36 | Present Ops | Training / seen\nBefore word overlap: \
+0.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[64]}, 
+          "\"Report #36 | Activity Planned | Training / seen\\nBefore word \
+overlap: 0.20\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #36 | Activity Planned | Training / seen\nBefore word \
+overlap: 0.20", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[65]}, 
+          "\"Report #38 | Present Ops | Training / seen\\nBefore word \
+overlap: 0.22\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #38 | Present Ops | Training / seen\nBefore word overlap: \
+0.22", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[66]}, 
+          "\"Report #38 | Activity Planned | Training / seen\\nBefore word \
+overlap: 0.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #38 | Activity Planned | Training / seen\nBefore word \
+overlap: 0.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[67]}, 
+          "\"Report #39 | Present Ops | Training / seen\\nBefore word \
+overlap: 0.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #39 | Present Ops | Training / seen\nBefore word overlap: \
+0.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[68]}, 
+          "\"Report #39 | Activity Planned | Training / seen\\nBefore word \
+overlap: 0.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #39 | Activity Planned | Training / seen\nBefore word \
+overlap: 0.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[69]}, 
+          "\"Report #48 | Present Ops | Training / seen\\nBefore word \
+overlap: 0.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #48 | Present Ops | Training / seen\nBefore word overlap: \
+0.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[70]}, 
+          "\"Report #48 | Activity Planned | Training / seen\\nBefore word \
+overlap: 0.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #48 | Activity Planned | Training / seen\nBefore word \
+overlap: 0.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[71]}, 
+          "\"Report #49 | Present Ops | Training / seen\\nBefore word \
+overlap: 0.33\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #49 | Present Ops | Training / seen\nBefore word overlap: \
+0.33", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[72]}, 
+          "\"Report #49 | Activity Planned | Training / seen\\nBefore word \
+overlap: 0.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #49 | Activity Planned | Training / seen\nBefore word \
+overlap: 0.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[73]}, 
+          "\"Report #50 | Present Ops | Training / seen\\nBefore word \
+overlap: 0.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #50 | Present Ops | Training / seen\nBefore word overlap: \
+0.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[74]}, 
+          "\"Report #50 | Activity Planned | Training / seen\\nBefore word \
+overlap: 0.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #50 | Activity Planned | Training / seen\nBefore word \
+overlap: 0.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[75]}, 
+          "\"Report #37 | Present Ops | Held-out / never seen\\nBefore word \
+overlap: 0.14\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #37 | Present Ops | Held-out / never seen\nBefore word \
+overlap: 0.14", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[76]}, 
+          "\"Report #37 | Activity Planned | Held-out / never seen\\nBefore \
+word overlap: 0.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #37 | Activity Planned | Held-out / never seen\nBefore word \
+overlap: 0.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[77]}, 
+          "\"Report #3 | Present Ops | Training / seen\\nAfter word overlap: \
+1.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #3 | Present Ops | Training / seen\nAfter word overlap: \
+1.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[78]}, 
+          "\"Report #3 | Activity Planned | Training / seen\\nAfter word \
+overlap: 0.09\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #3 | Activity Planned | Training / seen\nAfter word \
+overlap: 0.09", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[79]}, 
+          "\"Report #19 | Present Ops | Training / seen\\nAfter word overlap: \
+1.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #19 | Present Ops | Training / seen\nAfter word overlap: \
+1.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[80]}, 
+          "\"Report #19 | Activity Planned | Training / seen\\nAfter word \
+overlap: 1.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #19 | Activity Planned | Training / seen\nAfter word \
+overlap: 1.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[81]}, 
+          "\"Report #36 | Present Ops | Training / seen\\nAfter word overlap: \
+0.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #36 | Present Ops | Training / seen\nAfter word overlap: \
+0.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[82]}, 
+          "\"Report #36 | Activity Planned | Training / seen\\nAfter word \
+overlap: 1.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #36 | Activity Planned | Training / seen\nAfter word \
+overlap: 1.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[83]}, 
+          "\"Report #38 | Present Ops | Training / seen\\nAfter word overlap: \
+1.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #38 | Present Ops | Training / seen\nAfter word overlap: \
+1.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[84]}, 
+          "\"Report #38 | Activity Planned | Training / seen\\nAfter word \
+overlap: 1.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #38 | Activity Planned | Training / seen\nAfter word \
+overlap: 1.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[85]}, 
+          "\"Report #39 | Present Ops | Training / seen\\nAfter word overlap: \
+1.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #39 | Present Ops | Training / seen\nAfter word overlap: \
+1.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[86]}, 
+          "\"Report #39 | Activity Planned | Training / seen\\nAfter word \
+overlap: 1.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #39 | Activity Planned | Training / seen\nAfter word \
+overlap: 1.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[87]}, 
+          "\"Report #48 | Present Ops | Training / seen\\nAfter word overlap: \
+0.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #48 | Present Ops | Training / seen\nAfter word overlap: \
+0.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[88]}, 
+          "\"Report #48 | Activity Planned | Training / seen\\nAfter word \
+overlap: 1.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #48 | Activity Planned | Training / seen\nAfter word \
+overlap: 1.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[89]}, 
+          "\"Report #49 | Present Ops | Training / seen\\nAfter word overlap: \
+1.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #49 | Present Ops | Training / seen\nAfter word overlap: \
+1.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[90]}, 
+          "\"Report #49 | Activity Planned | Training / seen\\nAfter word \
+overlap: 1.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #49 | Activity Planned | Training / seen\nAfter word \
+overlap: 1.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[91]}, 
+          "\"Report #50 | Present Ops | Training / seen\\nAfter word overlap: \
+1.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #50 | Present Ops | Training / seen\nAfter word overlap: \
+1.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[92]}, 
+          "\"Report #50 | Activity Planned | Training / seen\\nAfter word \
+overlap: 1.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #50 | Activity Planned | Training / seen\nAfter word \
+overlap: 1.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[93]}, 
+          "\"Report #37 | Present Ops | Held-out / never seen\\nAfter word \
+overlap: 0.00\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #37 | Present Ops | Held-out / never seen\nAfter word \
+overlap: 0.00", "Tooltip"]& ], 
+        TagBox[
+         TooltipBox[{
+           Opacity[0.], 
+           PointBox[94]}, 
+          "\"Report #37 | Activity Planned | Held-out / never seen\\nAfter \
+word overlap: 0.08\"", TooltipStyle -> "TextStyling"], 
+         Annotation[#, 
+          "Report #37 | Activity Planned | Held-out / never seen\nAfter word \
+overlap: 0.08", "Tooltip"]& ]}}], {{}, {}}}, {
+    DisplayFunction -> Identity, DisplayFunction -> Identity, 
+     PlotInteractivity :> True, 
+     DefaultBaseStyle -> {"PlotGraphics", "Graphics"}, DisplayFunction -> 
+     Identity, PlotInteractivity :> True, 
+     DefaultBaseStyle -> {"PlotGraphics", "Graphics"}, AspectRatio -> 
+     NCache[GoldenRatio^(-1), 0.6180339887498948], Axes -> {True, True}, 
+     AxesLabel -> {None, None}, AxesOrigin -> {0, 0}, DisplayFunction :> 
+     Identity, Epilog -> {
+       Dashing[{Small, Small}], 
+       GrayLevel[0.5], 
+       LineBox[{{16.5, -0.05}, {16.5, 1.05}}], 
+       InsetBox[
+        FormBox[
+         StyleBox["\"held-out\"", 11, 
+          GrayLevel[0.35], StripOnInput -> False], TraditionalForm], {17.3, 
+        0.92}]}, Frame -> {{True, True}, {True, True}}, FrameLabel -> {{
+        FormBox[
+         TagBox["\"Correct-answer word overlap\"", HoldForm], 
+         TraditionalForm], None}, {
+        FormBox[
+         TagBox["\"Example number\"", HoldForm], TraditionalForm], None}}, 
+     FrameTicks -> {{Automatic, Automatic}, {Automatic, Automatic}}, 
+     GridLines -> {None, None}, GridLinesStyle -> Directive[
+       GrayLevel[0.5, 0.4]], ImageSize -> 640, 
+     Method -> {
+      "AxisPadding" -> Scaled[0.02], "DefaultBoundaryStyle" -> Automatic, 
+       "DefaultGraphicsInteraction" -> {
+        "Version" -> 1.2, "TrackMousePosition" -> {True, False}, 
+         "Effects" -> {
+          "Highlight" -> {"ratio" -> 2}, "HighlightPoint" -> {"ratio" -> 2}, 
+           "Droplines" -> {
+            "freeformCursorMode" -> True, 
+             "placement" -> {"x" -> "All", "y" -> "None"}}}}, 
+       "DefaultMeshStyle" -> AbsolutePointSize[6], "DefaultPlotStyle" -> {
+         Directive[
+          RGBColor[0.24, 0.6, 0.8], 
+          AbsoluteThickness[2]], 
+         Directive[
+          RGBColor[0.95, 0.627, 0.1425], 
+          AbsoluteThickness[2]], 
+         Directive[
+          RGBColor[0.455, 0.7, 0.21], 
+          AbsoluteThickness[2]], 
+         Directive[
+          RGBColor[0.922526, 0.385626, 0.209179], 
+          AbsoluteThickness[2]], 
+         Directive[
+          RGBColor[0.578, 0.51, 0.85], 
+          AbsoluteThickness[2]], 
+         Directive[
+          RGBColor[0.772079, 0.431554, 0.102387], 
+          AbsoluteThickness[2]], 
+         Directive[
+          RGBColor[0., 0.6, 0.6], 
+          AbsoluteThickness[2]], 
+         Directive[
+          RGBColor[0.9, 0.36, 0.684], 
+          AbsoluteThickness[2]], 
+         Directive[
+          RGBColor[0.56, 0.7, 0.], 
+          AbsoluteThickness[2]], 
+         Directive[
+          RGBColor[0.9, 0.54, 0.], 
+          AbsoluteThickness[2]], 
+         Directive[
+          RGBColor[0.585, 0.5976, 0.9], 
+          AbsoluteThickness[2]], 
+         Directive[
+          RGBColor[0.9, 0.45, 0.45], 
+          AbsoluteThickness[2]], 
+         Directive[
+          RGBColor[0.7632186717367254, 0.8174402144034898, 0.], 
+          AbsoluteThickness[2]], 
+         Directive[
+          RGBColor[
+          0.8554632469481959, 0.24885384718327969`, 0.8334053873948551], 
+          AbsoluteThickness[2]], 
+         Directive[
+          RGBColor[
+          0.032972823413648836`, 0.7396719749139476, 0.534700104525218], 
+          AbsoluteThickness[2]]}, "DomainPadding" -> Scaled[0.02], 
+       "PointSizeFunction" -> "SmallPointSize", "RangePadding" -> 
+       Scaled[0.05], "OptimizePlotMarkers" -> True, "IncludeHighlighting" -> 
+       Automatic, "HighlightStyle" -> Automatic, "OptimizePlotMarkers" -> 
+       True, "IncludeHighlighting" -> "CurrentPoint", "HighlightStyle" -> 
+       Automatic, "OptimizePlotMarkers" -> True, 
+       "CoordinatesToolOptions" -> {"DisplayFunction" -> ({
+           (Identity[#]& )[
+            Part[#, 1]], 
+           (Identity[#]& )[
+            Part[#, 2]]}& ), "CopiedValueFunction" -> ({
+           (Identity[#]& )[
+            Part[#, 1]], 
+           (Identity[#]& )[
+            Part[#, 2]]}& )}}, PlotInteractivity :> True, PlotLabel -> 
+     FormBox["\"Partial overlap exposes wins, misses, and memorized wrong \
+patterns\"", TraditionalForm], PlotRange -> {{0, 18.}, {-0.05, 1.05}}, 
+     PlotRangeClipping -> True, PlotRangePadding -> {{
+        Scaled[0.02], 
+        Scaled[0.02]}, {None, None}}, Ticks -> {Automatic, Automatic}, 
+     PlotInteractivity :> True}], 
+   FormBox[
+    FormBox[
+     TemplateBox[{"\"Before fine-tuning\"", "\"After fine-tuning\""}, 
+      "PointLegend", DisplayFunction -> (FormBox[
+        StyleBox[
+         StyleBox[
+          PaneBox[
+           TagBox[
+            GridBox[{{
+               TagBox[
+                GridBox[{{
+                   GraphicsBox[{{}, {
+                    Directive[
+                    EdgeForm[
+                    Directive[
+                    Opacity[0.3], 
+                    GrayLevel[0]]], 
+                    PointSize[0.5], 
+                    AbsoluteThickness[2], 
+                    RGBColor[0.82, 0.28, 0.23]], {
+                    Directive[
+                    EdgeForm[
+                    Directive[
+                    Opacity[0.3], 
+                    GrayLevel[0]]], 
+                    PointSize[0.5], 
+                    AbsoluteThickness[2], 
+                    RGBColor[0.82, 0.28, 0.23]], 
+                    PointBox[
+                    NCache[{
+                    Scaled[{
+                    Rational[1, 2], 
+                    Rational[1, 2]}]}, {
+                    Scaled[{0.5, 0.5}]}]]}}}, AspectRatio -> Full, 
+                    ImageSize -> {10, 12.5}, PlotRangePadding -> None, 
+                    ImagePadding -> Automatic, 
+                    BaselinePosition -> (Scaled[0.18000000000000002`] -> 
+                    Baseline)], #}, {
+                   GraphicsBox[{{}, {
+                    Directive[
+                    EdgeForm[
+                    Directive[
+                    Opacity[0.3], 
+                    GrayLevel[0]]], 
+                    PointSize[0.5], 
+                    AbsoluteThickness[2], 
+                    RGBColor[0.14, 0.58, 0.35]], {
+                    Directive[
+                    EdgeForm[
+                    Directive[
+                    Opacity[0.3], 
+                    GrayLevel[0]]], 
+                    PointSize[0.5], 
+                    AbsoluteThickness[2], 
+                    RGBColor[0.14, 0.58, 0.35]], 
+                    PointBox[
+                    NCache[{
+                    Scaled[{
+                    Rational[1, 2], 
+                    Rational[1, 2]}]}, {
+                    Scaled[{0.5, 0.5}]}]]}}}, AspectRatio -> Full, 
+                    ImageSize -> {10, 12.5}, PlotRangePadding -> None, 
+                    ImagePadding -> Automatic, 
+                    BaselinePosition -> (Scaled[0.18000000000000002`] -> 
+                    Baseline)], #2}}, 
+                 GridBoxAlignment -> {
+                  "Columns" -> {Center, Left}, "Rows" -> {{Baseline}}}, 
+                 AutoDelete -> False, 
+                 GridBoxDividers -> {
+                  "Columns" -> {{False}}, "Rows" -> {{False}}}, 
+                 GridBoxItemSize -> {"Columns" -> {{All}}, "Rows" -> {{All}}},
+                  GridBoxSpacings -> {
+                  "Columns" -> {{0.5}}, "Rows" -> {{0.8}}}], "Grid"]}}, 
+             GridBoxAlignment -> {"Columns" -> {{Left}}, "Rows" -> {{Top}}}, 
+             AutoDelete -> False, 
+             GridBoxItemSize -> {
+              "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}, 
+             GridBoxSpacings -> {"Columns" -> {{1}}, "Rows" -> {{0}}}], 
+            "Grid"], Alignment -> Left, AppearanceElements -> None, 
+           ImageMargins -> {{5, 5}, {5, 5}}, ImageSizeAction -> 
+           "ResizeToFit"], LineIndent -> 0, StripOnInput -> False], {
+         FontFamily -> "Arial"}, Background -> Automatic, StripOnInput -> 
+         False], TraditionalForm]& ), 
+      InterpretationFunction :> (RowBox[{"PointLegend", "[", 
+         RowBox[{
+           RowBox[{"{", 
+             RowBox[{
+               RowBox[{"Directive", "[", 
+                 RowBox[{
+                   RowBox[{"PointSize", "[", "0.012833333333333334`", "]"}], 
+                   ",", 
+                   RowBox[{"AbsoluteThickness", "[", "2", "]"}], ",", 
+                   
+                   TemplateBox[<|"color" -> RGBColor[0.82, 0.28, 0.23]|>, 
+                    "RGBColorSwatchTemplate"]}], "]"}], ",", 
+               RowBox[{"Directive", "[", 
+                 RowBox[{
+                   RowBox[{"PointSize", "[", "0.012833333333333334`", "]"}], 
+                   ",", 
+                   RowBox[{"AbsoluteThickness", "[", "2", "]"}], ",", 
+                   
+                   TemplateBox[<|"color" -> RGBColor[0.14, 0.58, 0.35]|>, 
+                    "RGBColorSwatchTemplate"]}], "]"}]}], "}"}], ",", 
+           RowBox[{"{", 
+             RowBox[{#, ",", #2}], "}"}], ",", 
+           RowBox[{"LegendMarkers", "\[Rule]", 
+             RowBox[{"{", 
+               RowBox[{
+                 RowBox[{"{", 
+                   RowBox[{"False", ",", "Automatic"}], "}"}], ",", 
+                 RowBox[{"{", 
+                   RowBox[{"False", ",", "Automatic"}], "}"}]}], "}"}]}], ",", 
+           RowBox[{"Joined", "\[Rule]", 
+             RowBox[{"{", 
+               RowBox[{"False", ",", "False"}], "}"}]}], ",", 
+           RowBox[{"LabelStyle", "\[Rule]", 
+             RowBox[{"{", "}"}]}], ",", 
+           RowBox[{"LegendLayout", "\[Rule]", "\"Column\""}]}], "]"}]& ), 
+      Editable -> True], TraditionalForm], TraditionalForm]},
+  "Legended",
+  DisplayFunction->(GridBox[{{
+      TagBox[
+       ItemBox[
+        PaneBox[
+         TagBox[#, "SkipImageSizeLevel"], Alignment -> {Center, Baseline}, 
+         BaselinePosition -> Baseline], DefaultBaseStyle -> "Labeled"], 
+       "SkipImageSizeLevel"], 
+      ItemBox[#2, DefaultBaseStyle -> "LabeledLabel"]}}, 
+    GridBoxAlignment -> {"Columns" -> {{Center}}, "Rows" -> {{Center}}}, 
+    AutoDelete -> False, GridBoxItemSize -> Automatic, 
+    BaselinePosition -> {1, 1}]& ),
+  Editable->True,
+  InterpretationFunction->(RowBox[{"Legended", "[", 
+     RowBox[{#, ",", 
+       RowBox[{"Placed", "[", 
+         RowBox[{#2, ",", "After"}], "]"}]}], "]"}]& )]], "Output",
+ CellChangeTimes->{3.996229595129162*^9, 3.9962316534472237`*^9, 
+  3.996296225682004*^9},
+ CellLabel->"Out[39]=",ExpressionUUID->"e34d6a85-67e7-4d0d-a7de-cbc25157f615"]
+}, Open  ]]
+}, Open  ]],
 
 Cell[CellGroupData[{
 
-Cell["4. Answer microscope", "Section"],
+Cell["4. Query-to-answer cosine similarity", "Section",ExpressionUUID->"71f1c4e5-4c7a-4fcb-95f5-d45ca33b971a"],
 
-Cell["Pick any real question. Highlighted words are tokens that also appear in the reference answer. This turns the before/after comparison into something you can read visually: generic explanations, exact copied successes, and confident wrong template reuse look very different.", "Text"],
+Cell["\<\
+Cosine similarity compares the words in the query with the words in each \
+answer. It is useful for spotting answers that echo the question, but it is \
+not a correctness score. In this notebook, correctness still comes from \
+matching the reference answer and reading the source excerpt.\
+\>", "Text",ExpressionUUID->"7edede50-a9cf-4d38-bc99-b896d45d4678"],
 
-Cell["optionsList = Table[i -> exampleLabel[examplesList[[i]]], {i, Length[examplesList]}];
+Cell[CellGroupData[{
+
+Cell["\<\
+cosineRows = Table[
+  {
+    Style[\"#\" <> ToString[i], GrayLevel[0.35]],
+    Style[exampleLabel[examplesList[[i]]], 11],
+    NumberForm[querySimilarity[examplesList[[i]], \"query_to_reference\"], \
+{3, 2}],
+    NumberForm[querySimilarity[examplesList[[i]], \"query_to_base_answer\"], \
+{3, 2}],
+    NumberForm[querySimilarity[examplesList[[i]], \"query_to_finetuned_answer\
+\"], {3, 2}],
+    Style[If[
+      querySimilarity[examplesList[[i]], \"query_to_base_answer\"] > \
+querySimilarity[examplesList[[i]], \"query_to_finetuned_answer\"],
+      \"Base echoes query more\",
+      \"Fine-tuned echoes query more\"
+    ], 10, GrayLevel[0.25]]
+  },
+  {i, Length[examplesList]}
+];
+
+Grid[
+  Prepend[
+    cosineRows,
+    {Style[\"Row\", Bold], Style[\"Example\", Bold], Style[\"Query vs \
+reference\", Bold], Style[\"Query vs base\", Bold], Style[\"Query vs \
+fine-tuned\", Bold], Style[\"Reading\", Bold]}
+  ],
+  Alignment -> Left,
+  Dividers -> {None, {True, True}},
+  Spacings -> {1.1, .7},
+  Background -> {None, {RGBColor[0.92, 0.92, 0.88], None}}
+]\
+\>", "Input",
+ CellOpen->False,
+ CellLabel->"In[40]:=",ExpressionUUID->"511d2d04-bf89-42c0-8a92-780f1cbd8ae7"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {
+     StyleBox["\<\"Row\"\>",
+      StripOnInput->False,
+      FontWeight->Bold], 
+     StyleBox["\<\"Example\"\>",
+      StripOnInput->False,
+      FontWeight->Bold], 
+     StyleBox["\<\"Query vs reference\"\>",
+      StripOnInput->False,
+      FontWeight->Bold], 
+     StyleBox["\<\"Query vs base\"\>",
+      StripOnInput->False,
+      FontWeight->Bold], 
+     StyleBox["\<\"Query vs fine-tuned\"\>",
+      StripOnInput->False,
+      FontWeight->Bold], 
+     StyleBox["\<\"Reading\"\>",
+      StripOnInput->False,
+      FontWeight->Bold]},
+    {
+     StyleBox["\<\"#1\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #3 | Present Ops | Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.49\"\>",
+        ShowStringCharacters->False],
+       0.4934637712198267,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#2\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #3 | Activity Planned | Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.16\"\>",
+        ShowStringCharacters->False],
+       0.16273613872602985`,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#3\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #19 | Present Ops | Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.49\"\>",
+        ShowStringCharacters->False],
+       0.4923659639173309,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#4\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #19 | Activity Planned | Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.20\"\>",
+        ShowStringCharacters->False],
+       0.19528336647123581`,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#5\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #36 | Present Ops | Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.60\"\>",
+        ShowStringCharacters->False],
+       0.6038596398555418,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#6\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #36 | Activity Planned | Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.31\"\>",
+        ShowStringCharacters->False],
+       0.3120188603766914,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#7\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #38 | Present Ops | Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.49\"\>",
+        ShowStringCharacters->False],
+       0.4934637712198267,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#8\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #38 | Activity Planned | Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.31\"\>",
+        ShowStringCharacters->False],
+       0.3120188603766914,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#9\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #39 | Present Ops | Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.49\"\>",
+        ShowStringCharacters->False],
+       0.4934637712198267,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#10\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #39 | Activity Planned | Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.31\"\>",
+        ShowStringCharacters->False],
+       0.3120188603766914,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#11\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #48 | Present Ops | Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.41\"\>",
+        ShowStringCharacters->False],
+       0.4099951888601959,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#12\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #48 | Activity Planned | Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.25\"\>",
+        ShowStringCharacters->False],
+       0.2450490147049017,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#13\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #49 | Present Ops | Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.41\"\>",
+        ShowStringCharacters->False],
+       0.4099951888601959,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#14\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #49 | Activity Planned | Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.25\"\>",
+        ShowStringCharacters->False],
+       0.2450490147049017,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#15\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #50 | Present Ops | Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.41\"\>",
+        ShowStringCharacters->False],
+       0.4099951888601959,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#16\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #50 | Activity Planned | Training / seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.25\"\>",
+        ShowStringCharacters->False],
+       0.2450490147049017,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#17\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #37 | Present Ops | Held-out / never seen\"\>",
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.60\"\>",
+        ShowStringCharacters->False],
+       0.6038596398555418,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]},
+    {
+     StyleBox["\<\"#18\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.35],
+      FrontFaceColor->GrayLevel[0.35],
+      BackFaceColor->GrayLevel[0.35],
+      GraphicsColor->GrayLevel[0.35],
+      FontColor->GrayLevel[0.35]], 
+     StyleBox["\<\"Report #37 | Activity Planned | Held-out / never seen\"\>",
+      
+      StripOnInput->False,
+      FontSize->11], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.31\"\>",
+        ShowStringCharacters->False],
+       0.3120188603766914,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     TagBox[
+      InterpretationBox[
+       StyleBox["\<\"0.00\"\>",
+        ShowStringCharacters->False],
+       0.,
+       AutoDelete->True],
+      NumberForm[#, {3, 2}]& ], 
+     StyleBox["\<\"Base echoes query more\"\>",
+      StripOnInput->False,
+      LineColor->GrayLevel[0.25],
+      FrontFaceColor->GrayLevel[0.25],
+      BackFaceColor->GrayLevel[0.25],
+      GraphicsColor->GrayLevel[0.25],
+      FontSize->10,
+      FontColor->GrayLevel[0.25]]}
+   },
+   AutoDelete->False,
+   GridBoxAlignment->{"Columns" -> {{Left}}},
+   GridBoxBackground->{"Columns" -> {{None}}, "Rows" -> {
+       RGBColor[0.92, 0.92, 0.88], None}},
+   GridBoxDividers->{"Columns" -> {{None}}, "Rows" -> {True, True}},
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+   GridBoxSpacings->{"Columns" -> {{1.1}}, "Rows" -> {{0.7}}}],
+  "Grid"]], "Output",
+ CellChangeTimes->{3.996229595137714*^9, 3.996231653454194*^9, 
+  3.996296225689787*^9},
+ CellLabel->"Out[42]=",ExpressionUUID->"5ee472fa-7f92-4856-be39-84af62ae5168"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+cosineOptions = Table[i -> exampleLabel[examplesList[[i]]], {i, \
+Length[examplesList]}];
+
+Manipulate[
+  Module[{ex = examplesList[[i]], values},
+    values = {
+      querySimilarity[ex, \"query_to_reference\"],
+      querySimilarity[ex, \"query_to_base_answer\"],
+      querySimilarity[ex, \"query_to_finetuned_answer\"]
+    };
+    Column[{
+      Framed[
+        Column[{
+          Style[exampleLabel[ex], 14, Bold],
+          Style[\"Query text\", Bold],
+          Panel[wrappedText[ex[\"query_text\"], 650]],
+          Style[\"How much each answer reuses the query wording\", Bold]
+        }, Spacings -> .7],
+        Background -> RGBColor[0.97, 0.97, 0.95],
+        FrameStyle -> RGBColor[0.82, 0.82, 0.78],
+        FrameMargins -> 12,
+        RoundingRadius -> 6
+      ],
+      BarChart[
+        values,
+        ChartLabels -> Placed[{\"Reference\", \"Base answer\", \"Fine-tuned \
+answer\"}, Below],
+        ChartStyle -> {RGBColor[0.35, 0.48, 0.78], RGBColor[0.82, 0.28, \
+0.23], RGBColor[0.14, 0.58, 0.35]},
+        PlotRange -> {0, 1},
+        AxesLabel -> {None, \"Cosine similarity to query\"},
+        PlotLabel -> \"Query-to-answer lexical cosine similarity\",
+        ImageSize -> 620
+      ],
+      Style[
+        \"Read this as prompt-word similarity, not correctness. A high base \
+score can mean the base model repeated the question context instead of \
+answering from the report.\",
+        11,
+        GrayLevel[0.35]
+      ]
+    }, Spacings -> 1.1]
+  ],
+  {{i, 1, \"Pick a real query\"}, cosineOptions},
+  ControlPlacement -> Top
+]\
+\>", "Input",
+ CellOpen->False,
+ CellLabel->"In[43]:=",ExpressionUUID->"196c0729-df46-479e-97bc-58845bc941ce"],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`i$$ = 1, Typeset`show$$ = True, 
+    Typeset`bookmarkList$$ = {}, Typeset`bookmarkMode$$ = "Menu", 
+    Typeset`animator$$, Typeset`animvar$$ = 1, Typeset`name$$ = 
+    "\"untitled\"", Typeset`specs$$ = {{{
+       Hold[$CellContext`i$$], 1, "Pick a real query"}, {
+      1 -> "Report #3 | Present Ops | Training / seen", 2 -> 
+       "Report #3 | Activity Planned | Training / seen", 3 -> 
+       "Report #19 | Present Ops | Training / seen", 4 -> 
+       "Report #19 | Activity Planned | Training / seen", 5 -> 
+       "Report #36 | Present Ops | Training / seen", 6 -> 
+       "Report #36 | Activity Planned | Training / seen", 7 -> 
+       "Report #38 | Present Ops | Training / seen", 8 -> 
+       "Report #38 | Activity Planned | Training / seen", 9 -> 
+       "Report #39 | Present Ops | Training / seen", 10 -> 
+       "Report #39 | Activity Planned | Training / seen", 11 -> 
+       "Report #48 | Present Ops | Training / seen", 12 -> 
+       "Report #48 | Activity Planned | Training / seen", 13 -> 
+       "Report #49 | Present Ops | Training / seen", 14 -> 
+       "Report #49 | Activity Planned | Training / seen", 15 -> 
+       "Report #50 | Present Ops | Training / seen", 16 -> 
+       "Report #50 | Activity Planned | Training / seen", 17 -> 
+       "Report #37 | Present Ops | Held-out / never seen", 18 -> 
+       "Report #37 | Activity Planned | Held-out / never seen"}, ControlType -> 
+      PopupMenu}}, Typeset`size$$ = {
+    1075.80107421875, {274.3202325969961, 280.0521661907461}}, 
+    Typeset`update$$ = 0, Typeset`initDone$$, Typeset`skipInitDone$$ = True, 
+    Typeset`keyframeActionsQ$$ = False, Typeset`keyframeList$$ = {}}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, "Variables" :> {$CellContext`i$$ = 1}, 
+      "ControllerVariables" :> {}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$, Typeset`keyframeActionsQ$$, 
+        Typeset`keyframeList$$}, "Body" :> 
+      Module[{$CellContext`ex = 
+         Part[$CellContext`examplesList, $CellContext`i$$], \
+$CellContext`values}, $CellContext`values = {
+           $CellContext`querySimilarity[$CellContext`ex, 
+            "query_to_reference"], 
+           $CellContext`querySimilarity[$CellContext`ex, 
+            "query_to_base_answer"], 
+           $CellContext`querySimilarity[$CellContext`ex, 
+            "query_to_finetuned_answer"]}; Column[{
+           Framed[
+            Column[{
+              Style[
+               $CellContext`exampleLabel[$CellContext`ex], 14, Bold], 
+              Style["Query text", Bold], 
+              Panel[
+               $CellContext`wrappedText[
+                $CellContext`ex["query_text"], 650]], 
+              Style["How much each answer reuses the query wording", Bold]}, 
+             Spacings -> 0.7], Background -> RGBColor[0.97, 0.97, 0.95], 
+            FrameStyle -> RGBColor[0.82, 0.82, 0.78], FrameMargins -> 12, 
+            RoundingRadius -> 6], 
+           
+           BarChart[$CellContext`values, ChartLabels -> 
+            Placed[{"Reference", "Base answer", "Fine-tuned answer"}, Below], 
+            ChartStyle -> {
+              RGBColor[0.35, 0.48, 0.78], 
+              RGBColor[0.82, 0.28, 0.23], 
+              RGBColor[0.14, 0.58, 0.35]}, PlotRange -> {0, 1}, 
+            AxesLabel -> {None, "Cosine similarity to query"}, PlotLabel -> 
+            "Query-to-answer lexical cosine similarity", ImageSize -> 620], 
+           Style[
+           "Read this as prompt-word similarity, not correctness. A high base \
+score can mean the base model repeated the question context instead of \
+answering from the report.", 11, 
+            GrayLevel[0.35]]}, Spacings -> 1.1]], 
+      "Specifications" :> {{{$CellContext`i$$, 1, "Pick a real query"}, {
+         1 -> "Report #3 | Present Ops | Training / seen", 2 -> 
+          "Report #3 | Activity Planned | Training / seen", 3 -> 
+          "Report #19 | Present Ops | Training / seen", 4 -> 
+          "Report #19 | Activity Planned | Training / seen", 5 -> 
+          "Report #36 | Present Ops | Training / seen", 6 -> 
+          "Report #36 | Activity Planned | Training / seen", 7 -> 
+          "Report #38 | Present Ops | Training / seen", 8 -> 
+          "Report #38 | Activity Planned | Training / seen", 9 -> 
+          "Report #39 | Present Ops | Training / seen", 10 -> 
+          "Report #39 | Activity Planned | Training / seen", 11 -> 
+          "Report #48 | Present Ops | Training / seen", 12 -> 
+          "Report #48 | Activity Planned | Training / seen", 13 -> 
+          "Report #49 | Present Ops | Training / seen", 14 -> 
+          "Report #49 | Activity Planned | Training / seen", 15 -> 
+          "Report #50 | Present Ops | Training / seen", 16 -> 
+          "Report #50 | Activity Planned | Training / seen", 17 -> 
+          "Report #37 | Present Ops | Held-out / never seen", 18 -> 
+          "Report #37 | Activity Planned | Held-out / never seen"}}}, 
+      "Options" :> {ControlPlacement -> Top}, "DefaultOptions" :> {}],
+     ImageSizeCache->{
+      1124.90107421875, {322.0598409518626, 327.7917745456126}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UndoTrackedVariables:>{Typeset`show$$, Typeset`bookmarkMode$$},
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{3.99622959514951*^9, 3.9962316534623404`*^9, 
+  3.996296225706973*^9},
+ CellLabel->"Out[45]=",ExpressionUUID->"1c85246f-ffaa-40fb-bdba-7f3a36ad146f"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["5. Guided examples: one win, one limit", "Section",ExpressionUUID->"1975451f-b26f-4732-bbb7-9aa891e409e7"],
+
+Cell["\<\
+These two examples are the shortest path through the result. The first shows \
+what fine-tuning learned well. The second shows the limit: a held-out report \
+still needs retrieval because its facts were never in the training examples.\
+\>", "Text",ExpressionUUID->"5aa1f793-f07a-486c-b85f-ddf13195d3e3"],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+successExample = FirstCase[examplesList, ex_ /; ex[\"group\"] === \
+\"training\" && TrueQ[ex[\"finetuned_matched\"]] && ! TrueQ[ex[\"base_matched\
+\"]] :> ex];
+heldOutFailureExample = FirstCase[examplesList, ex_ /; ex[\"group\"] === \
+\"held_out\" && ! TrueQ[ex[\"finetuned_matched\"]] :> ex];
+
+guidedCard[title_, ex_, color_, note_] := Framed[
+  Module[{fieldWidth = 455, fieldBlock, scoreLine},
+    fieldBlock[label_, body_] := Column[
+      {
+        Style[label, Bold],
+        Panel[wrappedText[body, fieldWidth]]
+      },
+      Spacings -> .25
+    ];
+    scoreLine[label_, matched_, value_] := Row[
+      {Style[label, Bold], Spacer[10], statusCell[matched], Spacer[8], \
+NumberForm[value, {3, 2}], \" word overlap\"}
+    ];
+    Column[{
+      Style[title, 16, Bold, color],
+      Style[exampleLabel[ex], 12, GrayLevel[0.35]],
+      fieldBlock[\"Question\", ex[\"instruction\"]],
+      fieldBlock[\"Expected\", ex[\"expected\"]],
+      scoreLine[\"Before\", ex[\"base_matched\"], recallValue[ex, \"base\"]],
+      fieldBlock[\"Why base missed\", ex[\"base_miss_explanation\"]],
+      scoreLine[\"After\", ex[\"finetuned_matched\"], recallValue[ex, \
+\"finetuned\"]],
+      fieldBlock[\"After answer\", ex[\"finetuned_model_answer\"]],
+      fieldBlock[\"Takeaway\", note]
+    }, Spacings -> .75]
+  ],
+  Background -> RGBColor[0.98, 0.98, 0.96],
+  FrameStyle -> Lighter[color, .55],
+  FrameMargins -> 12,
+  RoundingRadius -> 6,
+  ImageSize -> 540
+];
+
+Grid[
+  {{
+    guidedCard[
+      \"What fine-tuning learned\",
+      successExample,
+      RGBColor[0.05, 0.42, 0.22],
+      \"The fine-tuned model reproduces the expected report wording exactly \
+on a seen training-style example.\"
+    ],
+    guidedCard[
+      \"What fine-tuning still cannot know\",
+      heldOutFailureExample,
+      RGBColor[0.72, 0.18, 0.16],
+      \"This report was never seen during training, so the fine-tuned answer \
+remains ungrounded. This is the handoff point to retrieval.\"
+    ]
+  }},
+  Spacings -> {1.4, 1}
+]\
+\>", "Input",
+ CellOpen->False,
+ CellLabel->"In[46]:=",ExpressionUUID->"2f4104a9-4d4c-413e-a1cc-22519c5b7b10"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {
+     FrameBox[
+      TagBox[GridBox[{
+         {
+          StyleBox["\<\"What fine-tuning learned\"\>",
+           StripOnInput->False,
+           LineColor->RGBColor[0.05, 0.42, 0.22],
+           FrontFaceColor->RGBColor[0.05, 0.42, 0.22],
+           BackFaceColor->RGBColor[0.05, 0.42, 0.22],
+           GraphicsColor->RGBColor[0.05, 0.42, 0.22],
+           FontSize->16,
+           FontWeight->Bold,
+           FontColor->RGBColor[0.05, 0.42, 0.22]]},
+         {
+          StyleBox["\<\"Report #3 | Present Ops | Training / seen\"\>",
+           StripOnInput->False,
+           LineColor->GrayLevel[0.35],
+           FrontFaceColor->GrayLevel[0.35],
+           BackFaceColor->GrayLevel[0.35],
+           GraphicsColor->GrayLevel[0.35],
+           FontSize->12,
+           FontColor->GrayLevel[0.35]]},
+         {
+          TagBox[GridBox[{
+             {
+              StyleBox["\<\"Question\"\>",
+               StripOnInput->False,
+               FontWeight->Bold]},
+             {
+              PanelBox[
+               PaneBox[
+                
+                StyleBox["\<\"What are the present operations reported on \
+this well?\"\>",
+                 StripOnInput->False,
+                 LineBreakWithin->True,
+                 FontSize->12],
+                ImageSize->{455, Automatic}]]}
+            },
+            DefaultBaseStyle->"Column",
+            GridBoxAlignment->{"Columns" -> {{Left}}},
+            
+            GridBoxItemSize->{
+             "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+            GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.25}}}],
+           "Column"]},
+         {
+          TagBox[GridBox[{
+             {
+              StyleBox["\<\"Expected\"\>",
+               StripOnInput->False,
+               FontWeight->Bold]},
+             {
+              PanelBox[
+               PaneBox[
+                
+                StyleBox["\<\"RIGGING UP WITH FRONTIER CREWS AND SUPERVISION \
+AND JW JONES TRUCKING\"\>",
+                 StripOnInput->False,
+                 LineBreakWithin->True,
+                 FontSize->12],
+                ImageSize->{455, Automatic},
+                ScrollPosition->{0., 0.}]]}
+            },
+            DefaultBaseStyle->"Column",
+            GridBoxAlignment->{"Columns" -> {{Left}}},
+            
+            GridBoxItemSize->{
+             "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+            GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.25}}}],
+           "Column"]},
+         {
+          TemplateBox[{
+            StyleBox["\"Before\"", Bold, StripOnInput -> False], 
+            TemplateBox[{10}, "Spacer1"], 
+            FrameBox[
+             StyleBox["\"MISS\"", Bold, 11, 
+              GrayLevel[1], StripOnInput -> False], Background -> 
+             RGBColor[0.78, 0.2, 0.2], FrameStyle -> None, RoundingRadius -> 
+             4, FrameMargins -> {{8, 8}, {3, 3}}, StripOnInput -> False], 
+            TemplateBox[{8}, "Spacer1"], 
+            TagBox[
+             InterpretationBox[
+              StyleBox["\"0.10\"", ShowStringCharacters -> False], 0.1, 
+              AutoDelete -> True], NumberForm[#, {3, 2}]& ], 
+            "\" word overlap\""},
+           "RowDefault"]},
+         {
+          TagBox[GridBox[{
+             {
+              StyleBox["\<\"Why base missed\"\>",
+               StripOnInput->False,
+               FontWeight->Bold]},
+             {
+              PanelBox[
+               PaneBox[
+                
+                StyleBox["\<\"The base prompt only includes the well name, \
+report number, date, and question. It does not include the report field \
+containing the correct answer, so the base model has no source text to \
+extract from. The generated base answer also stops mid-sentence, which shows \
+the output was cut off by the generation limit rather than reaching a \
+complete answer.\"\>",
+                 StripOnInput->False,
+                 LineBreakWithin->True,
+                 FontSize->12],
+                ImageSize->{455, Automatic},
+                ScrollPosition->{1558.76123046875, 0.}]]}
+            },
+            DefaultBaseStyle->"Column",
+            GridBoxAlignment->{"Columns" -> {{Left}}},
+            
+            GridBoxItemSize->{
+             "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+            GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.25}}}],
+           "Column"]},
+         {
+          TemplateBox[{
+            StyleBox["\"After\"", Bold, StripOnInput -> False], 
+            TemplateBox[{10}, "Spacer1"], 
+            FrameBox[
+             StyleBox["\"MATCH\"", Bold, 11, 
+              GrayLevel[1], StripOnInput -> False], Background -> 
+             RGBColor[0.12, 0.55, 0.31], FrameStyle -> None, RoundingRadius -> 
+             4, FrameMargins -> {{8, 8}, {3, 3}}, StripOnInput -> False], 
+            TemplateBox[{8}, "Spacer1"], 
+            TagBox[
+             InterpretationBox[
+              StyleBox["\"1.00\"", ShowStringCharacters -> False], 1., 
+              AutoDelete -> True], NumberForm[#, {3, 2}]& ], 
+            "\" word overlap\""},
+           "RowDefault"]},
+         {
+          TagBox[GridBox[{
+             {
+              StyleBox["\<\"After answer\"\>",
+               StripOnInput->False,
+               FontWeight->Bold]},
+             {
+              PanelBox[
+               PaneBox[
+                
+                StyleBox["\<\"RIGGING UP WITH FRONTIER CREWS AND SUPERVISION \
+AND JW JONES TRUCKING\"\>",
+                 StripOnInput->False,
+                 LineBreakWithin->True,
+                 FontSize->12],
+                ImageSize->{455, Automatic},
+                ScrollPosition->{0., 0.}]]}
+            },
+            DefaultBaseStyle->"Column",
+            GridBoxAlignment->{"Columns" -> {{Left}}},
+            
+            GridBoxItemSize->{
+             "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+            GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.25}}}],
+           "Column"]},
+         {
+          TagBox[GridBox[{
+             {
+              StyleBox["\<\"Takeaway\"\>",
+               StripOnInput->False,
+               FontWeight->Bold]},
+             {
+              PanelBox[
+               PaneBox[
+                
+                StyleBox["\<\"The fine-tuned model reproduces the expected \
+report wording exactly on a seen training-style example.\"\>",
+                 StripOnInput->False,
+                 LineBreakWithin->True,
+                 FontSize->12],
+                ImageSize->{455, Automatic},
+                ScrollPosition->{0., 0.}]]}
+            },
+            DefaultBaseStyle->"Column",
+            GridBoxAlignment->{"Columns" -> {{Left}}},
+            
+            GridBoxItemSize->{
+             "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+            GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.25}}}],
+           "Column"]}
+        },
+        DefaultBaseStyle->"Column",
+        GridBoxAlignment->{"Columns" -> {{Left}}},
+        GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+        GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.75}}}],
+       "Column"],
+      Background->RGBColor[0.98, 0.98, 0.96],
+      FrameMargins->12,
+      FrameStyle->RGBColor[0.5725, 0.7390000000000001, 0.649],
+      ImageSize->540,
+      RoundingRadius->6,
+      StripOnInput->False], 
+     FrameBox[
+      TagBox[GridBox[{
+         {
+          StyleBox["\<\"What fine-tuning still cannot know\"\>",
+           StripOnInput->False,
+           LineColor->RGBColor[0.72, 0.18, 0.16],
+           FrontFaceColor->RGBColor[0.72, 0.18, 0.16],
+           BackFaceColor->RGBColor[0.72, 0.18, 0.16],
+           GraphicsColor->RGBColor[0.72, 0.18, 0.16],
+           FontSize->16,
+           FontWeight->Bold,
+           FontColor->RGBColor[0.72, 0.18, 0.16]]},
+         {
+          
+          StyleBox["\<\"Report #37 | Present Ops | Held-out / never seen\"\>",
+           
+           StripOnInput->False,
+           LineColor->GrayLevel[0.35],
+           FrontFaceColor->GrayLevel[0.35],
+           BackFaceColor->GrayLevel[0.35],
+           GraphicsColor->GrayLevel[0.35],
+           FontSize->12,
+           FontColor->GrayLevel[0.35]]},
+         {
+          TagBox[GridBox[{
+             {
+              StyleBox["\<\"Question\"\>",
+               StripOnInput->False,
+               FontWeight->Bold]},
+             {
+              PanelBox[
+               PaneBox[
+                
+                StyleBox["\<\"What are the present operations reported on \
+this well?\"\>",
+                 StripOnInput->False,
+                 LineBreakWithin->True,
+                 FontSize->12],
+                ImageSize->{455, Automatic}]]}
+            },
+            DefaultBaseStyle->"Column",
+            GridBoxAlignment->{"Columns" -> {{Left}}},
+            
+            GridBoxItemSize->{
+             "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+            GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.25}}}],
+           "Column"]},
+         {
+          TagBox[GridBox[{
+             {
+              StyleBox["\<\"Expected\"\>",
+               StripOnInput->False,
+               FontWeight->Bold]},
+             {
+              PanelBox[
+               PaneBox[
+                StyleBox["\<\"RIG UP SCHLUMBERGER PREPARE TO RUN LOGS\"\>",
+                 StripOnInput->False,
+                 LineBreakWithin->True,
+                 FontSize->12],
+                ImageSize->{455, Automatic}]]}
+            },
+            DefaultBaseStyle->"Column",
+            GridBoxAlignment->{"Columns" -> {{Left}}},
+            
+            GridBoxItemSize->{
+             "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+            GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.25}}}],
+           "Column"]},
+         {
+          TemplateBox[{
+            StyleBox["\"Before\"", Bold, StripOnInput -> False], 
+            TemplateBox[{10}, "Spacer1"], 
+            FrameBox[
+             StyleBox["\"MISS\"", Bold, 11, 
+              GrayLevel[1], StripOnInput -> False], Background -> 
+             RGBColor[0.78, 0.2, 0.2], FrameStyle -> None, RoundingRadius -> 
+             4, FrameMargins -> {{8, 8}, {3, 3}}, StripOnInput -> False], 
+            TemplateBox[{8}, "Spacer1"], 
+            TagBox[
+             InterpretationBox[
+              StyleBox["\"0.14\"", ShowStringCharacters -> False], 
+              0.14285714285714285`, AutoDelete -> True], 
+             NumberForm[#, {3, 2}]& ], "\" word overlap\""},
+           "RowDefault"]},
+         {
+          TagBox[GridBox[{
+             {
+              StyleBox["\<\"Why base missed\"\>",
+               StripOnInput->False,
+               FontWeight->Bold]},
+             {
+              PanelBox[
+               PaneBox[
+                
+                StyleBox["\<\"The base prompt only includes the well name, \
+report number, date, and question. It does not include the report field \
+containing the correct answer, so the base model has no source text to \
+extract from.\"\>",
+                 StripOnInput->False,
+                 LineBreakWithin->True,
+                 FontSize->12],
+                ImageSize->{455, Automatic},
+                ScrollPosition->{0., 0.}]]}
+            },
+            DefaultBaseStyle->"Column",
+            GridBoxAlignment->{"Columns" -> {{Left}}},
+            
+            GridBoxItemSize->{
+             "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+            GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.25}}}],
+           "Column"]},
+         {
+          TemplateBox[{
+            StyleBox["\"After\"", Bold, StripOnInput -> False], 
+            TemplateBox[{10}, "Spacer1"], 
+            FrameBox[
+             StyleBox["\"MISS\"", Bold, 11, 
+              GrayLevel[1], StripOnInput -> False], Background -> 
+             RGBColor[0.78, 0.2, 0.2], FrameStyle -> None, RoundingRadius -> 
+             4, FrameMargins -> {{8, 8}, {3, 3}}, StripOnInput -> False], 
+            TemplateBox[{8}, "Spacer1"], 
+            TagBox[
+             InterpretationBox[
+              StyleBox["\"0.00\"", ShowStringCharacters -> False], 0., 
+              AutoDelete -> True], NumberForm[#, {3, 2}]& ], 
+            "\" word overlap\""},
+           "RowDefault"]},
+         {
+          TagBox[GridBox[{
+             {
+              StyleBox["\<\"After answer\"\>",
+               StripOnInput->False,
+               FontWeight->Bold]},
+             {
+              PanelBox[
+               PaneBox[
+                
+                StyleBox["\<\"PIPE FREE, TRIP OUT OF HOLE FOR BHA \
+INSPECTION\"\>",
+                 StripOnInput->False,
+                 LineBreakWithin->True,
+                 FontSize->12],
+                ImageSize->{455, Automatic}]]}
+            },
+            DefaultBaseStyle->"Column",
+            GridBoxAlignment->{"Columns" -> {{Left}}},
+            
+            GridBoxItemSize->{
+             "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+            GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.25}}}],
+           "Column"]},
+         {
+          TagBox[GridBox[{
+             {
+              StyleBox["\<\"Takeaway\"\>",
+               StripOnInput->False,
+               FontWeight->Bold]},
+             {
+              PanelBox[
+               PaneBox[
+                
+                StyleBox["\<\"This report was never seen during training, so \
+the fine-tuned answer remains ungrounded. This is the handoff point to \
+retrieval.\"\>",
+                 StripOnInput->False,
+                 LineBreakWithin->True,
+                 FontSize->12],
+                ImageSize->{455, Automatic},
+                ScrollPosition->{267.98779296875, 0.}]]}
+            },
+            DefaultBaseStyle->"Column",
+            GridBoxAlignment->{"Columns" -> {{Left}}},
+            
+            GridBoxItemSize->{
+             "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+            GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.25}}}],
+           "Column"]}
+        },
+        DefaultBaseStyle->"Column",
+        GridBoxAlignment->{"Columns" -> {{Left}}},
+        GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+        GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.75}}}],
+       "Column"],
+      Background->RGBColor[0.98, 0.98, 0.96],
+      FrameMargins->12,
+      FrameStyle->RGBColor[0.874, 0.6310000000000001, 0.622],
+      ImageSize->540,
+      RoundingRadius->6,
+      StripOnInput->False]}
+   },
+   AutoDelete->False,
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+   GridBoxSpacings->{"Columns" -> {{1.4}}, "Rows" -> {{1}}}],
+  "Grid"]], "Output",
+ CellChangeTimes->{3.9962295952059917`*^9, 3.9962316534878798`*^9, 
+  3.996296225740273*^9},
+ CellLabel->"Out[51]=",ExpressionUUID->"e65e968b-cee1-4419-88a2-d1d56cb8201c"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["6. Answer microscope", "Section",ExpressionUUID->"b469da9d-1386-4326-8889-4e06c9523877"],
+
+Cell["\<\
+Pick any real question. Highlighted words are tokens that also appear in the \
+reference answer. This turns the before/after comparison into something you \
+can read visually: generic explanations, exact copied successes, and \
+confident wrong template reuse look very different.\
+\>", "Text",ExpressionUUID->"7d6bccfe-3cf5-4a13-9f49-1f6a58d6ac51"],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+optionsList = Table[i -> exampleLabel[examplesList[[i]]], {i, \
+Length[examplesList]}];
 
 Manipulate[
   Module[{ex = examplesList[[i]]},
@@ -170,7 +3939,9 @@ Manipulate[
           {Style[\"Question\", Bold, 13], ex[\"instruction\"]},
           {Style[\"Context\", Bold, 13], ex[\"report_context\"]},
           {Style[\"Set\", Bold, 13], groupLabel[ex[\"group\"]]},
-          {Style[\"Outcome\", Bold, 13], Row[{\"Before \", statusCell[ex[\"base_matched\"]], Spacer[12], \"After \", statusCell[ex[\"finetuned_matched\"]]}]}
+          {Style[\"Outcome\", Bold, 13], Row[{\"Before \", \
+statusCell[ex[\"base_matched\"]], Spacer[12], \"After \", \
+statusCell[ex[\"finetuned_matched\"]]}]}
         }, Alignment -> Left, Spacings -> {1.2, .75}],
         Background -> RGBColor[0.97, 0.97, 0.95],
         FrameStyle -> RGBColor[0.82, 0.82, 0.78],
@@ -179,24 +3950,44 @@ Manipulate[
       ],
 
       Style[\"Source report excerpt\", Bold, 14],
-      Panel[Pane[Style[ex[\"snippet\"], FontFamily -> \"Courier\", FontSize -> 12], {680, 145}, Scrollbars -> True]],
+      Panel[Pane[Style[ex[\"snippet\"], FontFamily -> \"Courier\", FontSize \
+-> 12], {680, 145}, Scrollbars -> True]],
 
       Style[\"Reference answer\", Bold, 14],
-      Framed[Style[ex[\"expected\"], 13, RGBColor[0.1, 0.1, 0.1]], Background -> RGBColor[0.94, 0.96, 1.0], FrameStyle -> RGBColor[0.75, 0.80, 0.90], FrameMargins -> 10],
+      Framed[Style[ex[\"expected\"], 13, RGBColor[0.1, 0.1, 0.1]], Background \
+-> RGBColor[0.94, 0.96, 1.0], FrameStyle -> RGBColor[0.75, 0.80, 0.90], \
+FrameMargins -> 10],
+
+      Style[\"Why the base model missed\", Bold, 14],
+      Framed[
+        wrappedText[ex[\"base_miss_explanation\"], 680],
+        Background -> RGBColor[1.0, 0.97, 0.92],
+        FrameStyle -> RGBColor[0.90, 0.72, 0.55],
+        FrameMargins -> 10,
+        RoundingRadius -> 6
+      ],
 
       Grid[
         {
           {
-            Style[\"Base model before fine-tuning\", Bold, RGBColor[0.65, 0.12, 0.12]],
-            Style[\"Fine-tuned model after fine-tuning\", Bold, RGBColor[0.05, 0.40, 0.22]]
+            Style[\"Base model before fine-tuning\", Bold, RGBColor[0.65, \
+0.12, 0.12]],
+            Style[\"Fine-tuned model after fine-tuning\", Bold, \
+RGBColor[0.05, 0.40, 0.22]]
           },
           {
-            Panel[highlightedAnswer[ex[\"base_model_answer\"], ex[\"expected\"]], ImageSize -> 340],
-            Panel[highlightedAnswer[ex[\"finetuned_model_answer\"], ex[\"expected\"]], ImageSize -> 340]
+            Panel[highlightedAnswer[ex[\"base_model_answer\"], \
+ex[\"expected\"]], ImageSize -> 340],
+            Panel[highlightedAnswer[ex[\"finetuned_model_answer\"], \
+ex[\"expected\"]], ImageSize -> 340]
           },
           {
-            Row[{\"Expected-token recall: \", NumberForm[recallValue[ex, \"base\"], {3, 2}], \" | Jaccard: \", NumberForm[overlapValue[ex, \"base\"], {3, 2}]}],
-            Row[{\"Expected-token recall: \", NumberForm[recallValue[ex, \"finetuned\"], {3, 2}], \" | Jaccard: \", NumberForm[overlapValue[ex, \"finetuned\"], {3, 2}]}]
+            Row[{\"Correct-answer word overlap: \", \
+NumberForm[recallValue[ex, \"base\"], {3, 2}], \" | Query cosine: \", \
+NumberForm[querySimilarity[ex, \"query_to_base_answer\"], {3, 2}]}],
+            Row[{\"Correct-answer word overlap: \", \
+NumberForm[recallValue[ex, \"finetuned\"], {3, 2}], \" | Query cosine: \", \
+NumberForm[querySimilarity[ex, \"query_to_finetuned_answer\"], {3, 2}]}]
           }
         },
         Alignment -> Left,
@@ -207,25 +3998,181 @@ Manipulate[
   ],
   {{i, 1, \"Pick a real question\"}, optionsList},
   ControlPlacement -> Top
-]", "Input"]
+]\
+\>", "Input",
+ CellOpen->False,
+ CellLabel->"In[52]:=",ExpressionUUID->"f9fd1d85-0dd9-4620-9377-d2883cfa4907"],
 
-}, Open]],
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`i$$ = 1, Typeset`show$$ = True, 
+    Typeset`bookmarkList$$ = {}, Typeset`bookmarkMode$$ = "Menu", 
+    Typeset`animator$$, Typeset`animvar$$ = 1, Typeset`name$$ = 
+    "\"untitled\"", Typeset`specs$$ = {{{
+       Hold[$CellContext`i$$], 1, "Pick a real question"}, {
+      1 -> "Report #3 | Present Ops | Training / seen", 2 -> 
+       "Report #3 | Activity Planned | Training / seen", 3 -> 
+       "Report #19 | Present Ops | Training / seen", 4 -> 
+       "Report #19 | Activity Planned | Training / seen", 5 -> 
+       "Report #36 | Present Ops | Training / seen", 6 -> 
+       "Report #36 | Activity Planned | Training / seen", 7 -> 
+       "Report #38 | Present Ops | Training / seen", 8 -> 
+       "Report #38 | Activity Planned | Training / seen", 9 -> 
+       "Report #39 | Present Ops | Training / seen", 10 -> 
+       "Report #39 | Activity Planned | Training / seen", 11 -> 
+       "Report #48 | Present Ops | Training / seen", 12 -> 
+       "Report #48 | Activity Planned | Training / seen", 13 -> 
+       "Report #49 | Present Ops | Training / seen", 14 -> 
+       "Report #49 | Activity Planned | Training / seen", 15 -> 
+       "Report #50 | Present Ops | Training / seen", 16 -> 
+       "Report #50 | Activity Planned | Training / seen", 17 -> 
+       "Report #37 | Present Ops | Held-out / never seen", 18 -> 
+       "Report #37 | Activity Planned | Held-out / never seen"}, ControlType -> 
+      PopupMenu}}, Typeset`size$$ = {
+    868.4050781249999, {332.1998101077825, 337.9317437015325}}, 
+    Typeset`update$$ = 0, Typeset`initDone$$, Typeset`skipInitDone$$ = True, 
+    Typeset`keyframeActionsQ$$ = False, Typeset`keyframeList$$ = {}}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, "Variables" :> {$CellContext`i$$ = 1}, 
+      "ControllerVariables" :> {}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$, Typeset`keyframeActionsQ$$, 
+        Typeset`keyframeList$$}, "Body" :> 
+      Module[{$CellContext`ex = 
+         Part[$CellContext`examplesList, $CellContext`i$$]}, 
+        Column[{
+          Framed[
+           Grid[{{
+              Style["Question", Bold, 13], 
+              $CellContext`ex["instruction"]}, {
+              Style["Context", Bold, 13], 
+              $CellContext`ex["report_context"]}, {
+              Style["Set", Bold, 13], 
+              $CellContext`groupLabel[
+               $CellContext`ex["group"]]}, {
+              Style["Outcome", Bold, 13], 
+              Row[{"Before ", 
+                $CellContext`statusCell[
+                 $CellContext`ex["base_matched"]], 
+                Spacer[12], "After ", 
+                $CellContext`statusCell[
+                 $CellContext`ex["finetuned_matched"]]}]}}, Alignment -> Left,
+             Spacings -> {1.2, 0.75}], Background -> 
+           RGBColor[0.97, 0.97, 0.95], FrameStyle -> 
+           RGBColor[0.82, 0.82, 0.78], RoundingRadius -> 6, FrameMargins -> 
+           12], 
+          Style["Source report excerpt", Bold, 14], 
+          Panel[
+           Pane[
+            Style[
+             $CellContext`ex["snippet"], FontFamily -> "Courier", FontSize -> 
+             12], {680, 145}, Scrollbars -> True]], 
+          Style["Reference answer", Bold, 14], 
+          Framed[
+           Style[
+            $CellContext`ex["expected"], 13, 
+            RGBColor[0.1, 0.1, 0.1]], Background -> RGBColor[0.94, 0.96, 1.], 
+           FrameStyle -> RGBColor[0.75, 0.8, 0.9], FrameMargins -> 10], 
+          Style["Why the base model missed", Bold, 14], 
+          Framed[
+           $CellContext`wrappedText[
+            $CellContext`ex["base_miss_explanation"], 680], Background -> 
+           RGBColor[1., 0.97, 0.92], FrameStyle -> RGBColor[0.9, 0.72, 0.55], 
+           FrameMargins -> 10, RoundingRadius -> 6], 
+          Grid[{{
+             Style["Base model before fine-tuning", Bold, 
+              RGBColor[0.65, 0.12, 0.12]], 
+             Style["Fine-tuned model after fine-tuning", Bold, 
+              RGBColor[0.05, 0.4, 0.22]]}, {
+             Panel[
+              $CellContext`highlightedAnswer[
+               $CellContext`ex["base_model_answer"], 
+               $CellContext`ex["expected"]], ImageSize -> 340], 
+             Panel[
+              $CellContext`highlightedAnswer[
+               $CellContext`ex["finetuned_model_answer"], 
+               $CellContext`ex["expected"]], ImageSize -> 340]}, {
+             Row[{"Correct-answer word overlap: ", 
+               NumberForm[
+                $CellContext`recallValue[$CellContext`ex, "base"], {3, 2}], 
+               " | Query cosine: ", 
+               NumberForm[
+                $CellContext`querySimilarity[$CellContext`ex, 
+                 "query_to_base_answer"], {3, 2}]}], 
+             Row[{"Correct-answer word overlap: ", 
+               NumberForm[
+                $CellContext`recallValue[$CellContext`ex, "finetuned"], {3, 
+                2}], " | Query cosine: ", 
+               NumberForm[
+                $CellContext`querySimilarity[$CellContext`ex, 
+                 "query_to_finetuned_answer"], {3, 2}]}]}}, Alignment -> Left,
+            Spacings -> {2, 1}, Dividers -> Center]}, Spacings -> 1.2]], 
+      "Specifications" :> {{{$CellContext`i$$, 1, "Pick a real question"}, {
+         1 -> "Report #3 | Present Ops | Training / seen", 2 -> 
+          "Report #3 | Activity Planned | Training / seen", 3 -> 
+          "Report #19 | Present Ops | Training / seen", 4 -> 
+          "Report #19 | Activity Planned | Training / seen", 5 -> 
+          "Report #36 | Present Ops | Training / seen", 6 -> 
+          "Report #36 | Activity Planned | Training / seen", 7 -> 
+          "Report #38 | Present Ops | Training / seen", 8 -> 
+          "Report #38 | Activity Planned | Training / seen", 9 -> 
+          "Report #39 | Present Ops | Training / seen", 10 -> 
+          "Report #39 | Activity Planned | Training / seen", 11 -> 
+          "Report #48 | Present Ops | Training / seen", 12 -> 
+          "Report #48 | Activity Planned | Training / seen", 13 -> 
+          "Report #49 | Present Ops | Training / seen", 14 -> 
+          "Report #49 | Activity Planned | Training / seen", 15 -> 
+          "Report #50 | Present Ops | Training / seen", 16 -> 
+          "Report #50 | Activity Planned | Training / seen", 17 -> 
+          "Report #37 | Present Ops | Held-out / never seen", 18 -> 
+          "Report #37 | Activity Planned | Held-out / never seen"}}}, 
+      "Options" :> {ControlPlacement -> Top}, "DefaultOptions" :> {}],
+     ImageSizeCache->{
+      917.505078125, {379.93941846264903`, 385.67135205639903`}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UndoTrackedVariables:>{Typeset`show$$, Typeset`bookmarkMode$$},
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{3.9962295952133512`*^9, 3.996231653493642*^9, 
+  3.9962962257516336`*^9},
+ CellLabel->"Out[54]=",ExpressionUUID->"c50ba556-3cf5-4bc9-ba6f-ba07ae55c0c5"]
+}, Open  ]]
+}, Open  ]],
 
 Cell[CellGroupData[{
 
-Cell["5. Failure patterns", "Section"],
+Cell["7. Failure patterns", "Section",ExpressionUUID->"8fe712fd-5a27-493b-a092-8025fe6da5ba"],
 
-Cell["The failures after fine-tuning are the most important teaching examples. They show that the fine-tuned model can sound more domain-specific while still pulling the wrong remembered pattern into a new report context.", "Text"],
+Cell["\<\
+The failures after fine-tuning are the most important teaching examples. They \
+show that the fine-tuned model can sound more domain-specific while still \
+pulling the wrong remembered pattern into a new report context.\
+\>", "Text",ExpressionUUID->"c2d3ff35-9aaf-4e5c-9521-ba88ce3349d9"],
 
-Cell["failedAfter = Select[examplesList, ! TrueQ[#[\"finetuned_matched\"]] &];
-failureOptions = Table[i -> exampleLabel[failedAfter[[i]]] <> \" | \" <> failedAfter[[i]][\"failure_category\"], {i, Length[failedAfter]}];
+Cell[CellGroupData[{
+
+Cell["\<\
+failedAfter = Select[examplesList, ! TrueQ[#[\"finetuned_matched\"]] &];
+failureOptions = Table[i -> exampleLabel[failedAfter[[i]]] <> \" | \" <> \
+failedAfter[[i]][\"failure_category\"], {i, Length[failedAfter]}];
 
 Manipulate[
   Module[{ex = failedAfter[[i]]},
     Column[{
       Framed[
         Column[{
-          Style[ex[\"failure_category\"], 16, Bold, RGBColor[0.65, 0.15, 0.12]],
+          Style[ex[\"failure_category\"], 16, Bold, RGBColor[0.65, 0.15, \
+0.12]],
           Style[exampleLabel[ex], 12, GrayLevel[0.25]]
         }],
         Background -> RGBColor[1.0, 0.95, 0.92],
@@ -235,11 +4182,17 @@ Manipulate[
       ],
       Grid[
         {
-          {Style[\"Expected from report\", Bold], Panel[Pane[ex[\"expected\"], {620, Automatic}]]},
-          {Style[\"Fine-tuned answer\", Bold], Panel[Pane[highlightedAnswer[ex[\"finetuned_model_answer\"], ex[\"expected\"]], {620, Automatic}]]},
-          {Style[\"What to notice\", Bold], If[ex[\"group\"] === \"held_out\",
-              \"The model never saw this report during training. Fine-tuning alone did not give it factual access to the held-out report.\",
-              \"The answer is now domain-shaped, but it is the wrong report pattern. This is more convincing than the base model, and therefore more dangerous.\"
+          {Style[\"Expected from report\", Bold], \
+Panel[wrappedText[ex[\"expected\"], 620]]},
+          {Style[\"Fine-tuned answer\", Bold], \
+Panel[highlightedAnswer[ex[\"finetuned_model_answer\"], ex[\"expected\"]]]},
+          {Style[\"What to notice\", Bold], If[ex[\"group\"] === \
+\"held_out\",
+              \"The model never saw this report during training. Fine-tuning \
+alone did not give it factual access to the held-out report.\",
+              \"The answer is now domain-shaped, but it is the wrong report \
+pattern. This is more convincing than the base model, and therefore more \
+dangerous.\"
             ]}
         },
         Alignment -> Left,
@@ -249,21 +4202,260 @@ Manipulate[
   ],
   {{i, 1, \"Post-fine-tune failure\"}, failureOptions},
   ControlPlacement -> Top
-]", "Input"]
+]\
+\>", "Input",
+ CellOpen->False,
+ CellLabel->"In[55]:=",ExpressionUUID->"bb286efb-c9ce-4021-8bcf-099cd249661c"],
 
-}, Open]],
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`i$$ = 1, Typeset`show$$ = True, 
+    Typeset`bookmarkList$$ = {}, Typeset`bookmarkMode$$ = "Menu", 
+    Typeset`animator$$, Typeset`animvar$$ = 1, Typeset`name$$ = 
+    "\"untitled\"", Typeset`specs$$ = {{{
+       Hold[$CellContext`i$$], 1, "Post-fine-tune failure"}, {
+      1 -> "Report #3 | Activity Planned | Training / seen | Partial wording \
+overlap, wrong answer", 2 -> 
+       "Report #36 | Present Ops | Training / seen | Wrong memorized pattern",
+        3 -> "Report #48 | Present Ops | Training / seen | Wrong memorized \
+pattern", 4 -> 
+       "Report #37 | Present Ops | Held-out / never seen | Held-out \
+generalization gap", 5 -> 
+       "Report #37 | Activity Planned | Held-out / never seen | Held-out \
+generalization gap"}, ControlType -> SetterBar}}, Typeset`size$$ = {
+    1287.0012695312496`, {83.2004384765625, 88.9323720703125}}, 
+    Typeset`update$$ = 0, Typeset`initDone$$, Typeset`skipInitDone$$ = True, 
+    Typeset`keyframeActionsQ$$ = False, Typeset`keyframeList$$ = {}}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, "Variables" :> {$CellContext`i$$ = 1}, 
+      "ControllerVariables" :> {}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$, Typeset`keyframeActionsQ$$, 
+        Typeset`keyframeList$$}, "Body" :> 
+      Module[{$CellContext`ex = 
+         Part[$CellContext`failedAfter, $CellContext`i$$]}, 
+        Column[{
+          Framed[
+           Column[{
+             Style[
+              $CellContext`ex["failure_category"], 16, Bold, 
+              RGBColor[0.65, 0.15, 0.12]], 
+             Style[
+              $CellContext`exampleLabel[$CellContext`ex], 12, 
+              GrayLevel[0.25]]}], Background -> RGBColor[1., 0.95, 0.92], 
+           FrameStyle -> RGBColor[0.9, 0.68, 0.6], FrameMargins -> 12, 
+           RoundingRadius -> 6], 
+          Grid[{{
+             Style["Expected from report", Bold], 
+             Panel[
+              $CellContext`wrappedText[
+               $CellContext`ex["expected"], 620]]}, {
+             Style["Fine-tuned answer", Bold], 
+             Panel[
+              $CellContext`highlightedAnswer[
+               $CellContext`ex["finetuned_model_answer"], 
+               $CellContext`ex["expected"]]]}, {
+             Style["What to notice", Bold], 
+             
+             If[$CellContext`ex["group"] === "held_out", 
+              "The model never saw this report during training. Fine-tuning \
+alone did not give it factual access to the held-out report.", 
+              "The answer is now domain-shaped, but it is the wrong report \
+pattern. This is more convincing than the base model, and therefore more \
+dangerous."]}}, Alignment -> Left, Spacings -> {1.2, 1}]}, Spacings -> 1.2]], 
+      "Specifications" :> {{{$CellContext`i$$, 1, "Post-fine-tune failure"}, {
+         1 -> "Report #3 | Activity Planned | Training / seen | Partial \
+wording overlap, wrong answer", 2 -> 
+          "Report #36 | Present Ops | Training / seen | Wrong memorized \
+pattern", 3 -> 
+          "Report #48 | Present Ops | Training / seen | Wrong memorized \
+pattern", 4 -> 
+          "Report #37 | Present Ops | Held-out / never seen | Held-out \
+generalization gap", 5 -> 
+          "Report #37 | Activity Planned | Held-out / never seen | Held-out \
+generalization gap"}}}, "Options" :> {ControlPlacement -> Top}, 
+      "DefaultOptions" :> {}],
+     ImageSizeCache->{
+      1931.5124999999998`, {131.17075972205402`, 136.90269331580402`}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UndoTrackedVariables:>{Typeset`show$$, Typeset`bookmarkMode$$},
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{3.996229595239431*^9, 3.996231653516032*^9, 
+  3.996296225778811*^9},
+ CellLabel->"Out[58]=",ExpressionUUID->"af61b2a2-f178-46bf-80a1-45607c2928d6"]
+}, Open  ]]
+}, Open  ]],
 
 Cell[CellGroupData[{
 
-Cell["6. Why retrieval comes next", "Section"],
+Cell["8. Optional advanced: semantic embeddings", "Section",ExpressionUUID->"6ff91c84-4277-4abf-95c9-4179b62f6b78"],
 
-Cell["This Chapter 5 notebook deliberately stops at fine-tuning, but the visual result points toward Chapter 9: when the report was never in training, the model needs a retrieval step to find the relevant source text before answering.", "Text"],
+Cell["\<\
+This optional section uses a sentence-embedding model to compare meanings \
+rather than exact words. It is useful for spotting answers that are \
+conceptually close to the reference even when exact-match says MISS. It is \
+still not a factual correctness score: an answer can be semantically \
+oilfield-like and still refer to the wrong report.\
+\>", "Text",ExpressionUUID->"3d048a81-a069-4080-a2f6-f171313038e0"],
 
-Cell["heldOutPanel = Framed[
+Cell[CellGroupData[{
+
+Cell["\<\
+semanticPath = FileNameJoin[{NotebookDirectory[], \"data\", \
+\"semantic_embedding_examples.json\"}];
+
+If[! FileExistsQ[semanticPath],
+  Framed[
+    Column[{
+      Style[\"Optional semantic embedding data not found\", 15, Bold],
+      \"Run this from the repository root to generate it:\",
+      Style[\"python mathematica/export_semantic_embeddings.py\", FontFamily \
+-> \"Courier\", 12],
+      \"The first run may download the sentence-transformer model used in \
+Chapter 4.\"
+    }, Spacings -> .7],
+    Background -> RGBColor[1.0, 0.98, 0.92],
+    FrameStyle -> RGBColor[0.86, 0.72, 0.45],
+    FrameMargins -> 14,
+    RoundingRadius -> 6
+  ],
+
+  semanticData = Import[semanticPath, \"RawJSON\"];
+  semanticExamples = semanticData[\"examples\"];
+  semanticPoints = semanticData[\"points_2d\"];
+
   Column[{
-    Style[\"Held-out report #37 remains unsolved by fine-tuning alone\", 15, Bold],
-    \"Fine-tuning changed the model's style and made many seen examples exact. It did not make unseen report facts available inside the weights.\",
-    \"Next visual extension: add a third answer lane for Fine-tuned + retrieval, with the retrieved source chunk shown beside the generated answer.\"
+    Framed[
+      Column[{
+        Style[\"Semantic model\", 14, Bold],
+        semanticData[\"model\"],
+        Style[semanticData[\"note\"], 11, GrayLevel[0.35]]
+      }, Spacings -> .5],
+      Background -> RGBColor[0.95, 0.97, 1.0],
+      FrameStyle -> RGBColor[0.70, 0.78, 0.90],
+      FrameMargins -> 12,
+      RoundingRadius -> 6
+    ],
+
+    Grid[
+      Prepend[
+        Table[
+          {
+            Style[\"#\" <> ToString[row[\"row\"]], GrayLevel[0.35]],
+            row[\"label\"],
+            NumberForm[row[\"semantic_similarity\"][\"base_answer_to_\
+reference\"], {3, 2}],
+            NumberForm[row[\"semantic_similarity\"][\"finetuned_answer_to_\
+reference\"], {3, 2}],
+            If[row[\"semantic_similarity\"][\"finetuned_answer_to_reference\"]\
+ > row[\"semantic_similarity\"][\"base_answer_to_reference\"],
+              Style[\"Fine-tuned closer\", RGBColor[0.05, 0.40, 0.22]],
+              Style[\"Base closer\", RGBColor[0.65, 0.12, 0.12]]
+            ]
+          },
+          {row, semanticExamples}
+        ],
+        {Style[\"Row\", Bold], Style[\"Example\", Bold], Style[\"Base vs \
+reference\", Bold], Style[\"Fine-tuned vs reference\", Bold], Style[\"Reading\
+\", Bold]}
+      ],
+      Alignment -> Left,
+      Dividers -> {None, {True, True}},
+      Spacings -> {1.1, .7},
+      Background -> {None, {RGBColor[0.92, 0.92, 0.88], None}}
+    ],
+
+    ListPlot[
+      Table[
+        Tooltip[
+          {point[\"x\"], point[\"y\"]},
+          point[\"label\"]
+        ],
+        {point, semanticPoints}
+      ],
+      PlotStyle -> GrayLevel[0.25],
+      Frame -> True,
+      FrameLabel -> {\"Embedding projection 1\", \"Embedding projection 2\"},
+      PlotLabel -> \"2D projection of queries, references, and model answers\",
+      ImageSize -> 640
+    ]
+  }, Spacings -> 1.2]
+]\
+\>", "Input",
+ CellOpen->False,
+ CellLabel->"In[59]:=",ExpressionUUID->"dc131e35-606e-452e-ad5b-b9b7c446b2c1"],
+
+Cell[BoxData[
+ FrameBox[
+  TagBox[GridBox[{
+     {
+      StyleBox["\<\"Optional semantic embedding data not found\"\>",
+       StripOnInput->False,
+       FontSize->15,
+       FontWeight->Bold]},
+     {"\<\"Run this from the repository root to generate it:\"\>"},
+     {
+      StyleBox["\<\"python mathematica/export_semantic_embeddings.py\"\>",
+       StripOnInput->False,
+       FontFamily->"Courier",
+       FontSize->12]},
+     {"\<\"The first run may download the sentence-transformer model used in \
+Chapter 4.\"\>"}
+    },
+    DefaultBaseStyle->"Column",
+    GridBoxAlignment->{"Columns" -> {{Left}}},
+    GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+    GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.7}}}],
+   "Column"],
+  Background->RGBColor[1., 0.98, 0.92],
+  FrameMargins->14,
+  FrameStyle->RGBColor[0.86, 0.72, 0.45],
+  RoundingRadius->6,
+  StripOnInput->False]], "Output",
+ CellChangeTimes->{3.9962316535353127`*^9, 3.996296225802936*^9},
+ CellLabel->"Out[61]=",ExpressionUUID->"9d458e17-47d8-4960-b5de-ba3d4f676bcd"]
+}, Open  ]],
+
+Cell["\<\
+
+Null\
+\>", "Input",
+ CellLabel->"In[62]:=",ExpressionUUID->"1a38eec0-33a0-4aa2-b7ad-9b5bd709aef6"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["9. Why retrieval comes next", "Section",ExpressionUUID->"4514e68f-d5d4-4660-a55d-662abf0978b8"],
+
+Cell["\<\
+This Chapter 5 notebook deliberately stops at fine-tuning, but the visual \
+result points toward Chapter 9: when the report was never in training, the \
+model needs a retrieval step to find the relevant source text before \
+answering.\
+\>", "Text",ExpressionUUID->"5284367a-0894-463a-8fda-59fd445c44f4"],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+heldOutPanel = Framed[
+  Column[{
+    Style[\"Held-out report #37 remains unsolved by fine-tuning alone\", 15, \
+Bold],
+    \"Fine-tuning changed the model's style and made many seen examples \
+exact. It did not make unseen report facts available inside the weights.\",
+    \"Next visual extension: add a third answer lane for Fine-tuned + \
+retrieval, with the retrieved source chunk shown beside the generated answer.\"
   }, Spacings -> .8],
   Background -> RGBColor[0.95, 0.97, 1.0],
   FrameStyle -> RGBColor[0.70, 0.78, 0.90],
@@ -286,7 +4478,9 @@ If[Length[heldOutExamples] > 0,
           },
           {ex, heldOutExamples}
         ],
-        {Style[\"Report\", Bold], Style[\"Question\", Bold], Style[\"Fine-tuned\", Bold], Style[\"Reference\", Bold], Style[\"Fine-tuned answer\", Bold]}
+        {Style[\"Report\", Bold], Style[\"Question\", Bold], \
+Style[\"Fine-tuned\", Bold], Style[\"Reference\", Bold], Style[\"Fine-tuned \
+answer\", Bold]}
       ],
       Alignment -> Left,
       Spacings -> {1.2, .8},
@@ -294,10 +4488,256 @@ If[Length[heldOutExamples] > 0,
     ]
   }, Spacings -> 1.2],
   heldOutPanel
-]", "Input"]
+]\
+\>", "Input",
+ CellOpen->False,
+ CellLabel->"In[64]:=",ExpressionUUID->"e57d9823-b88a-437b-bd3f-8cacd8e68f4b"],
 
-}, Open]],
+Cell[BoxData[
+ TagBox[GridBox[{
+    {
+     FrameBox[
+      TagBox[GridBox[{
+         {
+          
+          StyleBox["\<\"Held-out report #37 remains unsolved by fine-tuning \
+alone\"\>",
+           StripOnInput->False,
+           FontSize->15,
+           FontWeight->Bold]},
+         {"\<\"Fine-tuning changed the model's style and made many seen \
+examples exact. It did not make unseen report facts available inside the \
+weights.\"\>"},
+         {"\<\"Next visual extension: add a third answer lane for Fine-tuned \
++ retrieval, with the retrieved source chunk shown beside the generated \
+answer.\"\>"}
+        },
+        DefaultBaseStyle->"Column",
+        GridBoxAlignment->{"Columns" -> {{Left}}},
+        GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+        GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{0.8}}}],
+       "Column"],
+      Background->RGBColor[0.95, 0.97, 1.],
+      FrameMargins->14,
+      FrameStyle->RGBColor[0.7, 0.78, 0.9],
+      RoundingRadius->6,
+      StripOnInput->False]},
+    {
+     TagBox[GridBox[{
+        {
+         StyleBox["\<\"Report\"\>",
+          StripOnInput->False,
+          FontWeight->Bold], 
+         StyleBox["\<\"Question\"\>",
+          StripOnInput->False,
+          FontWeight->Bold], 
+         StyleBox["\<\"Fine-tuned\"\>",
+          StripOnInput->False,
+          FontWeight->Bold], 
+         StyleBox["\<\"Reference\"\>",
+          StripOnInput->False,
+          FontWeight->Bold], 
+         StyleBox["\<\"Fine-tuned answer\"\>",
+          StripOnInput->False,
+          FontWeight->Bold]},
+        {"\<\"Report #37\"\>", "\<\"Present Ops\"\>", 
+         FrameBox[
+          StyleBox["\<\"MISS\"\>",
+           StripOnInput->False,
+           LineColor->GrayLevel[1],
+           FrontFaceColor->GrayLevel[1],
+           BackFaceColor->GrayLevel[1],
+           GraphicsColor->GrayLevel[1],
+           FontSize->11,
+           FontWeight->Bold,
+           FontColor->GrayLevel[1]],
+          Background->RGBColor[0.78, 0.2, 0.2],
+          FrameMargins->{{8, 8}, {3, 3}},
+          FrameStyle->None,
+          RoundingRadius->4,
+          
+          StripOnInput->
+           False], "\<\"RIG UP SCHLUMBERGER PREPARE TO RUN LOGS\"\>", \
+"\<\"PIPE FREE, TRIP OUT OF HOLE FOR BHA INSPECTION\"\>"},
+        {"\<\"Report #37\"\>", "\<\"Activity Planned\"\>", 
+         FrameBox[
+          StyleBox["\<\"MISS\"\>",
+           StripOnInput->False,
+           LineColor->GrayLevel[1],
+           FrontFaceColor->GrayLevel[1],
+           BackFaceColor->GrayLevel[1],
+           GraphicsColor->GrayLevel[1],
+           FontSize->11,
+           FontWeight->Bold,
+           FontColor->GrayLevel[1]],
+          Background->RGBColor[0.78, 0.2, 0.2],
+          FrameMargins->{{8, 8}, {3, 3}},
+          FrameStyle->None,
+          RoundingRadius->4,
+          
+          StripOnInput->
+           False], "\<\"RUN UBI LOG, PICK UP BHA # 2, DRILL 8 3/4\\\" Curve\"\
+\>", "\<\"CONTINUE BUILDING CURVE TO 65\[Degree]\"\>"}
+       },
+       AutoDelete->False,
+       GridBoxAlignment->{"Columns" -> {{Left}}},
+       GridBoxDividers->{"Columns" -> {{None}}, "Rows" -> {True, True}},
+       GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+       
+       GridBoxSpacings->{"Columns" -> {{1.2}}, "Rows" -> {{0.8}}}],
+      "Grid"]}
+   },
+   DefaultBaseStyle->"Column",
+   GridBoxAlignment->{"Columns" -> {{Left}}},
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}},
+   GridBoxSpacings->{"Columns" -> {{Automatic}}, "Rows" -> {{1.2}}}],
+  "Column"]], "Output",
+ CellChangeTimes->{3.996229595257002*^9, 3.9962316535440083`*^9, 
+  3.9962962258133507`*^9},
+ CellLabel->"Out[66]=",ExpressionUUID->"cc30ef1b-9bf9-4f2b-afac-da2f2c9d1976"]
+}, Open  ]],
 
-Cell["To regenerate this data yourself -- for example after retraining Chapter 5's checkpoint, or against your own reports -- run \"python mathematica/export_before_after.py\" from the repository root, with book/.venv active. See mathematica/README.md for details and prerequisites.", "Text"]
+Cell["\<\
+To regenerate this data yourself -- for example after retraining Chapter 5's \
+checkpoint, or against your own reports -- run \"python \
+mathematica/export_before_after.py\" from the repository root, with \
+book/.venv active. See mathematica/README.md for details and prerequisites.\
+\>", "Text",ExpressionUUID->"76eb3bd7-7af9-49c3-b756-3a267f79b04b"]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{4, Automatic}, {Automatic, 4}},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+FrontEndVersion->"15.0 for Mac OS X ARM (64-bit) (July 2, 2026)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"192b0d06-81bd-4899-892d-da67387cac8e"
+]
+(* End of Notebook Content *)
 
-}]
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[576, 22, 105, 0, 96, "Title",ExpressionUUID->"68a98443-264e-4a87-9331-86bbf92efd8e"],
+Cell[684, 24, 153, 2, 52, "Subtitle",ExpressionUUID->"d33cfbd7-d95d-46cb-b592-e84a4e4a3ab9"],
+Cell[840, 28, 442, 6, 55, "Text",ExpressionUUID->"29c92242-f1bd-467c-9327-7664950f20be"],
+Cell[CellGroupData[{
+Cell[1307, 38, 584, 13, 19, "Input",ExpressionUUID->"28b39ccc-f66f-4065-bddd-2a19fb75cba5",
+ CellOpen->False],
+Cell[1894, 53, 1032, 27, 106, "Output",ExpressionUUID->"744ee392-9598-4df7-bdf6-3c0f087ff6c5"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2963, 85, 104, 0, 66, "Section",ExpressionUUID->"ef53bd31-1933-4fe8-8104-29078802d099"],
+Cell[CellGroupData[{
+Cell[3092, 89, 461, 10, 19, "Input",ExpressionUUID->"097ac3a6-fccf-4137-bf38-207d33fce9f0",
+ CellOpen->False],
+Cell[3556, 101, 198, 3, 33, "Output",ExpressionUUID->"729f1e26-122c-4d0e-b43f-5505fd695414"]
+}, Open  ]],
+Cell[3769, 107, 122, 0, 33, "Text",ExpressionUUID->"5651f3e1-59ee-45e8-865c-34423b6e6370"],
+Cell[3894, 109, 2571, 70, 19, "Input",ExpressionUUID->"cc0fc931-ebb8-4d04-b139-c3e3345b49e6",
+ CellOpen->False]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6502, 184, 106, 0, 66, "Section",ExpressionUUID->"3ec1dc07-6d50-41b5-ae28-e471f3b71f88"],
+Cell[6611, 186, 348, 5, 55, "Text",ExpressionUUID->"eec4b619-cad4-4b2f-abc2-1c696e8af26a"],
+Cell[CellGroupData[{
+Cell[6984, 195, 910, 20, 19, "Input",ExpressionUUID->"331c8a62-c602-41a1-bbc9-14620e59469d",
+ CellOpen->False],
+Cell[7897, 217, 6604, 178, 111, "Output",ExpressionUUID->"44048b88-1e0e-4955-9729-67dbbd43a63d"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[14538, 400, 677, 17, 19, "Input",ExpressionUUID->"4430c409-38f9-4a7c-bbd0-f49f6a6adce4",
+ CellOpen->False],
+Cell[15218, 419, 6748, 175, 421, "Output",ExpressionUUID->"0220f069-e26c-448e-98cd-f5d7d582516e"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[22015, 600, 111, 0, 66, "Section",ExpressionUUID->"a62570d6-dfff-423b-9fd0-a40508769838"],
+Cell[22129, 602, 395, 6, 55, "Text",ExpressionUUID->"f75e989b-e815-4c8d-a83d-f77bffd53bd7"],
+Cell[CellGroupData[{
+Cell[22549, 612, 1187, 29, 19, "Input",ExpressionUUID->"98717170-de84-4a62-9f0d-c27435851e58",
+ CellOpen->False],
+Cell[23739, 643, 36197, 1175, 591, "Output",ExpressionUUID->"8dd3f25a-3771-4522-af52-fde089ce2e56"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[59973, 1823, 1041, 27, 19, "Input",ExpressionUUID->"380900c3-4b1e-4991-ac8a-a5397b23545b",
+ CellOpen->False],
+Cell[61017, 1852, 24613, 617, 436, "Output",ExpressionUUID->"e34d6a85-67e7-4d0d-a7de-cbc25157f615"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[85679, 2475, 110, 0, 66, "Section",ExpressionUUID->"71f1c4e5-4c7a-4fcb-95f5-d45ca33b971a"],
+Cell[85792, 2477, 367, 5, 55, "Text",ExpressionUUID->"7edede50-a9cf-4d38-bc99-b896d45d4678"],
+Cell[CellGroupData[{
+Cell[86184, 2486, 1171, 35, 19, "Input",ExpressionUUID->"511d2d04-bf89-42c0-8a92-780f1cbd8ae7",
+ CellOpen->False],
+Cell[87358, 2523, 22699, 753, 413, "Output",ExpressionUUID->"5ee472fa-7f92-4856-be39-84af62ae5168"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[110094, 3281, 1675, 49, 19, "Input",ExpressionUUID->"196c0729-df46-479e-97bc-58845bc941ce",
+ CellOpen->False],
+Cell[111772, 3332, 5916, 108, 666, "Output",ExpressionUUID->"1c85246f-ffaa-40fb-bdba-7f3a36ad146f"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[117737, 3446, 112, 0, 66, "Section",ExpressionUUID->"1975451f-b26f-4732-bbb7-9aa891e409e7"],
+Cell[117852, 3448, 313, 4, 55, "Text",ExpressionUUID->"5aa1f793-f07a-486c-b85f-ddf13195d3e3"],
+Cell[CellGroupData[{
+Cell[118190, 3456, 2120, 61, 19, "Input",ExpressionUUID->"2f4104a9-4d4c-413e-a1cc-22519c5b7b10",
+ CellOpen->False],
+Cell[120313, 3519, 14981, 393, 419, "Output",ExpressionUUID->"e65e968b-cee1-4419-88a2-d1d56cb8201c"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[135343, 3918, 94, 0, 66, "Section",ExpressionUUID->"b469da9d-1386-4326-8889-4e06c9523877"],
+Cell[135440, 3920, 358, 5, 55, "Text",ExpressionUUID->"7d6bccfe-3cf5-4a13-9f49-1f6a58d6ac51"],
+Cell[CellGroupData[{
+Cell[135823, 3929, 2657, 74, 19, "Input",ExpressionUUID->"f9fd1d85-0dd9-4620-9377-d2883cfa4907",
+ CellOpen->False],
+Cell[138483, 4005, 7410, 142, 782, "Output",ExpressionUUID->"c50ba556-3cf5-4bc9-ba6f-ba07ae55c0c5"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[145942, 4153, 93, 0, 66, "Section",ExpressionUUID->"8fe712fd-5a27-493b-a092-8025fe6da5ba"],
+Cell[146038, 4155, 298, 4, 33, "Text",ExpressionUUID->"c2d3ff35-9aaf-4e5c-9521-ba88ce3349d9"],
+Cell[CellGroupData[{
+Cell[146361, 4163, 1578, 44, 19, "Input",ExpressionUUID->"bb286efb-c9ce-4021-8bcf-099cd249661c",
+ CellOpen->False],
+Cell[147942, 4209, 4292, 86, 285, "Output",ExpressionUUID->"af61b2a2-f178-46bf-80a1-45607c2928d6"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[152283, 4301, 115, 0, 66, "Section",ExpressionUUID->"6ff91c84-4277-4abf-95c9-4179b62f6b78"],
+Cell[152401, 4303, 423, 6, 55, "Text",ExpressionUUID->"3d048a81-a069-4080-a2f6-f171313038e0"],
+Cell[CellGroupData[{
+Cell[152849, 4313, 2739, 83, 19, "Input",ExpressionUUID->"dc131e35-606e-452e-ad5b-b9b7c446b2c1",
+ CellOpen->False],
+Cell[155591, 4398, 1072, 28, 125, "Output",ExpressionUUID->"9d458e17-47d8-4960-b5de-ba3d4f676bcd"]
+}, Open  ]],
+Cell[156678, 4429, 109, 4, 46, "Input",ExpressionUUID->"1a38eec0-33a0-4aa2-b7ad-9b5bd709aef6"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[156824, 4438, 101, 0, 66, "Section",ExpressionUUID->"4514e68f-d5d4-4660-a55d-662abf0978b8"],
+Cell[156928, 4440, 313, 5, 55, "Text",ExpressionUUID->"5284367a-0894-463a-8fda-59fd445c44f4"],
+Cell[CellGroupData[{
+Cell[157266, 4449, 1419, 44, 19, "Input",ExpressionUUID->"e57d9823-b88a-437b-bd3f-8cacd8e68f4b",
+ CellOpen->False],
+Cell[158688, 4495, 3754, 101, 205, "Output",ExpressionUUID->"cc30ef1b-9bf9-4f2b-afac-da2f2c9d1976"]
+}, Open  ]],
+Cell[162457, 4599, 361, 5, 55, "Text",ExpressionUUID->"76eb3bd7-7af9-49c3-b756-3a267f79b04b"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
+

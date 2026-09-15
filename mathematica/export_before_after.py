@@ -18,8 +18,10 @@ Usage:
 """
 
 import json
+import math
 import re
 import sys
+from collections import Counter
 from pathlib import Path
 
 BOOK_ROOT = Path(__file__).resolve().parents[1] / "book"
@@ -69,6 +71,50 @@ def token_metrics(answer: str, expected: str) -> dict[str, float | int]:
         "jaccard_overlap": len(shared) / len(union) if union else 0.0,
         "expected_token_recall": len(shared) / len(expected_set) if expected_set else 0.0,
     }
+
+
+def cosine_similarity(left: str, right: str) -> float:
+    left_counts = Counter(tokens(left))
+    right_counts = Counter(tokens(right))
+    if not left_counts or not right_counts:
+        return 0.0
+
+    shared = set(left_counts) & set(right_counts)
+    dot_product = sum(left_counts[token] * right_counts[token] for token in shared)
+    left_norm = math.sqrt(sum(count * count for count in left_counts.values()))
+    right_norm = math.sqrt(sum(count * count for count in right_counts.values()))
+    return dot_product / (left_norm * right_norm) if left_norm and right_norm else 0.0
+
+
+def query_text(row: dict) -> str:
+    return f"{row['instruction']} {row['report_context']}"
+
+
+def query_similarity_metrics(row: dict) -> dict[str, float]:
+    query = query_text(row)
+    return {
+        "query_to_reference": cosine_similarity(query, row["expected"]),
+        "query_to_base_answer": cosine_similarity(query, row["base_model_answer"]),
+        "query_to_finetuned_answer": cosine_similarity(query, row["finetuned_model_answer"]),
+    }
+
+
+def base_miss_explanation(row: dict) -> str:
+    if row["base_matched"]:
+        return "The base model matched the reference answer."
+
+    explanation = (
+        "The base prompt only includes the well name, report number, date, and question. "
+        "It does not include the report field containing the correct answer, so the base "
+        "model has no source text to extract from."
+    )
+    answer = row["base_model_answer"].strip()
+    if answer and answer[-1] not in ".!?":
+        explanation += (
+            " The generated base answer also stops mid-sentence, which shows the output "
+            "was cut off by the generation limit rather than reaching a complete answer."
+        )
+    return explanation
 
 
 def report_number(report_context: str) -> str:
@@ -162,6 +208,9 @@ def merge_finetuned(rows: list[dict], finetuned_results: list[dict]) -> None:
         row["question_type"] = question_type(row["instruction"])
         row["base_metrics"] = token_metrics(row["base_model_answer"], row["expected"])
         row["finetuned_metrics"] = token_metrics(row["finetuned_model_answer"], row["expected"])
+        row["query_text"] = query_text(row)
+        row["query_similarity"] = query_similarity_metrics(row)
+        row["base_miss_explanation"] = base_miss_explanation(row)
         row["failure_category"] = failure_category(row)
 
 

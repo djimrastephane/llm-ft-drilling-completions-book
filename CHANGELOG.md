@@ -345,6 +345,38 @@ highlights in narrative form.
   never leaked into training data. Produced 18 findings (1 CRITICAL, 2
   HIGH, 7 MEDIUM, 8 LOW) with file/line evidence, a claim register, an
   11-category scorecard, and a publication assessment.
+- **Author-authored expansion of the Mathematica Before/After
+  Explorer.** `export_before_after.py` gained
+  `query_similarity_metrics()` -- a pure token-overlap cosine
+  similarity (no ML library needed) comparing each question's query
+  text against the reference answer, the base model's answer, and the
+  fine-tuned model's answer -- and `base_miss_explanation()`, which
+  states plainly why the base model misses each question in this
+  book's own archive: the prompt template carries only the well name,
+  report number, date, and question, never the report field holding
+  the actual answer, so the base model has no source text to extract
+  from; it separately flags mid-sentence truncation when a generated
+  answer doesn't end in sentence-ending punctuation. Added a new
+  optional second-stage script, `export_semantic_embeddings.py`, which
+  embeds the already-exported query/reference/base/fine-tuned text with
+  `sentence-transformers`' `all-MiniLM-L6-v2` for a real
+  semantic-similarity signal, kept separate so the core notebook stays
+  fast and dependency-light. `mathematica/README.md` documents the new
+  eight-step reading order (guided examples, the cosine-similarity
+  view, the optional advanced semantic-embedding section) and the
+  optional second export command. Also added
+  `mathematica/TinyTransformerByHand.nb`, a separate standalone
+  notebook working a tiny transformer's forward pass by hand -- not yet
+  linked from `mathematica/README.md`. Verified: both export scripts
+  compile cleanly with `py_compile`; the regenerated
+  `before_after_examples.json` is valid JSON with the new
+  `query_similarity`/`base_miss_explanation` fields populated with
+  internally consistent values (e.g. zero query-to-reference token
+  overlap matches the explanation that the prompt carries no source
+  text); and the notebook's brackets/braces/parens are balanced -- no
+  live Wolfram kernel was available to re-verify execution of the
+  updated notebook or export a fresh `.pdf`, matching this same
+  limitation noted for the notebook's original six-section expansion.
 
 ### Changed
 
