@@ -3,7 +3,7 @@
 This book reuses the same source archive as the author's previous book,
 [`ddr-rag-book`](https://github.com/djimrastephane/ddr-rag-book): real,
 publicly available Daily Drilling Reports and completion reports from
-**Utah FORGE** (well FORGE 16A(78)-32), a Department of Energy-funded
+**Utah FORGE** (well FORGE 16A [78]-32), a Department of Energy-funded
 enhanced geothermal system research well. No anonymisation is applied or
 needed -- this is public data.
 

@@ -209,10 +209,15 @@ Output is written to `_book/`. No API keys or paid services are required
 ## Running tests
 
 `tests/` exercises the real functions in every chapter's
-`code/chapter_NN/` script — 74 tests across all 13 chapters. CI runs the
-full suite on Linux, Windows, and macOS on every push and pull request
-that touches `book/**` (see `.github/workflows/tests-linux.yml`,
-`tests-windows.yml`, `tests-macos.yml`), and all three are green.
+`code/chapter_NN/` script — 81 tests across all 13 chapters (101
+including the companion app's own tests). CI runs the fast,
+deterministic subset — `pytest -m "not slow"`, 74 of those 101 — on
+Linux, Windows, and macOS on every push and pull request that touches
+`book/**` (see `.github/workflows/tests-linux.yml`, `tests-windows.yml`,
+`tests-macos.yml`), and all three are green. The remaining tests are
+marked `slow` (they download the real base model or need a trained
+checkpoint already on disk) and are run locally before each chapter
+ships, not in CI.
 
 ```bash
 pip install -r requirements.txt

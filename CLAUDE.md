@@ -273,6 +273,9 @@ exist:
   numbers/technique. This book's own code never imports from or
   depends on it — every chapter script runs standalone against
   `book/datasets/`.
-- `book/app/` — an optional Streamlit companion app, **not yet
-  implemented** (`book/app/README.md` says so explicitly). Don't
-  assume it exists or works.
+- `book/app/` — an optional Streamlit companion app. **V1-V3 are
+  frozen and working** (`book/app/README.md` has the current status) —
+  Model Playground, Dataset Explorer, and Before vs. After Evaluation
+  are real, finished pages, not a stub. Re-check `book/app/README.md`
+  before assuming any specific page's status, since this note has
+  gone stale before.

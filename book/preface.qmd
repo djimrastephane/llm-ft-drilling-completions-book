@@ -17,8 +17,8 @@ quantized successor QLoRA [@dettmers2023qlora] made this practical on
 ordinary hardware — a full retrain of a foundation model is out of reach
 for almost everyone; adapting a few percent of its parameters on a
 consumer GPU is not. This book builds on that shift: you fine-tune a
-small open-weight model, evaluate it honestly, and keep it current, all
-running locally.
+small, already instruction-tuned open-weight model [@wei2021flan],
+evaluate it honestly, and keep it current, all running locally.
 
 ## What this protects
 
@@ -29,6 +29,11 @@ constraint, not an afterthought — training data handling, what stays
 local, and what an evaluation harness should catch before a fine-tuned
 model is trusted are covered starting in Part I, not bolted on at the
 end.
+
+A fine-tuned model can also sound confident while being wrong — the
+well-documented failure mode usually called hallucination
+[@ji2023hallucination] — which is a separate risk from data leakage and
+gets its own detection tooling starting in Chapter 10.
 
 A fine-tuned model doesn't replace an engineer's judgment. It replaces
 having to explain your operation's conventions to a generic assistant
@@ -88,7 +93,7 @@ sensitive and confidential — which is exactly why this book reuses the
 same source as the author's previous book on retrieval: real, publicly
 available Daily Drilling and completion reports from **Utah FORGE**, a
 Department of Energy-funded enhanced geothermal system research well
-(FORGE 16A(78)-32). No anonymisation was applied, because none was
+(FORGE 16A [78]-32). No anonymisation was applied, because none was
 needed. See `book/datasets/README.md` for the exact layout and policy.
 
 That said, the *technique* in this book generalises directly to a

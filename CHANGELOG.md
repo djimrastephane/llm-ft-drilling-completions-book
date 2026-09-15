@@ -325,6 +325,26 @@ highlights in narrative form.
   reference issue:
   [#88](https://github.com/djimrastephane/llm-ft-drilling-completions-book/issues/88)
   (closed; a completed record, not an open action item).
+- **Ran a full independent technical review of the repository and
+  published it as `TECHNICAL_REVIEW.md`** -- ML/fine-tuning
+  correctness, LoRA/PEFT implementation, RAG/retrieval, evaluation
+  methodology, drilling/completions engineering accuracy, data-leakage
+  and source-traceability, reproducibility, and editorial quality.
+  Split across six parallel focused passes, each verifying claims
+  against the real repository rather than trusting prose: re-ran
+  Chapter 5's full LoRA fine-tune end-to-end (real
+  Qwen2.5-1.5B-Instruct, CPU, `torch.manual_seed(0)`) and reproduced
+  its numbers digit-for-digit (losses
+  `4.7173/1.2688/0.3360/0.1850/0.1201`, training recall `0/16 -> 13/16`,
+  held-out `0/2` unchanged); independently hand-derived Chapter 5's
+  trainable-parameter count (`2,179,072 / 1,545,893,376 = 0.1410%`)
+  from Qwen2.5-1.5B-Instruct's real architecture and matched exactly;
+  independently reproduced Chapter 9's BM25-vs-dense-embedding
+  retrieval comparison exactly; and confirmed by direct grep across
+  every training JSONL that the held-out report (`#37`) is genuinely
+  never leaked into training data. Produced 18 findings (1 CRITICAL, 2
+  HIGH, 7 MEDIUM, 8 LOW) with file/line evidence, a claim register, an
+  11-category scorecard, and a publication assessment.
 
 ### Changed
 
@@ -489,6 +509,55 @@ highlights in narrative form.
   it was opened. Closed both with a comment explaining why, matching
   this repo's own habit of closing each issue in the same session that
   finishes the underlying work.
+- **Fixed every finding from the independent technical review above**,
+  applied in severity order with the author's approval at each tier.
+  **CRIT-01**: Chapter 4's "Example training excerpt" quoted a line
+  (`"0600-1130 POOH FR 9,842' TO CHANGE BHA. ERRATIC TORQUE OBSD LAST 3
+  STDS."`) explicitly attributed to a real, named report
+  (`Drilling_038`) that does not actually contain it -- confirmed by
+  grepping every PDF's extracted text in the archive. Replaced it with
+  a genuine, verified line from `Drilling_017`'s real TIME BREAKDOWN
+  table (`"TOOH (trip out of hole) with BHA #2. Break off bit, lay down
+  Scout RSS (rotary steerable)."`), and fixed the practical exercise,
+  which previously sent readers looking for fictional terms (`OBSD`,
+  `STDS`, `FR`) in a report that never had them. **HIGH-01/HIGH-02**:
+  reworded the root README's "a local model sidesteps the
+  [data-governance] question entirely" to match this book's own
+  better-hedged Appendix A language, and corrected both READMEs' claims
+  of full-suite CI coverage to describe what CI actually runs (`pytest
+  -m "not slow"`, the fast deterministic subset) versus what only runs
+  locally. **MED-01 through MED-07**: clarified the "strict exact-match"
+  metric's actual containment-check behavior at its two definitional
+  points (README, Chapter 11); disambiguated Chapter 9/10's overloaded
+  "grounded" naming and Chapter 12's narrower-than-MLOps "drift"
+  definition with one sentence each; named Chapter 13's
+  continual-fine-tuning regression explicitly as catastrophic
+  forgetting / recency bias, with the standard (unattempted) replay
+  mitigation noted; reworded a real internal inconsistency between two
+  of Chapter 13's own regression claims that disagreed on perplexity's
+  direction; added the same small-n caveat Chapter 11 already uses to
+  Chapter 9's BM25-vs-dense-embeddings takeaway; and added a real fast
+  regression test for Chapter 1's `USE_TF`/`USE_FLAX` import-order fix
+  -- previously the only chapter with zero fast/CI-covered tests --
+  bringing the suite to 81 chapter tests / 101 total / 74 non-slow (was
+  80/100/73). **LOW-01 through LOW-08**: closed the Chapter 4/5
+  embedding-vs-attention-weights mental-model gap with one sentence on
+  each side; aligned Chapter 0's bitsandbytes/QLoRA caveat with the
+  appendices' fuller wording; de-quoted a Chapter 1 paraphrase that
+  wasn't actually verbatim; standardized the well name's prose notation
+  to the bracket form (`FORGE 16A [78]-32`) matching the real DDR field
+  across three files; cited both previously-orphaned bibliography
+  entries (`wei2021flan`, `ji2023hallucination`) in the preface,
+  matching this book's existing citation convention; standardized
+  chapter-status time ranges on en-dash across Chapters 3-13; fixed an
+  unfulfilled Chapter 1 forward-reference to GPU precision content
+  Chapter 5 never covers; and corrected `CLAUDE.md`'s stale claim that
+  the companion Streamlit app is "not yet implemented" (it's fully
+  built, V1-V3). Updated `TECHNICAL_REVIEW.md` with a Status line on
+  every finding, a before/after scorecard, and a final assessment of
+  **READY** (up from "READY AFTER TECHNICAL CORRECTIONS"). Re-ran the
+  full fast test suite after every batch of changes; stayed green
+  throughout (final: 74 passed, 0 failed).
 
 ## [1.0.0] - 2026-08-19
 

@@ -12,7 +12,7 @@
 :::
 
 ::: {.chapter-status}
-Progress `███████████░░` **11 / 13** &nbsp;·&nbsp; **Estimated time:** 30-40 min &nbsp;·&nbsp; **Difficulty:** 🟠 Intermediate
+Progress `███████████░░` **11 / 13** &nbsp;·&nbsp; **Estimated time:** 30–40 min &nbsp;·&nbsp; **Difficulty:** 🟠 Intermediate
 :::
 
 ## Learning objectives
@@ -170,7 +170,10 @@ see Key takeaways.
 
 ## What problem are we solving?
 
-Reuse Chapter 3's strict exact-match check, and pair it with Chapter
+Reuse Chapter 3's `matched_expected` check — renamed `exact_match`
+here, though it still does exactly what Chapter 3 described: it checks
+whether the generated text *contains* the expected answer, word for
+word, not whether the two strings are identical. Pair it with Chapter
 10's word-overlap scoring (originally built to check an answer against
 a *retrieved source*) applied to a different comparison: an answer
 against its *known-correct output*.

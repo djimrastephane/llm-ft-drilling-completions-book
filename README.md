@@ -15,7 +15,7 @@ Reports, honestly, including where it fails.
 
 **[Read the book](https://djimrastephane.github.io/llm-ft-drilling-completions-book/)** · **[Start Here](#start-here)** · **[Companion App](#companion-app)**
 
-13 chapters · 74 automated tests · Linux ✓ macOS ✓ Windows ✓ · real Utah
+13 chapters · 81 automated tests · Linux ✓ macOS ✓ Windows ✓ · real Utah
 FORGE report data, no synthetic stand-ins
 
 <img src="book/figures/app_screenshot_playground_readme.jpg" alt="Model Playground, screenshotted from a real local run: report #37's held-out question, answered live by both the base model and Chapter 5's first fine-tuned checkpoint, with the real exact-match and overlap scores for each." width="760">
@@ -125,15 +125,18 @@ own hands — Chapter 1 covers this in more depth). Keeping the workflow
 local also gives you direct control over where operational data is
 processed, which matters for drilling and completions reports subject
 to company confidentiality and data-governance requirements — not
-every hosted deployment handles that the same way, but a local model
-sidesteps the question entirely.
+every hosted deployment handles that the same way. A local model
+answers the "does this leave my machine" part of that question, but
+not the rest of it: your organisation's own confidentiality,
+retention, and access-control policies still apply to the data itself
+(Appendix A, Section 4 covers this in more depth).
 
 This book fixes both problems: it fine-tunes a small local model
 directly on your own reports, chapter by chapter (Chapter 5 onward). And
 because fine-tuning alone is a weak tool for citing an exact source,
 Chapter 8 measured exactly how weak: `0/50` on a strict **exact-match**
-test, where the model's answer had to match the report's exact wording,
-word for word, to count. Chapter 9 pairs it with a real search step over
+test, where the model's answer had to *contain* the report's exact
+wording, word for word, to count. Chapter 9 pairs it with a real search step over
 the report archive (**retrieval**, like a well-indexed filing cabinet)
 so the final answer comes back **grounded** (actually built from a real,
 cited report, not just a plausible guess) and traceable to the report it
@@ -554,9 +557,11 @@ chapter's code under `book/code/chapter_NN/challenge/`.
 ## Automated Tests
 
 Every chapter's real code is tested in [`book/tests/`](book/tests) —
-74 tests across all 13 chapters, run on Linux, Windows, and macOS on
-every push that touches `book/**` (badges above). Run them yourself
-from the `book/` directory:
+81 tests across all 13 chapters. The fast, deterministic subset (56 of
+the 81) runs on Linux, Windows, and macOS on every push that touches
+`book/**` (badges above); the rest are marked `slow` and are run
+locally before each chapter ships (see below for why). Run them
+yourself from the `book/` directory:
 
 ```bash
 pip install -r requirements.txt

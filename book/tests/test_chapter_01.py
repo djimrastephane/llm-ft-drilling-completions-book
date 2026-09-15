@@ -1,15 +1,25 @@
 """Tests for Chapter 1: Loading and Running Your First Local LLM.
 
-Marked `slow`: the first run downloads Qwen/Qwen2.5-1.5B-Instruct
-(a few GB) and every run loads it into memory. Skip locally if you're
-offline or on modest hardware:
+The model-loading and generation tests below are marked `slow`: the
+first run downloads Qwen/Qwen2.5-1.5B-Instruct (a few GB) and every run
+loads it into memory. Skip them locally if you're offline or on modest
+hardware:
 
     pytest -v -m "not slow"
 """
 
+import os
+
 import pytest
 
 from load_local_model import MODEL_NAME, generate_reply, load_model_and_tokenizer
+
+
+def test_importing_load_local_model_disables_tf_and_flax_backends():
+    # Regression guard for the crash CLAUDE.md documents: TensorFlow/Flax
+    # probing must stay disabled before transformers is ever imported.
+    assert os.environ.get("USE_TF") == "0"
+    assert os.environ.get("USE_FLAX") == "0"
 
 
 @pytest.fixture(scope="module")

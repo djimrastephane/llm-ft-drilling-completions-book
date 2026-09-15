@@ -12,7 +12,7 @@
 :::
 
 ::: {.chapter-status}
-Progress `████████░░░░░` **8 / 13** &nbsp;·&nbsp; **Estimated time:** 45-60 min &nbsp;·&nbsp; **Difficulty:** 🟠 Intermediate
+Progress `████████░░░░░` **8 / 13** &nbsp;·&nbsp; **Estimated time:** 45–60 min &nbsp;·&nbsp; **Difficulty:** 🟠 Intermediate
 :::
 
 ## Learning objectives

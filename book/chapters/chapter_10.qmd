@@ -12,7 +12,7 @@
 :::
 
 ::: {.chapter-status}
-Progress `██████████░░░` **10 / 13** &nbsp;·&nbsp; **Estimated time:** 30-40 min &nbsp;·&nbsp; **Difficulty:** 🟠 Intermediate
+Progress `██████████░░░` **10 / 13** &nbsp;·&nbsp; **Estimated time:** 30–40 min &nbsp;·&nbsp; **Difficulty:** 🟠 Intermediate
 :::
 
 ## Learning objectives
@@ -262,8 +262,14 @@ def answer_with_traceable_sources(model, tokenizer, instruction, input_context, 
 
 `retrieve` and `build_grounded_prompt` are Chapter 9's own functions,
 reused unchanged — this step doesn't touch how retrieval or generation
-work, only what happens to the result afterward. `threshold=0.5` is a
-plain default, not tuned to any one answer; Step 3 shows what it does
+work, only what happens to the result afterward. Note the naming shift:
+Chapter 9's `build_grounded_prompt` just means "built from retrieved
+text," true whether or not the model actually used it; this step's own
+`"grounded"` field is the stricter claim — true only once at least one
+source has passed the faithfulness check below. Same word, two
+different chapters, deliberately different strictness; watch for which
+one is being made wherever you see it. `threshold=0.5` is a plain
+default, not tuned to any one answer; Step 3 shows what it does
 across all 4 of Chapter 9's real test cases.
 
 ## Production Reality

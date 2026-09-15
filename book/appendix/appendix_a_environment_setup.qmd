@@ -14,7 +14,7 @@ chose in Part 0, see Appendices A1–A5 instead.
 ## 1. The training dataset
 
 Chapters 1–5 use ten real, curated Daily Drilling and completion reports
-from the public Utah FORGE archive (well FORGE 16A(78)-32) — already
+from the public Utah FORGE archive (well FORGE 16A [78]-32) — already
 committed as PDFs in `datasets/sample_training_set/`, the same
 curated subset used in the author's previous book. Part II's "at scale"
 chapters use the full 76-report archive, committed at

@@ -55,9 +55,9 @@ real stuck-pipe day referenced throughout this book:
 ```
 :::
 
-Hold that phrase — *"lost tool face and became stuck"* — in mind. Later
-in this chapter, you'll ask the base model about it directly, and see
-exactly how much (or how little) it understands.
+Hold that idea — the driller lost tool face and the assembly became
+stuck — in mind. Later in this chapter, you'll ask the base model about
+it directly, and see exactly how much (or how little) it understands.
 
 ## Theory
 
@@ -195,9 +195,10 @@ model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, torch_dtype=torch.float
 
 `AutoTokenizer` and `AutoModelForCausalLM` each downloaded (or reused
 the cached copy of) everything needed for this specific model, then
-loaded it into memory. `torch_dtype=torch.float32` is the CPU-safe
-numeric precision this book uses by default — Chapter 5 introduces
-lower precision for faster fine-tuning on a GPU. (Depending on your
+loaded it into memory. `torch_dtype=torch.float32` is the CPU-safe numeric precision this book
+uses throughout, on CPU, GPU, or Apple Silicon alike — Chapter 5 shows
+how to move the same full-precision model onto a GPU (`model.to("cuda")`)
+if you have one, without changing this precision. (Depending on your
 installed `transformers` version, this argument may print a harmless
 deprecation notice suggesting `dtype=` instead — both work identically
 for this book's purposes.)

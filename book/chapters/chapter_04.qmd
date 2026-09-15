@@ -12,7 +12,7 @@
 :::
 
 ::: {.chapter-status}
-Progress `████░░░░░░░░░` **4 / 13** &nbsp;·&nbsp; **Estimated time:** 30-40 min &nbsp;·&nbsp; **Difficulty:** 🟠 Intermediate
+Progress `████░░░░░░░░░` **4 / 13** &nbsp;·&nbsp; **Estimated time:** 30–40 min &nbsp;·&nbsp; **Difficulty:** 🟠 Intermediate
 :::
 
 ## Learning objectives
@@ -48,20 +48,22 @@ means.
 
 ## Example training excerpt
 
-A realistic instruction/response pair built the same way Chapter 2's
-`Drilling_038` examples were, using report shorthand exactly as written:
+A real instruction/response pair, built the same way Chapter 2's
+`Drilling_038` examples were, but this one drawn from a genuine
+TIME BREAKDOWN entry in `Drilling_017` (2020-11-05), quoted exactly as
+filed:
 
-::: {.callout-note title="Sample training example"}
+::: {.callout-note title="Sample training example -- FORGE-16A-78-32_Drilling_017_2020-11-05.pdf"}
 ```json
 {
-  "instruction": "Summarize the operational risk in this report excerpt.",
-  "input": "0600-1130 POOH FR 9,842' TO CHANGE BHA. ERRATIC TORQUE OBSD LAST 3 STDS.",
-  "output": "Erratic torque over the last three stands before pulling out of hole suggests a developing hole-cleaning or BHA issue that should be monitored on the next run."
+  "instruction": "Summarize what operation this report excerpt describes.",
+  "input": "TOOH (trip out of hole) with BHA #2. Break off bit, lay down Scout RSS (rotary steerable).",
+  "output": "A planned bottom hole assembly change: BHA #2 is pulled out of hole, its bit is broken off, and the rotary steerable tool is laid down ahead of picking up the next BHA."
 }
 ```
 :::
 
-`POOH` and `BHA` sit right in the `input` above. Before this chapter is
+`TOOH` and `BHA` sit right in the `input` above. Before this chapter is
 over, you'll know exactly how the model's tokenizer splits both of
 those, and how close — if at all — its own numbers place them next to
 what they actually mean.
@@ -338,8 +340,10 @@ by people who never saw this archive, has no more reason to know that
 
 **Try it yourself:** run
 `python code/chapter_04/tokenize_and_embed.py` from inside `book/`, then
-pick two more terms from `Drilling_038`'s excerpt above (`OBSD`, `STDS`,
-`FR`) and check how they tokenize.
+open `datasets/full_training_set/FORGE-16A-78-32_Drilling_017_2020-11-05.pdf`
+and pick two more real abbreviations from its TIME BREAKDOWN table
+(`RSS` and `TIH` both appear, each self-glossed in parentheses right in
+the report, the same way `TOOH` is above) and check how they tokenize.
 
 **You'll know it worked when:** you can point to the exact pieces each
 term splits into, and explain in one sentence why a short acronym isn't
@@ -433,7 +437,9 @@ kinds of off-the-shelf embeddings against this book's own oilfield
 shorthand, with real, reproducible numbers showing neither reliably
 understands it. This is the concrete evidence for *why* Chapter 5 has
 to actually update the model's weights, not just hope a bigger
-embedding model would fix it.
+embedding model would fix it -- though, as you'll see there, Chapter
+5's fine-tune leaves this exact raw embedding table frozen and untouched;
+the fix happens at the attention layers downstream of it instead.
 :::
 
 ## What can you do now that you couldn't do before?

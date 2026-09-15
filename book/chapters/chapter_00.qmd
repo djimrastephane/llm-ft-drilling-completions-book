@@ -193,8 +193,9 @@ red `ERROR` lines.
 `requirements.txt` installs `bitsandbytes` (used for 4-/8-bit QLoRA
 fine-tuning) only on Linux — it has no working build for macOS. If
 you're on macOS or a CPU-only machine, this is expected and not an
-error; Chapter 5 explains the full-precision LoRA path you'll use
-instead.
+error — and it doesn't matter for this book either way: no chapter
+script here actually loads a quantized model. Chapter 5 explains the
+full-precision LoRA path every chapter uses instead.
 :::
 
 ## 0.6 Check your hardware

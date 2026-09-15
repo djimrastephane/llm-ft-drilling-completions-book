@@ -12,7 +12,7 @@
 :::
 
 ::: {.chapter-status}
-Progress `█████░░░░░░░░` **5 / 13** &nbsp;·&nbsp; **Estimated time:** 45-60 min &nbsp;·&nbsp; **Difficulty:** 🟠 Intermediate
+Progress `█████░░░░░░░░` **5 / 13** &nbsp;·&nbsp; **Estimated time:** 45–60 min &nbsp;·&nbsp; **Difficulty:** 🟠 Intermediate
 :::
 
 ## Learning objectives
@@ -271,7 +271,11 @@ output projections every attention layer has. `r=8` sets the adapter's
 size (its "rank" — a small number by design). The result: `2,179,072`
 trainable parameters out of `1,545,893,376` total — `0.141%`. Everything
 else in the model is frozen and will never change during this chapter's
-training.
+training -- including the raw embedding table Chapter 4 measured;
+`BHA`'s own coordinate doesn't move. What changes instead is how the
+attention layers *use* that unchanged coordinate once text passes
+through them, which is where this chapter's improvement actually comes
+from.
 
 ## Production Reality
 

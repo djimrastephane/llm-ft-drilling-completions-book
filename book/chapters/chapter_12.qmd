@@ -12,7 +12,7 @@
 :::
 
 ::: {.chapter-status}
-Progress `████████████░` **12 / 13** &nbsp;·&nbsp; **Estimated time:** 30-40 min &nbsp;·&nbsp; **Difficulty:** 🟠 Intermediate
+Progress `████████████░` **12 / 13** &nbsp;·&nbsp; **Estimated time:** 30–40 min &nbsp;·&nbsp; **Difficulty:** 🟠 Intermediate
 :::
 
 ## Learning objectives
@@ -68,7 +68,12 @@ verified. Neither one is wrong. Neither one is the whole answer either.
 kind of drift: something that used to work (or score well) stops
 working, in a version that's supposed to be an improvement. Neither
 term says *why* — only that something changed and is worth a second
-look.
+look. This chapter's drift check means comparing two already-trained
+checkpoints against one fixed evaluation set. A production ML team
+also watches for a different kind of drift — a deployed model's live,
+unlabeled input traffic gradually looking different from what it was
+trained on — which is a separate, ongoing monitoring problem this book
+doesn't build.
 :::
 
 ## Why comparing one metric isn't enough

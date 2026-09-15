@@ -12,7 +12,7 @@
 :::
 
 ::: {.chapter-status}
-Progress `█████████░░░░` **9 / 13** &nbsp;·&nbsp; **Estimated time:** 45-60 min &nbsp;·&nbsp; **Difficulty:** 🔴 Advanced
+Progress `█████████░░░░` **9 / 13** &nbsp;·&nbsp; **Estimated time:** 45–60 min &nbsp;·&nbsp; **Difficulty:** 🔴 Advanced
 :::
 
 ## Learning objectives
@@ -396,7 +396,11 @@ against BM25's `4/4` on the same queries.
 - For this archive's dense technical phrasing, keyword search (BM25)
   beat general-purpose dense embeddings at finding the right source —
   the same domain-vocabulary gap Chapter 4 found at the single-term
-  level shows up again at the sentence level.
+  level shows up again at the sentence level. Four test queries is a
+  real result, not a toy one, but it's still too small to call this a
+  statistically powered comparison — read it as consistent with BM25's
+  known strength on exact-jargon matching, not as proof dense
+  embeddings lose on this archive in general.
 - A retrieval query and a fine-tuned model's expected input are
   different things. Reusing one as the other — the templated metadata
   string as a search query — silently retrieves the wrong documents.
