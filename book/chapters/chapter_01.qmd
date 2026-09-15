@@ -195,13 +195,13 @@ model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, torch_dtype=torch.float
 
 `AutoTokenizer` and `AutoModelForCausalLM` each downloaded (or reused
 the cached copy of) everything needed for this specific model, then
-loaded it into memory. `torch_dtype=torch.float32` is the CPU-safe numeric precision this book
-uses throughout, on CPU, GPU, or Apple Silicon alike — Chapter 5 shows
-how to move the same full-precision model onto a GPU (`model.to("cuda")`)
-if you have one, without changing this precision. (Depending on your
-installed `transformers` version, this argument may print a harmless
-deprecation notice suggesting `dtype=` instead — both work identically
-for this book's purposes.)
+loaded it into memory. `torch_dtype=torch.float32` is the CPU-safe
+numeric precision this book uses throughout, on CPU, GPU, or Apple
+Silicon alike — Chapter 5 shows how to move the same full-precision
+model onto a GPU (`model.to("cuda")`) if you have one, without changing
+this precision. (Depending on your installed `transformers` version,
+this argument may print a harmless deprecation notice suggesting
+`dtype=` instead — both work identically for this book's purposes.)
 
 ## Production Reality
 
