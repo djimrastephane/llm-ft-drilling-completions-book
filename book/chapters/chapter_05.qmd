@@ -31,7 +31,7 @@ By the end of this chapter, you will be able to:
 
 ## Operational Problem
 
-Mike, the completions engineer, has watched this book build up evidence
+Carlos, the completions engineer, has watched this book build up evidence
 for four chapters — the base model doesn't know this well's vocabulary,
 doesn't know its specific reports, and its embeddings don't already
 understand the shorthand. He's ready for the payoff, but wary of a
@@ -300,7 +300,7 @@ this chapter's logic doesn't depend on which device it runs on.
 ## What problem are we solving?
 
 Actually train the adapter on Chapter 2's 16 examples, then answer
-Mike's question with numbers: did the model learn these exact examples,
+Carlos's question with numbers: did the model learn these exact examples,
 and separately, did anything transfer to a report it never saw?
 
 ## Inputs

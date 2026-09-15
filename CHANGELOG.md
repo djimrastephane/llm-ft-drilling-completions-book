@@ -503,6 +503,24 @@ highlights in narrative form.
   as the author's; AI assisted with drafting/editing/documentation/
   verification; AI-assisted work reviewed against real data before
   acceptance). Verified with a local `quarto render acknowledgements.qmd`.
+- **Renamed two of the book's four recurring personas, at the author's
+  request**: Mike (completions) -> Carlos, Sean (production) -> Farid.
+  Oumy (drilling) and Sarah (intervention) are unchanged. Updated every
+  occurrence: `index.qmd`'s roster table and its own referencing prose,
+  `chapter_template.qmd`'s persona-rotation comment, the seven chapters
+  where either persona opens an "Operational Problem" or is referenced
+  again later in the same chapter (Chapters 1, 4, 5, 7, 8, 11, 12), and
+  both READMEs' and `CLAUDE.md`'s own persona-roster notes. Verified no
+  stray references remain (grepped the whole repo including
+  `book/code/`, `book/tests/`, and `book/app/` -- none found, since
+  persona names never appear in code) and the full fast test suite
+  still passes unchanged (74/74). Also fixed, found while re-reading
+  this file for style: `book/acknowledgements.qmd` illustrated the
+  archive's terse report style with the same fabricated "POOH to change
+  BHA due to erratic torque" quote this session's independent technical
+  review already found and corrected in Chapter 4 (see `TECHNICAL_REVIEW.md`
+  CRIT-01) -- it never appeared anywhere in the archive. Replaced with
+  the same genuine `Drilling_017` excerpt used in that fix.
 
 ### Fixed
 

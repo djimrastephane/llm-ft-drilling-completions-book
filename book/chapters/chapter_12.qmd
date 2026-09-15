@@ -32,7 +32,7 @@ By the end of this chapter, you will be able to:
 
 ## Operational Problem
 
-Sean, the production engineer who worried back in Chapter 7 about
+Farid, the production engineer who worried back in Chapter 7 about
 losing information by throwing away most of a shift's log, has a new
 worry now that Chapter 11 gave the book a real evaluation harness:
 *"We're not going to fine-tune once and stop — we'll retrain as new

@@ -31,7 +31,7 @@ By the end of this chapter, you will be able to:
 
 ## Operational Problem
 
-Mike, the completions engineer who asked in Chapter 5 whether
+Carlos, the completions engineer who asked in Chapter 5 whether
 fine-tuning teaches the operation or just memorizes flashcards, has a
 more practical worry now that the training set has grown from 16
 examples to 669: *"If this run takes half an hour and the laptop goes

@@ -64,8 +64,8 @@ Required structural elements (do not skip any of these):
 9. A ".chapter-status" div directly under the pipeline diagram: a 12-block
    progress bar (N filled for chapter N, rest empty), an estimated time,
    and a difficulty badge (🟢/🟠/🔴). See markup below.
-10. Exactly one named persona (Mike/completions, Sarah/intervention,
-    Sean/production, Oumy/drilling — see index.qmd's roster) appears in
+10. Exactly one named persona (Carlos/completions, Sarah/intervention,
+    Farid/production, Oumy/drilling — see index.qmd's roster) appears in
     the opening sentence(s) of "## Operational Problem", asking the
     motivating question. Pick whichever persona the chapter's question
     naturally belongs to. Personas may be echoed once more in "##

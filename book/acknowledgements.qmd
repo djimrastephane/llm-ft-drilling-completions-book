@@ -1,8 +1,9 @@
 # Acknowledgements {.unnumbered}
 
 This book exists because drilling and completions reports capture far
-more than operational summaries. Behind short entries such as "POOH to
-change BHA due to erratic torque" sit decisions, experience, and
+more than operational summaries. Behind short, genuine entries such as
+"TOOH with BHA #2. Break off bit, lay down Scout RSS" (from this
+book's own Utah FORGE archive) sit decisions, experience, and
 operational context that are obvious to the engineers involved in the
 operation but invisible to standard AI systems that have never seen
 field data.

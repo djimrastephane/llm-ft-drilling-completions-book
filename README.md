@@ -238,7 +238,7 @@ This book is written for drilling, completions, intervention, and
 production engineers — and for the digital oilfield professionals and
 energy data scientists who support them. You'll recognize the fit
 quickly: every chapter opens with one of four recurring engineers (Oumy,
-Mike, Sarah, Sean — you'll meet all four) asking the kind of question
+Carlos, Sarah, Farid — you'll meet all four) asking the kind of question
 you'd actually ask before trusting a model with your own reports, then
 answers it with real code and a real result, not a hypothetical.
 

@@ -32,7 +32,7 @@ By the end of this chapter, you will be able to:
 
 ## Operational Problem
 
-Sean, the production engineer, looks at Chapter 2's output and asks the
+Farid, the production engineer, looks at Chapter 2's output and asks the
 obvious question: *"Two lines per report? These reports have a whole
 shift-by-shift log in them. Are we just throwing the rest away?"*
 

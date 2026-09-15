@@ -31,7 +31,7 @@ By the end of this chapter, you will be able to:
 
 ## Operational Problem
 
-Sean, the production engineer, pushes back on Chapter 1's finding:
+Farid, the production engineer, pushes back on Chapter 1's finding:
 *"Sure, this small model didn't know 'trip out of hole' — but ChatGPT
 and every other LLM I've used seem to handle abbreviations and jargon
 fine elsewhere. Isn't that basically a solved problem by now?"*
@@ -99,7 +99,7 @@ them that way — nothing about having a coordinate guarantees it's a
 
 ## Why "the model has seen jargon before" isn't evidence
 
-Sean's instinct — that a language model trained on huge amounts of text
+Farid's instinct — that a language model trained on huge amounts of text
 has probably seen abbreviations and shorthand before — is reasonable.
 But "seen text like this somewhere" and "placed this specific term next
 to its specific meaning" are different claims, and only the second one

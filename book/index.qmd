@@ -194,12 +194,12 @@ opens a chapter's **Operational Problem**:
 | Name | Role |
 |---|---|
 | Oumy | Drilling Engineer |
-| Mike | Completions Engineer |
+| Carlos | Completions Engineer |
 | Sarah | Intervention Engineer |
-| Sean | Production Engineer |
+| Farid | Production Engineer |
 
 They're a framing device, not a source of data: whichever question Oumy,
-Mike, Sarah, or Sean asks, every number and result used to answer it must
+Carlos, Sarah, or Farid asks, every number and result used to answer it must
 come from a real, reproducible run of this book's own code — never
 invented on their behalf.
 

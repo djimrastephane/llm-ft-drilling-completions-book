@@ -147,7 +147,7 @@ sections, persona rules). Highlights:
   files → CHECKPOINT + WHAT YOU BUILT → What can you do now → Suggested
   next step (bolded "Coming up in Chapter N+1:").
 - **Personas** (`index.qmd`'s roster, rotate — don't always reuse one):
-  Oumy (drilling), Mike (completions), Sarah (intervention), Sean
+  Oumy (drilling), Carlos (completions), Sarah (intervention), Farid
   (production). One persona per chapter's Operational Problem, chosen
   for narrative fit, never appearing in Theory/Production
   Reality/Field notes (those stay unattributed and independently

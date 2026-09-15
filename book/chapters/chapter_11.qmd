@@ -33,7 +33,7 @@ By the end of this chapter, you will be able to:
 
 ## Operational Problem
 
-Mike, the completions engineer who asked back in Chapter 5 whether
+Carlos, the completions engineer who asked back in Chapter 5 whether
 fine-tuning teaches the operation or just memorizes flashcards, has a
 sharper version of the same question now that Chapters 9 and 10 added
 retrieval and faithfulness-checking on top: *"We've been checking all
@@ -48,7 +48,7 @@ check by hand, exactly what Chapter 10 ended by admitting doesn't
 scale. This chapter builds a real evaluation set — 8 real questions
 from a report that has never been in any training set in this book —
 and scores it more than one way, because a single number turns out not
-to be enough to answer Mike's question honestly.
+to be enough to answer Carlos's question honestly.
 
 ## Example: one answer, asked eight different questions
 
@@ -107,7 +107,7 @@ its own `metrics.csv` — a `held_out_exact_match` column that reads
 that number says fine-tuning made zero progress on anything it hadn't
 already memorized. Field Notes below shows a second, real metric that
 says something very different about the exact same three checkpoints
-— both numbers are true, and neither one alone tells Mike what he
+— both numbers are true, and neither one alone tells Carlos what he
 actually asked.
 
 ## Implementation

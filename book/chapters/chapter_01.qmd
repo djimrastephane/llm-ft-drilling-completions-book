@@ -323,7 +323,7 @@ generic answer to a specific question. That gap is this entire book.
 
 **Try it yourself:** open `code/chapter_01/load_local_model.py`, change
 the `question` variable in `main()` to something from your own role —
-Mike (completions), Sarah (intervention), or Sean (production) would
+Carlos (completions), Sarah (intervention), or Farid (production) would
 each ask something different — and re-run the script.
 
 **You'll know it worked when:** you get a fluent, plausible-sounding
