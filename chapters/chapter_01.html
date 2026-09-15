@@ -717,7 +717,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output" class="level2" data-number="1.10">
 <h2 data-number="1.10" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">1.10</span> Expected Output</h2>
 <p>No visible output yet — this step just gets the model ready in memory. On the author’s machine, the very first run (including the download) took about 80 seconds; every run after that, loading from the local cache took 3–4 seconds. Yours will vary with your connection and disk speed, but a first run under a few minutes and cached runs under 10 seconds are both normal.</p>
-<div id="4482523b" class="cell" data-execution_count="1">
+<div id="e01c9562" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoModelForCausalLM, AutoTokenizer</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -752,7 +752,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output-1" class="level2" data-number="1.15">
 <h2 data-number="1.15" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">1.15</span> Expected Output</h2>
 <p>A chunk of generated text, printed to your terminal, in the neighborhood of a paragraph or two, taking roughly 10–15 seconds on a CPU for a response this length (again, faster with a GPU, slower on older hardware).</p>
-<div id="04712f1f" class="cell" data-execution_count="2">
+<div id="857668b6" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> generate_reply(model, tokenizer, user_message: <span class="bu">str</span>, max_new_tokens: <span class="bu">int</span> <span class="op">=</span> <span class="dv">340</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    messages <span class="op">=</span> [{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: user_message}]</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    prompt <span class="op">=</span> tokenizer.apply_chat_template(</span>
@@ -1609,13 +1609,13 @@ and continue safely through the next curve section.</code></pre>
 <span id="cb5-197"><a href="#cb5-197" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-198"><a href="#cb5-198" aria-hidden="true" tabindex="-1"></a><span class="in">`AutoTokenizer`</span> and <span class="in">`AutoModelForCausalLM`</span> each downloaded (or reused</span>
 <span id="cb5-199"><a href="#cb5-199" aria-hidden="true" tabindex="-1"></a>the cached copy of) everything needed for this specific model, then</span>
-<span id="cb5-200"><a href="#cb5-200" aria-hidden="true" tabindex="-1"></a>loaded it into memory. <span class="in">`torch_dtype=torch.float32`</span> is the CPU-safe numeric precision this book</span>
-<span id="cb5-201"><a href="#cb5-201" aria-hidden="true" tabindex="-1"></a>uses throughout, on CPU, GPU, or Apple Silicon alike — Chapter 5 shows</span>
-<span id="cb5-202"><a href="#cb5-202" aria-hidden="true" tabindex="-1"></a>how to move the same full-precision model onto a GPU (<span class="in">`model.to("cuda")`</span>)</span>
-<span id="cb5-203"><a href="#cb5-203" aria-hidden="true" tabindex="-1"></a>if you have one, without changing this precision. (Depending on your</span>
-<span id="cb5-204"><a href="#cb5-204" aria-hidden="true" tabindex="-1"></a>installed <span class="in">`transformers`</span> version, this argument may print a harmless</span>
-<span id="cb5-205"><a href="#cb5-205" aria-hidden="true" tabindex="-1"></a>deprecation notice suggesting <span class="in">`dtype=`</span> instead — both work identically</span>
-<span id="cb5-206"><a href="#cb5-206" aria-hidden="true" tabindex="-1"></a>for this book's purposes.)</span>
+<span id="cb5-200"><a href="#cb5-200" aria-hidden="true" tabindex="-1"></a>loaded it into memory. <span class="in">`torch_dtype=torch.float32`</span> is the CPU-safe</span>
+<span id="cb5-201"><a href="#cb5-201" aria-hidden="true" tabindex="-1"></a>numeric precision this book uses throughout, on CPU, GPU, or Apple</span>
+<span id="cb5-202"><a href="#cb5-202" aria-hidden="true" tabindex="-1"></a>Silicon alike — Chapter 5 shows how to move the same full-precision</span>
+<span id="cb5-203"><a href="#cb5-203" aria-hidden="true" tabindex="-1"></a>model onto a GPU (<span class="in">`model.to("cuda")`</span>) if you have one, without changing</span>
+<span id="cb5-204"><a href="#cb5-204" aria-hidden="true" tabindex="-1"></a>this precision. (Depending on your installed <span class="in">`transformers`</span> version,</span>
+<span id="cb5-205"><a href="#cb5-205" aria-hidden="true" tabindex="-1"></a>this argument may print a harmless deprecation notice suggesting</span>
+<span id="cb5-206"><a href="#cb5-206" aria-hidden="true" tabindex="-1"></a><span class="in">`dtype=`</span> instead — both work identically for this book's purposes.)</span>
 <span id="cb5-207"><a href="#cb5-207" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-208"><a href="#cb5-208" aria-hidden="true" tabindex="-1"></a><span class="fu">## Production Reality</span></span>
 <span id="cb5-209"><a href="#cb5-209" aria-hidden="true" tabindex="-1"></a></span>
