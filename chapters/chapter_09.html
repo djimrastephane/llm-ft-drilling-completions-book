@@ -84,9 +84,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-f352355e9c4cf757a45f4f8798595620.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-5eaba02739cdb78914c5f4540b400244.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -596,7 +596,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="../figures/diagrams/pipeline_ch09_light.svg" class="diagram-light img-fluid" width="180"> <img src="../figures/diagrams/pipeline_ch09_dark.svg" class="diagram-dark img-fluid" width="180"></p>
 </div>
 <div class="chapter-status">
-<p>Progress <code>█████████░░░░</code> <strong>9 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 45-60 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🔴 Advanced</p>
+<p>Progress <code>█████████░░░░</code> <strong>9 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 45–60 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🔴 Advanced</p>
 </div>
 <section id="learning-objectives" class="level2" data-number="9.1">
 <h2 data-number="9.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">9.1</span> Learning objectives</h2>
@@ -690,7 +690,7 @@ With retrieval:
 <section id="expected-output" class="level2" data-number="9.9">
 <h2 data-number="9.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">9.9</span> Expected Output</h2>
 <p>Every quality-gated report’s chunks, in one flat list — more than Chapter 7’s training set, because this one keeps the held-out report in.</p>
-<div id="57100e67" class="cell" data-execution_count="1">
+<div id="12c4c960" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -750,7 +750,7 @@ With retrieval:
 <section id="expected-output-1" class="level2" data-number="9.14">
 <h2 data-number="9.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">9.14</span> Expected Output</h2>
 <p>The top-k chunks, ranked by BM25 score, each labeled with its source report and time window.</p>
-<div id="9d49eaf4" class="cell" data-execution_count="2">
+<div id="cb7993a4" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rank_bm25 <span class="im">import</span> BM25Okapi</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -799,7 +799,7 @@ With retrieval:
 <section id="expected-output-2" class="level2" data-number="9.19">
 <h2 data-number="9.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">9.19</span> Expected Output</h2>
 <p>An answer, plus the specific report(s) and time window(s) it was grounded in.</p>
-<div id="5b0c9aed" class="cell" data-execution_count="3">
+<div id="9a77c291" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_grounded_prompt(instruction, input_context, retrieved_chunks):</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    sources <span class="op">=</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>.join(<span class="ss">f"[Report #</span><span class="sc">{</span>c[<span class="st">'report_num'</span>]<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>c[<span class="st">'from_time'</span>]<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span>c[<span class="st">'to_time'</span>]<span class="sc">}</span><span class="ss">]: </span><span class="sc">{</span>c[<span class="st">'text'</span>]<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> c <span class="kw">in</span> retrieved_chunks)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"</span><span class="sc">{</span>instruction<span class="sc">}</span><span class="ch">\n</span><span class="sc">{</span>input_context<span class="sc">}</span><span class="ch">\n\n</span><span class="ss">Relevant report excerpts:</span><span class="ch">\n</span><span class="sc">{</span>sources<span class="sc">}</span><span class="ss">"</span></span>
@@ -913,7 +913,7 @@ Sources: [{'report_num': 37, 'from_time': '20:30', 'to_time': '21:30'}, {'report
 <h2 data-number="9.25" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">9.25</span> Key takeaways</h2>
 <ul>
 <li>Retrieval should cover everything, held-out data included — a fine-tuned model’s blind spots are exactly where retrieval needs to work, not where it’s optional.</li>
-<li>For this archive’s dense technical phrasing, keyword search (BM25) beat general-purpose dense embeddings at finding the right source — the same domain-vocabulary gap Chapter 4 found at the single-term level shows up again at the sentence level.</li>
+<li>For this archive’s dense technical phrasing, keyword search (BM25) beat general-purpose dense embeddings at finding the right source — the same domain-vocabulary gap Chapter 4 found at the single-term level shows up again at the sentence level. Four test queries is a real result, not a toy one, but it’s still too small to call this a statistically powered comparison — read it as consistent with BM25’s known strength on exact-jargon matching, not as proof dense embeddings lose on this archive in general.</li>
 <li>A retrieval query and a fine-tuned model’s expected input are different things. Reusing one as the other — the templated metadata string as a search query — silently retrieves the wrong documents.</li>
 <li>Successful retrieval doesn’t guarantee grounded generation. This chapter measured both separately and found them genuinely different: retrieval succeeded 4/4 times; the model faithfully used what it was given only some of that time.</li>
 </ul>
@@ -1487,7 +1487,7 @@ Sources: [{'report_num': 37, 'from_time': '20:30', 'to_time': '21:30'}, {'report
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>::: {.chapter-status}</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`█████████░░░░`</span> **9 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 45-60 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🔴 Advanced</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`█████████░░░░`</span> **9 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 45–60 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🔴 Advanced</span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learning objectives</span></span>
@@ -1871,57 +1871,61 @@ Sources: [{'report_num': 37, 'from_time': '20:30', 'to_time': '21:30'}, {'report
 <span id="cb8-402"><a href="#cb8-402" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>For this archive's dense technical phrasing, keyword search (BM25)</span>
 <span id="cb8-403"><a href="#cb8-403" aria-hidden="true" tabindex="-1"></a>  beat general-purpose dense embeddings at finding the right source —</span>
 <span id="cb8-404"><a href="#cb8-404" aria-hidden="true" tabindex="-1"></a>  the same domain-vocabulary gap Chapter 4 found at the single-term</span>
-<span id="cb8-405"><a href="#cb8-405" aria-hidden="true" tabindex="-1"></a>  level shows up again at the sentence level.</span>
-<span id="cb8-406"><a href="#cb8-406" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A retrieval query and a fine-tuned model's expected input are</span>
-<span id="cb8-407"><a href="#cb8-407" aria-hidden="true" tabindex="-1"></a>  different things. Reusing one as the other — the templated metadata</span>
-<span id="cb8-408"><a href="#cb8-408" aria-hidden="true" tabindex="-1"></a>  string as a search query — silently retrieves the wrong documents.</span>
-<span id="cb8-409"><a href="#cb8-409" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Successful retrieval doesn't guarantee grounded generation. This</span>
-<span id="cb8-410"><a href="#cb8-410" aria-hidden="true" tabindex="-1"></a>  chapter measured both separately and found them genuinely different:</span>
-<span id="cb8-411"><a href="#cb8-411" aria-hidden="true" tabindex="-1"></a>  retrieval succeeded 4/4 times; the model faithfully used what it was</span>
-<span id="cb8-412"><a href="#cb8-412" aria-hidden="true" tabindex="-1"></a>  given only some of that time.</span>
-<span id="cb8-413"><a href="#cb8-413" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-414"><a href="#cb8-414" aria-hidden="true" tabindex="-1"></a><span class="fu">## Repository files</span></span>
-<span id="cb8-415"><a href="#cb8-415" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-416"><a href="#cb8-416" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> File <span class="pp">|</span> Purpose <span class="pp">|</span></span>
-<span id="cb8-417"><a href="#cb8-417" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb8-418"><a href="#cb8-418" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_09/hybrid_rag_finetune.py`</span> <span class="pp">|</span> Builds a BM25 retrieval index over the full archive and combines it with Chapter 8's fine-tuned model <span class="pp">|</span></span>
-<span id="cb8-419"><a href="#cb8-419" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_09/challenge/challenge.py`</span> <span class="pp">|</span> Reference solution: dense-embedding retrieval, compared directly against BM25 <span class="pp">|</span></span>
-<span id="cb8-420"><a href="#cb8-420" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`notebooks/chapter_09_explore.ipynb`</span> <span class="pp">|</span> Interactive companion notebook <span class="pp">|</span></span>
-<span id="cb8-421"><a href="#cb8-421" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-422"><a href="#cb8-422" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution title="CHECKPOINT — Chapter 9"}</span>
-<span id="cb8-423"><a href="#cb8-423" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Built a retrieval corpus covering every quality-gated report,</span>
-<span id="cb8-424"><a href="#cb8-424" aria-hidden="true" tabindex="-1"></a>      including the one the fine-tuned model never trained on</span>
-<span id="cb8-425"><a href="#cb8-425" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Chose BM25 over dense embeddings based on a real, measured</span>
-<span id="cb8-426"><a href="#cb8-426" aria-hidden="true" tabindex="-1"></a>      comparison, not by default</span>
-<span id="cb8-427"><a href="#cb8-427" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Combined retrieval with Chapter 8's fine-tuned model to produce</span>
-<span id="cb8-428"><a href="#cb8-428" aria-hidden="true" tabindex="-1"></a>      answers with citations</span>
-<span id="cb8-429"><a href="#cb8-429" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Measured retrieval accuracy and generation faithfulness</span>
-<span id="cb8-430"><a href="#cb8-430" aria-hidden="true" tabindex="-1"></a>      separately, and found they're not the same thing</span>
-<span id="cb8-431"><a href="#cb8-431" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-432"><a href="#cb8-432" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-433"><a href="#cb8-433" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}</span>
-<span id="cb8-434"><a href="#cb8-434" aria-hidden="true" tabindex="-1"></a>**`hybrid_rag_finetune.py`** — a BM25 retrieval index over all 75</span>
-<span id="cb8-435"><a href="#cb8-435" aria-hidden="true" tabindex="-1"></a>quality-gated reports (held-out report included), combined with Chapter</span>
-<span id="cb8-436"><a href="#cb8-436" aria-hidden="true" tabindex="-1"></a>8's fine-tuned checkpoint to produce cited, source-grounded answers.</span>
-<span id="cb8-437"><a href="#cb8-437" aria-hidden="true" tabindex="-1"></a>Chapter 10 picks up exactly where this chapter's Field Notes left off:</span>
-<span id="cb8-438"><a href="#cb8-438" aria-hidden="true" tabindex="-1"></a>checking whether an answer is actually consistent with what it cites.</span>
-<span id="cb8-439"><a href="#cb8-439" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-440"><a href="#cb8-440" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-441"><a href="#cb8-441" aria-hidden="true" tabindex="-1"></a><span class="fu">## What can you do now that you couldn't do before?</span></span>
-<span id="cb8-442"><a href="#cb8-442" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-443"><a href="#cb8-443" aria-hidden="true" tabindex="-1"></a>You can answer a question using both a model that's learned your</span>
-<span id="cb8-444"><a href="#cb8-444" aria-hidden="true" tabindex="-1"></a>domain's language and a search over your actual reports, together — and</span>
-<span id="cb8-445"><a href="#cb8-445" aria-hidden="true" tabindex="-1"></a>you can point to exactly which report and time window an answer came</span>
-<span id="cb8-446"><a href="#cb8-446" aria-hidden="true" tabindex="-1"></a>from, instead of asking the model to simply be right.</span>
-<span id="cb8-447"><a href="#cb8-447" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-448"><a href="#cb8-448" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suggested next step</span></span>
-<span id="cb8-449"><a href="#cb8-449" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-450"><a href="#cb8-450" aria-hidden="true" tabindex="-1"></a>**Coming up in Chapter 10:** this chapter's Field Notes found a real</span>
-<span id="cb8-451"><a href="#cb8-451" aria-hidden="true" tabindex="-1"></a>gap — retrieval can find the right source and the model can still write</span>
-<span id="cb8-452"><a href="#cb8-452" aria-hidden="true" tabindex="-1"></a>an answer that ignores it. Chapter 10 builds the check this chapter is</span>
-<span id="cb8-453"><a href="#cb8-453" aria-hidden="true" tabindex="-1"></a>missing: verifying an answer is actually consistent with the report it</span>
-<span id="cb8-454"><a href="#cb8-454" aria-hidden="true" tabindex="-1"></a>cites, and flagging it when it isn't, instead of trusting a citation</span>
-<span id="cb8-455"><a href="#cb8-455" aria-hidden="true" tabindex="-1"></a>just because one was attached.</span>
+<span id="cb8-405"><a href="#cb8-405" aria-hidden="true" tabindex="-1"></a>  level shows up again at the sentence level. Four test queries is a</span>
+<span id="cb8-406"><a href="#cb8-406" aria-hidden="true" tabindex="-1"></a>  real result, not a toy one, but it's still too small to call this a</span>
+<span id="cb8-407"><a href="#cb8-407" aria-hidden="true" tabindex="-1"></a>  statistically powered comparison — read it as consistent with BM25's</span>
+<span id="cb8-408"><a href="#cb8-408" aria-hidden="true" tabindex="-1"></a>  known strength on exact-jargon matching, not as proof dense</span>
+<span id="cb8-409"><a href="#cb8-409" aria-hidden="true" tabindex="-1"></a>  embeddings lose on this archive in general.</span>
+<span id="cb8-410"><a href="#cb8-410" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A retrieval query and a fine-tuned model's expected input are</span>
+<span id="cb8-411"><a href="#cb8-411" aria-hidden="true" tabindex="-1"></a>  different things. Reusing one as the other — the templated metadata</span>
+<span id="cb8-412"><a href="#cb8-412" aria-hidden="true" tabindex="-1"></a>  string as a search query — silently retrieves the wrong documents.</span>
+<span id="cb8-413"><a href="#cb8-413" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Successful retrieval doesn't guarantee grounded generation. This</span>
+<span id="cb8-414"><a href="#cb8-414" aria-hidden="true" tabindex="-1"></a>  chapter measured both separately and found them genuinely different:</span>
+<span id="cb8-415"><a href="#cb8-415" aria-hidden="true" tabindex="-1"></a>  retrieval succeeded 4/4 times; the model faithfully used what it was</span>
+<span id="cb8-416"><a href="#cb8-416" aria-hidden="true" tabindex="-1"></a>  given only some of that time.</span>
+<span id="cb8-417"><a href="#cb8-417" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-418"><a href="#cb8-418" aria-hidden="true" tabindex="-1"></a><span class="fu">## Repository files</span></span>
+<span id="cb8-419"><a href="#cb8-419" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-420"><a href="#cb8-420" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> File <span class="pp">|</span> Purpose <span class="pp">|</span></span>
+<span id="cb8-421"><a href="#cb8-421" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb8-422"><a href="#cb8-422" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_09/hybrid_rag_finetune.py`</span> <span class="pp">|</span> Builds a BM25 retrieval index over the full archive and combines it with Chapter 8's fine-tuned model <span class="pp">|</span></span>
+<span id="cb8-423"><a href="#cb8-423" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_09/challenge/challenge.py`</span> <span class="pp">|</span> Reference solution: dense-embedding retrieval, compared directly against BM25 <span class="pp">|</span></span>
+<span id="cb8-424"><a href="#cb8-424" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`notebooks/chapter_09_explore.ipynb`</span> <span class="pp">|</span> Interactive companion notebook <span class="pp">|</span></span>
+<span id="cb8-425"><a href="#cb8-425" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-426"><a href="#cb8-426" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution title="CHECKPOINT — Chapter 9"}</span>
+<span id="cb8-427"><a href="#cb8-427" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Built a retrieval corpus covering every quality-gated report,</span>
+<span id="cb8-428"><a href="#cb8-428" aria-hidden="true" tabindex="-1"></a>      including the one the fine-tuned model never trained on</span>
+<span id="cb8-429"><a href="#cb8-429" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Chose BM25 over dense embeddings based on a real, measured</span>
+<span id="cb8-430"><a href="#cb8-430" aria-hidden="true" tabindex="-1"></a>      comparison, not by default</span>
+<span id="cb8-431"><a href="#cb8-431" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Combined retrieval with Chapter 8's fine-tuned model to produce</span>
+<span id="cb8-432"><a href="#cb8-432" aria-hidden="true" tabindex="-1"></a>      answers with citations</span>
+<span id="cb8-433"><a href="#cb8-433" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Measured retrieval accuracy and generation faithfulness</span>
+<span id="cb8-434"><a href="#cb8-434" aria-hidden="true" tabindex="-1"></a>      separately, and found they're not the same thing</span>
+<span id="cb8-435"><a href="#cb8-435" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-436"><a href="#cb8-436" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-437"><a href="#cb8-437" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}</span>
+<span id="cb8-438"><a href="#cb8-438" aria-hidden="true" tabindex="-1"></a>**`hybrid_rag_finetune.py`** — a BM25 retrieval index over all 75</span>
+<span id="cb8-439"><a href="#cb8-439" aria-hidden="true" tabindex="-1"></a>quality-gated reports (held-out report included), combined with Chapter</span>
+<span id="cb8-440"><a href="#cb8-440" aria-hidden="true" tabindex="-1"></a>8's fine-tuned checkpoint to produce cited, source-grounded answers.</span>
+<span id="cb8-441"><a href="#cb8-441" aria-hidden="true" tabindex="-1"></a>Chapter 10 picks up exactly where this chapter's Field Notes left off:</span>
+<span id="cb8-442"><a href="#cb8-442" aria-hidden="true" tabindex="-1"></a>checking whether an answer is actually consistent with what it cites.</span>
+<span id="cb8-443"><a href="#cb8-443" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-444"><a href="#cb8-444" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-445"><a href="#cb8-445" aria-hidden="true" tabindex="-1"></a><span class="fu">## What can you do now that you couldn't do before?</span></span>
+<span id="cb8-446"><a href="#cb8-446" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-447"><a href="#cb8-447" aria-hidden="true" tabindex="-1"></a>You can answer a question using both a model that's learned your</span>
+<span id="cb8-448"><a href="#cb8-448" aria-hidden="true" tabindex="-1"></a>domain's language and a search over your actual reports, together — and</span>
+<span id="cb8-449"><a href="#cb8-449" aria-hidden="true" tabindex="-1"></a>you can point to exactly which report and time window an answer came</span>
+<span id="cb8-450"><a href="#cb8-450" aria-hidden="true" tabindex="-1"></a>from, instead of asking the model to simply be right.</span>
+<span id="cb8-451"><a href="#cb8-451" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-452"><a href="#cb8-452" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suggested next step</span></span>
+<span id="cb8-453"><a href="#cb8-453" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-454"><a href="#cb8-454" aria-hidden="true" tabindex="-1"></a>**Coming up in Chapter 10:** this chapter's Field Notes found a real</span>
+<span id="cb8-455"><a href="#cb8-455" aria-hidden="true" tabindex="-1"></a>gap — retrieval can find the right source and the model can still write</span>
+<span id="cb8-456"><a href="#cb8-456" aria-hidden="true" tabindex="-1"></a>an answer that ignores it. Chapter 10 builds the check this chapter is</span>
+<span id="cb8-457"><a href="#cb8-457" aria-hidden="true" tabindex="-1"></a>missing: verifying an answer is actually consistent with the report it</span>
+<span id="cb8-458"><a href="#cb8-458" aria-hidden="true" tabindex="-1"></a>cites, and flagging it when it isn't, instead of trusting a citation</span>
+<span id="cb8-459"><a href="#cb8-459" aria-hidden="true" tabindex="-1"></a>just because one was attached.</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

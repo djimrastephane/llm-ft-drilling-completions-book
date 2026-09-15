@@ -84,9 +84,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-f352355e9c4cf757a45f4f8798595620.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-5eaba02739cdb78914c5f4540b400244.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -848,7 +848,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <td>Drift</td>
-<td>A model’s behavior changing across versions or over time. A <strong>regression</strong> is drift for the worse – something that used to work stops working in a version meant to be an improvement — Chapter 12.</td>
+<td>A model’s behavior changing across versions or over time. A <strong>regression</strong> is drift for the worse – something that used to work stops working in a version meant to be an improvement — Chapter 12 checks this by comparing checkpoints on a fixed evaluation set, not by monitoring a deployed model’s live input traffic (a different, unimplemented problem also called drift).</td>
 </tr>
 <tr class="odd">
 <td>RAG (retrieval-augmented generation)</td>
@@ -1447,7 +1447,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Epoch <span class="pp">|</span> One full pass through the training dataset. <span class="pp">|</span></span>
 <span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Perplexity <span class="pp">|</span> A numeric measure of how well a model predicts held-out text; lower is generally better — Chapter 11. <span class="pp">|</span></span>
 <span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Hallucination <span class="pp">|</span> A fluent but factually unsupported model output — Chapter 10 covers detecting and mitigating it. <span class="pp">|</span></span>
-<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Drift <span class="pp">|</span> A model's behavior changing across versions or over time. A **regression** is drift for the worse -- something that used to work stops working in a version meant to be an improvement — Chapter 12. <span class="pp">|</span></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Drift <span class="pp">|</span> A model's behavior changing across versions or over time. A **regression** is drift for the worse -- something that used to work stops working in a version meant to be an improvement — Chapter 12 checks this by comparing checkpoints on a fixed evaluation set, not by monitoring a deployed model's live input traffic (a different, unimplemented problem also called drift). <span class="pp">|</span></span>
 <span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> RAG (retrieval-augmented generation) <span class="pp">|</span> Combining a model with a retrieval step over external documents, instead of relying only on what's in its weights — Chapter 9. <span class="pp">|</span></span>
 <span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Grounded / grounding <span class="pp">|</span> An answer that's actually built from a real, cited source, not just retrieved alongside it — Chapter 10 checks the difference. <span class="pp">|</span></span>
 <span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Faithfulness <span class="pp">|</span> How well an answer's actual content matches what a specific source says — Chapter 10's word-overlap check is one simple way to measure it. <span class="pp">|</span></span>

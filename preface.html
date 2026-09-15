@@ -103,9 +103,9 @@ div.csl-indent {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-f352355e9c4cf757a45f4f8798595620.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-5eaba02739cdb78914c5f4540b400244.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -582,11 +582,12 @@ div.csl-indent {
 <section id="why-this-book-exists" class="level2">
 <h2 class="anchored" data-anchor-id="why-this-book-exists">Why this book exists</h2>
 <p>I wrote this book because I kept seeing the same gap on drilling and completions teams considering local LLMs: a general-purpose model is fluent, but it doesn’t actually know how <em>this</em> operation talks — report shorthand, sequencing conventions, the judgment calls a completions engineer makes without writing out the reasoning. You can paper over that with an enormous prompt every time, or you can fine-tune a small local model on your own operational text so it has actually learned the domain. This book teaches the second path, end to end, in plain Python.</p>
-<p>Parameter-efficient fine-tuning methods like LoRA <span class="citation" data-cites="hu2021lora">(<a href="references.html#ref-hu2021lora" role="doc-biblioref">Hu et al. 2021</a>)</span> and its quantized successor QLoRA <span class="citation" data-cites="dettmers2023qlora">(<a href="references.html#ref-dettmers2023qlora" role="doc-biblioref">Dettmers et al. 2023</a>)</span> made this practical on ordinary hardware — a full retrain of a foundation model is out of reach for almost everyone; adapting a few percent of its parameters on a consumer GPU is not. This book builds on that shift: you fine-tune a small open-weight model, evaluate it honestly, and keep it current, all running locally.</p>
+<p>Parameter-efficient fine-tuning methods like LoRA <span class="citation" data-cites="hu2021lora">(<a href="references.html#ref-hu2021lora" role="doc-biblioref">Hu et al. 2021</a>)</span> and its quantized successor QLoRA <span class="citation" data-cites="dettmers2023qlora">(<a href="references.html#ref-dettmers2023qlora" role="doc-biblioref">Dettmers et al. 2023</a>)</span> made this practical on ordinary hardware — a full retrain of a foundation model is out of reach for almost everyone; adapting a few percent of its parameters on a consumer GPU is not. This book builds on that shift: you fine-tune a small, already instruction-tuned open-weight model <span class="citation" data-cites="wei2021flan">(<a href="references.html#ref-wei2021flan" role="doc-biblioref">Wei et al. 2021</a>)</span>, evaluate it honestly, and keep it current, all running locally.</p>
 </section>
 <section id="what-this-protects" class="level2">
 <h2 class="anchored" data-anchor-id="what-this-protects">What this protects</h2>
 <p>Fine-tuning on operational text raises the same stakes as any system trained on a company’s own data: what goes into the model can, in principle, come back out of it. This book treats that as a first-class constraint, not an afterthought — training data handling, what stays local, and what an evaluation harness should catch before a fine-tuned model is trusted are covered starting in Part I, not bolted on at the end.</p>
+<p>A fine-tuned model can also sound confident while being wrong — the well-documented failure mode usually called hallucination <span class="citation" data-cites="ji2023hallucination">(<a href="references.html#ref-ji2023hallucination" role="doc-biblioref">Ji et al. 2023</a>)</span> — which is a separate risk from data leakage and gets its own detection tooling starting in Chapter 10.</p>
 <p>A fine-tuned model doesn’t replace an engineer’s judgment. It replaces having to explain your operation’s conventions to a generic assistant every single time. Deciding what a result means, or whether a model’s answer is safe to act on, stays yours to make.</p>
 </section>
 <section id="why-industrial" class="level2">
@@ -609,7 +610,7 @@ div.csl-indent {
 </section>
 <section id="a-note-on-data" class="level2">
 <h2 class="anchored" data-anchor-id="a-note-on-data">A note on data</h2>
-<p>Daily drilling and completions reports are typically operationally sensitive and confidential — which is exactly why this book reuses the same source as the author’s previous book on retrieval: real, publicly available Daily Drilling and completion reports from <strong>Utah FORGE</strong>, a Department of Energy-funded enhanced geothermal system research well (FORGE 16A(78)-32). No anonymisation was applied, because none was needed. See <code>book/datasets/README.md</code> for the exact layout and policy.</p>
+<p>Daily drilling and completions reports are typically operationally sensitive and confidential — which is exactly why this book reuses the same source as the author’s previous book on retrieval: real, publicly available Daily Drilling and completion reports from <strong>Utah FORGE</strong>, a Department of Energy-funded enhanced geothermal system research well (FORGE 16A [78]-32). No anonymisation was applied, because none was needed. See <code>book/datasets/README.md</code> for the exact layout and policy.</p>
 <p>That said, the <em>technique</em> in this book generalises directly to a confidential archive: everything from Chapter 6 onward — data quality gates, evaluation, drift detection — exists precisely because production training data is messier and more sensitive than this public one. If you point this book’s code at your own organisation’s reports instead, do not commit them to a public repository, and see <a href="./appendix/appendix_a_environment_setup.html">Appendix A</a> for a data-handling checklist.</p>
 <p>One thing that does <em>not</em> generalise automatically: Chapter 2’s and Chapter 7’s extraction code reads specific field labels at specific positions in Utah FORGE’s own report layout, and Chapter 6’s data quality gate runs that same extraction code unchanged over the full archive. There is no single “Daily Drilling Report” format across operators, contractors, and basins, so that extraction code will need rewriting — new labels, new patterns — against your own archive’s actual layout before anything downstream of it works. Doing that rewrite means editing regular-expression patterns directly, which is a real programming task even though the rest of this book doesn’t assume you can do one yet. That adaptation is not a gap to route around; it is the point. This book teaches you the full pipeline end to end, on one real dataset, so you have the understanding to rebuild each stage against your own data — not a drop-in tool that already expects it. See <a href="./appendix/appendix_c_known_limitations.html">Appendix C</a> for this and five other concrete places this book’s code is scoped to what it was actually tested against.</p>
 
@@ -623,8 +624,14 @@ Dettmers, Tim, Artidoro Pagnoni, Ari Holtzman, and Luke Zettlemoyer. 2023. <em><
 <div id="ref-hu2021lora" class="csl-entry" role="listitem">
 Hu, Edward J., Yelong Shen, Phillip Wallis, et al. 2021. <em><span>LoRA</span>: Low-Rank Adaptation of Large Language Models</em>. <a href="https://arxiv.org/abs/2106.09685">https://arxiv.org/abs/2106.09685</a>.
 </div>
+<div id="ref-ji2023hallucination" class="csl-entry" role="listitem">
+Ji, Ziwei, Nayeon Lee, Rita Frieske, et al. 2023. <span>“Survey of Hallucination in Natural Language Generation.”</span> In <em>ACM Computing Surveys</em>, No. 12, vol. 55. <a href="https://doi.org/10.1145/3571730">https://doi.org/10.1145/3571730</a>.
+</div>
 <div id="ref-matthes2023python" class="csl-entry" role="listitem">
 Matthes, Eric. 2023. <em>Python Crash Course: A Hands-on, Project-Based Introduction to Programming</em>. 3rd ed. No Starch Press.
+</div>
+<div id="ref-wei2021flan" class="csl-entry" role="listitem">
+Wei, Jason, Maarten Bosma, Vincent Y. Zhao, et al. 2021. <em>Finetuned Language Models Are Zero-Shot Learners</em>. <a href="https://arxiv.org/abs/2109.01652">https://arxiv.org/abs/2109.01652</a>.
 </div>
 </div>
 </section>
@@ -1130,8 +1137,8 @@ Matthes, Eric. 2023. <em>Python Crash Course: A Hands-on, Project-Based Introduc
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>ordinary hardware — a full retrain of a foundation model is out of reach</span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>for almost everyone; adapting a few percent of its parameters on a</span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>consumer GPU is not. This book builds on that shift: you fine-tune a</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>small open-weight model, evaluate it honestly, and keep it current, all</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>running locally.</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>small, already instruction-tuned open-weight model <span class="co">[</span><span class="ot">@wei2021flan</span><span class="co">]</span>,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>evaluate it honestly, and keep it current, all running locally.</span>
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu">## What this protects</span></span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
@@ -1143,93 +1150,98 @@ Matthes, Eric. 2023. <em>Python Crash Course: A Hands-on, Project-Based Introduc
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>model is trusted are covered starting in Part I, not bolted on at the</span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>end.</span>
 <span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>A fine-tuned model doesn't replace an engineer's judgment. It replaces</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>having to explain your operation's conventions to a generic assistant</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>every single time. Deciding what a result means, or whether a model's</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>answer is safe to act on, stays yours to make.</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>A fine-tuned model can also sound confident while being wrong — the</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>well-documented failure mode usually called hallucination</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">@ji2023hallucination</span><span class="co">]</span> — which is a separate risk from data leakage and</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>gets its own detection tooling starting in Chapter 10.</span>
 <span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why "industrial"</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>A demo that fine-tunes a model on a handful of hand-picked examples is</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>easy to build and easy to find online. An industrial system is</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>different. It has to:</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Handle real, messy training data — inconsistent formatting, duplicate</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  or near-duplicate reports, missing fields.</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Prove the fine-tune actually improved something, with numbers, not</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>  impressions.</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Never silently regress on cases the base model already got right.</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Be auditable and reproducible by someone who was not in the room when</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  it was trained.</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>Every chapter in Part II exists because a toy fine-tuning script fails at</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>one of these requirements. We fix them one at a time, in the order you</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>would actually hit them in the field.</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="fu">## How to read this book</span></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>This book borrows the practical-first, project-based spirit of *Python</span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>Crash Course* <span class="co">[</span><span class="ot">@matthes2023python</span><span class="co">]</span> — small wins early, theory only when</span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>the code in front of you needs it, a working artifact at the end of every</span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>chapter — but assumes considerably less going in. You do not need to have</span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>written Python before. You do not need to know what a function or a loop</span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>is before Chapter 1; each concept is explained in plain language,</span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>translated into terms an engineer already knows, exactly when you need it</span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>to solve the problem in front of you.</span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>If you've never installed Python or set up a project folder before, start</span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>with Part 0 — it gets you to a working setup in whichever editor or</span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>notebook tool you're most comfortable with, with no assumption that</span>
-<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>you've done this before.</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>A fine-tuned model doesn't replace an engineer's judgment. It replaces</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>having to explain your operation's conventions to a generic assistant</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>every single time. Deciding what a result means, or whether a model's</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>answer is safe to act on, stays yours to make.</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why "industrial"</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>A demo that fine-tunes a model on a handful of hand-picked examples is</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>easy to build and easy to find online. An industrial system is</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>different. It has to:</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Handle real, messy training data — inconsistent formatting, duplicate</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  or near-duplicate reports, missing fields.</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Prove the fine-tune actually improved something, with numbers, not</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  impressions.</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Never silently regress on cases the base model already got right.</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Be auditable and reproducible by someone who was not in the room when</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>  it was trained.</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>Every chapter in Part II exists because a toy fine-tuning script fails at</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>one of these requirements. We fix them one at a time, in the order you</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>would actually hit them in the field.</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="fu">## How to read this book</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>This book borrows the practical-first, project-based spirit of *Python</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>Crash Course* <span class="co">[</span><span class="ot">@matthes2023python</span><span class="co">]</span> — small wins early, theory only when</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>the code in front of you needs it, a working artifact at the end of every</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>chapter — but assumes considerably less going in. You do not need to have</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>written Python before. You do not need to know what a function or a loop</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>is before Chapter 1; each concept is explained in plain language,</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>translated into terms an engineer already knows, exactly when you need it</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>to solve the problem in front of you.</span>
 <span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>Read it in order the first time. Each chapter assumes the code from the</span>
-<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>previous one exists and works — this is a build, not a reference manual.</span>
-<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>After your first pass, use it as a reference: jump to the chapter that</span>
-<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>matches the problem you currently have (Chapter 6 if your training data</span>
-<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>is messy, Chapter 11 if you're not sure the fine-tune helped, Chapter 12</span>
-<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>if you suspect a newer version regressed).</span>
-<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>Type the code yourself. Do not copy-paste from the companion repository</span>
-<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>until you have typed it once and watched it run. This is slower and it is</span>
-<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>worth it — and if you finish this book able to say "I can build this,"</span>
-<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>rather than "I understand the theory," it did its job.</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>If you've never installed Python or set up a project folder before, start</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>with Part 0 — it gets you to a working setup in whichever editor or</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>notebook tool you're most comfortable with, with no assumption that</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>you've done this before.</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>Read it in order the first time. Each chapter assumes the code from the</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>previous one exists and works — this is a build, not a reference manual.</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>After your first pass, use it as a reference: jump to the chapter that</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>matches the problem you currently have (Chapter 6 if your training data</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>is messy, Chapter 11 if you're not sure the fine-tune helped, Chapter 12</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>if you suspect a newer version regressed).</span>
 <span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a><span class="fu">## A note on data</span></span>
-<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>Daily drilling and completions reports are typically operationally</span>
-<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>sensitive and confidential — which is exactly why this book reuses the</span>
-<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>same source as the author's previous book on retrieval: real, publicly</span>
-<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>available Daily Drilling and completion reports from **Utah FORGE**, a</span>
-<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>Department of Energy-funded enhanced geothermal system research well</span>
-<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>(FORGE 16A(78)-32). No anonymisation was applied, because none was</span>
-<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>needed. See <span class="in">`book/datasets/README.md`</span> for the exact layout and policy.</span>
-<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>That said, the *technique* in this book generalises directly to a</span>
-<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>confidential archive: everything from Chapter 6 onward — data quality</span>
-<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>gates, evaluation, drift detection — exists precisely because production</span>
-<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>training data is messier and more sensitive than this public one. If you</span>
-<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>point this book's code at your own organisation's reports instead, do</span>
-<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>not commit them to a public repository, and see</span>
-<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Appendix A</span><span class="co">](appendix/appendix_a_environment_setup.qmd)</span> for a</span>
-<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>data-handling checklist.</span>
-<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>One thing that does *not* generalise automatically: Chapter 2's and</span>
-<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>Chapter 7's extraction code reads specific field labels at specific</span>
-<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>positions in Utah FORGE's own report layout, and Chapter 6's data</span>
-<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>quality gate runs that same extraction code unchanged over the full</span>
-<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>archive. There is no single "Daily Drilling Report" format across</span>
-<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>operators, contractors, and basins, so that extraction code will need</span>
-<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>rewriting — new labels, new patterns — against your own archive's</span>
-<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>actual layout before anything downstream of it works. Doing that</span>
-<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>rewrite means editing regular-expression patterns directly, which is a</span>
-<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>real programming task even though the rest of this book doesn't assume</span>
-<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>you can do one yet. That adaptation is not a gap to route around; it is</span>
-<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>the point. This book teaches you the full pipeline end to end, on one</span>
-<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>real dataset, so you have the understanding to rebuild each stage</span>
-<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>against your own data — not a drop-in tool that already expects it. See</span>
-<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Appendix C</span><span class="co">](appendix/appendix_c_known_limitations.qmd)</span> for this and</span>
-<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>five other concrete places this book's code is scoped to what it was</span>
-<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>actually tested against.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>Type the code yourself. Do not copy-paste from the companion repository</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>until you have typed it once and watched it run. This is slower and it is</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>worth it — and if you finish this book able to say "I can build this,"</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>rather than "I understand the theory," it did its job.</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a><span class="fu">## A note on data</span></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>Daily drilling and completions reports are typically operationally</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>sensitive and confidential — which is exactly why this book reuses the</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>same source as the author's previous book on retrieval: real, publicly</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>available Daily Drilling and completion reports from **Utah FORGE**, a</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>Department of Energy-funded enhanced geothermal system research well</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>(FORGE 16A <span class="co">[</span><span class="ot">78</span><span class="co">]</span>-32). No anonymisation was applied, because none was</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>needed. See <span class="in">`book/datasets/README.md`</span> for the exact layout and policy.</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>That said, the *technique* in this book generalises directly to a</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>confidential archive: everything from Chapter 6 onward — data quality</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>gates, evaluation, drift detection — exists precisely because production</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>training data is messier and more sensitive than this public one. If you</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>point this book's code at your own organisation's reports instead, do</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>not commit them to a public repository, and see</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Appendix A</span><span class="co">](appendix/appendix_a_environment_setup.qmd)</span> for a</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>data-handling checklist.</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>One thing that does *not* generalise automatically: Chapter 2's and</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>Chapter 7's extraction code reads specific field labels at specific</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>positions in Utah FORGE's own report layout, and Chapter 6's data</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>quality gate runs that same extraction code unchanged over the full</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>archive. There is no single "Daily Drilling Report" format across</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>operators, contractors, and basins, so that extraction code will need</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>rewriting — new labels, new patterns — against your own archive's</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>actual layout before anything downstream of it works. Doing that</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>rewrite means editing regular-expression patterns directly, which is a</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>real programming task even though the rest of this book doesn't assume</span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>you can do one yet. That adaptation is not a gap to route around; it is</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>the point. This book teaches you the full pipeline end to end, on one</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>real dataset, so you have the understanding to rebuild each stage</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>against your own data — not a drop-in tool that already expects it. See</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Appendix C</span><span class="co">](appendix/appendix_c_known_limitations.qmd)</span> for this and</span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a>five other concrete places this book's code is scoped to what it was</span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>actually tested against.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">

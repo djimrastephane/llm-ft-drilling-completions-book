@@ -84,9 +84,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-f352355e9c4cf757a45f4f8798595620.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-5eaba02739cdb78914c5f4540b400244.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -597,7 +597,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="../figures/diagrams/pipeline_ch03_light.svg" class="diagram-light img-fluid" width="180"> <img src="../figures/diagrams/pipeline_ch03_dark.svg" class="diagram-dark img-fluid" width="180"></p>
 </div>
 <div class="chapter-status">
-<p>Progress <code>███░░░░░░░░░░</code> <strong>3 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 20-30 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🟢 Beginner</p>
+<p>Progress <code>███░░░░░░░░░░</code> <strong>3 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 20–30 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🟢 Beginner</p>
 </div>
 <section id="learning-objectives" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">3.1</span> Learning objectives</h2>
@@ -758,7 +758,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output" class="level2" data-number="3.10">
 <h2 data-number="3.10" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">3.10</span> Expected Output</h2>
 <p>A plain-text prompt string, with no trace of the expected answer.</p>
-<div id="31a092c0" class="cell" data-execution_count="1">
+<div id="d1c81c4c" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -806,7 +806,7 @@ Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22</code></pre>
 <section id="expected-output-1" class="level2" data-number="3.15">
 <h2 data-number="3.15" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">3.15</span> Expected Output</h2>
 <p>A dictionary recording the question, the hidden expected answer, the model’s actual answer, and whether they matched.</p>
-<div id="7310745e" class="cell" data-execution_count="2">
+<div id="077a4546" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ask_baseline(model, tokenizer, example: <span class="bu">dict</span>, max_new_tokens: <span class="bu">int</span> <span class="op">=</span> <span class="dv">60</span>) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    prompt <span class="op">=</span> build_prompt(example)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    answer <span class="op">=</span> generate_reply(model, tokenizer, prompt, max_new_tokens<span class="op">=</span>max_new_tokens)</span>
@@ -856,7 +856,7 @@ Well: FORGE 16A [78]-32 | Report #3 | Date: 2020-10-22</code></pre>
 <section id="expected-output-2" class="level2" data-number="3.20">
 <h2 data-number="3.20" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">3.20</span> Expected Output</h2>
 <p>A summary line reporting how many of the 16 answers matched, and a saved <code>.jsonl</code> file with one result per question.</p>
-<div id="9413be75" class="cell" data-execution_count="3">
+<div id="34a6d817" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>TRAINING_BASELINE_OUTPUT_PATH <span class="op">=</span> BOOK_ROOT <span class="op">/</span> <span class="st">"datasets"</span> <span class="op">/</span> <span class="st">"training_examples"</span> <span class="op">/</span> <span class="st">"training_baseline_results.jsonl"</span></span>
@@ -1506,7 +1506,7 @@ Saved -&gt; datasets/training_examples/training_baseline_results.jsonl</code></p
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>::: {.chapter-status}</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`███░░░░░░░░░░`</span> **3 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 20-30 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🟢 Beginner</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`███░░░░░░░░░░`</span> **3 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 20–30 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🟢 Beginner</span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learning objectives</span></span>

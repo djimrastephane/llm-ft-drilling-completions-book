@@ -84,9 +84,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-f352355e9c4cf757a45f4f8798595620.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-5eaba02739cdb78914c5f4540b400244.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -595,7 +595,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="../figures/diagrams/pipeline_ch06_light.svg" class="diagram-light img-fluid" width="180"> <img src="../figures/diagrams/pipeline_ch06_dark.svg" class="diagram-dark img-fluid" width="180"></p>
 </div>
 <div class="chapter-status">
-<p>Progress <code>██████░░░░░░░</code> <strong>6 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 30-40 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🟢 Beginner</p>
+<p>Progress <code>██████░░░░░░░</code> <strong>6 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 30–40 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🟢 Beginner</p>
 </div>
 <section id="learning-objectives" class="level2" data-number="6.1">
 <h2 data-number="6.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">6.1</span> Learning objectives</h2>
@@ -684,7 +684,7 @@ Report #70 (2020-12-28), present_operations: "CIRCULATE FOR TEMPERATURE"</code><
 <section id="expected-output" class="level2" data-number="6.9">
 <h2 data-number="6.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">6.9</span> Expected Output</h2>
 <p>A status (<code>ok</code> or <code>unrecognized_format</code>) attached to every report.</p>
-<div id="85e205f6" class="cell" data-execution_count="1">
+<div id="760c2c32" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -745,7 +745,7 @@ Failed: ['FORGE-16A-78-32_Completion_003_2021-01-06.pdf']</code></pre>
 <section id="expected-output-1" class="level2" data-number="6.14">
 <h2 data-number="6.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">6.14</span> Expected Output</h2>
 <p>Every field value that appears on more than one report, with the report numbers involved.</p>
-<div id="693d07a4" class="cell" data-execution_count="2">
+<div id="850ac3dc" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> defaultdict</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -796,7 +796,7 @@ Duplicate activity_planned values:
 <section id="expected-output-2" class="level2" data-number="6.19">
 <h2 data-number="6.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">6.19</span> Expected Output</h2>
 <p>Each duplicate group labeled <code>consecutive</code> or <code>needs_review</code>, plus a final summary.</p>
-<div id="fde0a797" class="cell" data-execution_count="3">
+<div id="992b0b54" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> classify_duplicate(rpt_nums: <span class="bu">list</span>[<span class="bu">int</span>]) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    gaps <span class="op">=</span> [b <span class="op">-</span> a <span class="cf">for</span> a, b <span class="kw">in</span> <span class="bu">zip</span>(rpt_nums, rpt_nums[<span class="dv">1</span>:])]</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"consecutive"</span> <span class="cf">if</span> <span class="bu">all</span>(gap <span class="op">==</span> <span class="dv">1</span> <span class="cf">for</span> gap <span class="kw">in</span> gaps) <span class="cf">else</span> <span class="st">"needs_review"</span></span>
@@ -1440,7 +1440,7 @@ Duplicates: 4 consecutive (no action needed), 2 need review
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>::: {.chapter-status}</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`██████░░░░░░░`</span> **6 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 30-40 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🟢 Beginner</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`██████░░░░░░░`</span> **6 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 30–40 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🟢 Beginner</span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learning objectives</span></span>

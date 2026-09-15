@@ -84,9 +84,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-f352355e9c4cf757a45f4f8798595620.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-5eaba02739cdb78914c5f4540b400244.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -595,7 +595,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="../figures/diagrams/pipeline_ch04_light.svg" class="diagram-light img-fluid" width="180"> <img src="../figures/diagrams/pipeline_ch04_dark.svg" class="diagram-dark img-fluid" width="180"></p>
 </div>
 <div class="chapter-status">
-<p>Progress <code>████░░░░░░░░░</code> <strong>4 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 30-40 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🟠 Intermediate</p>
+<p>Progress <code>████░░░░░░░░░</code> <strong>4 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 30–40 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🟠 Intermediate</p>
 </div>
 <section id="learning-objectives" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">4.1</span> Learning objectives</h2>
@@ -609,30 +609,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="operational-problem" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="operational-problem"><span class="header-section-number">4.2</span> Operational Problem</h2>
-<p>Sean, the production engineer, pushes back on Chapter 1’s finding: <em>“Sure, this small model didn’t know ‘trip out of hole’ — but ChatGPT and every other LLM I’ve used seem to handle abbreviations and jargon fine elsewhere. Isn’t that basically a solved problem by now?”</em></p>
+<p>Farid, the production engineer, pushes back on Chapter 1’s finding: <em>“Sure, this small model didn’t know ‘trip out of hole’ — but ChatGPT and every other LLM I’ve used seem to handle abbreviations and jargon fine elsewhere. Isn’t that basically a solved problem by now?”</em></p>
 <p>It’s a fair challenge, and answering it honestly means looking one layer lower than any question-and-answer test can show. Before a model generates anything, your text gets cut into pieces and looked up against a fixed table of numbers — and that happens the same way whether the model has seen your domain’s jargon a million times or never once. This chapter looks directly at that layer: what pieces this book’s oilfield shorthand actually gets cut into, and whether the numbers those pieces get looked up against already know anything about what that shorthand means.</p>
 </section>
 <section id="example-training-excerpt" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="example-training-excerpt"><span class="header-section-number">4.3</span> Example training excerpt</h2>
-<p>A realistic instruction/response pair built the same way Chapter 2’s <code>Drilling_038</code> examples were, using report shorthand exactly as written:</p>
-<div class="callout callout-style-default callout-note callout-titled" title="Sample training example">
+<p>A real instruction/response pair, built the same way Chapter 2’s <code>Drilling_038</code> examples were, but this one drawn from a genuine TIME BREAKDOWN entry in <code>Drilling_017</code> (2020-11-05), quoted exactly as filed:</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Sample training example -- FORGE-16A-78-32_Drilling_017_2020-11-05.pdf">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Sample training example
+<span class="screen-reader-only">Note</span>Sample training example – FORGE-16A-78-32_Drilling_017_2020-11-05.pdf
 </div>
 </div>
 <div class="callout-body-container callout-body">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"instruction"</span><span class="fu">:</span> <span class="st">"Summarize the operational risk in this report excerpt."</span><span class="fu">,</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"input"</span><span class="fu">:</span> <span class="st">"0600-1130 POOH FR 9,842' TO CHANGE BHA. ERRATIC TORQUE OBSD LAST 3 STDS."</span><span class="fu">,</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"output"</span><span class="fu">:</span> <span class="st">"Erratic torque over the last three stands before pulling out of hole suggests a developing hole-cleaning or BHA issue that should be monitored on the next run."</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"instruction"</span><span class="fu">:</span> <span class="st">"Summarize what operation this report excerpt describes."</span><span class="fu">,</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"input"</span><span class="fu">:</span> <span class="st">"TOOH (trip out of hole) with BHA #2. Break off bit, lay down Scout RSS (rotary steerable)."</span><span class="fu">,</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"output"</span><span class="fu">:</span> <span class="st">"A planned bottom hole assembly change: BHA #2 is pulled out of hole, its bit is broken off, and the rotary steerable tool is laid down ahead of picking up the next BHA."</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
-<p><code>POOH</code> and <code>BHA</code> sit right in the <code>input</code> above. Before this chapter is over, you’ll know exactly how the model’s tokenizer splits both of those, and how close — if at all — its own numbers place them next to what they actually mean.</p>
+<p><code>TOOH</code> and <code>BHA</code> sit right in the <code>input</code> above. Before this chapter is over, you’ll know exactly how the model’s tokenizer splits both of those, and how close — if at all — its own numbers place them next to what they actually mean.</p>
 </section>
 <section id="theory" class="level2" data-number="4.4">
 <h2 data-number="4.4" class="anchored" data-anchor-id="theory"><span class="header-section-number">4.4</span> Theory</h2>
@@ -678,7 +678,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="why-the-model-has-seen-jargon-before-isnt-evidence" class="level2" data-number="4.5">
 <h2 data-number="4.5" class="anchored" data-anchor-id="why-the-model-has-seen-jargon-before-isnt-evidence"><span class="header-section-number">4.5</span> Why “the model has seen jargon before” isn’t evidence</h2>
-<p>Sean’s instinct — that a language model trained on huge amounts of text has probably seen abbreviations and shorthand before — is reasonable. But “seen text like this somewhere” and “placed this specific term next to its specific meaning” are different claims, and only the second one matters for whether the model can answer a question about <code>BHA</code> correctly. This chapter tests the second claim directly, two ways: by looking at the model’s own raw, per-token embeddings, and by checking whether a dedicated, purpose-built sentence-embedding model — not this book’s small base model, something specifically designed to place similar meanings close together — does any better. Both results below are from real runs, not assumptions.</p>
+<p>Farid’s instinct — that a language model trained on huge amounts of text has probably seen abbreviations and shorthand before — is reasonable. But “seen text like this somewhere” and “placed this specific term next to its specific meaning” are different claims, and only the second one matters for whether the model can answer a question about <code>BHA</code> correctly. This chapter tests the second claim directly, two ways: by looking at the model’s own raw, per-token embeddings, and by checking whether a dedicated, purpose-built sentence-embedding model — not this book’s small base model, something specifically designed to place similar meanings close together — does any better. Both results below are from real runs, not assumptions.</p>
 </section>
 <section id="implementation" class="level2" data-number="4.6">
 <h2 data-number="4.6" class="anchored" data-anchor-id="implementation"><span class="header-section-number">4.6</span> Implementation</h2>
@@ -700,7 +700,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output" class="level2" data-number="4.9">
 <h2 data-number="4.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">4.9</span> Expected Output</h2>
 <p>A token count and the exact pieces for each term.</p>
-<div id="2b0cfba9" class="cell" data-execution_count="1">
+<div id="5f8184e3" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -760,7 +760,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output-1" class="level2" data-number="4.14">
 <h2 data-number="4.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">4.14</span> Expected Output</h2>
 <p>A cosine similarity score for each pair — closer to <code>1.0</code> means “close together,” closer to <code>0</code> means “no relationship,” negative means “pointing away from each other.”</p>
-<div id="e3f63b8d" class="cell" data-execution_count="2">
+<div id="6a1429d5" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>TERM_PAIRS <span class="op">=</span> [</span>
@@ -820,7 +820,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output-2" class="level2" data-number="4.19">
 <h2 data-number="4.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">4.19</span> Expected Output</h2>
 <p>The same style of cosine similarity scores, from a different, dedicated embedding model.</p>
-<div id="9f4f8984" class="cell" data-execution_count="3">
+<div id="00f45676" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sentence_transformers <span class="im">import</span> SentenceTransformer</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>st_model <span class="op">=</span> SentenceTransformer(<span class="st">"all-MiniLM-L6-v2"</span>)</span>
@@ -848,7 +848,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="practical-exercise" class="level2" data-number="4.21">
 <h2 data-number="4.21" class="anchored" data-anchor-id="practical-exercise"><span class="header-section-number">4.21</span> Practical exercise</h2>
 <p>🟢 <strong>Beginner</strong></p>
-<p><strong>Try it yourself:</strong> run <code>python code/chapter_04/tokenize_and_embed.py</code> from inside <code>book/</code>, then pick two more terms from <code>Drilling_038</code>’s excerpt above (<code>OBSD</code>, <code>STDS</code>, <code>FR</code>) and check how they tokenize.</p>
+<p><strong>Try it yourself:</strong> run <code>python code/chapter_04/tokenize_and_embed.py</code> from inside <code>book/</code>, then open <code>datasets/full_training_set/FORGE-16A-78-32_Drilling_017_2020-11-05.pdf</code> and pick two more real abbreviations from its TIME BREAKDOWN table (<code>RSS</code> and <code>TIH</code> both appear, each self-glossed in parentheses right in the report, the same way <code>TOOH</code> is above) and check how they tokenize.</p>
 <p><strong>You’ll know it worked when:</strong> you can point to the exact pieces each term splits into, and explain in one sentence why a short acronym isn’t necessarily “safe” from being split, even though it’s already short.</p>
 </section>
 <section id="field-notes" class="level2" data-number="4.22">
@@ -960,7 +960,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong><code>tokenize_and_embed.py</code></strong> — inspects tokenization and compares two kinds of off-the-shelf embeddings against this book’s own oilfield shorthand, with real, reproducible numbers showing neither reliably understands it. This is the concrete evidence for <em>why</em> Chapter 5 has to actually update the model’s weights, not just hope a bigger embedding model would fix it.</p>
+<p><strong><code>tokenize_and_embed.py</code></strong> — inspects tokenization and compares two kinds of off-the-shelf embeddings against this book’s own oilfield shorthand, with real, reproducible numbers showing neither reliably understands it. This is the concrete evidence for <em>why</em> Chapter 5 has to actually update the model’s weights, not just hope a bigger embedding model would fix it – though, as you’ll see there, Chapter 5’s fine-tune leaves this exact raw embedding table frozen and untouched; the fix happens at the attention layers downstream of it instead.</p>
 </div>
 </div>
 </section>
@@ -1473,7 +1473,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>::: {.chapter-status}</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`████░░░░░░░░░`</span> **4 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 30-40 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🟠 Intermediate</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`████░░░░░░░░░`</span> **4 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 30–40 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🟠 Intermediate</span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learning objectives</span></span>
@@ -1492,7 +1492,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## Operational Problem</span></span>
 <span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>Sean, the production engineer, pushes back on Chapter 1's finding:</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>Farid, the production engineer, pushes back on Chapter 1's finding:</span>
 <span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>*"Sure, this small model didn't know 'trip out of hole' — but ChatGPT</span>
 <span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>and every other LLM I've used seem to handle abbreviations and jargon</span>
 <span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>fine elsewhere. Isn't that basically a solved problem by now?"*</span>
@@ -1509,410 +1509,416 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="fu">## Example training excerpt</span></span>
 <span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>A realistic instruction/response pair built the same way Chapter 2's</span>
-<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="in">`Drilling_038`</span> examples were, using report shorthand exactly as written:</span>
-<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="Sample training example"}</span>
-<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a><span class="in">```json</span></span>
-<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>{</span>
-<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>  <span class="st">"instruction"</span><span class="op">:</span> <span class="st">"Summarize the operational risk in this report excerpt."</span><span class="op">,</span></span>
-<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>  <span class="st">"input"</span><span class="op">:</span> <span class="st">"0600-1130 POOH FR 9,842' TO CHANGE BHA. ERRATIC TORQUE OBSD LAST 3 STDS."</span><span class="op">,</span></span>
-<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>  <span class="st">"output"</span><span class="op">:</span> <span class="st">"Erratic torque over the last three stands before pulling out of hole suggests a developing hole-cleaning or BHA issue that should be monitored on the next run."</span></span>
-<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a><span class="in">`POOH`</span> and <span class="in">`BHA`</span> sit right in the <span class="in">`input`</span> above. Before this chapter is</span>
-<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>over, you'll know exactly how the model's tokenizer splits both of</span>
-<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>those, and how close — if at all — its own numbers place them next to</span>
-<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>what they actually mean.</span>
-<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a><span class="fu">## Theory</span></span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>A real instruction/response pair, built the same way Chapter 2's</span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="in">`Drilling_038`</span> examples were, but this one drawn from a genuine</span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>TIME BREAKDOWN entry in <span class="in">`Drilling_017`</span> (2020-11-05), quoted exactly as</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>filed:</span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="Sample training example -- FORGE-16A-78-32_Drilling_017_2020-11-05.pdf"}</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a><span class="in">```json</span></span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>  <span class="st">"instruction"</span><span class="op">:</span> <span class="st">"Summarize what operation this report excerpt describes."</span><span class="op">,</span></span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>  <span class="st">"input"</span><span class="op">:</span> <span class="st">"TOOH (trip out of hole) with BHA #2. Break off bit, lay down Scout RSS (rotary steerable)."</span><span class="op">,</span></span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>  <span class="st">"output"</span><span class="op">:</span> <span class="st">"A planned bottom hole assembly change: BHA #2 is pulled out of hole, its bit is broken off, and the rotary steerable tool is laid down ahead of picking up the next BHA."</span></span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a><span class="in">`TOOH`</span> and <span class="in">`BHA`</span> sit right in the <span class="in">`input`</span> above. Before this chapter is</span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>over, you'll know exactly how the model's tokenizer splits both of</span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>those, and how close — if at all — its own numbers place them next to</span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>what they actually mean.</span>
 <span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Engineering Translation: token"}</span>
-<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>A **token** is the actual chunk of text a model reads — not necessarily</span>
-<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>a whole word. A **tokenizer** is the fixed rulebook that decides where</span>
-<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>those chunks break. It doesn't know your domain, your abbreviations, or</span>
-<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>your intent; it just mechanically applies the same splitting rules to</span>
-<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>everything, the way a shipping label printer wraps text at a fixed</span>
-<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>column width whether or not that's where a word actually ends.</span>
-<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Engineering Translation: vocabulary"}</span>
-<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a>A model's **vocabulary** is the fixed list of pieces its tokenizer is</span>
-<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a>allowed to produce — tens of thousands of them, decided once when the</span>
-<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a>model was built and never updated by fine-tuning. If a term isn't one</span>
-<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a>whole piece on that list, it gets cut into smaller pieces that are.</span>
-<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Engineering Translation: embedding"}</span>
-<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a>An **embedding** is a list of numbers — a coordinate — that stands in</span>
-<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a>for a token or a phrase, so the model can do math with meaning instead</span>
-<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a>of with letters. Two coordinates being close together is supposed to</span>
-<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a>mean "these mean similar things," the same way two points close</span>
-<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a>together on a map are supposed to mean "these places are near each</span>
-<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a>other." That promise only holds if the model actually learned to place</span>
-<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a>them that way — nothing about having a coordinate guarantees it's a</span>
-<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a>*good* one.</span>
-<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why "the model has seen jargon before" isn't evidence</span></span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a><span class="fu">## Theory</span></span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Engineering Translation: token"}</span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>A **token** is the actual chunk of text a model reads — not necessarily</span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>a whole word. A **tokenizer** is the fixed rulebook that decides where</span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>those chunks break. It doesn't know your domain, your abbreviations, or</span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>your intent; it just mechanically applies the same splitting rules to</span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>everything, the way a shipping label printer wraps text at a fixed</span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>column width whether or not that's where a word actually ends.</span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Engineering Translation: vocabulary"}</span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a>A model's **vocabulary** is the fixed list of pieces its tokenizer is</span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a>allowed to produce — tens of thousands of them, decided once when the</span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a>model was built and never updated by fine-tuning. If a term isn't one</span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a>whole piece on that list, it gets cut into smaller pieces that are.</span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Engineering Translation: embedding"}</span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a>An **embedding** is a list of numbers — a coordinate — that stands in</span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a>for a token or a phrase, so the model can do math with meaning instead</span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a>of with letters. Two coordinates being close together is supposed to</span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a>mean "these mean similar things," the same way two points close</span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a>together on a map are supposed to mean "these places are near each</span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a>other." That promise only holds if the model actually learned to place</span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a>them that way — nothing about having a coordinate guarantees it's a</span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a>*good* one.</span>
+<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a>Sean's instinct — that a language model trained on huge amounts of text</span>
-<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a>has probably seen abbreviations and shorthand before — is reasonable.</span>
-<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a>But "seen text like this somewhere" and "placed this specific term next</span>
-<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a>to its specific meaning" are different claims, and only the second one</span>
-<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a>matters for whether the model can answer a question about <span class="in">`BHA`</span></span>
-<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a>correctly. This chapter tests the second claim directly, two ways: by</span>
-<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a>looking at the model's own raw, per-token embeddings, and by checking</span>
-<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a>whether a dedicated, purpose-built sentence-embedding model — not this</span>
-<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a>book's small base model, something specifically designed to place</span>
-<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a>similar meanings close together — does any better. Both results below</span>
-<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a>are from real runs, not assumptions.</span>
-<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a><span class="fu">## Implementation</span></span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why "the model has seen jargon before" isn't evidence</span></span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a>Farid's instinct — that a language model trained on huge amounts of text</span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a>has probably seen abbreviations and shorthand before — is reasonable.</span>
+<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a>But "seen text like this somewhere" and "placed this specific term next</span>
+<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a>to its specific meaning" are different claims, and only the second one</span>
+<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a>matters for whether the model can answer a question about <span class="in">`BHA`</span></span>
+<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a>correctly. This chapter tests the second claim directly, two ways: by</span>
+<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a>looking at the model's own raw, per-token embeddings, and by checking</span>
+<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a>whether a dedicated, purpose-built sentence-embedding model — not this</span>
+<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a>book's small base model, something specifically designed to place</span>
+<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a>similar meanings close together — does any better. Both results below</span>
+<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a>are from real runs, not assumptions.</span>
 <span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 1: See exactly how the tokenizer splits oilfield shorthand</span></span>
+<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a><span class="fu">## Implementation</span></span>
 <span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 1: See exactly how the tokenizer splits oilfield shorthand</span></span>
 <span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a>Before asking anything about meaning, see the literal pieces the</span>
-<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a>tokenizer produces — the raw material every later layer of the model</span>
-<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a>has to work with.</span>
-<span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a>Before asking anything about meaning, see the literal pieces the</span>
+<span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a>tokenizer produces — the raw material every later layer of the model</span>
+<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a>has to work with.</span>
 <span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The tokenizer loaded in Chapter 1 (<span class="in">`Qwen/Qwen2.5-1.5B-Instruct`</span>)</span>
-<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A handful of oilfield acronyms from this chapter's example, plus a few</span>
-<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a>  ordinary English words for contrast</span>
-<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The tokenizer loaded in Chapter 1 (<span class="in">`Qwen/Qwen2.5-1.5B-Instruct`</span>)</span>
+<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A handful of oilfield acronyms from this chapter's example, plus a few</span>
+<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a>  ordinary English words for contrast</span>
 <span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a>A token count and the exact pieces for each term.</span>
+<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
 <span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
-<span id="cb8-137"><a href="#cb8-137" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb8-138"><a href="#cb8-138" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-139"><a href="#cb8-139" aria-hidden="true" tabindex="-1"></a>BOOK_ROOT <span class="op">=</span> Path(<span class="va">__file__</span>).resolve().parents[<span class="dv">2</span>]</span>
-<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="bu">str</span>(BOOK_ROOT <span class="op">/</span> <span class="st">"code"</span> <span class="op">/</span> <span class="st">"chapter_01"</span>))</span>
-<span id="cb8-141"><a href="#cb8-141" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-142"><a href="#cb8-142" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> load_local_model <span class="im">import</span> MODEL_NAME, load_model_and_tokenizer</span>
+<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a>A token count and the exact pieces for each term.</span>
+<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-137"><a href="#cb8-137" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-138"><a href="#cb8-138" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb8-139"><a href="#cb8-139" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-141"><a href="#cb8-141" aria-hidden="true" tabindex="-1"></a>BOOK_ROOT <span class="op">=</span> Path(<span class="va">__file__</span>).resolve().parents[<span class="dv">2</span>]</span>
+<span id="cb8-142"><a href="#cb8-142" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="bu">str</span>(BOOK_ROOT <span class="op">/</span> <span class="st">"code"</span> <span class="op">/</span> <span class="st">"chapter_01"</span>))</span>
 <span id="cb8-143"><a href="#cb8-143" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-144"><a href="#cb8-144" aria-hidden="true" tabindex="-1"></a>OILFIELD_TERMS <span class="op">=</span> [<span class="st">"POOH"</span>, <span class="st">"TOOH"</span>, <span class="st">"BHA"</span>, <span class="st">"WOB"</span>, <span class="st">"SPP"</span>, <span class="st">"RPM"</span>]</span>
-<span id="cb8-145"><a href="#cb8-145" aria-hidden="true" tabindex="-1"></a>PLAIN_TERMS <span class="op">=</span> [<span class="st">"pipe"</span>, <span class="st">"hello"</span>, <span class="st">"drilling"</span>, <span class="st">"stuck"</span>]</span>
-<span id="cb8-146"><a href="#cb8-146" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-147"><a href="#cb8-147" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-148"><a href="#cb8-148" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tokenize_with_pieces(tokenizer, text: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">str</span>]:</span>
-<span id="cb8-149"><a href="#cb8-149" aria-hidden="true" tabindex="-1"></a>    ids <span class="op">=</span> tokenizer.encode(text, add_special_tokens<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb8-150"><a href="#cb8-150" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> tokenizer.convert_ids_to_tokens(ids)</span>
-<span id="cb8-151"><a href="#cb8-151" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-152"><a href="#cb8-152" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-153"><a href="#cb8-153" aria-hidden="true" tabindex="-1"></a>model, tokenizer <span class="op">=</span> load_model_and_tokenizer(MODEL_NAME)</span>
-<span id="cb8-154"><a href="#cb8-154" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> term <span class="kw">in</span> OILFIELD_TERMS <span class="op">+</span> PLAIN_TERMS:</span>
-<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a>    pieces <span class="op">=</span> tokenize_with_pieces(tokenizer, term)</span>
-<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>term<span class="sc">!r:12}</span><span class="ss"> -&gt; </span><span class="sc">{</span><span class="bu">len</span>(pieces)<span class="sc">}</span><span class="ss"> token(s): </span><span class="sc">{</span>pieces<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-144"><a href="#cb8-144" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> load_local_model <span class="im">import</span> MODEL_NAME, load_model_and_tokenizer</span>
+<span id="cb8-145"><a href="#cb8-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-146"><a href="#cb8-146" aria-hidden="true" tabindex="-1"></a>OILFIELD_TERMS <span class="op">=</span> [<span class="st">"POOH"</span>, <span class="st">"TOOH"</span>, <span class="st">"BHA"</span>, <span class="st">"WOB"</span>, <span class="st">"SPP"</span>, <span class="st">"RPM"</span>]</span>
+<span id="cb8-147"><a href="#cb8-147" aria-hidden="true" tabindex="-1"></a>PLAIN_TERMS <span class="op">=</span> [<span class="st">"pipe"</span>, <span class="st">"hello"</span>, <span class="st">"drilling"</span>, <span class="st">"stuck"</span>]</span>
+<span id="cb8-148"><a href="#cb8-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-149"><a href="#cb8-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-150"><a href="#cb8-150" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tokenize_with_pieces(tokenizer, text: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">str</span>]:</span>
+<span id="cb8-151"><a href="#cb8-151" aria-hidden="true" tabindex="-1"></a>    ids <span class="op">=</span> tokenizer.encode(text, add_special_tokens<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb8-152"><a href="#cb8-152" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> tokenizer.convert_ids_to_tokens(ids)</span>
+<span id="cb8-153"><a href="#cb8-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-154"><a href="#cb8-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a>model, tokenizer <span class="op">=</span> load_model_and_tokenizer(MODEL_NAME)</span>
+<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> term <span class="kw">in</span> OILFIELD_TERMS <span class="op">+</span> PLAIN_TERMS:</span>
+<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a>    pieces <span class="op">=</span> tokenize_with_pieces(tokenizer, term)</span>
+<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>term<span class="sc">!r:12}</span><span class="ss"> -&gt; </span><span class="sc">{</span><span class="bu">len</span>(pieces)<span class="sc">}</span><span class="ss"> token(s): </span><span class="sc">{</span>pieces<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb8-160"><a href="#cb8-160" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-161"><a href="#cb8-161" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-162"><a href="#cb8-162" aria-hidden="true" tabindex="-1"></a><span class="in">'POOH'       -&gt; 2 token(s): ['PO', 'OH']</span></span>
-<span id="cb8-163"><a href="#cb8-163" aria-hidden="true" tabindex="-1"></a><span class="in">'TOOH'       -&gt; 2 token(s): ['TO', 'OH']</span></span>
-<span id="cb8-164"><a href="#cb8-164" aria-hidden="true" tabindex="-1"></a><span class="in">'BHA'        -&gt; 2 token(s): ['B', 'HA']</span></span>
-<span id="cb8-165"><a href="#cb8-165" aria-hidden="true" tabindex="-1"></a><span class="in">'WOB'        -&gt; 2 token(s): ['W', 'OB']</span></span>
-<span id="cb8-166"><a href="#cb8-166" aria-hidden="true" tabindex="-1"></a><span class="in">'SPP'        -&gt; 2 token(s): ['S', 'PP']</span></span>
-<span id="cb8-167"><a href="#cb8-167" aria-hidden="true" tabindex="-1"></a><span class="in">'RPM'        -&gt; 2 token(s): ['R', 'PM']</span></span>
-<span id="cb8-168"><a href="#cb8-168" aria-hidden="true" tabindex="-1"></a><span class="in">'pipe'       -&gt; 1 token(s): ['pipe']</span></span>
-<span id="cb8-169"><a href="#cb8-169" aria-hidden="true" tabindex="-1"></a><span class="in">'hello'      -&gt; 1 token(s): ['hello']</span></span>
-<span id="cb8-170"><a href="#cb8-170" aria-hidden="true" tabindex="-1"></a><span class="in">'drilling'   -&gt; 2 token(s): ['dr', 'illing']</span></span>
-<span id="cb8-171"><a href="#cb8-171" aria-hidden="true" tabindex="-1"></a><span class="in">'stuck'      -&gt; 2 token(s): ['st', 'uck']</span></span>
-<span id="cb8-172"><a href="#cb8-172" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-173"><a href="#cb8-173" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-174"><a href="#cb8-174" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-161"><a href="#cb8-161" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-162"><a href="#cb8-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-163"><a href="#cb8-163" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-164"><a href="#cb8-164" aria-hidden="true" tabindex="-1"></a><span class="in">'POOH'       -&gt; 2 token(s): ['PO', 'OH']</span></span>
+<span id="cb8-165"><a href="#cb8-165" aria-hidden="true" tabindex="-1"></a><span class="in">'TOOH'       -&gt; 2 token(s): ['TO', 'OH']</span></span>
+<span id="cb8-166"><a href="#cb8-166" aria-hidden="true" tabindex="-1"></a><span class="in">'BHA'        -&gt; 2 token(s): ['B', 'HA']</span></span>
+<span id="cb8-167"><a href="#cb8-167" aria-hidden="true" tabindex="-1"></a><span class="in">'WOB'        -&gt; 2 token(s): ['W', 'OB']</span></span>
+<span id="cb8-168"><a href="#cb8-168" aria-hidden="true" tabindex="-1"></a><span class="in">'SPP'        -&gt; 2 token(s): ['S', 'PP']</span></span>
+<span id="cb8-169"><a href="#cb8-169" aria-hidden="true" tabindex="-1"></a><span class="in">'RPM'        -&gt; 2 token(s): ['R', 'PM']</span></span>
+<span id="cb8-170"><a href="#cb8-170" aria-hidden="true" tabindex="-1"></a><span class="in">'pipe'       -&gt; 1 token(s): ['pipe']</span></span>
+<span id="cb8-171"><a href="#cb8-171" aria-hidden="true" tabindex="-1"></a><span class="in">'hello'      -&gt; 1 token(s): ['hello']</span></span>
+<span id="cb8-172"><a href="#cb8-172" aria-hidden="true" tabindex="-1"></a><span class="in">'drilling'   -&gt; 2 token(s): ['dr', 'illing']</span></span>
+<span id="cb8-173"><a href="#cb8-173" aria-hidden="true" tabindex="-1"></a><span class="in">'stuck'      -&gt; 2 token(s): ['st', 'uck']</span></span>
+<span id="cb8-174"><a href="#cb8-174" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb8-175"><a href="#cb8-175" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-176"><a href="#cb8-176" aria-hidden="true" tabindex="-1"></a>Every oilfield acronym split into exactly two arbitrary pieces —</span>
-<span id="cb8-177"><a href="#cb8-177" aria-hidden="true" tabindex="-1"></a><span class="in">`'BHA'`</span> became <span class="in">`'B'`</span> + <span class="in">`'HA'`</span>, with no more relationship to "bottom hole</span>
-<span id="cb8-178"><a href="#cb8-178" aria-hidden="true" tabindex="-1"></a>assembly" than those two letters carry on their own. But notice</span>
-<span id="cb8-179"><a href="#cb8-179" aria-hidden="true" tabindex="-1"></a><span class="in">`'drilling'`</span> and <span class="in">`'stuck'`</span> split too, into pieces that are just as</span>
-<span id="cb8-180"><a href="#cb8-180" aria-hidden="true" tabindex="-1"></a>arbitrary (<span class="in">`'dr'`</span> + <span class="in">`'illing'`</span>, <span class="in">`'st'`</span> + <span class="in">`'uck'`</span>) — so splitting itself</span>
-<span id="cb8-181"><a href="#cb8-181" aria-hidden="true" tabindex="-1"></a>isn't a domain-jargon problem, it's just how this tokenizer's fixed</span>
-<span id="cb8-182"><a href="#cb8-182" aria-hidden="true" tabindex="-1"></a>vocabulary handles anything not common enough to earn its own whole</span>
-<span id="cb8-183"><a href="#cb8-183" aria-hidden="true" tabindex="-1"></a>token. <span class="in">`'pipe'`</span> and <span class="in">`'hello'`</span> happened to make the cut; <span class="in">`'BHA'`</span> didn't.</span>
-<span id="cb8-184"><a href="#cb8-184" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-185"><a href="#cb8-185" aria-hidden="true" tabindex="-1"></a><span class="fu">## Production Reality</span></span>
+<span id="cb8-176"><a href="#cb8-176" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-177"><a href="#cb8-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-178"><a href="#cb8-178" aria-hidden="true" tabindex="-1"></a>Every oilfield acronym split into exactly two arbitrary pieces —</span>
+<span id="cb8-179"><a href="#cb8-179" aria-hidden="true" tabindex="-1"></a><span class="in">`'BHA'`</span> became <span class="in">`'B'`</span> + <span class="in">`'HA'`</span>, with no more relationship to "bottom hole</span>
+<span id="cb8-180"><a href="#cb8-180" aria-hidden="true" tabindex="-1"></a>assembly" than those two letters carry on their own. But notice</span>
+<span id="cb8-181"><a href="#cb8-181" aria-hidden="true" tabindex="-1"></a><span class="in">`'drilling'`</span> and <span class="in">`'stuck'`</span> split too, into pieces that are just as</span>
+<span id="cb8-182"><a href="#cb8-182" aria-hidden="true" tabindex="-1"></a>arbitrary (<span class="in">`'dr'`</span> + <span class="in">`'illing'`</span>, <span class="in">`'st'`</span> + <span class="in">`'uck'`</span>) — so splitting itself</span>
+<span id="cb8-183"><a href="#cb8-183" aria-hidden="true" tabindex="-1"></a>isn't a domain-jargon problem, it's just how this tokenizer's fixed</span>
+<span id="cb8-184"><a href="#cb8-184" aria-hidden="true" tabindex="-1"></a>vocabulary handles anything not common enough to earn its own whole</span>
+<span id="cb8-185"><a href="#cb8-185" aria-hidden="true" tabindex="-1"></a>token. <span class="in">`'pipe'`</span> and <span class="in">`'hello'`</span> happened to make the cut; <span class="in">`'BHA'`</span> didn't.</span>
 <span id="cb8-186"><a href="#cb8-186" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-187"><a href="#cb8-187" aria-hidden="true" tabindex="-1"></a>This book's tokenizer is fixed — it came with the base model and</span>
-<span id="cb8-188"><a href="#cb8-188" aria-hidden="true" tabindex="-1"></a>Chapter 5's fine-tuning doesn't change it. A production system dealing</span>
-<span id="cb8-189"><a href="#cb8-189" aria-hidden="true" tabindex="-1"></a>with truly nonstandard shorthand (a specific operator's internal codes,</span>
-<span id="cb8-190"><a href="#cb8-190" aria-hidden="true" tabindex="-1"></a>say) sometimes trains or extends a custom tokenizer instead of just</span>
-<span id="cb8-191"><a href="#cb8-191" aria-hidden="true" tabindex="-1"></a>fine-tuning on top of a generic one; that's a heavier, rarer move this</span>
-<span id="cb8-192"><a href="#cb8-192" aria-hidden="true" tabindex="-1"></a>book doesn't cover, because for the vocabulary in this archive, as</span>
-<span id="cb8-193"><a href="#cb8-193" aria-hidden="true" tabindex="-1"></a>Step 2 shows next, the fix doesn't need to happen at the tokenizer</span>
-<span id="cb8-194"><a href="#cb8-194" aria-hidden="true" tabindex="-1"></a>level at all.</span>
-<span id="cb8-195"><a href="#cb8-195" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-196"><a href="#cb8-196" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 2: Check the base model's own raw embeddings for these terms</span></span>
+<span id="cb8-187"><a href="#cb8-187" aria-hidden="true" tabindex="-1"></a><span class="fu">## Production Reality</span></span>
+<span id="cb8-188"><a href="#cb8-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-189"><a href="#cb8-189" aria-hidden="true" tabindex="-1"></a>This book's tokenizer is fixed — it came with the base model and</span>
+<span id="cb8-190"><a href="#cb8-190" aria-hidden="true" tabindex="-1"></a>Chapter 5's fine-tuning doesn't change it. A production system dealing</span>
+<span id="cb8-191"><a href="#cb8-191" aria-hidden="true" tabindex="-1"></a>with truly nonstandard shorthand (a specific operator's internal codes,</span>
+<span id="cb8-192"><a href="#cb8-192" aria-hidden="true" tabindex="-1"></a>say) sometimes trains or extends a custom tokenizer instead of just</span>
+<span id="cb8-193"><a href="#cb8-193" aria-hidden="true" tabindex="-1"></a>fine-tuning on top of a generic one; that's a heavier, rarer move this</span>
+<span id="cb8-194"><a href="#cb8-194" aria-hidden="true" tabindex="-1"></a>book doesn't cover, because for the vocabulary in this archive, as</span>
+<span id="cb8-195"><a href="#cb8-195" aria-hidden="true" tabindex="-1"></a>Step 2 shows next, the fix doesn't need to happen at the tokenizer</span>
+<span id="cb8-196"><a href="#cb8-196" aria-hidden="true" tabindex="-1"></a>level at all.</span>
 <span id="cb8-197"><a href="#cb8-197" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-198"><a href="#cb8-198" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-198"><a href="#cb8-198" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 2: Check the base model's own raw embeddings for these terms</span></span>
 <span id="cb8-199"><a href="#cb8-199" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-200"><a href="#cb8-200" aria-hidden="true" tabindex="-1"></a>Tokenizing a term is not the same as the model understanding it. This</span>
-<span id="cb8-201"><a href="#cb8-201" aria-hidden="true" tabindex="-1"></a>step looks up the model's own numeric coordinate for each piece,</span>
-<span id="cb8-202"><a href="#cb8-202" aria-hidden="true" tabindex="-1"></a>combines them into one vector per term, and measures how close an</span>
-<span id="cb8-203"><a href="#cb8-203" aria-hidden="true" tabindex="-1"></a>acronym's vector is to its spelled-out meaning's vector.</span>
-<span id="cb8-204"><a href="#cb8-204" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-205"><a href="#cb8-205" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-200"><a href="#cb8-200" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-201"><a href="#cb8-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-202"><a href="#cb8-202" aria-hidden="true" tabindex="-1"></a>Tokenizing a term is not the same as the model understanding it. This</span>
+<span id="cb8-203"><a href="#cb8-203" aria-hidden="true" tabindex="-1"></a>step looks up the model's own numeric coordinate for each piece,</span>
+<span id="cb8-204"><a href="#cb8-204" aria-hidden="true" tabindex="-1"></a>combines them into one vector per term, and measures how close an</span>
+<span id="cb8-205"><a href="#cb8-205" aria-hidden="true" tabindex="-1"></a>acronym's vector is to its spelled-out meaning's vector.</span>
 <span id="cb8-206"><a href="#cb8-206" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-207"><a href="#cb8-207" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The loaded <span class="in">`model`</span> from Step 1 (specifically, <span class="in">`model.get_input_embeddings()`</span>)</span>
-<span id="cb8-208"><a href="#cb8-208" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Pairs of oilfield shorthand and their real meanings</span>
-<span id="cb8-209"><a href="#cb8-209" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-210"><a href="#cb8-210" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-207"><a href="#cb8-207" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-208"><a href="#cb8-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-209"><a href="#cb8-209" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The loaded <span class="in">`model`</span> from Step 1 (specifically, <span class="in">`model.get_input_embeddings()`</span>)</span>
+<span id="cb8-210"><a href="#cb8-210" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Pairs of oilfield shorthand and their real meanings</span>
 <span id="cb8-211"><a href="#cb8-211" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-212"><a href="#cb8-212" aria-hidden="true" tabindex="-1"></a>A cosine similarity score for each pair — closer to <span class="in">`1.0`</span> means "close</span>
-<span id="cb8-213"><a href="#cb8-213" aria-hidden="true" tabindex="-1"></a>together," closer to <span class="in">`0`</span> means "no relationship," negative means</span>
-<span id="cb8-214"><a href="#cb8-214" aria-hidden="true" tabindex="-1"></a>"pointing away from each other."</span>
-<span id="cb8-215"><a href="#cb8-215" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-218"><a href="#cb8-218" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-219"><a href="#cb8-219" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb8-220"><a href="#cb8-220" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
-<span id="cb8-221"><a href="#cb8-221" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-222"><a href="#cb8-222" aria-hidden="true" tabindex="-1"></a>TERM_PAIRS <span class="op">=</span> [</span>
-<span id="cb8-223"><a href="#cb8-223" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"POOH"</span>, <span class="st">"trip out of hole"</span>),</span>
-<span id="cb8-224"><a href="#cb8-224" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"TOOH"</span>, <span class="st">"trip out of hole"</span>),</span>
-<span id="cb8-225"><a href="#cb8-225" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"BHA"</span>, <span class="st">"bottom hole assembly"</span>),</span>
-<span id="cb8-226"><a href="#cb8-226" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"BHA"</span>, <span class="st">"pizza delivery"</span>),</span>
-<span id="cb8-227"><a href="#cb8-227" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"trip out of hole"</span>, <span class="st">"pull out of hole"</span>),</span>
-<span id="cb8-228"><a href="#cb8-228" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb8-229"><a href="#cb8-229" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-230"><a href="#cb8-230" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-231"><a href="#cb8-231" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> term_embedding(model, tokenizer, term: <span class="bu">str</span>) <span class="op">-&gt;</span> torch.Tensor:</span>
-<span id="cb8-232"><a href="#cb8-232" aria-hidden="true" tabindex="-1"></a>    ids <span class="op">=</span> tokenizer.encode(term, add_special_tokens<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb8-233"><a href="#cb8-233" aria-hidden="true" tabindex="-1"></a>    input_ids <span class="op">=</span> torch.tensor([ids])</span>
-<span id="cb8-234"><a href="#cb8-234" aria-hidden="true" tabindex="-1"></a>    vectors <span class="op">=</span> model.get_input_embeddings()(input_ids)[<span class="dv">0</span>]</span>
-<span id="cb8-235"><a href="#cb8-235" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> vectors.mean(dim<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb8-236"><a href="#cb8-236" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-237"><a href="#cb8-237" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-238"><a href="#cb8-238" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> cosine_similarity(a: torch.Tensor, b: torch.Tensor) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
-<span id="cb8-239"><a href="#cb8-239" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> torch.nn.functional.cosine_similarity(a.unsqueeze(<span class="dv">0</span>), b.unsqueeze(<span class="dv">0</span>)).item()</span>
-<span id="cb8-240"><a href="#cb8-240" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-241"><a href="#cb8-241" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-242"><a href="#cb8-242" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> term_a, term_b <span class="kw">in</span> TERM_PAIRS:</span>
-<span id="cb8-243"><a href="#cb8-243" aria-hidden="true" tabindex="-1"></a>    vec_a <span class="op">=</span> term_embedding(model, tokenizer, term_a)</span>
-<span id="cb8-244"><a href="#cb8-244" aria-hidden="true" tabindex="-1"></a>    vec_b <span class="op">=</span> term_embedding(model, tokenizer, term_b)</span>
-<span id="cb8-245"><a href="#cb8-245" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>term_a<span class="sc">!r:20}</span><span class="ss"> vs </span><span class="sc">{</span>term_b<span class="sc">!r:20}</span><span class="ss"> -&gt; </span><span class="sc">{</span>cosine_similarity(vec_a, vec_b)<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
-<span id="cb8-246"><a href="#cb8-246" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-247"><a href="#cb8-247" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-248"><a href="#cb8-248" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-212"><a href="#cb8-212" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-213"><a href="#cb8-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-214"><a href="#cb8-214" aria-hidden="true" tabindex="-1"></a>A cosine similarity score for each pair — closer to <span class="in">`1.0`</span> means "close</span>
+<span id="cb8-215"><a href="#cb8-215" aria-hidden="true" tabindex="-1"></a>together," closer to <span class="in">`0`</span> means "no relationship," negative means</span>
+<span id="cb8-216"><a href="#cb8-216" aria-hidden="true" tabindex="-1"></a>"pointing away from each other."</span>
+<span id="cb8-217"><a href="#cb8-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-220"><a href="#cb8-220" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-221"><a href="#cb8-221" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-222"><a href="#cb8-222" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb8-223"><a href="#cb8-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-224"><a href="#cb8-224" aria-hidden="true" tabindex="-1"></a>TERM_PAIRS <span class="op">=</span> [</span>
+<span id="cb8-225"><a href="#cb8-225" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"POOH"</span>, <span class="st">"trip out of hole"</span>),</span>
+<span id="cb8-226"><a href="#cb8-226" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"TOOH"</span>, <span class="st">"trip out of hole"</span>),</span>
+<span id="cb8-227"><a href="#cb8-227" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"BHA"</span>, <span class="st">"bottom hole assembly"</span>),</span>
+<span id="cb8-228"><a href="#cb8-228" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"BHA"</span>, <span class="st">"pizza delivery"</span>),</span>
+<span id="cb8-229"><a href="#cb8-229" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"trip out of hole"</span>, <span class="st">"pull out of hole"</span>),</span>
+<span id="cb8-230"><a href="#cb8-230" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb8-231"><a href="#cb8-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-232"><a href="#cb8-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-233"><a href="#cb8-233" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> term_embedding(model, tokenizer, term: <span class="bu">str</span>) <span class="op">-&gt;</span> torch.Tensor:</span>
+<span id="cb8-234"><a href="#cb8-234" aria-hidden="true" tabindex="-1"></a>    ids <span class="op">=</span> tokenizer.encode(term, add_special_tokens<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb8-235"><a href="#cb8-235" aria-hidden="true" tabindex="-1"></a>    input_ids <span class="op">=</span> torch.tensor([ids])</span>
+<span id="cb8-236"><a href="#cb8-236" aria-hidden="true" tabindex="-1"></a>    vectors <span class="op">=</span> model.get_input_embeddings()(input_ids)[<span class="dv">0</span>]</span>
+<span id="cb8-237"><a href="#cb8-237" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> vectors.mean(dim<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb8-238"><a href="#cb8-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-239"><a href="#cb8-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-240"><a href="#cb8-240" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> cosine_similarity(a: torch.Tensor, b: torch.Tensor) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
+<span id="cb8-241"><a href="#cb8-241" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> torch.nn.functional.cosine_similarity(a.unsqueeze(<span class="dv">0</span>), b.unsqueeze(<span class="dv">0</span>)).item()</span>
+<span id="cb8-242"><a href="#cb8-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-243"><a href="#cb8-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-244"><a href="#cb8-244" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> term_a, term_b <span class="kw">in</span> TERM_PAIRS:</span>
+<span id="cb8-245"><a href="#cb8-245" aria-hidden="true" tabindex="-1"></a>    vec_a <span class="op">=</span> term_embedding(model, tokenizer, term_a)</span>
+<span id="cb8-246"><a href="#cb8-246" aria-hidden="true" tabindex="-1"></a>    vec_b <span class="op">=</span> term_embedding(model, tokenizer, term_b)</span>
+<span id="cb8-247"><a href="#cb8-247" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>term_a<span class="sc">!r:20}</span><span class="ss"> vs </span><span class="sc">{</span>term_b<span class="sc">!r:20}</span><span class="ss"> -&gt; </span><span class="sc">{</span>cosine_similarity(vec_a, vec_b)<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb8-248"><a href="#cb8-248" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb8-249"><a href="#cb8-249" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-250"><a href="#cb8-250" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-251"><a href="#cb8-251" aria-hidden="true" tabindex="-1"></a><span class="in">'POOH'               vs 'trip out of hole'   -&gt; 0.046</span></span>
-<span id="cb8-252"><a href="#cb8-252" aria-hidden="true" tabindex="-1"></a><span class="in">'TOOH'               vs 'trip out of hole'   -&gt; 0.026</span></span>
-<span id="cb8-253"><a href="#cb8-253" aria-hidden="true" tabindex="-1"></a><span class="in">'BHA'                vs 'bottom hole assembly' -&gt; -0.035</span></span>
-<span id="cb8-254"><a href="#cb8-254" aria-hidden="true" tabindex="-1"></a><span class="in">'BHA'                vs 'pizza delivery'     -&gt; -0.111</span></span>
-<span id="cb8-255"><a href="#cb8-255" aria-hidden="true" tabindex="-1"></a><span class="in">'trip out of hole'   vs 'pull out of hole'   -&gt; 0.709</span></span>
-<span id="cb8-256"><a href="#cb8-256" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-257"><a href="#cb8-257" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-258"><a href="#cb8-258" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-250"><a href="#cb8-250" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-251"><a href="#cb8-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-252"><a href="#cb8-252" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-253"><a href="#cb8-253" aria-hidden="true" tabindex="-1"></a><span class="in">'POOH'               vs 'trip out of hole'   -&gt; 0.046</span></span>
+<span id="cb8-254"><a href="#cb8-254" aria-hidden="true" tabindex="-1"></a><span class="in">'TOOH'               vs 'trip out of hole'   -&gt; 0.026</span></span>
+<span id="cb8-255"><a href="#cb8-255" aria-hidden="true" tabindex="-1"></a><span class="in">'BHA'                vs 'bottom hole assembly' -&gt; -0.035</span></span>
+<span id="cb8-256"><a href="#cb8-256" aria-hidden="true" tabindex="-1"></a><span class="in">'BHA'                vs 'pizza delivery'     -&gt; -0.111</span></span>
+<span id="cb8-257"><a href="#cb8-257" aria-hidden="true" tabindex="-1"></a><span class="in">'trip out of hole'   vs 'pull out of hole'   -&gt; 0.709</span></span>
+<span id="cb8-258"><a href="#cb8-258" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb8-259"><a href="#cb8-259" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-260"><a href="#cb8-260" aria-hidden="true" tabindex="-1"></a>The one pair that scored high — <span class="in">`'trip out of hole'`</span> vs. `'pull out of</span>
-<span id="cb8-261"><a href="#cb8-261" aria-hidden="true" tabindex="-1"></a>hole'<span class="in">` — shares three of its four literal tokens (`</span>'out'<span class="in">`, `</span>'of'`,</span>
-<span id="cb8-262"><a href="#cb8-262" aria-hidden="true" tabindex="-1"></a><span class="in">`'hole'`</span>), so a high score there mostly reflects token overlap, not</span>
-<span id="cb8-263"><a href="#cb8-263" aria-hidden="true" tabindex="-1"></a>proof the model reasoned about synonyms. The real test is the acronym</span>
-<span id="cb8-264"><a href="#cb8-264" aria-hidden="true" tabindex="-1"></a>pairs, which share *no* tokens with their meanings: <span class="in">`'BHA'`</span> scored</span>
-<span id="cb8-265"><a href="#cb8-265" aria-hidden="true" tabindex="-1"></a><span class="in">`-0.035`</span> against its own spelled-out meaning — statistically no</span>
-<span id="cb8-266"><a href="#cb8-266" aria-hidden="true" tabindex="-1"></a>relationship at all, and barely different from <span class="in">`-0.111`</span> against</span>
-<span id="cb8-267"><a href="#cb8-267" aria-hidden="true" tabindex="-1"></a><span class="in">`'pizza delivery'`</span>. These raw, per-token embeddings are the model's</span>
-<span id="cb8-268"><a href="#cb8-268" aria-hidden="true" tabindex="-1"></a>very first, static lookup table, before any contextual reasoning</span>
-<span id="cb8-269"><a href="#cb8-269" aria-hidden="true" tabindex="-1"></a>happens — and at that layer, an acronym and its meaning are strangers.</span>
-<span id="cb8-270"><a href="#cb8-270" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-271"><a href="#cb8-271" aria-hidden="true" tabindex="-1"></a><span class="fu">## Production Reality</span></span>
+<span id="cb8-260"><a href="#cb8-260" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-261"><a href="#cb8-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-262"><a href="#cb8-262" aria-hidden="true" tabindex="-1"></a>The one pair that scored high — <span class="in">`'trip out of hole'`</span> vs. `'pull out of</span>
+<span id="cb8-263"><a href="#cb8-263" aria-hidden="true" tabindex="-1"></a>hole'<span class="in">` — shares three of its four literal tokens (`</span>'out'<span class="in">`, `</span>'of'`,</span>
+<span id="cb8-264"><a href="#cb8-264" aria-hidden="true" tabindex="-1"></a><span class="in">`'hole'`</span>), so a high score there mostly reflects token overlap, not</span>
+<span id="cb8-265"><a href="#cb8-265" aria-hidden="true" tabindex="-1"></a>proof the model reasoned about synonyms. The real test is the acronym</span>
+<span id="cb8-266"><a href="#cb8-266" aria-hidden="true" tabindex="-1"></a>pairs, which share *no* tokens with their meanings: <span class="in">`'BHA'`</span> scored</span>
+<span id="cb8-267"><a href="#cb8-267" aria-hidden="true" tabindex="-1"></a><span class="in">`-0.035`</span> against its own spelled-out meaning — statistically no</span>
+<span id="cb8-268"><a href="#cb8-268" aria-hidden="true" tabindex="-1"></a>relationship at all, and barely different from <span class="in">`-0.111`</span> against</span>
+<span id="cb8-269"><a href="#cb8-269" aria-hidden="true" tabindex="-1"></a><span class="in">`'pizza delivery'`</span>. These raw, per-token embeddings are the model's</span>
+<span id="cb8-270"><a href="#cb8-270" aria-hidden="true" tabindex="-1"></a>very first, static lookup table, before any contextual reasoning</span>
+<span id="cb8-271"><a href="#cb8-271" aria-hidden="true" tabindex="-1"></a>happens — and at that layer, an acronym and its meaning are strangers.</span>
 <span id="cb8-272"><a href="#cb8-272" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-273"><a href="#cb8-273" aria-hidden="true" tabindex="-1"></a>Raw input embeddings are the crudest possible measurement — a</span>
-<span id="cb8-274"><a href="#cb8-274" aria-hidden="true" tabindex="-1"></a>mean-pooled lookup with no context at all, nothing like how the model</span>
-<span id="cb8-275"><a href="#cb8-275" aria-hidden="true" tabindex="-1"></a>actually reasons once text moves through its attention layers during</span>
-<span id="cb8-276"><a href="#cb8-276" aria-hidden="true" tabindex="-1"></a>generation. A production system checking "does the model already know</span>
-<span id="cb8-277"><a href="#cb8-277" aria-hidden="true" tabindex="-1"></a>this term" would never stop at this layer. Step 3 checks a proper,</span>
-<span id="cb8-278"><a href="#cb8-278" aria-hidden="true" tabindex="-1"></a>purpose-built embedding model instead, to see if that changes the</span>
-<span id="cb8-279"><a href="#cb8-279" aria-hidden="true" tabindex="-1"></a>answer.</span>
-<span id="cb8-280"><a href="#cb8-280" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-281"><a href="#cb8-281" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 3: Check a purpose-built sentence-embedding model too</span></span>
+<span id="cb8-273"><a href="#cb8-273" aria-hidden="true" tabindex="-1"></a><span class="fu">## Production Reality</span></span>
+<span id="cb8-274"><a href="#cb8-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-275"><a href="#cb8-275" aria-hidden="true" tabindex="-1"></a>Raw input embeddings are the crudest possible measurement — a</span>
+<span id="cb8-276"><a href="#cb8-276" aria-hidden="true" tabindex="-1"></a>mean-pooled lookup with no context at all, nothing like how the model</span>
+<span id="cb8-277"><a href="#cb8-277" aria-hidden="true" tabindex="-1"></a>actually reasons once text moves through its attention layers during</span>
+<span id="cb8-278"><a href="#cb8-278" aria-hidden="true" tabindex="-1"></a>generation. A production system checking "does the model already know</span>
+<span id="cb8-279"><a href="#cb8-279" aria-hidden="true" tabindex="-1"></a>this term" would never stop at this layer. Step 3 checks a proper,</span>
+<span id="cb8-280"><a href="#cb8-280" aria-hidden="true" tabindex="-1"></a>purpose-built embedding model instead, to see if that changes the</span>
+<span id="cb8-281"><a href="#cb8-281" aria-hidden="true" tabindex="-1"></a>answer.</span>
 <span id="cb8-282"><a href="#cb8-282" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-283"><a href="#cb8-283" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-283"><a href="#cb8-283" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 3: Check a purpose-built sentence-embedding model too</span></span>
 <span id="cb8-284"><a href="#cb8-284" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-285"><a href="#cb8-285" aria-hidden="true" tabindex="-1"></a>Maybe the problem is specific to this small base model's raw embedding</span>
-<span id="cb8-286"><a href="#cb8-286" aria-hidden="true" tabindex="-1"></a>table, not embeddings in general. This step repeats the exact same</span>
-<span id="cb8-287"><a href="#cb8-287" aria-hidden="true" tabindex="-1"></a>comparison using <span class="in">`sentence-transformers`</span>, a general-purpose model built</span>
-<span id="cb8-288"><a href="#cb8-288" aria-hidden="true" tabindex="-1"></a>specifically to place similar meanings close together — the same kind</span>
-<span id="cb8-289"><a href="#cb8-289" aria-hidden="true" tabindex="-1"></a>of tool Chapter 9's retrieval system will use.</span>
-<span id="cb8-290"><a href="#cb8-290" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-291"><a href="#cb8-291" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-285"><a href="#cb8-285" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-286"><a href="#cb8-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-287"><a href="#cb8-287" aria-hidden="true" tabindex="-1"></a>Maybe the problem is specific to this small base model's raw embedding</span>
+<span id="cb8-288"><a href="#cb8-288" aria-hidden="true" tabindex="-1"></a>table, not embeddings in general. This step repeats the exact same</span>
+<span id="cb8-289"><a href="#cb8-289" aria-hidden="true" tabindex="-1"></a>comparison using <span class="in">`sentence-transformers`</span>, a general-purpose model built</span>
+<span id="cb8-290"><a href="#cb8-290" aria-hidden="true" tabindex="-1"></a>specifically to place similar meanings close together — the same kind</span>
+<span id="cb8-291"><a href="#cb8-291" aria-hidden="true" tabindex="-1"></a>of tool Chapter 9's retrieval system will use.</span>
 <span id="cb8-292"><a href="#cb8-292" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-293"><a href="#cb8-293" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The same <span class="in">`TERM_PAIRS`</span> from Step 2</span>
-<span id="cb8-294"><a href="#cb8-294" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`sentence-transformers`</span>' <span class="in">`all-MiniLM-L6-v2`</span> model (downloaded once,</span>
-<span id="cb8-295"><a href="#cb8-295" aria-hidden="true" tabindex="-1"></a>  then cached)</span>
-<span id="cb8-296"><a href="#cb8-296" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-297"><a href="#cb8-297" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-293"><a href="#cb8-293" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-294"><a href="#cb8-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-295"><a href="#cb8-295" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The same <span class="in">`TERM_PAIRS`</span> from Step 2</span>
+<span id="cb8-296"><a href="#cb8-296" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`sentence-transformers`</span>' <span class="in">`all-MiniLM-L6-v2`</span> model (downloaded once,</span>
+<span id="cb8-297"><a href="#cb8-297" aria-hidden="true" tabindex="-1"></a>  then cached)</span>
 <span id="cb8-298"><a href="#cb8-298" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-299"><a href="#cb8-299" aria-hidden="true" tabindex="-1"></a>The same style of cosine similarity scores, from a different, dedicated</span>
-<span id="cb8-300"><a href="#cb8-300" aria-hidden="true" tabindex="-1"></a>embedding model.</span>
-<span id="cb8-301"><a href="#cb8-301" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-304"><a href="#cb8-304" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-305"><a href="#cb8-305" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb8-306"><a href="#cb8-306" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sentence_transformers <span class="im">import</span> SentenceTransformer</span>
-<span id="cb8-307"><a href="#cb8-307" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-308"><a href="#cb8-308" aria-hidden="true" tabindex="-1"></a>st_model <span class="op">=</span> SentenceTransformer(<span class="st">"all-MiniLM-L6-v2"</span>)</span>
+<span id="cb8-299"><a href="#cb8-299" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-300"><a href="#cb8-300" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-301"><a href="#cb8-301" aria-hidden="true" tabindex="-1"></a>The same style of cosine similarity scores, from a different, dedicated</span>
+<span id="cb8-302"><a href="#cb8-302" aria-hidden="true" tabindex="-1"></a>embedding model.</span>
+<span id="cb8-303"><a href="#cb8-303" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-306"><a href="#cb8-306" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-307"><a href="#cb8-307" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-308"><a href="#cb8-308" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sentence_transformers <span class="im">import</span> SentenceTransformer</span>
 <span id="cb8-309"><a href="#cb8-309" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-310"><a href="#cb8-310" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> term_a, term_b <span class="kw">in</span> TERM_PAIRS:</span>
-<span id="cb8-311"><a href="#cb8-311" aria-hidden="true" tabindex="-1"></a>    vec_a, vec_b <span class="op">=</span> st_model.encode(term_a), st_model.encode(term_b)</span>
-<span id="cb8-312"><a href="#cb8-312" aria-hidden="true" tabindex="-1"></a>    sim <span class="op">=</span> <span class="bu">float</span>(</span>
-<span id="cb8-313"><a href="#cb8-313" aria-hidden="true" tabindex="-1"></a>        torch.nn.functional.cosine_similarity(</span>
-<span id="cb8-314"><a href="#cb8-314" aria-hidden="true" tabindex="-1"></a>            torch.tensor(vec_a).unsqueeze(<span class="dv">0</span>), torch.tensor(vec_b).unsqueeze(<span class="dv">0</span>)</span>
-<span id="cb8-315"><a href="#cb8-315" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb8-316"><a href="#cb8-316" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb8-317"><a href="#cb8-317" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>term_a<span class="sc">!r:20}</span><span class="ss"> vs </span><span class="sc">{</span>term_b<span class="sc">!r:20}</span><span class="ss"> -&gt; </span><span class="sc">{</span>sim<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
-<span id="cb8-318"><a href="#cb8-318" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-319"><a href="#cb8-319" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-320"><a href="#cb8-320" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-310"><a href="#cb8-310" aria-hidden="true" tabindex="-1"></a>st_model <span class="op">=</span> SentenceTransformer(<span class="st">"all-MiniLM-L6-v2"</span>)</span>
+<span id="cb8-311"><a href="#cb8-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-312"><a href="#cb8-312" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> term_a, term_b <span class="kw">in</span> TERM_PAIRS:</span>
+<span id="cb8-313"><a href="#cb8-313" aria-hidden="true" tabindex="-1"></a>    vec_a, vec_b <span class="op">=</span> st_model.encode(term_a), st_model.encode(term_b)</span>
+<span id="cb8-314"><a href="#cb8-314" aria-hidden="true" tabindex="-1"></a>    sim <span class="op">=</span> <span class="bu">float</span>(</span>
+<span id="cb8-315"><a href="#cb8-315" aria-hidden="true" tabindex="-1"></a>        torch.nn.functional.cosine_similarity(</span>
+<span id="cb8-316"><a href="#cb8-316" aria-hidden="true" tabindex="-1"></a>            torch.tensor(vec_a).unsqueeze(<span class="dv">0</span>), torch.tensor(vec_b).unsqueeze(<span class="dv">0</span>)</span>
+<span id="cb8-317"><a href="#cb8-317" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb8-318"><a href="#cb8-318" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-319"><a href="#cb8-319" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>term_a<span class="sc">!r:20}</span><span class="ss"> vs </span><span class="sc">{</span>term_b<span class="sc">!r:20}</span><span class="ss"> -&gt; </span><span class="sc">{</span>sim<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb8-320"><a href="#cb8-320" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb8-321"><a href="#cb8-321" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-322"><a href="#cb8-322" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-323"><a href="#cb8-323" aria-hidden="true" tabindex="-1"></a><span class="in">'POOH'               vs 'trip out of hole'   -&gt; 0.249</span></span>
-<span id="cb8-324"><a href="#cb8-324" aria-hidden="true" tabindex="-1"></a><span class="in">'TOOH'               vs 'trip out of hole'   -&gt; 0.167</span></span>
-<span id="cb8-325"><a href="#cb8-325" aria-hidden="true" tabindex="-1"></a><span class="in">'BHA'                vs 'bottom hole assembly' -&gt; 0.115</span></span>
-<span id="cb8-326"><a href="#cb8-326" aria-hidden="true" tabindex="-1"></a><span class="in">'BHA'                vs 'pizza delivery'     -&gt; 0.128</span></span>
-<span id="cb8-327"><a href="#cb8-327" aria-hidden="true" tabindex="-1"></a><span class="in">'trip out of hole'   vs 'pull out of hole'   -&gt; 0.747</span></span>
-<span id="cb8-328"><a href="#cb8-328" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-329"><a href="#cb8-329" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-330"><a href="#cb8-330" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-322"><a href="#cb8-322" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-323"><a href="#cb8-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-324"><a href="#cb8-324" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-325"><a href="#cb8-325" aria-hidden="true" tabindex="-1"></a><span class="in">'POOH'               vs 'trip out of hole'   -&gt; 0.249</span></span>
+<span id="cb8-326"><a href="#cb8-326" aria-hidden="true" tabindex="-1"></a><span class="in">'TOOH'               vs 'trip out of hole'   -&gt; 0.167</span></span>
+<span id="cb8-327"><a href="#cb8-327" aria-hidden="true" tabindex="-1"></a><span class="in">'BHA'                vs 'bottom hole assembly' -&gt; 0.115</span></span>
+<span id="cb8-328"><a href="#cb8-328" aria-hidden="true" tabindex="-1"></a><span class="in">'BHA'                vs 'pizza delivery'     -&gt; 0.128</span></span>
+<span id="cb8-329"><a href="#cb8-329" aria-hidden="true" tabindex="-1"></a><span class="in">'trip out of hole'   vs 'pull out of hole'   -&gt; 0.747</span></span>
+<span id="cb8-330"><a href="#cb8-330" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb8-331"><a href="#cb8-331" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-332"><a href="#cb8-332" aria-hidden="true" tabindex="-1"></a>A real, dedicated embedding model does slightly better on <span class="in">`'POOH'`</span></span>
-<span id="cb8-333"><a href="#cb8-333" aria-hidden="true" tabindex="-1"></a>(<span class="in">`0.249`</span>, up from <span class="in">`0.046`</span>) — some improvement, though still a weak</span>
-<span id="cb8-334"><a href="#cb8-334" aria-hidden="true" tabindex="-1"></a>score for two phrases that mean exactly the same thing. But <span class="in">`'BHA'`</span></span>
-<span id="cb8-335"><a href="#cb8-335" aria-hidden="true" tabindex="-1"></a>barely moved, and not in the direction that matters: <span class="in">`0.115`</span> against its</span>
-<span id="cb8-336"><a href="#cb8-336" aria-hidden="true" tabindex="-1"></a>own meaning versus <span class="in">`0.128`</span> against <span class="in">`'pizza delivery'`</span> — the unrelated</span>
-<span id="cb8-337"><a href="#cb8-337" aria-hidden="true" tabindex="-1"></a>phrase still scores *higher*. A general-purpose embedding model, built</span>
-<span id="cb8-338"><a href="#cb8-338" aria-hidden="true" tabindex="-1"></a>by people who never saw this archive, has no more reason to know that</span>
-<span id="cb8-339"><a href="#cb8-339" aria-hidden="true" tabindex="-1"></a><span class="in">`BHA`</span> means "bottom hole assembly" than the base language model did.</span>
-<span id="cb8-340"><a href="#cb8-340" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-341"><a href="#cb8-341" aria-hidden="true" tabindex="-1"></a><span class="fu">## Practical exercise</span></span>
+<span id="cb8-332"><a href="#cb8-332" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-333"><a href="#cb8-333" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-334"><a href="#cb8-334" aria-hidden="true" tabindex="-1"></a>A real, dedicated embedding model does slightly better on <span class="in">`'POOH'`</span></span>
+<span id="cb8-335"><a href="#cb8-335" aria-hidden="true" tabindex="-1"></a>(<span class="in">`0.249`</span>, up from <span class="in">`0.046`</span>) — some improvement, though still a weak</span>
+<span id="cb8-336"><a href="#cb8-336" aria-hidden="true" tabindex="-1"></a>score for two phrases that mean exactly the same thing. But <span class="in">`'BHA'`</span></span>
+<span id="cb8-337"><a href="#cb8-337" aria-hidden="true" tabindex="-1"></a>barely moved, and not in the direction that matters: <span class="in">`0.115`</span> against its</span>
+<span id="cb8-338"><a href="#cb8-338" aria-hidden="true" tabindex="-1"></a>own meaning versus <span class="in">`0.128`</span> against <span class="in">`'pizza delivery'`</span> — the unrelated</span>
+<span id="cb8-339"><a href="#cb8-339" aria-hidden="true" tabindex="-1"></a>phrase still scores *higher*. A general-purpose embedding model, built</span>
+<span id="cb8-340"><a href="#cb8-340" aria-hidden="true" tabindex="-1"></a>by people who never saw this archive, has no more reason to know that</span>
+<span id="cb8-341"><a href="#cb8-341" aria-hidden="true" tabindex="-1"></a><span class="in">`BHA`</span> means "bottom hole assembly" than the base language model did.</span>
 <span id="cb8-342"><a href="#cb8-342" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-343"><a href="#cb8-343" aria-hidden="true" tabindex="-1"></a>🟢 **Beginner**</span>
+<span id="cb8-343"><a href="#cb8-343" aria-hidden="true" tabindex="-1"></a><span class="fu">## Practical exercise</span></span>
 <span id="cb8-344"><a href="#cb8-344" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-345"><a href="#cb8-345" aria-hidden="true" tabindex="-1"></a>**Try it yourself:** run</span>
-<span id="cb8-346"><a href="#cb8-346" aria-hidden="true" tabindex="-1"></a><span class="in">`python code/chapter_04/tokenize_and_embed.py`</span> from inside <span class="in">`book/`</span>, then</span>
-<span id="cb8-347"><a href="#cb8-347" aria-hidden="true" tabindex="-1"></a>pick two more terms from <span class="in">`Drilling_038`</span>'s excerpt above (<span class="in">`OBSD`</span>, <span class="in">`STDS`</span>,</span>
-<span id="cb8-348"><a href="#cb8-348" aria-hidden="true" tabindex="-1"></a><span class="in">`FR`</span>) and check how they tokenize.</span>
-<span id="cb8-349"><a href="#cb8-349" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-350"><a href="#cb8-350" aria-hidden="true" tabindex="-1"></a>**You'll know it worked when:** you can point to the exact pieces each</span>
-<span id="cb8-351"><a href="#cb8-351" aria-hidden="true" tabindex="-1"></a>term splits into, and explain in one sentence why a short acronym isn't</span>
-<span id="cb8-352"><a href="#cb8-352" aria-hidden="true" tabindex="-1"></a>necessarily "safe" from being split, even though it's already short.</span>
+<span id="cb8-345"><a href="#cb8-345" aria-hidden="true" tabindex="-1"></a>🟢 **Beginner**</span>
+<span id="cb8-346"><a href="#cb8-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-347"><a href="#cb8-347" aria-hidden="true" tabindex="-1"></a>**Try it yourself:** run</span>
+<span id="cb8-348"><a href="#cb8-348" aria-hidden="true" tabindex="-1"></a><span class="in">`python code/chapter_04/tokenize_and_embed.py`</span> from inside <span class="in">`book/`</span>, then</span>
+<span id="cb8-349"><a href="#cb8-349" aria-hidden="true" tabindex="-1"></a>open <span class="in">`datasets/full_training_set/FORGE-16A-78-32_Drilling_017_2020-11-05.pdf`</span></span>
+<span id="cb8-350"><a href="#cb8-350" aria-hidden="true" tabindex="-1"></a>and pick two more real abbreviations from its TIME BREAKDOWN table</span>
+<span id="cb8-351"><a href="#cb8-351" aria-hidden="true" tabindex="-1"></a>(<span class="in">`RSS`</span> and <span class="in">`TIH`</span> both appear, each self-glossed in parentheses right in</span>
+<span id="cb8-352"><a href="#cb8-352" aria-hidden="true" tabindex="-1"></a>the report, the same way <span class="in">`TOOH`</span> is above) and check how they tokenize.</span>
 <span id="cb8-353"><a href="#cb8-353" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-354"><a href="#cb8-354" aria-hidden="true" tabindex="-1"></a><span class="fu">## Field notes</span></span>
-<span id="cb8-355"><a href="#cb8-355" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-356"><a href="#cb8-356" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="Field notes: a blowout preventer scores lower than a birthday party"}</span>
-<span id="cb8-357"><a href="#cb8-357" aria-hidden="true" tabindex="-1"></a>**Query:** how closely does each embedding approach place <span class="in">`BOP`</span> (the</span>
-<span id="cb8-358"><a href="#cb8-358" aria-hidden="true" tabindex="-1"></a>industry-standard abbreviation for **blowout preventer**, a critical</span>
-<span id="cb8-359"><a href="#cb8-359" aria-hidden="true" tabindex="-1"></a>well-control safety device, appearing 36 times across this book's 9</span>
-<span id="cb8-360"><a href="#cb8-360" aria-hidden="true" tabindex="-1"></a>drilling reports) next to its own meaning — compared to an unrelated</span>
-<span id="cb8-361"><a href="#cb8-361" aria-hidden="true" tabindex="-1"></a>phrase, <span class="in">`"birthday party"`</span>?</span>
-<span id="cb8-362"><a href="#cb8-362" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-363"><a href="#cb8-363" aria-hidden="true" tabindex="-1"></a>**Result:**</span>
-<span id="cb8-364"><a href="#cb8-364" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-365"><a href="#cb8-365" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Comparison <span class="pp">|</span> Raw input embedding <span class="pp">|</span> Sentence embedding <span class="pp">|</span></span>
-<span id="cb8-366"><a href="#cb8-366" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb8-367"><a href="#cb8-367" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`BOP`</span> vs. <span class="in">`"blowout preventer"`</span> <span class="pp">|</span> <span class="in">`0.131`</span> <span class="pp">|</span> <span class="in">`0.059`</span> <span class="pp">|</span></span>
-<span id="cb8-368"><a href="#cb8-368" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`BOP`</span> vs. <span class="in">`"birthday party"`</span> <span class="pp">|</span> <span class="in">`-0.105`</span> <span class="pp">|</span> <span class="in">`0.320`</span> <span class="pp">|</span></span>
-<span id="cb8-369"><a href="#cb8-369" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-370"><a href="#cb8-370" aria-hidden="true" tabindex="-1"></a>**Why:** the safest claim this result supports is the direct one —</span>
-<span id="cb8-371"><a href="#cb8-371" aria-hidden="true" tabindex="-1"></a>neither embedding approach encodes the equivalence between <span class="in">`BOP`</span> and</span>
-<span id="cb8-372"><a href="#cb8-372" aria-hidden="true" tabindex="-1"></a>"blowout preventer" strongly enough for this task. Exactly *why* the</span>
-<span id="cb8-373"><a href="#cb8-373" aria-hidden="true" tabindex="-1"></a>sentence-embedding model happens to place <span class="in">`"birthday party"`</span> closer is</span>
-<span id="cb8-374"><a href="#cb8-374" aria-hidden="true" tabindex="-1"></a>not something these two numbers prove on their own (this chapter</span>
-<span id="cb8-375"><a href="#cb8-375" aria-hidden="true" tabindex="-1"></a>doesn't inspect the model's internals to confirm a specific cause); what</span>
-<span id="cb8-376"><a href="#cb8-376" aria-hidden="true" tabindex="-1"></a>they do prove is that whatever <span class="in">`0.320`</span> is picking up on, it isn't</span>
-<span id="cb8-377"><a href="#cb8-377" aria-hidden="true" tabindex="-1"></a>domain understanding of well control.</span>
-<span id="cb8-378"><a href="#cb8-378" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-379"><a href="#cb8-379" aria-hidden="true" tabindex="-1"></a>**Lesson:** a safety-critical abbreviation is exactly the kind of term</span>
-<span id="cb8-380"><a href="#cb8-380" aria-hidden="true" tabindex="-1"></a>where "the embedding space probably has this covered" is the most</span>
-<span id="cb8-381"><a href="#cb8-381" aria-hidden="true" tabindex="-1"></a>dangerous assumption to make casually. Neither this chapter's raw</span>
-<span id="cb8-382"><a href="#cb8-382" aria-hidden="true" tabindex="-1"></a>embeddings nor a real, dedicated embedding model can be trusted with</span>
-<span id="cb8-383"><a href="#cb8-383" aria-hidden="true" tabindex="-1"></a>your domain's specific vocabulary out of the box. (Reproduce this</span>
-<span id="cb8-384"><a href="#cb8-384" aria-hidden="true" tabindex="-1"></a>yourself with <span class="in">`code/chapter_04/challenge/challenge.py`</span>, below.)</span>
-<span id="cb8-385"><a href="#cb8-385" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-386"><a href="#cb8-386" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-387"><a href="#cb8-387" aria-hidden="true" tabindex="-1"></a><span class="fu">## Challenge exercise</span></span>
-<span id="cb8-388"><a href="#cb8-388" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-389"><a href="#cb8-389" aria-hidden="true" tabindex="-1"></a>🟠 **Intermediate**</span>
+<span id="cb8-354"><a href="#cb8-354" aria-hidden="true" tabindex="-1"></a>**You'll know it worked when:** you can point to the exact pieces each</span>
+<span id="cb8-355"><a href="#cb8-355" aria-hidden="true" tabindex="-1"></a>term splits into, and explain in one sentence why a short acronym isn't</span>
+<span id="cb8-356"><a href="#cb8-356" aria-hidden="true" tabindex="-1"></a>necessarily "safe" from being split, even though it's already short.</span>
+<span id="cb8-357"><a href="#cb8-357" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-358"><a href="#cb8-358" aria-hidden="true" tabindex="-1"></a><span class="fu">## Field notes</span></span>
+<span id="cb8-359"><a href="#cb8-359" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-360"><a href="#cb8-360" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="Field notes: a blowout preventer scores lower than a birthday party"}</span>
+<span id="cb8-361"><a href="#cb8-361" aria-hidden="true" tabindex="-1"></a>**Query:** how closely does each embedding approach place <span class="in">`BOP`</span> (the</span>
+<span id="cb8-362"><a href="#cb8-362" aria-hidden="true" tabindex="-1"></a>industry-standard abbreviation for **blowout preventer**, a critical</span>
+<span id="cb8-363"><a href="#cb8-363" aria-hidden="true" tabindex="-1"></a>well-control safety device, appearing 36 times across this book's 9</span>
+<span id="cb8-364"><a href="#cb8-364" aria-hidden="true" tabindex="-1"></a>drilling reports) next to its own meaning — compared to an unrelated</span>
+<span id="cb8-365"><a href="#cb8-365" aria-hidden="true" tabindex="-1"></a>phrase, <span class="in">`"birthday party"`</span>?</span>
+<span id="cb8-366"><a href="#cb8-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-367"><a href="#cb8-367" aria-hidden="true" tabindex="-1"></a>**Result:**</span>
+<span id="cb8-368"><a href="#cb8-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-369"><a href="#cb8-369" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Comparison <span class="pp">|</span> Raw input embedding <span class="pp">|</span> Sentence embedding <span class="pp">|</span></span>
+<span id="cb8-370"><a href="#cb8-370" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb8-371"><a href="#cb8-371" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`BOP`</span> vs. <span class="in">`"blowout preventer"`</span> <span class="pp">|</span> <span class="in">`0.131`</span> <span class="pp">|</span> <span class="in">`0.059`</span> <span class="pp">|</span></span>
+<span id="cb8-372"><a href="#cb8-372" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`BOP`</span> vs. <span class="in">`"birthday party"`</span> <span class="pp">|</span> <span class="in">`-0.105`</span> <span class="pp">|</span> <span class="in">`0.320`</span> <span class="pp">|</span></span>
+<span id="cb8-373"><a href="#cb8-373" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-374"><a href="#cb8-374" aria-hidden="true" tabindex="-1"></a>**Why:** the safest claim this result supports is the direct one —</span>
+<span id="cb8-375"><a href="#cb8-375" aria-hidden="true" tabindex="-1"></a>neither embedding approach encodes the equivalence between <span class="in">`BOP`</span> and</span>
+<span id="cb8-376"><a href="#cb8-376" aria-hidden="true" tabindex="-1"></a>"blowout preventer" strongly enough for this task. Exactly *why* the</span>
+<span id="cb8-377"><a href="#cb8-377" aria-hidden="true" tabindex="-1"></a>sentence-embedding model happens to place <span class="in">`"birthday party"`</span> closer is</span>
+<span id="cb8-378"><a href="#cb8-378" aria-hidden="true" tabindex="-1"></a>not something these two numbers prove on their own (this chapter</span>
+<span id="cb8-379"><a href="#cb8-379" aria-hidden="true" tabindex="-1"></a>doesn't inspect the model's internals to confirm a specific cause); what</span>
+<span id="cb8-380"><a href="#cb8-380" aria-hidden="true" tabindex="-1"></a>they do prove is that whatever <span class="in">`0.320`</span> is picking up on, it isn't</span>
+<span id="cb8-381"><a href="#cb8-381" aria-hidden="true" tabindex="-1"></a>domain understanding of well control.</span>
+<span id="cb8-382"><a href="#cb8-382" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-383"><a href="#cb8-383" aria-hidden="true" tabindex="-1"></a>**Lesson:** a safety-critical abbreviation is exactly the kind of term</span>
+<span id="cb8-384"><a href="#cb8-384" aria-hidden="true" tabindex="-1"></a>where "the embedding space probably has this covered" is the most</span>
+<span id="cb8-385"><a href="#cb8-385" aria-hidden="true" tabindex="-1"></a>dangerous assumption to make casually. Neither this chapter's raw</span>
+<span id="cb8-386"><a href="#cb8-386" aria-hidden="true" tabindex="-1"></a>embeddings nor a real, dedicated embedding model can be trusted with</span>
+<span id="cb8-387"><a href="#cb8-387" aria-hidden="true" tabindex="-1"></a>your domain's specific vocabulary out of the box. (Reproduce this</span>
+<span id="cb8-388"><a href="#cb8-388" aria-hidden="true" tabindex="-1"></a>yourself with <span class="in">`code/chapter_04/challenge/challenge.py`</span>, below.)</span>
+<span id="cb8-389"><a href="#cb8-389" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-390"><a href="#cb8-390" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-391"><a href="#cb8-391" aria-hidden="true" tabindex="-1"></a>**Challenge:** extend the comparison to real acronyms pulled from this</span>
-<span id="cb8-392"><a href="#cb8-392" aria-hidden="true" tabindex="-1"></a>book's own archive instead of hand-picked examples — <span class="in">`BOP`</span> (blowout</span>
-<span id="cb8-393"><a href="#cb8-393" aria-hidden="true" tabindex="-1"></a>preventer) and <span class="in">`TVD`</span> (true vertical depth), both genuinely present</span>
-<span id="cb8-394"><a href="#cb8-394" aria-hidden="true" tabindex="-1"></a>across the 9 drilling reports (<span class="in">`36`</span> and <span class="in">`32`</span> times respectively, on a</span>
-<span id="cb8-395"><a href="#cb8-395" aria-hidden="true" tabindex="-1"></a>real count). A reference solution is at</span>
-<span id="cb8-396"><a href="#cb8-396" aria-hidden="true" tabindex="-1"></a><span class="in">`code/chapter_04/challenge/challenge.py`</span> — on a real run, <span class="in">`TVD`</span> vs.</span>
-<span id="cb8-397"><a href="#cb8-397" aria-hidden="true" tabindex="-1"></a><span class="in">`"true vertical depth"`</span> scores <span class="in">`0.024`</span> raw / <span class="in">`0.118`</span> sentence-embedding,</span>
-<span id="cb8-398"><a href="#cb8-398" aria-hidden="true" tabindex="-1"></a>in the same range as this chapter's other acronym pairs, and the same</span>
-<span id="cb8-399"><a href="#cb8-399" aria-hidden="true" tabindex="-1"></a>run's <span class="in">`count_term_occurrences()`</span> reproduces both counts above (and the</span>
-<span id="cb8-400"><a href="#cb8-400" aria-hidden="true" tabindex="-1"></a>Field Notes' <span class="in">`36`</span> for <span class="in">`BOP`</span>) directly from the archive.</span>
-<span id="cb8-401"><a href="#cb8-401" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-402"><a href="#cb8-402" aria-hidden="true" tabindex="-1"></a><span class="fu">## Key takeaways</span></span>
-<span id="cb8-403"><a href="#cb8-403" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-404"><a href="#cb8-404" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A tokenizer mechanically splits text into fixed pieces from a</span>
-<span id="cb8-405"><a href="#cb8-405" aria-hidden="true" tabindex="-1"></a>  vocabulary decided when the model was built — it has no awareness of</span>
-<span id="cb8-406"><a href="#cb8-406" aria-hidden="true" tabindex="-1"></a>  your domain, and fine-tuning doesn't change it.</span>
-<span id="cb8-407"><a href="#cb8-407" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Splitting into multiple pieces isn't unique to jargon — plenty of</span>
-<span id="cb8-408"><a href="#cb8-408" aria-hidden="true" tabindex="-1"></a>  ordinary English words split too. The real question is whether the</span>
-<span id="cb8-409"><a href="#cb8-409" aria-hidden="true" tabindex="-1"></a>  resulting pieces get placed anywhere near their meaning.</span>
-<span id="cb8-410"><a href="#cb8-410" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Raw, per-token embeddings are the model's crudest, first-layer lookup</span>
-<span id="cb8-411"><a href="#cb8-411" aria-hidden="true" tabindex="-1"></a>  — a real run shows this book's oilfield acronyms placed no closer to</span>
-<span id="cb8-412"><a href="#cb8-412" aria-hidden="true" tabindex="-1"></a>  their own meanings than to an unrelated phrase.</span>
-<span id="cb8-413"><a href="#cb8-413" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A dedicated, purpose-built sentence-embedding model does only</span>
-<span id="cb8-414"><a href="#cb8-414" aria-hidden="true" tabindex="-1"></a>  marginally better, and for at least one safety-critical term (<span class="in">`BOP`</span>)</span>
-<span id="cb8-415"><a href="#cb8-415" aria-hidden="true" tabindex="-1"></a>  actually favors an unrelated phrase. Off-the-shelf embeddings, of</span>
-<span id="cb8-416"><a href="#cb8-416" aria-hidden="true" tabindex="-1"></a>  either kind, cannot be assumed to already understand your domain's</span>
-<span id="cb8-417"><a href="#cb8-417" aria-hidden="true" tabindex="-1"></a>  specific shorthand.</span>
-<span id="cb8-418"><a href="#cb8-418" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-419"><a href="#cb8-419" aria-hidden="true" tabindex="-1"></a><span class="fu">## Repository files</span></span>
-<span id="cb8-420"><a href="#cb8-420" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-421"><a href="#cb8-421" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> File <span class="pp">|</span> Purpose <span class="pp">|</span></span>
-<span id="cb8-422"><a href="#cb8-422" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb8-423"><a href="#cb8-423" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_04/tokenize_and_embed.py`</span> <span class="pp">|</span> Tokenizes oilfield terms and compares raw vs. sentence-embedding similarity <span class="pp">|</span></span>
-<span id="cb8-424"><a href="#cb8-424" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_04/challenge/challenge.py`</span> <span class="pp">|</span> Reference solution: real archive acronyms (<span class="in">`BOP`</span>, <span class="in">`TVD`</span>) <span class="pp">|</span></span>
-<span id="cb8-425"><a href="#cb8-425" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`notebooks/chapter_04_explore.ipynb`</span> <span class="pp">|</span> Interactive companion notebook <span class="pp">|</span></span>
-<span id="cb8-426"><a href="#cb8-426" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-427"><a href="#cb8-427" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution title="CHECKPOINT — Chapter 4"}</span>
-<span id="cb8-428"><a href="#cb8-428" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Inspected the exact sub-word pieces the tokenizer produces for</span>
-<span id="cb8-429"><a href="#cb8-429" aria-hidden="true" tabindex="-1"></a>      real oilfield shorthand</span>
-<span id="cb8-430"><a href="#cb8-430" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Measured the base model's raw embedding similarity between</span>
-<span id="cb8-431"><a href="#cb8-431" aria-hidden="true" tabindex="-1"></a>      shorthand and its own spelled-out meaning</span>
-<span id="cb8-432"><a href="#cb8-432" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Measured the same comparison with a dedicated sentence-embedding</span>
-<span id="cb8-433"><a href="#cb8-433" aria-hidden="true" tabindex="-1"></a>      model, and confirmed it doesn't reliably do better</span>
-<span id="cb8-434"><a href="#cb8-434" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-435"><a href="#cb8-435" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-436"><a href="#cb8-436" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}</span>
-<span id="cb8-437"><a href="#cb8-437" aria-hidden="true" tabindex="-1"></a>**`tokenize_and_embed.py`** — inspects tokenization and compares two</span>
-<span id="cb8-438"><a href="#cb8-438" aria-hidden="true" tabindex="-1"></a>kinds of off-the-shelf embeddings against this book's own oilfield</span>
-<span id="cb8-439"><a href="#cb8-439" aria-hidden="true" tabindex="-1"></a>shorthand, with real, reproducible numbers showing neither reliably</span>
-<span id="cb8-440"><a href="#cb8-440" aria-hidden="true" tabindex="-1"></a>understands it. This is the concrete evidence for *why* Chapter 5 has</span>
-<span id="cb8-441"><a href="#cb8-441" aria-hidden="true" tabindex="-1"></a>to actually update the model's weights, not just hope a bigger</span>
-<span id="cb8-442"><a href="#cb8-442" aria-hidden="true" tabindex="-1"></a>embedding model would fix it.</span>
-<span id="cb8-443"><a href="#cb8-443" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-444"><a href="#cb8-444" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-445"><a href="#cb8-445" aria-hidden="true" tabindex="-1"></a><span class="fu">## What can you do now that you couldn't do before?</span></span>
-<span id="cb8-446"><a href="#cb8-446" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-447"><a href="#cb8-447" aria-hidden="true" tabindex="-1"></a>You can show, with real numbers instead of intuition, exactly what a</span>
-<span id="cb8-448"><a href="#cb8-448" aria-hidden="true" tabindex="-1"></a>model reads before it ever generates a word — and you have direct,</span>
-<span id="cb8-449"><a href="#cb8-449" aria-hidden="true" tabindex="-1"></a>reproducible evidence that off-the-shelf embeddings, of any kind, can't</span>
-<span id="cb8-450"><a href="#cb8-450" aria-hidden="true" tabindex="-1"></a>be assumed to already understand your operation's specific shorthand.</span>
-<span id="cb8-451"><a href="#cb8-451" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-452"><a href="#cb8-452" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suggested next step</span></span>
-<span id="cb8-453"><a href="#cb8-453" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-454"><a href="#cb8-454" aria-hidden="true" tabindex="-1"></a>**Coming up in Chapter 5:** tokenization and embeddings are the fixed</span>
-<span id="cb8-455"><a href="#cb8-455" aria-hidden="true" tabindex="-1"></a>starting material every chapter until now has quietly relied on.</span>
-<span id="cb8-456"><a href="#cb8-456" aria-hidden="true" tabindex="-1"></a>Chapter 5 is where that finally changes — your first LoRA fine-tune,</span>
-<span id="cb8-457"><a href="#cb8-457" aria-hidden="true" tabindex="-1"></a>which updates the model's own weights using Chapter 2's 16 training</span>
-<span id="cb8-458"><a href="#cb8-458" aria-hidden="true" tabindex="-1"></a>examples, then reruns Chapter 3's training baseline *and* its held-out</span>
-<span id="cb8-459"><a href="#cb8-459" aria-hidden="true" tabindex="-1"></a>check against <span class="in">`Drilling_037`</span> to see, honestly, how much actually</span>
-<span id="cb8-460"><a href="#cb8-460" aria-hidden="true" tabindex="-1"></a>improved.</span>
+<span id="cb8-391"><a href="#cb8-391" aria-hidden="true" tabindex="-1"></a><span class="fu">## Challenge exercise</span></span>
+<span id="cb8-392"><a href="#cb8-392" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-393"><a href="#cb8-393" aria-hidden="true" tabindex="-1"></a>🟠 **Intermediate**</span>
+<span id="cb8-394"><a href="#cb8-394" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-395"><a href="#cb8-395" aria-hidden="true" tabindex="-1"></a>**Challenge:** extend the comparison to real acronyms pulled from this</span>
+<span id="cb8-396"><a href="#cb8-396" aria-hidden="true" tabindex="-1"></a>book's own archive instead of hand-picked examples — <span class="in">`BOP`</span> (blowout</span>
+<span id="cb8-397"><a href="#cb8-397" aria-hidden="true" tabindex="-1"></a>preventer) and <span class="in">`TVD`</span> (true vertical depth), both genuinely present</span>
+<span id="cb8-398"><a href="#cb8-398" aria-hidden="true" tabindex="-1"></a>across the 9 drilling reports (<span class="in">`36`</span> and <span class="in">`32`</span> times respectively, on a</span>
+<span id="cb8-399"><a href="#cb8-399" aria-hidden="true" tabindex="-1"></a>real count). A reference solution is at</span>
+<span id="cb8-400"><a href="#cb8-400" aria-hidden="true" tabindex="-1"></a><span class="in">`code/chapter_04/challenge/challenge.py`</span> — on a real run, <span class="in">`TVD`</span> vs.</span>
+<span id="cb8-401"><a href="#cb8-401" aria-hidden="true" tabindex="-1"></a><span class="in">`"true vertical depth"`</span> scores <span class="in">`0.024`</span> raw / <span class="in">`0.118`</span> sentence-embedding,</span>
+<span id="cb8-402"><a href="#cb8-402" aria-hidden="true" tabindex="-1"></a>in the same range as this chapter's other acronym pairs, and the same</span>
+<span id="cb8-403"><a href="#cb8-403" aria-hidden="true" tabindex="-1"></a>run's <span class="in">`count_term_occurrences()`</span> reproduces both counts above (and the</span>
+<span id="cb8-404"><a href="#cb8-404" aria-hidden="true" tabindex="-1"></a>Field Notes' <span class="in">`36`</span> for <span class="in">`BOP`</span>) directly from the archive.</span>
+<span id="cb8-405"><a href="#cb8-405" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-406"><a href="#cb8-406" aria-hidden="true" tabindex="-1"></a><span class="fu">## Key takeaways</span></span>
+<span id="cb8-407"><a href="#cb8-407" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-408"><a href="#cb8-408" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A tokenizer mechanically splits text into fixed pieces from a</span>
+<span id="cb8-409"><a href="#cb8-409" aria-hidden="true" tabindex="-1"></a>  vocabulary decided when the model was built — it has no awareness of</span>
+<span id="cb8-410"><a href="#cb8-410" aria-hidden="true" tabindex="-1"></a>  your domain, and fine-tuning doesn't change it.</span>
+<span id="cb8-411"><a href="#cb8-411" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Splitting into multiple pieces isn't unique to jargon — plenty of</span>
+<span id="cb8-412"><a href="#cb8-412" aria-hidden="true" tabindex="-1"></a>  ordinary English words split too. The real question is whether the</span>
+<span id="cb8-413"><a href="#cb8-413" aria-hidden="true" tabindex="-1"></a>  resulting pieces get placed anywhere near their meaning.</span>
+<span id="cb8-414"><a href="#cb8-414" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Raw, per-token embeddings are the model's crudest, first-layer lookup</span>
+<span id="cb8-415"><a href="#cb8-415" aria-hidden="true" tabindex="-1"></a>  — a real run shows this book's oilfield acronyms placed no closer to</span>
+<span id="cb8-416"><a href="#cb8-416" aria-hidden="true" tabindex="-1"></a>  their own meanings than to an unrelated phrase.</span>
+<span id="cb8-417"><a href="#cb8-417" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A dedicated, purpose-built sentence-embedding model does only</span>
+<span id="cb8-418"><a href="#cb8-418" aria-hidden="true" tabindex="-1"></a>  marginally better, and for at least one safety-critical term (<span class="in">`BOP`</span>)</span>
+<span id="cb8-419"><a href="#cb8-419" aria-hidden="true" tabindex="-1"></a>  actually favors an unrelated phrase. Off-the-shelf embeddings, of</span>
+<span id="cb8-420"><a href="#cb8-420" aria-hidden="true" tabindex="-1"></a>  either kind, cannot be assumed to already understand your domain's</span>
+<span id="cb8-421"><a href="#cb8-421" aria-hidden="true" tabindex="-1"></a>  specific shorthand.</span>
+<span id="cb8-422"><a href="#cb8-422" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-423"><a href="#cb8-423" aria-hidden="true" tabindex="-1"></a><span class="fu">## Repository files</span></span>
+<span id="cb8-424"><a href="#cb8-424" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-425"><a href="#cb8-425" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> File <span class="pp">|</span> Purpose <span class="pp">|</span></span>
+<span id="cb8-426"><a href="#cb8-426" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb8-427"><a href="#cb8-427" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_04/tokenize_and_embed.py`</span> <span class="pp">|</span> Tokenizes oilfield terms and compares raw vs. sentence-embedding similarity <span class="pp">|</span></span>
+<span id="cb8-428"><a href="#cb8-428" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_04/challenge/challenge.py`</span> <span class="pp">|</span> Reference solution: real archive acronyms (<span class="in">`BOP`</span>, <span class="in">`TVD`</span>) <span class="pp">|</span></span>
+<span id="cb8-429"><a href="#cb8-429" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`notebooks/chapter_04_explore.ipynb`</span> <span class="pp">|</span> Interactive companion notebook <span class="pp">|</span></span>
+<span id="cb8-430"><a href="#cb8-430" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-431"><a href="#cb8-431" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution title="CHECKPOINT — Chapter 4"}</span>
+<span id="cb8-432"><a href="#cb8-432" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Inspected the exact sub-word pieces the tokenizer produces for</span>
+<span id="cb8-433"><a href="#cb8-433" aria-hidden="true" tabindex="-1"></a>      real oilfield shorthand</span>
+<span id="cb8-434"><a href="#cb8-434" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Measured the base model's raw embedding similarity between</span>
+<span id="cb8-435"><a href="#cb8-435" aria-hidden="true" tabindex="-1"></a>      shorthand and its own spelled-out meaning</span>
+<span id="cb8-436"><a href="#cb8-436" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Measured the same comparison with a dedicated sentence-embedding</span>
+<span id="cb8-437"><a href="#cb8-437" aria-hidden="true" tabindex="-1"></a>      model, and confirmed it doesn't reliably do better</span>
+<span id="cb8-438"><a href="#cb8-438" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-439"><a href="#cb8-439" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-440"><a href="#cb8-440" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}</span>
+<span id="cb8-441"><a href="#cb8-441" aria-hidden="true" tabindex="-1"></a>**`tokenize_and_embed.py`** — inspects tokenization and compares two</span>
+<span id="cb8-442"><a href="#cb8-442" aria-hidden="true" tabindex="-1"></a>kinds of off-the-shelf embeddings against this book's own oilfield</span>
+<span id="cb8-443"><a href="#cb8-443" aria-hidden="true" tabindex="-1"></a>shorthand, with real, reproducible numbers showing neither reliably</span>
+<span id="cb8-444"><a href="#cb8-444" aria-hidden="true" tabindex="-1"></a>understands it. This is the concrete evidence for *why* Chapter 5 has</span>
+<span id="cb8-445"><a href="#cb8-445" aria-hidden="true" tabindex="-1"></a>to actually update the model's weights, not just hope a bigger</span>
+<span id="cb8-446"><a href="#cb8-446" aria-hidden="true" tabindex="-1"></a>embedding model would fix it -- though, as you'll see there, Chapter</span>
+<span id="cb8-447"><a href="#cb8-447" aria-hidden="true" tabindex="-1"></a>5's fine-tune leaves this exact raw embedding table frozen and untouched;</span>
+<span id="cb8-448"><a href="#cb8-448" aria-hidden="true" tabindex="-1"></a>the fix happens at the attention layers downstream of it instead.</span>
+<span id="cb8-449"><a href="#cb8-449" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-450"><a href="#cb8-450" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-451"><a href="#cb8-451" aria-hidden="true" tabindex="-1"></a><span class="fu">## What can you do now that you couldn't do before?</span></span>
+<span id="cb8-452"><a href="#cb8-452" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-453"><a href="#cb8-453" aria-hidden="true" tabindex="-1"></a>You can show, with real numbers instead of intuition, exactly what a</span>
+<span id="cb8-454"><a href="#cb8-454" aria-hidden="true" tabindex="-1"></a>model reads before it ever generates a word — and you have direct,</span>
+<span id="cb8-455"><a href="#cb8-455" aria-hidden="true" tabindex="-1"></a>reproducible evidence that off-the-shelf embeddings, of any kind, can't</span>
+<span id="cb8-456"><a href="#cb8-456" aria-hidden="true" tabindex="-1"></a>be assumed to already understand your operation's specific shorthand.</span>
+<span id="cb8-457"><a href="#cb8-457" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-458"><a href="#cb8-458" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suggested next step</span></span>
+<span id="cb8-459"><a href="#cb8-459" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-460"><a href="#cb8-460" aria-hidden="true" tabindex="-1"></a>**Coming up in Chapter 5:** tokenization and embeddings are the fixed</span>
+<span id="cb8-461"><a href="#cb8-461" aria-hidden="true" tabindex="-1"></a>starting material every chapter until now has quietly relied on.</span>
+<span id="cb8-462"><a href="#cb8-462" aria-hidden="true" tabindex="-1"></a>Chapter 5 is where that finally changes — your first LoRA fine-tune,</span>
+<span id="cb8-463"><a href="#cb8-463" aria-hidden="true" tabindex="-1"></a>which updates the model's own weights using Chapter 2's 16 training</span>
+<span id="cb8-464"><a href="#cb8-464" aria-hidden="true" tabindex="-1"></a>examples, then reruns Chapter 3's training baseline *and* its held-out</span>
+<span id="cb8-465"><a href="#cb8-465" aria-hidden="true" tabindex="-1"></a>check against <span class="in">`Drilling_037`</span> to see, honestly, how much actually</span>
+<span id="cb8-466"><a href="#cb8-466" aria-hidden="true" tabindex="-1"></a>improved.</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

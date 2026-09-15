@@ -84,9 +84,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-f352355e9c4cf757a45f4f8798595620.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-5eaba02739cdb78914c5f4540b400244.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -596,7 +596,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="../figures/diagrams/pipeline_ch13_light.svg" class="diagram-light img-fluid" width="180"> <img src="../figures/diagrams/pipeline_ch13_dark.svg" class="diagram-dark img-fluid" width="180"></p>
 </div>
 <div class="chapter-status">
-<p>Progress <code>█████████████</code> <strong>13 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 45-60 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🔴 Advanced</p>
+<p>Progress <code>█████████████</code> <strong>13 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 45–60 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🔴 Advanced</p>
 </div>
 <section id="learning-objectives" class="level2" data-number="13.1">
 <h2 data-number="13.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">13.1</span> Learning objectives</h2>
@@ -673,7 +673,7 @@ Direction: exact_match=unchanged  avg_overlap=regressed  perplexity=improved</co
 <section id="expected-output" class="level2" data-number="13.9">
 <h2 data-number="13.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">13.9</span> Expected Output</h2>
 <p>Two lists of real report records: everything before the cutoff, and everything at or after it.</p>
-<div id="002e3458" class="cell" data-execution_count="1">
+<div id="58653f5a" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>CUTOFF_REPORT_NUM <span class="op">=</span> <span class="dv">60</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -718,7 +718,7 @@ New reports just arrived:  17 reports</code></pre>
 <section id="expected-output-1" class="level2" data-number="13.14">
 <h2 data-number="13.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">13.14</span> Expected Output</h2>
 <p>Four checkpoints: two from training on the current archive, two more continuing on the new batch alone.</p>
-<div id="e26c5e89" class="cell" data-execution_count="2">
+<div id="efc1d9b1" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>model, tokenizer <span class="op">=</span> load_model_and_tokenizer(MODEL_NAME)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>lora_model <span class="op">=</span> build_lora_model(model)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>train_with_checkpoints(lora_model, tokenizer, current_examples, held_out_eval_set, run_dir, logger, num_epochs<span class="op">=</span><span class="dv">2</span>)</span>
@@ -742,7 +742,7 @@ New reports just arrived:  17 reports</code></pre>
 </section>
 <section id="production-reality-1" class="level2" data-number="13.16">
 <h2 data-number="13.16" class="anchored" data-anchor-id="production-reality-1"><span class="header-section-number">13.16</span> Production Reality</h2>
-<p>Two epochs on 179 new examples is a small, fast update by design — a real production system might retrain more or less aggressively depending on how much new data has accumulated and how expensive a full retrain is. This chapter’s fixed 2-epoch continuation is a teaching choice, not a tuned production schedule.</p>
+<p>Two epochs on 179 new examples is a small, fast update by design — a real production system might retrain more or less aggressively depending on how much new data has accumulated and how expensive a full retrain is. This chapter’s fixed 2-epoch continuation is a teaching choice, not a tuned production schedule. It also trains on <code>new_examples</code> alone, with none of <code>current_examples</code> mixed back in — a real instance of what the field calls <strong>catastrophic forgetting</strong> (or, more precisely here, recency bias): training only on new data can pull a model’s behavior away from what it learned earlier, even without erasing it outright. The standard mitigation — replaying a sample of <code>current_examples</code> alongside each new batch — isn’t attempted here; Step 3 and the Field Notes below show part of what skipping it costs.</p>
 <section id="step-3-compare-before-deciding-to-deploy" class="level3" data-number="13.16.1">
 <h3 data-number="13.16.1" class="anchored" data-anchor-id="step-3-compare-before-deciding-to-deploy"><span class="header-section-number">13.16.1</span> Step 3: Compare before deciding to deploy</h3>
 </section>
@@ -761,7 +761,7 @@ New reports just arrived:  17 reports</code></pre>
 <section id="expected-output-2" class="level2" data-number="13.19">
 <h2 data-number="13.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">13.19</span> Expected Output</h2>
 <p>A direction per metric between the current and updated model.</p>
-<div id="a2417d67" class="cell" data-execution_count="3">
+<div id="65b0499c" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lora_current, tokenizer <span class="op">=</span> load_version(current_checkpoint)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>summary_current <span class="op">=</span> summarize_version(lora_current, tokenizer, held_out_eval_set)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -895,7 +895,7 @@ Direction:     {'exact_match': 'unchanged', 'avg_overlap': 'regressed', 'perplex
 <img src="../figures/app_screenshot_evaluation_readme.jpg" class="img-fluid figure-img" alt="Screenshot of the companion app's Before vs. After Evaluation page, showing a results table for the base model and three fine-tuned checkpoints, a callout stating the latest checkpoint regressed on both average overlap and perplexity compared to the previous one, and per-transition percentage changes for each metric.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-app-evaluation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.1: Before vs.&nbsp;After Evaluation, screenshotted from a real local run across this book’s own checkpoints – the exact “latest doesn’t mean best” regression this chapter’s own version-comparison run found above, surfaced automatically by the app.
+Figure&nbsp;13.1: Before vs.&nbsp;After Evaluation, screenshotted from a real local run across this book’s own checkpoints – a similar “latest doesn’t mean best” regression, found separately by comparing the book’s own persisted Chapter 5/8/13 checkpoints (this one regresses on both average overlap and perplexity, not the single metric this chapter’s own version-comparison run above flagged – a different checkpoint pair, not the same result), surfaced automatically by the app.
 </figcaption>
 </figure>
 </div>
@@ -1405,7 +1405,7 @@ Figure&nbsp;13.1: Before vs.&nbsp;After Evaluation, screenshotted from a real lo
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>::: {.chapter-status}</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`█████████████`</span> **13 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 45-60 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🔴 Advanced</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`█████████████`</span> **13 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 45–60 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🔴 Advanced</span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learning objectives</span></span>
@@ -1593,231 +1593,241 @@ Figure&nbsp;13.1: Before vs.&nbsp;After Evaluation, screenshotted from a real lo
 <span id="cb8-204"><a href="#cb8-204" aria-hidden="true" tabindex="-1"></a>real production system might retrain more or less aggressively</span>
 <span id="cb8-205"><a href="#cb8-205" aria-hidden="true" tabindex="-1"></a>depending on how much new data has accumulated and how expensive a</span>
 <span id="cb8-206"><a href="#cb8-206" aria-hidden="true" tabindex="-1"></a>full retrain is. This chapter's fixed 2-epoch continuation is a</span>
-<span id="cb8-207"><a href="#cb8-207" aria-hidden="true" tabindex="-1"></a>teaching choice, not a tuned production schedule.</span>
-<span id="cb8-208"><a href="#cb8-208" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-209"><a href="#cb8-209" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 3: Compare before deciding to deploy</span></span>
-<span id="cb8-210"><a href="#cb8-210" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-211"><a href="#cb8-211" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
-<span id="cb8-212"><a href="#cb8-212" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-213"><a href="#cb8-213" aria-hidden="true" tabindex="-1"></a>Answer the question Step 2's clean training run can't: is</span>
-<span id="cb8-214"><a href="#cb8-214" aria-hidden="true" tabindex="-1"></a><span class="in">`checkpoint_4`</span> actually an improvement over <span class="in">`checkpoint_2`</span>?</span>
+<span id="cb8-207"><a href="#cb8-207" aria-hidden="true" tabindex="-1"></a>teaching choice, not a tuned production schedule. It also trains on</span>
+<span id="cb8-208"><a href="#cb8-208" aria-hidden="true" tabindex="-1"></a><span class="in">`new_examples`</span> alone, with none of <span class="in">`current_examples`</span> mixed back in —</span>
+<span id="cb8-209"><a href="#cb8-209" aria-hidden="true" tabindex="-1"></a>a real instance of what the field calls **catastrophic forgetting** (or,</span>
+<span id="cb8-210"><a href="#cb8-210" aria-hidden="true" tabindex="-1"></a>more precisely here, recency bias): training only on new data can pull</span>
+<span id="cb8-211"><a href="#cb8-211" aria-hidden="true" tabindex="-1"></a>a model's behavior away from what it learned earlier, even without</span>
+<span id="cb8-212"><a href="#cb8-212" aria-hidden="true" tabindex="-1"></a>erasing it outright. The standard mitigation — replaying a sample of</span>
+<span id="cb8-213"><a href="#cb8-213" aria-hidden="true" tabindex="-1"></a><span class="in">`current_examples`</span> alongside each new batch — isn't attempted here;</span>
+<span id="cb8-214"><a href="#cb8-214" aria-hidden="true" tabindex="-1"></a>Step 3 and the Field Notes below show part of what skipping it costs.</span>
 <span id="cb8-215"><a href="#cb8-215" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-216"><a href="#cb8-216" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-216"><a href="#cb8-216" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 3: Compare before deciding to deploy</span></span>
 <span id="cb8-217"><a href="#cb8-217" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-218"><a href="#cb8-218" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Both checkpoints from Step 2, reloaded fresh from disk</span>
-<span id="cb8-219"><a href="#cb8-219" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`load_version`</span>, <span class="in">`summarize_version`</span>, and <span class="in">`compare_versions`</span></span>
-<span id="cb8-220"><a href="#cb8-220" aria-hidden="true" tabindex="-1"></a>  (Chapter 12), reused unchanged</span>
-<span id="cb8-221"><a href="#cb8-221" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-222"><a href="#cb8-222" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
-<span id="cb8-223"><a href="#cb8-223" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-224"><a href="#cb8-224" aria-hidden="true" tabindex="-1"></a>A direction per metric between the current and updated model.</span>
-<span id="cb8-225"><a href="#cb8-225" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-228"><a href="#cb8-228" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-229"><a href="#cb8-229" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb8-230"><a href="#cb8-230" aria-hidden="true" tabindex="-1"></a>lora_current, tokenizer <span class="op">=</span> load_version(current_checkpoint)</span>
-<span id="cb8-231"><a href="#cb8-231" aria-hidden="true" tabindex="-1"></a>summary_current <span class="op">=</span> summarize_version(lora_current, tokenizer, held_out_eval_set)</span>
+<span id="cb8-218"><a href="#cb8-218" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-219"><a href="#cb8-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-220"><a href="#cb8-220" aria-hidden="true" tabindex="-1"></a>Answer the question Step 2's clean training run can't: is</span>
+<span id="cb8-221"><a href="#cb8-221" aria-hidden="true" tabindex="-1"></a><span class="in">`checkpoint_4`</span> actually an improvement over <span class="in">`checkpoint_2`</span>?</span>
+<span id="cb8-222"><a href="#cb8-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-223"><a href="#cb8-223" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
+<span id="cb8-224"><a href="#cb8-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-225"><a href="#cb8-225" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Both checkpoints from Step 2, reloaded fresh from disk</span>
+<span id="cb8-226"><a href="#cb8-226" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`load_version`</span>, <span class="in">`summarize_version`</span>, and <span class="in">`compare_versions`</span></span>
+<span id="cb8-227"><a href="#cb8-227" aria-hidden="true" tabindex="-1"></a>  (Chapter 12), reused unchanged</span>
+<span id="cb8-228"><a href="#cb8-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-229"><a href="#cb8-229" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-230"><a href="#cb8-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-231"><a href="#cb8-231" aria-hidden="true" tabindex="-1"></a>A direction per metric between the current and updated model.</span>
 <span id="cb8-232"><a href="#cb8-232" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-233"><a href="#cb8-233" aria-hidden="true" tabindex="-1"></a>lora_updated, _ <span class="op">=</span> load_version(updated_checkpoint)</span>
-<span id="cb8-234"><a href="#cb8-234" aria-hidden="true" tabindex="-1"></a>summary_updated <span class="op">=</span> summarize_version(lora_updated, tokenizer, held_out_eval_set)</span>
-<span id="cb8-235"><a href="#cb8-235" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-236"><a href="#cb8-236" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Current model: </span><span class="sc">{</span>summary_current<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb8-237"><a href="#cb8-237" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Updated model: </span><span class="sc">{</span>summary_updated<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb8-238"><a href="#cb8-238" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Direction:     </span><span class="sc">{</span>compare_versions(summary_current, summary_updated)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb8-239"><a href="#cb8-239" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-240"><a href="#cb8-240" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-241"><a href="#cb8-241" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-235"><a href="#cb8-235" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-236"><a href="#cb8-236" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-237"><a href="#cb8-237" aria-hidden="true" tabindex="-1"></a>lora_current, tokenizer <span class="op">=</span> load_version(current_checkpoint)</span>
+<span id="cb8-238"><a href="#cb8-238" aria-hidden="true" tabindex="-1"></a>summary_current <span class="op">=</span> summarize_version(lora_current, tokenizer, held_out_eval_set)</span>
+<span id="cb8-239"><a href="#cb8-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-240"><a href="#cb8-240" aria-hidden="true" tabindex="-1"></a>lora_updated, _ <span class="op">=</span> load_version(updated_checkpoint)</span>
+<span id="cb8-241"><a href="#cb8-241" aria-hidden="true" tabindex="-1"></a>summary_updated <span class="op">=</span> summarize_version(lora_updated, tokenizer, held_out_eval_set)</span>
 <span id="cb8-242"><a href="#cb8-242" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-243"><a href="#cb8-243" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-244"><a href="#cb8-244" aria-hidden="true" tabindex="-1"></a><span class="in">Current model: {'exact_match': 0, 'avg_overlap': 0.464, 'perplexity': 25.92}</span></span>
-<span id="cb8-245"><a href="#cb8-245" aria-hidden="true" tabindex="-1"></a><span class="in">Updated model: {'exact_match': 0, 'avg_overlap': 0.125, 'perplexity': 25.73}</span></span>
-<span id="cb8-246"><a href="#cb8-246" aria-hidden="true" tabindex="-1"></a><span class="in">Direction:     {'exact_match': 'unchanged', 'avg_overlap': 'regressed', 'perplexity': 'improved'}</span></span>
-<span id="cb8-247"><a href="#cb8-247" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-248"><a href="#cb8-248" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-249"><a href="#cb8-249" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
-<span id="cb8-250"><a href="#cb8-250" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-251"><a href="#cb8-251" aria-hidden="true" tabindex="-1"></a>The same disagreement Chapter 12 found comparing two epochs of one</span>
-<span id="cb8-252"><a href="#cb8-252" aria-hidden="true" tabindex="-1"></a>run, and comparing two entirely different training regimes, shows up a</span>
-<span id="cb8-253"><a href="#cb8-253" aria-hidden="true" tabindex="-1"></a>third time here, on a genuinely new scenario: real new data, really</span>
-<span id="cb8-254"><a href="#cb8-254" aria-hidden="true" tabindex="-1"></a>incorporated. <span class="in">`avg_overlap`</span> says this update made things worse.</span>
-<span id="cb8-255"><a href="#cb8-255" aria-hidden="true" tabindex="-1"></a>Perplexity's "improved" label points the right direction but by a</span>
-<span id="cb8-256"><a href="#cb8-256" aria-hidden="true" tabindex="-1"></a>small margin — <span class="in">`25.92 -&gt; 25.73`</span> is about <span class="in">`0.7%`</span>, nowhere near the</span>
-<span id="cb8-257"><a href="#cb8-257" aria-hidden="true" tabindex="-1"></a>substantial, <span class="in">`6×`</span> gap Chapter 11 found between a base and fine-tuned</span>
-<span id="cb8-258"><a href="#cb8-258" aria-hidden="true" tabindex="-1"></a>model. Chapter 12's own Production Reality warned that this comparison</span>
-<span id="cb8-259"><a href="#cb8-259" aria-hidden="true" tabindex="-1"></a>has no noise threshold; this run is a live example of why that</span>
-<span id="cb8-260"><a href="#cb8-260" aria-hidden="true" tabindex="-1"></a>matters: a real disagreement (<span class="in">`avg_overlap`</span>) sits next to a real but</span>
-<span id="cb8-261"><a href="#cb8-261" aria-hidden="true" tabindex="-1"></a>minor "improvement" (<span class="in">`perplexity`</span>), and only one of them is worth</span>
-<span id="cb8-262"><a href="#cb8-262" aria-hidden="true" tabindex="-1"></a>acting on.</span>
-<span id="cb8-263"><a href="#cb8-263" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-264"><a href="#cb8-264" aria-hidden="true" tabindex="-1"></a>This step's loader is worth noticing too: it calls <span class="in">`load_version`</span></span>
-<span id="cb8-265"><a href="#cb8-265" aria-hidden="true" tabindex="-1"></a>(Chapter 12), not Step 2's <span class="in">`load_checkpoint`</span> (Chapter 8) — the two</span>
-<span id="cb8-266"><a href="#cb8-266" aria-hidden="true" tabindex="-1"></a>look interchangeable but aren't. <span class="in">`load_checkpoint`</span> sets</span>
-<span id="cb8-267"><a href="#cb8-267" aria-hidden="true" tabindex="-1"></a><span class="in">`is_trainable=True`</span>, which leaves the model in **train mode**, dropout</span>
-<span id="cb8-268"><a href="#cb8-268" aria-hidden="true" tabindex="-1"></a>included. That's correct for resuming training in Step 2; loading a</span>
-<span id="cb8-269"><a href="#cb8-269" aria-hidden="true" tabindex="-1"></a>checkpoint the same way just to *evaluate* it would leave dropout</span>
-<span id="cb8-270"><a href="#cb8-270" aria-hidden="true" tabindex="-1"></a>switched on during scoring, making perplexity noisy from run to run</span>
-<span id="cb8-271"><a href="#cb8-271" aria-hidden="true" tabindex="-1"></a>for no real reason. Catching this meant literally checking</span>
-<span id="cb8-272"><a href="#cb8-272" aria-hidden="true" tabindex="-1"></a><span class="in">`model.training`</span> after loading — it printed <span class="in">`True`</span> where it should</span>
-<span id="cb8-273"><a href="#cb8-273" aria-hidden="true" tabindex="-1"></a>have printed <span class="in">`False`</span>, on the first attempt at this exact step.</span>
-<span id="cb8-274"><a href="#cb8-274" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-275"><a href="#cb8-275" aria-hidden="true" tabindex="-1"></a><span class="fu">## Practical exercise</span></span>
-<span id="cb8-276"><a href="#cb8-276" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-277"><a href="#cb8-277" aria-hidden="true" tabindex="-1"></a>🟢 **Beginner**</span>
-<span id="cb8-278"><a href="#cb8-278" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-279"><a href="#cb8-279" aria-hidden="true" tabindex="-1"></a>**Try it yourself:** run</span>
-<span id="cb8-280"><a href="#cb8-280" aria-hidden="true" tabindex="-1"></a><span class="in">`python code/chapter_13/continuous_finetune.py`</span> from inside <span class="in">`book/`</span></span>
-<span id="cb8-281"><a href="#cb8-281" aria-hidden="true" tabindex="-1"></a>(it takes roughly 20-25 minutes on CPU) and compare its printed output</span>
-<span id="cb8-282"><a href="#cb8-282" aria-hidden="true" tabindex="-1"></a>to the transcripts above.</span>
+<span id="cb8-243"><a href="#cb8-243" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Current model: </span><span class="sc">{</span>summary_current<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-244"><a href="#cb8-244" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Updated model: </span><span class="sc">{</span>summary_updated<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-245"><a href="#cb8-245" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Direction:     </span><span class="sc">{</span>compare_versions(summary_current, summary_updated)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-246"><a href="#cb8-246" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-247"><a href="#cb8-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-248"><a href="#cb8-248" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-249"><a href="#cb8-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-250"><a href="#cb8-250" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-251"><a href="#cb8-251" aria-hidden="true" tabindex="-1"></a><span class="in">Current model: {'exact_match': 0, 'avg_overlap': 0.464, 'perplexity': 25.92}</span></span>
+<span id="cb8-252"><a href="#cb8-252" aria-hidden="true" tabindex="-1"></a><span class="in">Updated model: {'exact_match': 0, 'avg_overlap': 0.125, 'perplexity': 25.73}</span></span>
+<span id="cb8-253"><a href="#cb8-253" aria-hidden="true" tabindex="-1"></a><span class="in">Direction:     {'exact_match': 'unchanged', 'avg_overlap': 'regressed', 'perplexity': 'improved'}</span></span>
+<span id="cb8-254"><a href="#cb8-254" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-255"><a href="#cb8-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-256"><a href="#cb8-256" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
+<span id="cb8-257"><a href="#cb8-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-258"><a href="#cb8-258" aria-hidden="true" tabindex="-1"></a>The same disagreement Chapter 12 found comparing two epochs of one</span>
+<span id="cb8-259"><a href="#cb8-259" aria-hidden="true" tabindex="-1"></a>run, and comparing two entirely different training regimes, shows up a</span>
+<span id="cb8-260"><a href="#cb8-260" aria-hidden="true" tabindex="-1"></a>third time here, on a genuinely new scenario: real new data, really</span>
+<span id="cb8-261"><a href="#cb8-261" aria-hidden="true" tabindex="-1"></a>incorporated. <span class="in">`avg_overlap`</span> says this update made things worse.</span>
+<span id="cb8-262"><a href="#cb8-262" aria-hidden="true" tabindex="-1"></a>Perplexity's "improved" label points the right direction but by a</span>
+<span id="cb8-263"><a href="#cb8-263" aria-hidden="true" tabindex="-1"></a>small margin — <span class="in">`25.92 -&gt; 25.73`</span> is about <span class="in">`0.7%`</span>, nowhere near the</span>
+<span id="cb8-264"><a href="#cb8-264" aria-hidden="true" tabindex="-1"></a>substantial, <span class="in">`6×`</span> gap Chapter 11 found between a base and fine-tuned</span>
+<span id="cb8-265"><a href="#cb8-265" aria-hidden="true" tabindex="-1"></a>model. Chapter 12's own Production Reality warned that this comparison</span>
+<span id="cb8-266"><a href="#cb8-266" aria-hidden="true" tabindex="-1"></a>has no noise threshold; this run is a live example of why that</span>
+<span id="cb8-267"><a href="#cb8-267" aria-hidden="true" tabindex="-1"></a>matters: a real disagreement (<span class="in">`avg_overlap`</span>) sits next to a real but</span>
+<span id="cb8-268"><a href="#cb8-268" aria-hidden="true" tabindex="-1"></a>minor "improvement" (<span class="in">`perplexity`</span>), and only one of them is worth</span>
+<span id="cb8-269"><a href="#cb8-269" aria-hidden="true" tabindex="-1"></a>acting on.</span>
+<span id="cb8-270"><a href="#cb8-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-271"><a href="#cb8-271" aria-hidden="true" tabindex="-1"></a>This step's loader is worth noticing too: it calls <span class="in">`load_version`</span></span>
+<span id="cb8-272"><a href="#cb8-272" aria-hidden="true" tabindex="-1"></a>(Chapter 12), not Step 2's <span class="in">`load_checkpoint`</span> (Chapter 8) — the two</span>
+<span id="cb8-273"><a href="#cb8-273" aria-hidden="true" tabindex="-1"></a>look interchangeable but aren't. <span class="in">`load_checkpoint`</span> sets</span>
+<span id="cb8-274"><a href="#cb8-274" aria-hidden="true" tabindex="-1"></a><span class="in">`is_trainable=True`</span>, which leaves the model in **train mode**, dropout</span>
+<span id="cb8-275"><a href="#cb8-275" aria-hidden="true" tabindex="-1"></a>included. That's correct for resuming training in Step 2; loading a</span>
+<span id="cb8-276"><a href="#cb8-276" aria-hidden="true" tabindex="-1"></a>checkpoint the same way just to *evaluate* it would leave dropout</span>
+<span id="cb8-277"><a href="#cb8-277" aria-hidden="true" tabindex="-1"></a>switched on during scoring, making perplexity noisy from run to run</span>
+<span id="cb8-278"><a href="#cb8-278" aria-hidden="true" tabindex="-1"></a>for no real reason. Catching this meant literally checking</span>
+<span id="cb8-279"><a href="#cb8-279" aria-hidden="true" tabindex="-1"></a><span class="in">`model.training`</span> after loading — it printed <span class="in">`True`</span> where it should</span>
+<span id="cb8-280"><a href="#cb8-280" aria-hidden="true" tabindex="-1"></a>have printed <span class="in">`False`</span>, on the first attempt at this exact step.</span>
+<span id="cb8-281"><a href="#cb8-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-282"><a href="#cb8-282" aria-hidden="true" tabindex="-1"></a><span class="fu">## Practical exercise</span></span>
 <span id="cb8-283"><a href="#cb8-283" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-284"><a href="#cb8-284" aria-hidden="true" tabindex="-1"></a>**You'll know it worked when:** you see <span class="in">`avg_overlap: regressed`</span> in</span>
-<span id="cb8-285"><a href="#cb8-285" aria-hidden="true" tabindex="-1"></a>the final comparison, and you can explain in one sentence why that</span>
-<span id="cb8-286"><a href="#cb8-286" aria-hidden="true" tabindex="-1"></a>means this particular update shouldn't be deployed without a closer</span>
-<span id="cb8-287"><a href="#cb8-287" aria-hidden="true" tabindex="-1"></a>look, even though training itself ran cleanly.</span>
-<span id="cb8-288"><a href="#cb8-288" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-289"><a href="#cb8-289" aria-hidden="true" tabindex="-1"></a><span class="fu">## Field notes</span></span>
+<span id="cb8-284"><a href="#cb8-284" aria-hidden="true" tabindex="-1"></a>🟢 **Beginner**</span>
+<span id="cb8-285"><a href="#cb8-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-286"><a href="#cb8-286" aria-hidden="true" tabindex="-1"></a>**Try it yourself:** run</span>
+<span id="cb8-287"><a href="#cb8-287" aria-hidden="true" tabindex="-1"></a><span class="in">`python code/chapter_13/continuous_finetune.py`</span> from inside <span class="in">`book/`</span></span>
+<span id="cb8-288"><a href="#cb8-288" aria-hidden="true" tabindex="-1"></a>(it takes roughly 20-25 minutes on CPU) and compare its printed output</span>
+<span id="cb8-289"><a href="#cb8-289" aria-hidden="true" tabindex="-1"></a>to the transcripts above.</span>
 <span id="cb8-290"><a href="#cb8-290" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-291"><a href="#cb8-291" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="Field notes: the new batch skews toward a different phase of the well"}</span>
-<span id="cb8-292"><a href="#cb8-292" aria-hidden="true" tabindex="-1"></a>**Query:** what the 17 new reports (<span class="in">`#60`</span> onward) actually describe,</span>
-<span id="cb8-293"><a href="#cb8-293" aria-hidden="true" tabindex="-1"></a>compared to what the held-out evaluation report (<span class="in">`#37`</span>) describes.</span>
-<span id="cb8-294"><a href="#cb8-294" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-295"><a href="#cb8-295" aria-hidden="true" tabindex="-1"></a>**Result:** <span class="in">`20`</span> of the new batch's <span class="in">`179`</span> examples mention casing or</span>
-<span id="cb8-296"><a href="#cb8-296" aria-hidden="true" tabindex="-1"></a>cement — concentrated in the last several reports, right at the</span>
-<span id="cb8-297"><a href="#cb8-297" aria-hidden="true" tabindex="-1"></a>archive's end (*"Rig up and run 7" casing,"* *"Cement 7" casing,"*</span>
-<span id="cb8-298"><a href="#cb8-298" aria-hidden="true" tabindex="-1"></a>*"Production Casing Wait on Cement"*). The updated model's</span>
-<span id="cb8-299"><a href="#cb8-299" aria-hidden="true" tabindex="-1"></a>memorized-sounding template shifts to match: *"Production Casing Run</span>
-<span id="cb8-300"><a href="#cb8-300" aria-hidden="true" tabindex="-1"></a>Csg &amp; Cement Rig up cementing equipment,"* replacing the current</span>
-<span id="cb8-301"><a href="#cb8-301" aria-hidden="true" tabindex="-1"></a>model's *"Production Drilling Cond Mud &amp; Circ Circulate for</span>
-<span id="cb8-302"><a href="#cb8-302" aria-hidden="true" tabindex="-1"></a>temperature."* Report <span class="in">`#37`</span>, the held-out report this chapter still</span>
-<span id="cb8-303"><a href="#cb8-303" aria-hidden="true" tabindex="-1"></a>evaluates against, is from the middle of the well program — active</span>
-<span id="cb8-304"><a href="#cb8-304" aria-hidden="true" tabindex="-1"></a>drilling, not casing.</span>
-<span id="cb8-305"><a href="#cb8-305" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-306"><a href="#cb8-306" aria-hidden="true" tabindex="-1"></a>**Why:** a real well program drills first and cases and cements later,</span>
-<span id="cb8-307"><a href="#cb8-307" aria-hidden="true" tabindex="-1"></a>near total depth. The new batch isn't random new data; it's</span>
-<span id="cb8-308"><a href="#cb8-308" aria-hidden="true" tabindex="-1"></a>disproportionately drawn from a later, different operational phase</span>
-<span id="cb8-309"><a href="#cb8-309" aria-hidden="true" tabindex="-1"></a>than the report this chapter evaluates against. Continuing training on</span>
-<span id="cb8-310"><a href="#cb8-310" aria-hidden="true" tabindex="-1"></a>it pulled the model's default template toward casing/cementing</span>
-<span id="cb8-311"><a href="#cb8-311" aria-hidden="true" tabindex="-1"></a>language, which fits the new reports and doesn't fit report <span class="in">`#37`</span>.</span>
+<span id="cb8-291"><a href="#cb8-291" aria-hidden="true" tabindex="-1"></a>**You'll know it worked when:** you see <span class="in">`avg_overlap: regressed`</span> in</span>
+<span id="cb8-292"><a href="#cb8-292" aria-hidden="true" tabindex="-1"></a>the final comparison, and you can explain in one sentence why that</span>
+<span id="cb8-293"><a href="#cb8-293" aria-hidden="true" tabindex="-1"></a>means this particular update shouldn't be deployed without a closer</span>
+<span id="cb8-294"><a href="#cb8-294" aria-hidden="true" tabindex="-1"></a>look, even though training itself ran cleanly.</span>
+<span id="cb8-295"><a href="#cb8-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-296"><a href="#cb8-296" aria-hidden="true" tabindex="-1"></a><span class="fu">## Field notes</span></span>
+<span id="cb8-297"><a href="#cb8-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-298"><a href="#cb8-298" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="Field notes: the new batch skews toward a different phase of the well"}</span>
+<span id="cb8-299"><a href="#cb8-299" aria-hidden="true" tabindex="-1"></a>**Query:** what the 17 new reports (<span class="in">`#60`</span> onward) actually describe,</span>
+<span id="cb8-300"><a href="#cb8-300" aria-hidden="true" tabindex="-1"></a>compared to what the held-out evaluation report (<span class="in">`#37`</span>) describes.</span>
+<span id="cb8-301"><a href="#cb8-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-302"><a href="#cb8-302" aria-hidden="true" tabindex="-1"></a>**Result:** <span class="in">`20`</span> of the new batch's <span class="in">`179`</span> examples mention casing or</span>
+<span id="cb8-303"><a href="#cb8-303" aria-hidden="true" tabindex="-1"></a>cement — concentrated in the last several reports, right at the</span>
+<span id="cb8-304"><a href="#cb8-304" aria-hidden="true" tabindex="-1"></a>archive's end (*"Rig up and run 7" casing,"* *"Cement 7" casing,"*</span>
+<span id="cb8-305"><a href="#cb8-305" aria-hidden="true" tabindex="-1"></a>*"Production Casing Wait on Cement"*). The updated model's</span>
+<span id="cb8-306"><a href="#cb8-306" aria-hidden="true" tabindex="-1"></a>memorized-sounding template shifts to match: *"Production Casing Run</span>
+<span id="cb8-307"><a href="#cb8-307" aria-hidden="true" tabindex="-1"></a>Csg &amp; Cement Rig up cementing equipment,"* replacing the current</span>
+<span id="cb8-308"><a href="#cb8-308" aria-hidden="true" tabindex="-1"></a>model's *"Production Drilling Cond Mud &amp; Circ Circulate for</span>
+<span id="cb8-309"><a href="#cb8-309" aria-hidden="true" tabindex="-1"></a>temperature."* Report <span class="in">`#37`</span>, the held-out report this chapter still</span>
+<span id="cb8-310"><a href="#cb8-310" aria-hidden="true" tabindex="-1"></a>evaluates against, is from the middle of the well program — active</span>
+<span id="cb8-311"><a href="#cb8-311" aria-hidden="true" tabindex="-1"></a>drilling, not casing.</span>
 <span id="cb8-312"><a href="#cb8-312" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-313"><a href="#cb8-313" aria-hidden="true" tabindex="-1"></a>**Lesson:** "the new data is real and relevant" and "the new data</span>
-<span id="cb8-314"><a href="#cb8-314" aria-hidden="true" tabindex="-1"></a>resembles what you're evaluating against" are different claims. A drop</span>
-<span id="cb8-315"><a href="#cb8-315" aria-hidden="true" tabindex="-1"></a>in <span class="in">`avg_overlap`</span> here isn't a training bug — it's an honest reflection</span>
-<span id="cb8-316"><a href="#cb8-316" aria-hidden="true" tabindex="-1"></a>of what the new batch actually contains, and exactly the kind of thing</span>
-<span id="cb8-317"><a href="#cb8-317" aria-hidden="true" tabindex="-1"></a>a human should look at before deciding whether report <span class="in">`#37`</span>-style</span>
-<span id="cb8-318"><a href="#cb8-318" aria-hidden="true" tabindex="-1"></a>questions are still important enough to weight for, or whether the</span>
-<span id="cb8-319"><a href="#cb8-319" aria-hidden="true" tabindex="-1"></a>archive's growing casing/cementing content means the evaluation set</span>
-<span id="cb8-320"><a href="#cb8-320" aria-hidden="true" tabindex="-1"></a>itself needs to grow too.</span>
-<span id="cb8-321"><a href="#cb8-321" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-322"><a href="#cb8-322" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-323"><a href="#cb8-323" aria-hidden="true" tabindex="-1"></a><span class="fu">## Challenge exercise</span></span>
-<span id="cb8-324"><a href="#cb8-324" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-325"><a href="#cb8-325" aria-hidden="true" tabindex="-1"></a>🟠 **Intermediate**</span>
-<span id="cb8-326"><a href="#cb8-326" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-327"><a href="#cb8-327" aria-hidden="true" tabindex="-1"></a>**Challenge:** this chapter's evaluation set is still Chapter 11's</span>
-<span id="cb8-328"><a href="#cb8-328" aria-hidden="true" tabindex="-1"></a>original 8 questions, all from report <span class="in">`#37`</span> — a report about active</span>
-<span id="cb8-329"><a href="#cb8-329" aria-hidden="true" tabindex="-1"></a>drilling, not casing. Build a second held-out check from one of the</span>
-<span id="cb8-330"><a href="#cb8-330" aria-hidden="true" tabindex="-1"></a>new batch's own reports (held out from the "new" training set the same</span>
-<span id="cb8-331"><a href="#cb8-331" aria-hidden="true" tabindex="-1"></a>way <span class="in">`#37`</span> is held out from everything) and compare the updated model</span>
-<span id="cb8-332"><a href="#cb8-332" aria-hidden="true" tabindex="-1"></a>against it instead. A reference solution is at</span>
-<span id="cb8-333"><a href="#cb8-333" aria-hidden="true" tabindex="-1"></a><span class="in">`code/chapter_13/challenge/challenge.py`</span> — on a real run, holding</span>
-<span id="cb8-334"><a href="#cb8-334" aria-hidden="true" tabindex="-1"></a>report <span class="in">`#65`</span> (2020-12-23, <span class="in">`20`</span> real examples) out of the new-batch</span>
-<span id="cb8-335"><a href="#cb8-335" aria-hidden="true" tabindex="-1"></a>continuation and evaluating against it afterward gives</span>
-<span id="cb8-336"><a href="#cb8-336" aria-hidden="true" tabindex="-1"></a><span class="in">`{'exact_match': 0, 'avg_overlap': 0.14, 'perplexity': 16.56}`</span>.</span>
-<span id="cb8-337"><a href="#cb8-337" aria-hidden="true" tabindex="-1"></a>Perplexity is noticeably lower here than either model scored against</span>
-<span id="cb8-338"><a href="#cb8-338" aria-hidden="true" tabindex="-1"></a>report <span class="in">`#37`</span> (<span class="in">`~25.8`</span>) — the updated model finds a report from its own</span>
-<span id="cb8-339"><a href="#cb8-339" aria-hidden="true" tabindex="-1"></a>new batch's operational phase less surprising than one from an earlier</span>
-<span id="cb8-340"><a href="#cb8-340" aria-hidden="true" tabindex="-1"></a>phase, even though <span class="in">`avg_overlap`</span> stays just as low. Recency alone</span>
-<span id="cb8-341"><a href="#cb8-341" aria-hidden="true" tabindex="-1"></a>didn't fix what changed; matching the evaluation report's operational</span>
-<span id="cb8-342"><a href="#cb8-342" aria-hidden="true" tabindex="-1"></a>phase did more than matching its training era.</span>
-<span id="cb8-343"><a href="#cb8-343" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-344"><a href="#cb8-344" aria-hidden="true" tabindex="-1"></a><span class="fu">## Key takeaways</span></span>
-<span id="cb8-345"><a href="#cb8-345" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-346"><a href="#cb8-346" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Training completing without errors, with loss falling every epoch,</span>
-<span id="cb8-347"><a href="#cb8-347" aria-hidden="true" tabindex="-1"></a>  says nothing about whether the result should replace what's in</span>
-<span id="cb8-348"><a href="#cb8-348" aria-hidden="true" tabindex="-1"></a>  production. This chapter's real run trained cleanly and still</span>
-<span id="cb8-349"><a href="#cb8-349" aria-hidden="true" tabindex="-1"></a>  regressed on <span class="in">`avg_overlap`</span>.</span>
-<span id="cb8-350"><a href="#cb8-350" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The same metric-disagreement pattern Chapter 12 found comparing</span>
-<span id="cb8-351"><a href="#cb8-351" aria-hidden="true" tabindex="-1"></a>  epochs, and comparing entirely different training regimes, showed up</span>
-<span id="cb8-352"><a href="#cb8-352" aria-hidden="true" tabindex="-1"></a>  a third time in a genuinely new scenario — this isn't a one-off</span>
-<span id="cb8-353"><a href="#cb8-353" aria-hidden="true" tabindex="-1"></a>  quirk of one comparison.</span>
-<span id="cb8-354"><a href="#cb8-354" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A regression is worth investigating, not just flagging: the real</span>
-<span id="cb8-355"><a href="#cb8-355" aria-hidden="true" tabindex="-1"></a>  cause here was traceable to what the new reports actually contain,</span>
-<span id="cb8-356"><a href="#cb8-356" aria-hidden="true" tabindex="-1"></a>  not a training bug.</span>
-<span id="cb8-357"><a href="#cb8-357" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Perplexity moving in the "improved" direction by under <span class="in">`1%`</span> is not</span>
-<span id="cb8-358"><a href="#cb8-358" aria-hidden="true" tabindex="-1"></a>  the same claim as the substantial, <span class="in">`6×`</span> gap Chapter 11 found between</span>
-<span id="cb8-359"><a href="#cb8-359" aria-hidden="true" tabindex="-1"></a>  a base and fine-tuned model. Direction alone, without magnitude, can</span>
-<span id="cb8-360"><a href="#cb8-360" aria-hidden="true" tabindex="-1"></a>  overstate a trivial change.</span>
-<span id="cb8-361"><a href="#cb8-361" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A model left in train mode (dropout still active) scores noisily</span>
-<span id="cb8-362"><a href="#cb8-362" aria-hidden="true" tabindex="-1"></a>  even in eval-only code — <span class="in">`load_checkpoint`</span>'s <span class="in">`is_trainable=True`</span> is</span>
-<span id="cb8-363"><a href="#cb8-363" aria-hidden="true" tabindex="-1"></a>  right for resuming training and wrong for scoring; catching it meant</span>
-<span id="cb8-364"><a href="#cb8-364" aria-hidden="true" tabindex="-1"></a>  checking <span class="in">`model.training`</span> directly, not just distrusting a number</span>
-<span id="cb8-365"><a href="#cb8-365" aria-hidden="true" tabindex="-1"></a>  that looked slightly different between runs.</span>
-<span id="cb8-366"><a href="#cb8-366" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-367"><a href="#cb8-367" aria-hidden="true" tabindex="-1"></a><span class="fu">## Repository files</span></span>
-<span id="cb8-368"><a href="#cb8-368" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-369"><a href="#cb8-369" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> File <span class="pp">|</span> Purpose <span class="pp">|</span></span>
-<span id="cb8-370"><a href="#cb8-370" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb8-371"><a href="#cb8-371" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_13/continuous_finetune.py`</span> <span class="pp">|</span> Splits the archive, trains a current model, continues training on new reports, and compares the result <span class="pp">|</span></span>
-<span id="cb8-372"><a href="#cb8-372" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_13/challenge/challenge.py`</span> <span class="pp">|</span> Reference solution: evaluating against a held-out report from the new batch itself <span class="pp">|</span></span>
-<span id="cb8-373"><a href="#cb8-373" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`notebooks/chapter_13_explore.ipynb`</span> <span class="pp">|</span> Interactive companion notebook <span class="pp">|</span></span>
-<span id="cb8-374"><a href="#cb8-374" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-375"><a href="#cb8-375" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution title="CHECKPOINT — Chapter 13"}</span>
-<span id="cb8-376"><a href="#cb8-376" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Simulated new reports arriving using a real chronological split</span>
-<span id="cb8-377"><a href="#cb8-377" aria-hidden="true" tabindex="-1"></a>      of this book's own archive</span>
-<span id="cb8-378"><a href="#cb8-378" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Continued fine-tuning an existing checkpoint on just the new</span>
-<span id="cb8-379"><a href="#cb8-379" aria-hidden="true" tabindex="-1"></a>      batch, reusing Chapter 8's save-and-resume mechanism unchanged</span>
-<span id="cb8-380"><a href="#cb8-380" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Ran Chapter 12's comparison on the result and found a real</span>
-<span id="cb8-381"><a href="#cb8-381" aria-hidden="true" tabindex="-1"></a>      regression, not a hypothetical one</span>
-<span id="cb8-382"><a href="#cb8-382" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Traced that regression back to a real, sensible cause instead of</span>
-<span id="cb8-383"><a href="#cb8-383" aria-hidden="true" tabindex="-1"></a>      treating the metric as unexplainable noise</span>
-<span id="cb8-384"><a href="#cb8-384" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-385"><a href="#cb8-385" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-386"><a href="#cb8-386" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}</span>
-<span id="cb8-387"><a href="#cb8-387" aria-hidden="true" tabindex="-1"></a>**`continuous_finetune.py`** — splits this book's real archive by a</span>
-<span id="cb8-388"><a href="#cb8-388" aria-hidden="true" tabindex="-1"></a>chronological cutoff, trains a "current" model on one side, continues</span>
-<span id="cb8-389"><a href="#cb8-389" aria-hidden="true" tabindex="-1"></a>training it on the "new" side using Chapter 8's exact checkpoint</span>
-<span id="cb8-390"><a href="#cb8-390" aria-hidden="true" tabindex="-1"></a>mechanism, and runs Chapter 12's comparison to decide whether the</span>
-<span id="cb8-391"><a href="#cb8-391" aria-hidden="true" tabindex="-1"></a>result actually deserves to replace what's running. On a real run, it</span>
-<span id="cb8-392"><a href="#cb8-392" aria-hidden="true" tabindex="-1"></a>doesn't.</span>
-<span id="cb8-393"><a href="#cb8-393" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-394"><a href="#cb8-394" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-395"><a href="#cb8-395" aria-hidden="true" tabindex="-1"></a><span class="fu">## What can you do now that you couldn't do before?</span></span>
-<span id="cb8-396"><a href="#cb8-396" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-397"><a href="#cb8-397" aria-hidden="true" tabindex="-1"></a>You can retrain a model on new data as it arrives, and — because you</span>
-<span id="cb8-398"><a href="#cb8-398" aria-hidden="true" tabindex="-1"></a>built Chapter 12's comparison first — you can tell the difference</span>
-<span id="cb8-399"><a href="#cb8-399" aria-hidden="true" tabindex="-1"></a>between "we retrained" and "we improved," instead of deploying</span>
-<span id="cb8-400"><a href="#cb8-400" aria-hidden="true" tabindex="-1"></a>whatever a clean training run happens to produce.</span>
+<span id="cb8-313"><a href="#cb8-313" aria-hidden="true" tabindex="-1"></a>**Why:** a real well program drills first and cases and cements later,</span>
+<span id="cb8-314"><a href="#cb8-314" aria-hidden="true" tabindex="-1"></a>near total depth. The new batch isn't random new data; it's</span>
+<span id="cb8-315"><a href="#cb8-315" aria-hidden="true" tabindex="-1"></a>disproportionately drawn from a later, different operational phase</span>
+<span id="cb8-316"><a href="#cb8-316" aria-hidden="true" tabindex="-1"></a>than the report this chapter evaluates against. Continuing training on</span>
+<span id="cb8-317"><a href="#cb8-317" aria-hidden="true" tabindex="-1"></a>it pulled the model's default template toward casing/cementing</span>
+<span id="cb8-318"><a href="#cb8-318" aria-hidden="true" tabindex="-1"></a>language, which fits the new reports and doesn't fit report <span class="in">`#37`</span>.</span>
+<span id="cb8-319"><a href="#cb8-319" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-320"><a href="#cb8-320" aria-hidden="true" tabindex="-1"></a>**Lesson:** "the new data is real and relevant" and "the new data</span>
+<span id="cb8-321"><a href="#cb8-321" aria-hidden="true" tabindex="-1"></a>resembles what you're evaluating against" are different claims. A drop</span>
+<span id="cb8-322"><a href="#cb8-322" aria-hidden="true" tabindex="-1"></a>in <span class="in">`avg_overlap`</span> here isn't a training bug — it's an honest reflection</span>
+<span id="cb8-323"><a href="#cb8-323" aria-hidden="true" tabindex="-1"></a>of what the new batch actually contains, and exactly the kind of thing</span>
+<span id="cb8-324"><a href="#cb8-324" aria-hidden="true" tabindex="-1"></a>a human should look at before deciding whether report <span class="in">`#37`</span>-style</span>
+<span id="cb8-325"><a href="#cb8-325" aria-hidden="true" tabindex="-1"></a>questions are still important enough to weight for, or whether the</span>
+<span id="cb8-326"><a href="#cb8-326" aria-hidden="true" tabindex="-1"></a>archive's growing casing/cementing content means the evaluation set</span>
+<span id="cb8-327"><a href="#cb8-327" aria-hidden="true" tabindex="-1"></a>itself needs to grow too.</span>
+<span id="cb8-328"><a href="#cb8-328" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-329"><a href="#cb8-329" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-330"><a href="#cb8-330" aria-hidden="true" tabindex="-1"></a><span class="fu">## Challenge exercise</span></span>
+<span id="cb8-331"><a href="#cb8-331" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-332"><a href="#cb8-332" aria-hidden="true" tabindex="-1"></a>🟠 **Intermediate**</span>
+<span id="cb8-333"><a href="#cb8-333" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-334"><a href="#cb8-334" aria-hidden="true" tabindex="-1"></a>**Challenge:** this chapter's evaluation set is still Chapter 11's</span>
+<span id="cb8-335"><a href="#cb8-335" aria-hidden="true" tabindex="-1"></a>original 8 questions, all from report <span class="in">`#37`</span> — a report about active</span>
+<span id="cb8-336"><a href="#cb8-336" aria-hidden="true" tabindex="-1"></a>drilling, not casing. Build a second held-out check from one of the</span>
+<span id="cb8-337"><a href="#cb8-337" aria-hidden="true" tabindex="-1"></a>new batch's own reports (held out from the "new" training set the same</span>
+<span id="cb8-338"><a href="#cb8-338" aria-hidden="true" tabindex="-1"></a>way <span class="in">`#37`</span> is held out from everything) and compare the updated model</span>
+<span id="cb8-339"><a href="#cb8-339" aria-hidden="true" tabindex="-1"></a>against it instead. A reference solution is at</span>
+<span id="cb8-340"><a href="#cb8-340" aria-hidden="true" tabindex="-1"></a><span class="in">`code/chapter_13/challenge/challenge.py`</span> — on a real run, holding</span>
+<span id="cb8-341"><a href="#cb8-341" aria-hidden="true" tabindex="-1"></a>report <span class="in">`#65`</span> (2020-12-23, <span class="in">`20`</span> real examples) out of the new-batch</span>
+<span id="cb8-342"><a href="#cb8-342" aria-hidden="true" tabindex="-1"></a>continuation and evaluating against it afterward gives</span>
+<span id="cb8-343"><a href="#cb8-343" aria-hidden="true" tabindex="-1"></a><span class="in">`{'exact_match': 0, 'avg_overlap': 0.14, 'perplexity': 16.56}`</span>.</span>
+<span id="cb8-344"><a href="#cb8-344" aria-hidden="true" tabindex="-1"></a>Perplexity is noticeably lower here than either model scored against</span>
+<span id="cb8-345"><a href="#cb8-345" aria-hidden="true" tabindex="-1"></a>report <span class="in">`#37`</span> (<span class="in">`~25.8`</span>) — the updated model finds a report from its own</span>
+<span id="cb8-346"><a href="#cb8-346" aria-hidden="true" tabindex="-1"></a>new batch's operational phase less surprising than one from an earlier</span>
+<span id="cb8-347"><a href="#cb8-347" aria-hidden="true" tabindex="-1"></a>phase, even though <span class="in">`avg_overlap`</span> stays just as low. Recency alone</span>
+<span id="cb8-348"><a href="#cb8-348" aria-hidden="true" tabindex="-1"></a>didn't fix what changed; matching the evaluation report's operational</span>
+<span id="cb8-349"><a href="#cb8-349" aria-hidden="true" tabindex="-1"></a>phase did more than matching its training era.</span>
+<span id="cb8-350"><a href="#cb8-350" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-351"><a href="#cb8-351" aria-hidden="true" tabindex="-1"></a><span class="fu">## Key takeaways</span></span>
+<span id="cb8-352"><a href="#cb8-352" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-353"><a href="#cb8-353" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Training completing without errors, with loss falling every epoch,</span>
+<span id="cb8-354"><a href="#cb8-354" aria-hidden="true" tabindex="-1"></a>  says nothing about whether the result should replace what's in</span>
+<span id="cb8-355"><a href="#cb8-355" aria-hidden="true" tabindex="-1"></a>  production. This chapter's real run trained cleanly and still</span>
+<span id="cb8-356"><a href="#cb8-356" aria-hidden="true" tabindex="-1"></a>  regressed on <span class="in">`avg_overlap`</span>.</span>
+<span id="cb8-357"><a href="#cb8-357" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The same metric-disagreement pattern Chapter 12 found comparing</span>
+<span id="cb8-358"><a href="#cb8-358" aria-hidden="true" tabindex="-1"></a>  epochs, and comparing entirely different training regimes, showed up</span>
+<span id="cb8-359"><a href="#cb8-359" aria-hidden="true" tabindex="-1"></a>  a third time in a genuinely new scenario — this isn't a one-off</span>
+<span id="cb8-360"><a href="#cb8-360" aria-hidden="true" tabindex="-1"></a>  quirk of one comparison.</span>
+<span id="cb8-361"><a href="#cb8-361" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A regression is worth investigating, not just flagging: the real</span>
+<span id="cb8-362"><a href="#cb8-362" aria-hidden="true" tabindex="-1"></a>  cause here was traceable to what the new reports actually contain,</span>
+<span id="cb8-363"><a href="#cb8-363" aria-hidden="true" tabindex="-1"></a>  not a training bug.</span>
+<span id="cb8-364"><a href="#cb8-364" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Perplexity moving in the "improved" direction by under <span class="in">`1%`</span> is not</span>
+<span id="cb8-365"><a href="#cb8-365" aria-hidden="true" tabindex="-1"></a>  the same claim as the substantial, <span class="in">`6×`</span> gap Chapter 11 found between</span>
+<span id="cb8-366"><a href="#cb8-366" aria-hidden="true" tabindex="-1"></a>  a base and fine-tuned model. Direction alone, without magnitude, can</span>
+<span id="cb8-367"><a href="#cb8-367" aria-hidden="true" tabindex="-1"></a>  overstate a trivial change.</span>
+<span id="cb8-368"><a href="#cb8-368" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A model left in train mode (dropout still active) scores noisily</span>
+<span id="cb8-369"><a href="#cb8-369" aria-hidden="true" tabindex="-1"></a>  even in eval-only code — <span class="in">`load_checkpoint`</span>'s <span class="in">`is_trainable=True`</span> is</span>
+<span id="cb8-370"><a href="#cb8-370" aria-hidden="true" tabindex="-1"></a>  right for resuming training and wrong for scoring; catching it meant</span>
+<span id="cb8-371"><a href="#cb8-371" aria-hidden="true" tabindex="-1"></a>  checking <span class="in">`model.training`</span> directly, not just distrusting a number</span>
+<span id="cb8-372"><a href="#cb8-372" aria-hidden="true" tabindex="-1"></a>  that looked slightly different between runs.</span>
+<span id="cb8-373"><a href="#cb8-373" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-374"><a href="#cb8-374" aria-hidden="true" tabindex="-1"></a><span class="fu">## Repository files</span></span>
+<span id="cb8-375"><a href="#cb8-375" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-376"><a href="#cb8-376" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> File <span class="pp">|</span> Purpose <span class="pp">|</span></span>
+<span id="cb8-377"><a href="#cb8-377" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb8-378"><a href="#cb8-378" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_13/continuous_finetune.py`</span> <span class="pp">|</span> Splits the archive, trains a current model, continues training on new reports, and compares the result <span class="pp">|</span></span>
+<span id="cb8-379"><a href="#cb8-379" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_13/challenge/challenge.py`</span> <span class="pp">|</span> Reference solution: evaluating against a held-out report from the new batch itself <span class="pp">|</span></span>
+<span id="cb8-380"><a href="#cb8-380" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`notebooks/chapter_13_explore.ipynb`</span> <span class="pp">|</span> Interactive companion notebook <span class="pp">|</span></span>
+<span id="cb8-381"><a href="#cb8-381" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-382"><a href="#cb8-382" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution title="CHECKPOINT — Chapter 13"}</span>
+<span id="cb8-383"><a href="#cb8-383" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Simulated new reports arriving using a real chronological split</span>
+<span id="cb8-384"><a href="#cb8-384" aria-hidden="true" tabindex="-1"></a>      of this book's own archive</span>
+<span id="cb8-385"><a href="#cb8-385" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Continued fine-tuning an existing checkpoint on just the new</span>
+<span id="cb8-386"><a href="#cb8-386" aria-hidden="true" tabindex="-1"></a>      batch, reusing Chapter 8's save-and-resume mechanism unchanged</span>
+<span id="cb8-387"><a href="#cb8-387" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Ran Chapter 12's comparison on the result and found a real</span>
+<span id="cb8-388"><a href="#cb8-388" aria-hidden="true" tabindex="-1"></a>      regression, not a hypothetical one</span>
+<span id="cb8-389"><a href="#cb8-389" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Traced that regression back to a real, sensible cause instead of</span>
+<span id="cb8-390"><a href="#cb8-390" aria-hidden="true" tabindex="-1"></a>      treating the metric as unexplainable noise</span>
+<span id="cb8-391"><a href="#cb8-391" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-392"><a href="#cb8-392" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-393"><a href="#cb8-393" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}</span>
+<span id="cb8-394"><a href="#cb8-394" aria-hidden="true" tabindex="-1"></a>**`continuous_finetune.py`** — splits this book's real archive by a</span>
+<span id="cb8-395"><a href="#cb8-395" aria-hidden="true" tabindex="-1"></a>chronological cutoff, trains a "current" model on one side, continues</span>
+<span id="cb8-396"><a href="#cb8-396" aria-hidden="true" tabindex="-1"></a>training it on the "new" side using Chapter 8's exact checkpoint</span>
+<span id="cb8-397"><a href="#cb8-397" aria-hidden="true" tabindex="-1"></a>mechanism, and runs Chapter 12's comparison to decide whether the</span>
+<span id="cb8-398"><a href="#cb8-398" aria-hidden="true" tabindex="-1"></a>result actually deserves to replace what's running. On a real run, it</span>
+<span id="cb8-399"><a href="#cb8-399" aria-hidden="true" tabindex="-1"></a>doesn't.</span>
+<span id="cb8-400"><a href="#cb8-400" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-401"><a href="#cb8-401" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-402"><a href="#cb8-402" aria-hidden="true" tabindex="-1"></a><span class="fu">## See it side by side</span></span>
+<span id="cb8-402"><a href="#cb8-402" aria-hidden="true" tabindex="-1"></a><span class="fu">## What can you do now that you couldn't do before?</span></span>
 <span id="cb8-403"><a href="#cb8-403" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-404"><a href="#cb8-404" aria-hidden="true" tabindex="-1"></a>Every real checkpoint sitting in <span class="in">`checkpoints/`</span> right now — from</span>
-<span id="cb8-405"><a href="#cb8-405" aria-hidden="true" tabindex="-1"></a>Chapter 5's first fine-tune through this chapter's continuously-updated</span>
-<span id="cb8-406"><a href="#cb8-406" aria-hidden="true" tabindex="-1"></a>one — is something the book's companion app (<span class="in">`app/`</span>) can load directly,</span>
-<span id="cb8-407"><a href="#cb8-407" aria-hidden="true" tabindex="-1"></a>not a separate demo built beside this book. Its Model Playground puts</span>
-<span id="cb8-408"><a href="#cb8-408" aria-hidden="true" tabindex="-1"></a>the base and fine-tuned answers side by side on the same real prompt;</span>
-<span id="cb8-409"><a href="#cb8-409" aria-hidden="true" tabindex="-1"></a>Before vs. After Evaluation runs this book's own metrics live across</span>
-<span id="cb8-410"><a href="#cb8-410" aria-hidden="true" tabindex="-1"></a>the full held-out set; Dataset Explorer browses the real training</span>
-<span id="cb8-411"><a href="#cb8-411" aria-hidden="true" tabindex="-1"></a>examples behind them; and Failure Analysis reruns the book's own</span>
-<span id="cb8-412"><a href="#cb8-412" aria-hidden="true" tabindex="-1"></a>documented failure cases — including a real regression like the one</span>
-<span id="cb8-413"><a href="#cb8-413" aria-hidden="true" tabindex="-1"></a>this chapter just found — against whichever checkpoint you actually</span>
-<span id="cb8-414"><a href="#cb8-414" aria-hidden="true" tabindex="-1"></a>have. See <span class="in">`app/README.md`</span> to run it; nothing in it is pre-recorded, so</span>
-<span id="cb8-415"><a href="#cb8-415" aria-hidden="true" tabindex="-1"></a>your own checkpoint may not reproduce this book's exact numbers, and</span>
-<span id="cb8-416"><a href="#cb8-416" aria-hidden="true" tabindex="-1"></a>that difference is itself real information.</span>
-<span id="cb8-417"><a href="#cb8-417" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-418"><a href="#cb8-418" aria-hidden="true" tabindex="-1"></a>![Before vs. After Evaluation, screenshotted from a real local run</span>
-<span id="cb8-419"><a href="#cb8-419" aria-hidden="true" tabindex="-1"></a>across this book's own checkpoints -- the exact "latest doesn't mean</span>
-<span id="cb8-420"><a href="#cb8-420" aria-hidden="true" tabindex="-1"></a>best" regression this chapter's own version-comparison run found above,</span>
-<span id="cb8-421"><a href="#cb8-421" aria-hidden="true" tabindex="-1"></a>surfaced automatically by the</span>
-<span id="cb8-422"><a href="#cb8-422" aria-hidden="true" tabindex="-1"></a>app.](../figures/app_screenshot_evaluation_readme.jpg){#fig-app-evaluation fig-alt="Screenshot of the companion app's Before vs. After Evaluation page, showing a results table for the base model and three fine-tuned checkpoints, a callout stating the latest checkpoint regressed on both average overlap and perplexity compared to the previous one, and per-transition percentage changes for each metric."}</span>
-<span id="cb8-423"><a href="#cb8-423" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-424"><a href="#cb8-424" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suggested next step</span></span>
-<span id="cb8-425"><a href="#cb8-425" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-426"><a href="#cb8-426" aria-hidden="true" tabindex="-1"></a>This is the last chapter. Every tool in it runs on your own data, not</span>
-<span id="cb8-427"><a href="#cb8-427" aria-hidden="true" tabindex="-1"></a>just this book's Utah FORGE archive: Chapter 6's gate checks a new</span>
-<span id="cb8-428"><a href="#cb8-428" aria-hidden="true" tabindex="-1"></a>archive's quality, Chapter 8 fine-tunes it at whatever scale it has,</span>
-<span id="cb8-429"><a href="#cb8-429" aria-hidden="true" tabindex="-1"></a>Chapters 9 and 10 add retrieval and a faithfulness check on top,</span>
-<span id="cb8-430"><a href="#cb8-430" aria-hidden="true" tabindex="-1"></a>Chapter 11 builds a real evaluation set from whatever you hold out, and</span>
-<span id="cb8-431"><a href="#cb8-431" aria-hidden="true" tabindex="-1"></a>Chapters 12 and 13 decide, honestly, whether a new version is actually</span>
-<span id="cb8-432"><a href="#cb8-432" aria-hidden="true" tabindex="-1"></a>worth deploying. The book's own archive stops in January 2021. Yours</span>
-<span id="cb8-433"><a href="#cb8-433" aria-hidden="true" tabindex="-1"></a>doesn't have to.</span>
+<span id="cb8-404"><a href="#cb8-404" aria-hidden="true" tabindex="-1"></a>You can retrain a model on new data as it arrives, and — because you</span>
+<span id="cb8-405"><a href="#cb8-405" aria-hidden="true" tabindex="-1"></a>built Chapter 12's comparison first — you can tell the difference</span>
+<span id="cb8-406"><a href="#cb8-406" aria-hidden="true" tabindex="-1"></a>between "we retrained" and "we improved," instead of deploying</span>
+<span id="cb8-407"><a href="#cb8-407" aria-hidden="true" tabindex="-1"></a>whatever a clean training run happens to produce.</span>
+<span id="cb8-408"><a href="#cb8-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-409"><a href="#cb8-409" aria-hidden="true" tabindex="-1"></a><span class="fu">## See it side by side</span></span>
+<span id="cb8-410"><a href="#cb8-410" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-411"><a href="#cb8-411" aria-hidden="true" tabindex="-1"></a>Every real checkpoint sitting in <span class="in">`checkpoints/`</span> right now — from</span>
+<span id="cb8-412"><a href="#cb8-412" aria-hidden="true" tabindex="-1"></a>Chapter 5's first fine-tune through this chapter's continuously-updated</span>
+<span id="cb8-413"><a href="#cb8-413" aria-hidden="true" tabindex="-1"></a>one — is something the book's companion app (<span class="in">`app/`</span>) can load directly,</span>
+<span id="cb8-414"><a href="#cb8-414" aria-hidden="true" tabindex="-1"></a>not a separate demo built beside this book. Its Model Playground puts</span>
+<span id="cb8-415"><a href="#cb8-415" aria-hidden="true" tabindex="-1"></a>the base and fine-tuned answers side by side on the same real prompt;</span>
+<span id="cb8-416"><a href="#cb8-416" aria-hidden="true" tabindex="-1"></a>Before vs. After Evaluation runs this book's own metrics live across</span>
+<span id="cb8-417"><a href="#cb8-417" aria-hidden="true" tabindex="-1"></a>the full held-out set; Dataset Explorer browses the real training</span>
+<span id="cb8-418"><a href="#cb8-418" aria-hidden="true" tabindex="-1"></a>examples behind them; and Failure Analysis reruns the book's own</span>
+<span id="cb8-419"><a href="#cb8-419" aria-hidden="true" tabindex="-1"></a>documented failure cases — including a real regression like the one</span>
+<span id="cb8-420"><a href="#cb8-420" aria-hidden="true" tabindex="-1"></a>this chapter just found — against whichever checkpoint you actually</span>
+<span id="cb8-421"><a href="#cb8-421" aria-hidden="true" tabindex="-1"></a>have. See <span class="in">`app/README.md`</span> to run it; nothing in it is pre-recorded, so</span>
+<span id="cb8-422"><a href="#cb8-422" aria-hidden="true" tabindex="-1"></a>your own checkpoint may not reproduce this book's exact numbers, and</span>
+<span id="cb8-423"><a href="#cb8-423" aria-hidden="true" tabindex="-1"></a>that difference is itself real information.</span>
+<span id="cb8-424"><a href="#cb8-424" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-425"><a href="#cb8-425" aria-hidden="true" tabindex="-1"></a>![Before vs. After Evaluation, screenshotted from a real local run</span>
+<span id="cb8-426"><a href="#cb8-426" aria-hidden="true" tabindex="-1"></a>across this book's own checkpoints -- a similar "latest doesn't mean</span>
+<span id="cb8-427"><a href="#cb8-427" aria-hidden="true" tabindex="-1"></a>best" regression, found separately by comparing the book's own</span>
+<span id="cb8-428"><a href="#cb8-428" aria-hidden="true" tabindex="-1"></a>persisted Chapter 5/8/13 checkpoints (this one regresses on both</span>
+<span id="cb8-429"><a href="#cb8-429" aria-hidden="true" tabindex="-1"></a>average overlap and perplexity, not the single metric this chapter's</span>
+<span id="cb8-430"><a href="#cb8-430" aria-hidden="true" tabindex="-1"></a>own version-comparison run above flagged -- a different checkpoint</span>
+<span id="cb8-431"><a href="#cb8-431" aria-hidden="true" tabindex="-1"></a>pair, not the same result), surfaced automatically by the</span>
+<span id="cb8-432"><a href="#cb8-432" aria-hidden="true" tabindex="-1"></a>app.](../figures/app_screenshot_evaluation_readme.jpg){#fig-app-evaluation fig-alt="Screenshot of the companion app's Before vs. After Evaluation page, showing a results table for the base model and three fine-tuned checkpoints, a callout stating the latest checkpoint regressed on both average overlap and perplexity compared to the previous one, and per-transition percentage changes for each metric."}</span>
+<span id="cb8-433"><a href="#cb8-433" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-434"><a href="#cb8-434" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suggested next step</span></span>
+<span id="cb8-435"><a href="#cb8-435" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-436"><a href="#cb8-436" aria-hidden="true" tabindex="-1"></a>This is the last chapter. Every tool in it runs on your own data, not</span>
+<span id="cb8-437"><a href="#cb8-437" aria-hidden="true" tabindex="-1"></a>just this book's Utah FORGE archive: Chapter 6's gate checks a new</span>
+<span id="cb8-438"><a href="#cb8-438" aria-hidden="true" tabindex="-1"></a>archive's quality, Chapter 8 fine-tunes it at whatever scale it has,</span>
+<span id="cb8-439"><a href="#cb8-439" aria-hidden="true" tabindex="-1"></a>Chapters 9 and 10 add retrieval and a faithfulness check on top,</span>
+<span id="cb8-440"><a href="#cb8-440" aria-hidden="true" tabindex="-1"></a>Chapter 11 builds a real evaluation set from whatever you hold out, and</span>
+<span id="cb8-441"><a href="#cb8-441" aria-hidden="true" tabindex="-1"></a>Chapters 12 and 13 decide, honestly, whether a new version is actually</span>
+<span id="cb8-442"><a href="#cb8-442" aria-hidden="true" tabindex="-1"></a>worth deploying. The book's own archive stops in January 2021. Yours</span>
+<span id="cb8-443"><a href="#cb8-443" aria-hidden="true" tabindex="-1"></a>doesn't have to.</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

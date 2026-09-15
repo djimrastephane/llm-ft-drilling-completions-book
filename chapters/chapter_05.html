@@ -84,9 +84,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-f352355e9c4cf757a45f4f8798595620.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-5eaba02739cdb78914c5f4540b400244.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -595,7 +595,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="../figures/diagrams/pipeline_ch05_light.svg" class="diagram-light img-fluid" width="180"> <img src="../figures/diagrams/pipeline_ch05_dark.svg" class="diagram-dark img-fluid" width="180"></p>
 </div>
 <div class="chapter-status">
-<p>Progress <code>█████░░░░░░░░</code> <strong>5 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 45-60 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🟠 Intermediate</p>
+<p>Progress <code>█████░░░░░░░░</code> <strong>5 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 45–60 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🟠 Intermediate</p>
 </div>
 <section id="learning-objectives" class="level2" data-number="5.1">
 <h2 data-number="5.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">5.1</span> Learning objectives</h2>
@@ -609,7 +609,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="operational-problem" class="level2" data-number="5.2">
 <h2 data-number="5.2" class="anchored" data-anchor-id="operational-problem"><span class="header-section-number">5.2</span> Operational Problem</h2>
-<p>Mike, the completions engineer, has watched this book build up evidence for four chapters — the base model doesn’t know this well’s vocabulary, doesn’t know its specific reports, and its embeddings don’t already understand the shorthand. He’s ready for the payoff, but wary of a different failure: <em>“If we fine-tune this on sixteen examples, are we teaching it our operation — or just teaching it to repeat sixteen sentences back at us?”</em></p>
+<p>Carlos, the completions engineer, has watched this book build up evidence for four chapters — the base model doesn’t know this well’s vocabulary, doesn’t know its specific reports, and its embeddings don’t already understand the shorthand. He’s ready for the payoff, but wary of a different failure: <em>“If we fine-tune this on sixteen examples, are we teaching it our operation — or just teaching it to repeat sixteen sentences back at us?”</em></p>
 <p>That’s exactly the right question, and this chapter answers it two ways, not one. It fine-tunes the base model on Chapter 2’s 16 training examples, then checks <em>both</em> whether it learned those exact examples (training recall) <em>and</em> whether that learning transfers to a report it never saw during training (generalization, using Chapter 2’s reserved <code>Drilling_037</code>). Chapter 3 already scored the base model <code>0/16</code> and <code>0/2</code> on both. This chapter reruns that exact same harness against the fine-tuned model — same questions, same scoring, same code — so the comparison means something.</p>
 </section>
 <section id="example-what-the-model-actually-trains-on" class="level2" data-number="5.3">
@@ -715,7 +715,7 @@ Figure&nbsp;5.1: LoRA trains two small adapter tables. Their product creates a f
 <section id="expected-output" class="level2" data-number="5.9">
 <h2 data-number="5.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">5.9</span> Expected Output</h2>
 <p>Two tensors of matching shape: the full token sequence, and a labels tensor where the prompt portion is replaced with <code>-100</code> (PyTorch’s “ignore this position” marker for loss computation).</p>
-<div id="17daf290" class="cell" data-execution_count="1">
+<div id="07ae38af" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_training_ids(tokenizer, example: <span class="bu">dict</span>) <span class="op">-&gt;</span> <span class="bu">tuple</span>[torch.Tensor, torch.Tensor]:</span>
@@ -769,7 +769,7 @@ Figure&nbsp;5.1: LoRA trains two small adapter tables. Their product creates a f
 <section id="expected-output-1" class="level2" data-number="5.14">
 <h2 data-number="5.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">5.14</span> Expected Output</h2>
 <p>A wrapped model, plus a printed count of how many parameters are actually trainable.</p>
-<div id="4de614a3" class="cell" data-execution_count="2">
+<div id="9d9c6515" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> peft <span class="im">import</span> LoraConfig, TaskType, get_peft_model</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>LORA_CONFIG <span class="op">=</span> LoraConfig(</span>
@@ -788,7 +788,7 @@ Figure&nbsp;5.1: LoRA trains two small adapter tables. Their product creates a f
 </section>
 <section id="what-just-happened-1" class="level2" data-number="5.15">
 <h2 data-number="5.15" class="anchored" data-anchor-id="what-just-happened-1"><span class="header-section-number">5.15</span> What just happened?</h2>
-<p><code>target_modules</code> names the specific weight matrices inside each attention layer that get a LoRA adapter attached — <code>q_proj</code>/<code>k_proj</code>/<code>v_proj</code>/<code>o_proj</code> are the query, key, value, and output projections every attention layer has. <code>r=8</code> sets the adapter’s size (its “rank” — a small number by design). The result: <code>2,179,072</code> trainable parameters out of <code>1,545,893,376</code> total — <code>0.141%</code>. Everything else in the model is frozen and will never change during this chapter’s training.</p>
+<p><code>target_modules</code> names the specific weight matrices inside each attention layer that get a LoRA adapter attached — <code>q_proj</code>/<code>k_proj</code>/<code>v_proj</code>/<code>o_proj</code> are the query, key, value, and output projections every attention layer has. <code>r=8</code> sets the adapter’s size (its “rank” — a small number by design). The result: <code>2,179,072</code> trainable parameters out of <code>1,545,893,376</code> total — <code>0.141%</code>. Everything else in the model is frozen and will never change during this chapter’s training – including the raw embedding table Chapter 4 measured; <code>BHA</code>’s own coordinate doesn’t move. What changes instead is how the attention layers <em>use</em> that unchanged coordinate once text passes through them, which is where this chapter’s improvement actually comes from.</p>
 </section>
 <section id="production-reality-1" class="level2" data-number="5.16">
 <h2 data-number="5.16" class="anchored" data-anchor-id="production-reality-1"><span class="header-section-number">5.16</span> Production Reality</h2>
@@ -800,7 +800,7 @@ Figure&nbsp;5.1: LoRA trains two small adapter tables. Their product creates a f
 </section>
 <section id="what-problem-are-we-solving-2" class="level2" data-number="5.17">
 <h2 data-number="5.17" class="anchored" data-anchor-id="what-problem-are-we-solving-2"><span class="header-section-number">5.17</span> What problem are we solving?</h2>
-<p>Actually train the adapter on Chapter 2’s 16 examples, then answer Mike’s question with numbers: did the model learn these exact examples, and separately, did anything transfer to a report it never saw?</p>
+<p>Actually train the adapter on Chapter 2’s 16 examples, then answer Carlos’s question with numbers: did the model learn these exact examples, and separately, did anything transfer to a report it never saw?</p>
 </section>
 <section id="inputs-2" class="level2" data-number="5.18">
 <h2 data-number="5.18" class="anchored" data-anchor-id="inputs-2"><span class="header-section-number">5.18</span> Inputs</h2>
@@ -813,7 +813,7 @@ Figure&nbsp;5.1: LoRA trains two small adapter tables. Their product creates a f
 <section id="expected-output-2" class="level2" data-number="5.19">
 <h2 data-number="5.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">5.19</span> Expected Output</h2>
 <p>A loss that falls across 20 epochs, then two before/after score comparisons.</p>
-<div id="4e47cd55" class="cell" data-execution_count="3">
+<div id="368b7281" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fine_tune(lora_model, tokenizer, examples: <span class="bu">list</span>[<span class="bu">dict</span>], num_epochs: <span class="bu">int</span> <span class="op">=</span> <span class="dv">20</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    lora_model.train()</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    optimizer <span class="op">=</span> torch.optim.AdamW(lora_model.parameters(), lr<span class="op">=</span><span class="fl">2e-4</span>)</span>
@@ -1538,7 +1538,7 @@ Figure&nbsp;5.2: The same fine-tune produces two very different outcomes — tra
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>::: {.chapter-status}</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`█████░░░░░░░░`</span> **5 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 45-60 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🟠 Intermediate</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`█████░░░░░░░░`</span> **5 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 45–60 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🟠 Intermediate</span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learning objectives</span></span>
@@ -1557,7 +1557,7 @@ Figure&nbsp;5.2: The same fine-tune produces two very different outcomes — tra
 <span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## Operational Problem</span></span>
 <span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>Mike, the completions engineer, has watched this book build up evidence</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>Carlos, the completions engineer, has watched this book build up evidence</span>
 <span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>for four chapters — the base model doesn't know this well's vocabulary,</span>
 <span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>doesn't know its specific reports, and its embeddings don't already</span>
 <span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>understand the shorthand. He's ready for the payoff, but wary of a</span>
@@ -1797,263 +1797,267 @@ Figure&nbsp;5.2: The same fine-tune produces two very different outcomes — tra
 <span id="cb8-275"><a href="#cb8-275" aria-hidden="true" tabindex="-1"></a>size (its "rank" — a small number by design). The result: <span class="in">`2,179,072`</span></span>
 <span id="cb8-276"><a href="#cb8-276" aria-hidden="true" tabindex="-1"></a>trainable parameters out of <span class="in">`1,545,893,376`</span> total — <span class="in">`0.141%`</span>. Everything</span>
 <span id="cb8-277"><a href="#cb8-277" aria-hidden="true" tabindex="-1"></a>else in the model is frozen and will never change during this chapter's</span>
-<span id="cb8-278"><a href="#cb8-278" aria-hidden="true" tabindex="-1"></a>training.</span>
-<span id="cb8-279"><a href="#cb8-279" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-280"><a href="#cb8-280" aria-hidden="true" tabindex="-1"></a><span class="fu">## Production Reality</span></span>
-<span id="cb8-281"><a href="#cb8-281" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-282"><a href="#cb8-282" aria-hidden="true" tabindex="-1"></a><span class="in">`target_modules`</span> and <span class="in">`r`</span> are real hyperparameters a production</span>
-<span id="cb8-283"><a href="#cb8-283" aria-hidden="true" tabindex="-1"></a>fine-tuning pipeline would sweep, not fix once — different layers</span>
-<span id="cb8-284"><a href="#cb8-284" aria-hidden="true" tabindex="-1"></a>targeted, or a larger rank, trade off adapter size against how much the</span>
-<span id="cb8-285"><a href="#cb8-285" aria-hidden="true" tabindex="-1"></a>model can actually learn. This chapter's challenge exercise tries a</span>
-<span id="cb8-286"><a href="#cb8-286" aria-hidden="true" tabindex="-1"></a>smaller <span class="in">`target_modules`</span> list and shows the real effect on results.</span>
-<span id="cb8-287"><a href="#cb8-287" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-288"><a href="#cb8-288" aria-hidden="true" tabindex="-1"></a>One more deliberate choice, worth naming directly: this chapter's</span>
-<span id="cb8-289"><a href="#cb8-289" aria-hidden="true" tabindex="-1"></a>training loop runs entirely on CPU, the same as Chapter 1's default. A</span>
-<span id="cb8-290"><a href="#cb8-290" aria-hidden="true" tabindex="-1"></a>GPU or Apple Silicon (MPS) machine can fine-tune this faster, but this</span>
-<span id="cb8-291"><a href="#cb8-291" aria-hidden="true" tabindex="-1"></a>book keeps every reader's numbers reproducible against the same</span>
-<span id="cb8-292"><a href="#cb8-292" aria-hidden="true" tabindex="-1"></a>baseline rather than depending on whichever accelerator a given machine</span>
-<span id="cb8-293"><a href="#cb8-293" aria-hidden="true" tabindex="-1"></a>happens to have. If you have a GPU and want to try it, <span class="in">`model.to("cuda")`</span></span>
-<span id="cb8-294"><a href="#cb8-294" aria-hidden="true" tabindex="-1"></a>(or <span class="in">`"mps"`</span>) before Step 2, and moving <span class="in">`input_ids`</span>/<span class="in">`labels`</span> in</span>
-<span id="cb8-295"><a href="#cb8-295" aria-hidden="true" tabindex="-1"></a><span class="in">`build_training_ids`</span> to the same device, is the change — the rest of</span>
-<span id="cb8-296"><a href="#cb8-296" aria-hidden="true" tabindex="-1"></a>this chapter's logic doesn't depend on which device it runs on.</span>
-<span id="cb8-297"><a href="#cb8-297" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-298"><a href="#cb8-298" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 3: Fine-tune, then measure recall *and* generalization</span></span>
-<span id="cb8-299"><a href="#cb8-299" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-300"><a href="#cb8-300" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
+<span id="cb8-278"><a href="#cb8-278" aria-hidden="true" tabindex="-1"></a>training -- including the raw embedding table Chapter 4 measured;</span>
+<span id="cb8-279"><a href="#cb8-279" aria-hidden="true" tabindex="-1"></a><span class="in">`BHA`</span>'s own coordinate doesn't move. What changes instead is how the</span>
+<span id="cb8-280"><a href="#cb8-280" aria-hidden="true" tabindex="-1"></a>attention layers *use* that unchanged coordinate once text passes</span>
+<span id="cb8-281"><a href="#cb8-281" aria-hidden="true" tabindex="-1"></a>through them, which is where this chapter's improvement actually comes</span>
+<span id="cb8-282"><a href="#cb8-282" aria-hidden="true" tabindex="-1"></a>from.</span>
+<span id="cb8-283"><a href="#cb8-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-284"><a href="#cb8-284" aria-hidden="true" tabindex="-1"></a><span class="fu">## Production Reality</span></span>
+<span id="cb8-285"><a href="#cb8-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-286"><a href="#cb8-286" aria-hidden="true" tabindex="-1"></a><span class="in">`target_modules`</span> and <span class="in">`r`</span> are real hyperparameters a production</span>
+<span id="cb8-287"><a href="#cb8-287" aria-hidden="true" tabindex="-1"></a>fine-tuning pipeline would sweep, not fix once — different layers</span>
+<span id="cb8-288"><a href="#cb8-288" aria-hidden="true" tabindex="-1"></a>targeted, or a larger rank, trade off adapter size against how much the</span>
+<span id="cb8-289"><a href="#cb8-289" aria-hidden="true" tabindex="-1"></a>model can actually learn. This chapter's challenge exercise tries a</span>
+<span id="cb8-290"><a href="#cb8-290" aria-hidden="true" tabindex="-1"></a>smaller <span class="in">`target_modules`</span> list and shows the real effect on results.</span>
+<span id="cb8-291"><a href="#cb8-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-292"><a href="#cb8-292" aria-hidden="true" tabindex="-1"></a>One more deliberate choice, worth naming directly: this chapter's</span>
+<span id="cb8-293"><a href="#cb8-293" aria-hidden="true" tabindex="-1"></a>training loop runs entirely on CPU, the same as Chapter 1's default. A</span>
+<span id="cb8-294"><a href="#cb8-294" aria-hidden="true" tabindex="-1"></a>GPU or Apple Silicon (MPS) machine can fine-tune this faster, but this</span>
+<span id="cb8-295"><a href="#cb8-295" aria-hidden="true" tabindex="-1"></a>book keeps every reader's numbers reproducible against the same</span>
+<span id="cb8-296"><a href="#cb8-296" aria-hidden="true" tabindex="-1"></a>baseline rather than depending on whichever accelerator a given machine</span>
+<span id="cb8-297"><a href="#cb8-297" aria-hidden="true" tabindex="-1"></a>happens to have. If you have a GPU and want to try it, <span class="in">`model.to("cuda")`</span></span>
+<span id="cb8-298"><a href="#cb8-298" aria-hidden="true" tabindex="-1"></a>(or <span class="in">`"mps"`</span>) before Step 2, and moving <span class="in">`input_ids`</span>/<span class="in">`labels`</span> in</span>
+<span id="cb8-299"><a href="#cb8-299" aria-hidden="true" tabindex="-1"></a><span class="in">`build_training_ids`</span> to the same device, is the change — the rest of</span>
+<span id="cb8-300"><a href="#cb8-300" aria-hidden="true" tabindex="-1"></a>this chapter's logic doesn't depend on which device it runs on.</span>
 <span id="cb8-301"><a href="#cb8-301" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-302"><a href="#cb8-302" aria-hidden="true" tabindex="-1"></a>Actually train the adapter on Chapter 2's 16 examples, then answer</span>
-<span id="cb8-303"><a href="#cb8-303" aria-hidden="true" tabindex="-1"></a>Mike's question with numbers: did the model learn these exact examples,</span>
-<span id="cb8-304"><a href="#cb8-304" aria-hidden="true" tabindex="-1"></a>and separately, did anything transfer to a report it never saw?</span>
+<span id="cb8-302"><a href="#cb8-302" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 3: Fine-tune, then measure recall *and* generalization</span></span>
+<span id="cb8-303"><a href="#cb8-303" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-304"><a href="#cb8-304" aria-hidden="true" tabindex="-1"></a><span class="fu">## What problem are we solving?</span></span>
 <span id="cb8-305"><a href="#cb8-305" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-306"><a href="#cb8-306" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
-<span id="cb8-307"><a href="#cb8-307" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-308"><a href="#cb8-308" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The wrapped <span class="in">`lora_model`</span> from Step 2</span>
-<span id="cb8-309"><a href="#cb8-309" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Chapter 2's 16 training examples, and its held-out report's 2 examples</span>
-<span id="cb8-310"><a href="#cb8-310" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Chapter 3's <span class="in">`run_baseline`</span> harness, reused unchanged</span>
+<span id="cb8-306"><a href="#cb8-306" aria-hidden="true" tabindex="-1"></a>Actually train the adapter on Chapter 2's 16 examples, then answer</span>
+<span id="cb8-307"><a href="#cb8-307" aria-hidden="true" tabindex="-1"></a>Carlos's question with numbers: did the model learn these exact examples,</span>
+<span id="cb8-308"><a href="#cb8-308" aria-hidden="true" tabindex="-1"></a>and separately, did anything transfer to a report it never saw?</span>
+<span id="cb8-309"><a href="#cb8-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-310"><a href="#cb8-310" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inputs</span></span>
 <span id="cb8-311"><a href="#cb8-311" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-312"><a href="#cb8-312" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
-<span id="cb8-313"><a href="#cb8-313" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-314"><a href="#cb8-314" aria-hidden="true" tabindex="-1"></a>A loss that falls across 20 epochs, then two before/after score</span>
-<span id="cb8-315"><a href="#cb8-315" aria-hidden="true" tabindex="-1"></a>comparisons.</span>
-<span id="cb8-316"><a href="#cb8-316" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-319"><a href="#cb8-319" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-320"><a href="#cb8-320" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb8-321"><a href="#cb8-321" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fine_tune(lora_model, tokenizer, examples: <span class="bu">list</span>[<span class="bu">dict</span>], num_epochs: <span class="bu">int</span> <span class="op">=</span> <span class="dv">20</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
-<span id="cb8-322"><a href="#cb8-322" aria-hidden="true" tabindex="-1"></a>    lora_model.train()</span>
-<span id="cb8-323"><a href="#cb8-323" aria-hidden="true" tabindex="-1"></a>    optimizer <span class="op">=</span> torch.optim.AdamW(lora_model.parameters(), lr<span class="op">=</span><span class="fl">2e-4</span>)</span>
-<span id="cb8-324"><a href="#cb8-324" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(num_epochs):</span>
-<span id="cb8-325"><a href="#cb8-325" aria-hidden="true" tabindex="-1"></a>        epoch_loss <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb8-326"><a href="#cb8-326" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> example <span class="kw">in</span> examples:</span>
-<span id="cb8-327"><a href="#cb8-327" aria-hidden="true" tabindex="-1"></a>            input_ids, labels <span class="op">=</span> build_training_ids(tokenizer, example)</span>
-<span id="cb8-328"><a href="#cb8-328" aria-hidden="true" tabindex="-1"></a>            loss <span class="op">=</span> lora_model(input_ids<span class="op">=</span>input_ids, labels<span class="op">=</span>labels).loss</span>
-<span id="cb8-329"><a href="#cb8-329" aria-hidden="true" tabindex="-1"></a>            loss.backward()</span>
-<span id="cb8-330"><a href="#cb8-330" aria-hidden="true" tabindex="-1"></a>            optimizer.step()</span>
-<span id="cb8-331"><a href="#cb8-331" aria-hidden="true" tabindex="-1"></a>            optimizer.zero_grad()</span>
-<span id="cb8-332"><a href="#cb8-332" aria-hidden="true" tabindex="-1"></a>            epoch_loss <span class="op">+=</span> loss.item()</span>
-<span id="cb8-333"><a href="#cb8-333" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (epoch <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> <span class="dv">5</span> <span class="op">==</span> <span class="dv">0</span> <span class="kw">or</span> epoch <span class="op">==</span> <span class="dv">0</span>:</span>
-<span id="cb8-334"><a href="#cb8-334" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"  epoch </span><span class="sc">{</span>epoch <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>num_epochs<span class="sc">}</span><span class="ss">: avg loss </span><span class="sc">{</span>epoch_loss <span class="op">/</span> <span class="bu">len</span>(examples)<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb8-335"><a href="#cb8-335" aria-hidden="true" tabindex="-1"></a>    lora_model.<span class="bu">eval</span>()</span>
-<span id="cb8-336"><a href="#cb8-336" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-337"><a href="#cb8-337" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-338"><a href="#cb8-338" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> score(results: <span class="bu">list</span>[<span class="bu">dict</span>]) <span class="op">-&gt;</span> <span class="bu">tuple</span>[<span class="bu">int</span>, <span class="bu">int</span>]:</span>
-<span id="cb8-339"><a href="#cb8-339" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span>(r[<span class="st">"matched_expected"</span>] <span class="cf">for</span> r <span class="kw">in</span> results), <span class="bu">len</span>(results)</span>
+<span id="cb8-312"><a href="#cb8-312" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The wrapped <span class="in">`lora_model`</span> from Step 2</span>
+<span id="cb8-313"><a href="#cb8-313" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Chapter 2's 16 training examples, and its held-out report's 2 examples</span>
+<span id="cb8-314"><a href="#cb8-314" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Chapter 3's <span class="in">`run_baseline`</span> harness, reused unchanged</span>
+<span id="cb8-315"><a href="#cb8-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-316"><a href="#cb8-316" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected Output</span></span>
+<span id="cb8-317"><a href="#cb8-317" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-318"><a href="#cb8-318" aria-hidden="true" tabindex="-1"></a>A loss that falls across 20 epochs, then two before/after score</span>
+<span id="cb8-319"><a href="#cb8-319" aria-hidden="true" tabindex="-1"></a>comparisons.</span>
+<span id="cb8-320"><a href="#cb8-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-323"><a href="#cb8-323" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-324"><a href="#cb8-324" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-325"><a href="#cb8-325" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fine_tune(lora_model, tokenizer, examples: <span class="bu">list</span>[<span class="bu">dict</span>], num_epochs: <span class="bu">int</span> <span class="op">=</span> <span class="dv">20</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb8-326"><a href="#cb8-326" aria-hidden="true" tabindex="-1"></a>    lora_model.train()</span>
+<span id="cb8-327"><a href="#cb8-327" aria-hidden="true" tabindex="-1"></a>    optimizer <span class="op">=</span> torch.optim.AdamW(lora_model.parameters(), lr<span class="op">=</span><span class="fl">2e-4</span>)</span>
+<span id="cb8-328"><a href="#cb8-328" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(num_epochs):</span>
+<span id="cb8-329"><a href="#cb8-329" aria-hidden="true" tabindex="-1"></a>        epoch_loss <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb8-330"><a href="#cb8-330" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> example <span class="kw">in</span> examples:</span>
+<span id="cb8-331"><a href="#cb8-331" aria-hidden="true" tabindex="-1"></a>            input_ids, labels <span class="op">=</span> build_training_ids(tokenizer, example)</span>
+<span id="cb8-332"><a href="#cb8-332" aria-hidden="true" tabindex="-1"></a>            loss <span class="op">=</span> lora_model(input_ids<span class="op">=</span>input_ids, labels<span class="op">=</span>labels).loss</span>
+<span id="cb8-333"><a href="#cb8-333" aria-hidden="true" tabindex="-1"></a>            loss.backward()</span>
+<span id="cb8-334"><a href="#cb8-334" aria-hidden="true" tabindex="-1"></a>            optimizer.step()</span>
+<span id="cb8-335"><a href="#cb8-335" aria-hidden="true" tabindex="-1"></a>            optimizer.zero_grad()</span>
+<span id="cb8-336"><a href="#cb8-336" aria-hidden="true" tabindex="-1"></a>            epoch_loss <span class="op">+=</span> loss.item()</span>
+<span id="cb8-337"><a href="#cb8-337" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (epoch <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> <span class="dv">5</span> <span class="op">==</span> <span class="dv">0</span> <span class="kw">or</span> epoch <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb8-338"><a href="#cb8-338" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"  epoch </span><span class="sc">{</span>epoch <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>num_epochs<span class="sc">}</span><span class="ss">: avg loss </span><span class="sc">{</span>epoch_loss <span class="op">/</span> <span class="bu">len</span>(examples)<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb8-339"><a href="#cb8-339" aria-hidden="true" tabindex="-1"></a>    lora_model.<span class="bu">eval</span>()</span>
 <span id="cb8-340"><a href="#cb8-340" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-341"><a href="#cb8-341" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-342"><a href="#cb8-342" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Before fine-tuning:"</span>)</span>
-<span id="cb8-343"><a href="#cb8-343" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Training baseline:  </span><span class="sc">{</span>score(run_baseline(model, tokenizer, examples))<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb8-344"><a href="#cb8-344" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Held-out baseline:  </span><span class="sc">{</span>score(run_baseline(model, tokenizer, held_out_examples))<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-342"><a href="#cb8-342" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> score(results: <span class="bu">list</span>[<span class="bu">dict</span>]) <span class="op">-&gt;</span> <span class="bu">tuple</span>[<span class="bu">int</span>, <span class="bu">int</span>]:</span>
+<span id="cb8-343"><a href="#cb8-343" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span>(r[<span class="st">"matched_expected"</span>] <span class="cf">for</span> r <span class="kw">in</span> results), <span class="bu">len</span>(results)</span>
+<span id="cb8-344"><a href="#cb8-344" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-345"><a href="#cb8-345" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-346"><a href="#cb8-346" aria-hidden="true" tabindex="-1"></a>fine_tune(lora_model, tokenizer, examples)</span>
-<span id="cb8-347"><a href="#cb8-347" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-348"><a href="#cb8-348" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"After fine-tuning:"</span>)</span>
-<span id="cb8-349"><a href="#cb8-349" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Training recall:         </span><span class="sc">{</span>score(run_baseline(lora_model, tokenizer, examples))<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb8-350"><a href="#cb8-350" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Held-out generalization: </span><span class="sc">{</span>score(run_baseline(lora_model, tokenizer, held_out_examples))<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb8-351"><a href="#cb8-351" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-352"><a href="#cb8-352" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-353"><a href="#cb8-353" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
-<span id="cb8-354"><a href="#cb8-354" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-346"><a href="#cb8-346" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Before fine-tuning:"</span>)</span>
+<span id="cb8-347"><a href="#cb8-347" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Training baseline:  </span><span class="sc">{</span>score(run_baseline(model, tokenizer, examples))<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-348"><a href="#cb8-348" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Held-out baseline:  </span><span class="sc">{</span>score(run_baseline(model, tokenizer, held_out_examples))<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-349"><a href="#cb8-349" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-350"><a href="#cb8-350" aria-hidden="true" tabindex="-1"></a>fine_tune(lora_model, tokenizer, examples)</span>
+<span id="cb8-351"><a href="#cb8-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-352"><a href="#cb8-352" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"After fine-tuning:"</span>)</span>
+<span id="cb8-353"><a href="#cb8-353" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Training recall:         </span><span class="sc">{</span>score(run_baseline(lora_model, tokenizer, examples))<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-354"><a href="#cb8-354" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Held-out generalization: </span><span class="sc">{</span>score(run_baseline(lora_model, tokenizer, held_out_examples))<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb8-355"><a href="#cb8-355" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-356"><a href="#cb8-356" aria-hidden="true" tabindex="-1"></a><span class="in">Before fine-tuning:</span></span>
-<span id="cb8-357"><a href="#cb8-357" aria-hidden="true" tabindex="-1"></a><span class="in">  Training baseline:  0/16</span></span>
-<span id="cb8-358"><a href="#cb8-358" aria-hidden="true" tabindex="-1"></a><span class="in">  Held-out baseline:  0/2</span></span>
-<span id="cb8-359"><a href="#cb8-359" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-360"><a href="#cb8-360" aria-hidden="true" tabindex="-1"></a><span class="in">  epoch 1/20: avg loss 4.7173</span></span>
-<span id="cb8-361"><a href="#cb8-361" aria-hidden="true" tabindex="-1"></a><span class="in">  epoch 5/20: avg loss 1.2688</span></span>
-<span id="cb8-362"><a href="#cb8-362" aria-hidden="true" tabindex="-1"></a><span class="in">  epoch 10/20: avg loss 0.3360</span></span>
-<span id="cb8-363"><a href="#cb8-363" aria-hidden="true" tabindex="-1"></a><span class="in">  epoch 15/20: avg loss 0.1850</span></span>
-<span id="cb8-364"><a href="#cb8-364" aria-hidden="true" tabindex="-1"></a><span class="in">  epoch 20/20: avg loss 0.1201</span></span>
-<span id="cb8-365"><a href="#cb8-365" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-366"><a href="#cb8-366" aria-hidden="true" tabindex="-1"></a><span class="in">After fine-tuning:</span></span>
-<span id="cb8-367"><a href="#cb8-367" aria-hidden="true" tabindex="-1"></a><span class="in">  Training recall:         13/16</span></span>
-<span id="cb8-368"><a href="#cb8-368" aria-hidden="true" tabindex="-1"></a><span class="in">  Held-out generalization: 0/2</span></span>
-<span id="cb8-369"><a href="#cb8-369" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-370"><a href="#cb8-370" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-371"><a href="#cb8-371" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
-<span id="cb8-372"><a href="#cb8-372" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-373"><a href="#cb8-373" aria-hidden="true" tabindex="-1"></a>::: {.content-visible when-format="html"}</span>
-<span id="cb8-374"><a href="#cb8-374" aria-hidden="true" tabindex="-1"></a>::: {#fig-recall-gap .pipeline-diagram}</span>
-<span id="cb8-375"><a href="#cb8-375" aria-hidden="true" tabindex="-1"></a><span class="al">![](../figures/diagrams/recall_gap_ch05_light.svg)</span>{.diagram-light width="440" fig-alt="Grouped bar chart. Training set questions rise from an exact-match score of 0 of 16 before fine-tuning to 13 of 16 after. Held-out report questions stay flat at 0 of 2, both before and after fine-tuning."}</span>
+<span id="cb8-356"><a href="#cb8-356" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-357"><a href="#cb8-357" aria-hidden="true" tabindex="-1"></a>Running this exact code prints:</span>
+<span id="cb8-358"><a href="#cb8-358" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-359"><a href="#cb8-359" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-360"><a href="#cb8-360" aria-hidden="true" tabindex="-1"></a><span class="in">Before fine-tuning:</span></span>
+<span id="cb8-361"><a href="#cb8-361" aria-hidden="true" tabindex="-1"></a><span class="in">  Training baseline:  0/16</span></span>
+<span id="cb8-362"><a href="#cb8-362" aria-hidden="true" tabindex="-1"></a><span class="in">  Held-out baseline:  0/2</span></span>
+<span id="cb8-363"><a href="#cb8-363" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-364"><a href="#cb8-364" aria-hidden="true" tabindex="-1"></a><span class="in">  epoch 1/20: avg loss 4.7173</span></span>
+<span id="cb8-365"><a href="#cb8-365" aria-hidden="true" tabindex="-1"></a><span class="in">  epoch 5/20: avg loss 1.2688</span></span>
+<span id="cb8-366"><a href="#cb8-366" aria-hidden="true" tabindex="-1"></a><span class="in">  epoch 10/20: avg loss 0.3360</span></span>
+<span id="cb8-367"><a href="#cb8-367" aria-hidden="true" tabindex="-1"></a><span class="in">  epoch 15/20: avg loss 0.1850</span></span>
+<span id="cb8-368"><a href="#cb8-368" aria-hidden="true" tabindex="-1"></a><span class="in">  epoch 20/20: avg loss 0.1201</span></span>
+<span id="cb8-369"><a href="#cb8-369" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-370"><a href="#cb8-370" aria-hidden="true" tabindex="-1"></a><span class="in">After fine-tuning:</span></span>
+<span id="cb8-371"><a href="#cb8-371" aria-hidden="true" tabindex="-1"></a><span class="in">  Training recall:         13/16</span></span>
+<span id="cb8-372"><a href="#cb8-372" aria-hidden="true" tabindex="-1"></a><span class="in">  Held-out generalization: 0/2</span></span>
+<span id="cb8-373"><a href="#cb8-373" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-374"><a href="#cb8-374" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-375"><a href="#cb8-375" aria-hidden="true" tabindex="-1"></a><span class="fu">## What just happened?</span></span>
 <span id="cb8-376"><a href="#cb8-376" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-377"><a href="#cb8-377" aria-hidden="true" tabindex="-1"></a><span class="al">![](../figures/diagrams/recall_gap_ch05_dark.svg)</span>{.diagram-dark width="440"}</span>
-<span id="cb8-378"><a href="#cb8-378" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-379"><a href="#cb8-379" aria-hidden="true" tabindex="-1"></a>The same fine-tune produces two very different outcomes — training recall jumps from 0/16 to 13/16, while held-out generalization stays flat at 0/2.</span>
-<span id="cb8-380"><a href="#cb8-380" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-381"><a href="#cb8-381" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-377"><a href="#cb8-377" aria-hidden="true" tabindex="-1"></a>::: {.content-visible when-format="html"}</span>
+<span id="cb8-378"><a href="#cb8-378" aria-hidden="true" tabindex="-1"></a>::: {#fig-recall-gap .pipeline-diagram}</span>
+<span id="cb8-379"><a href="#cb8-379" aria-hidden="true" tabindex="-1"></a><span class="al">![](../figures/diagrams/recall_gap_ch05_light.svg)</span>{.diagram-light width="440" fig-alt="Grouped bar chart. Training set questions rise from an exact-match score of 0 of 16 before fine-tuning to 13 of 16 after. Held-out report questions stay flat at 0 of 2, both before and after fine-tuning."}</span>
+<span id="cb8-380"><a href="#cb8-380" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-381"><a href="#cb8-381" aria-hidden="true" tabindex="-1"></a><span class="al">![](../figures/diagrams/recall_gap_ch05_dark.svg)</span>{.diagram-dark width="440"}</span>
 <span id="cb8-382"><a href="#cb8-382" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-383"><a href="#cb8-383" aria-hidden="true" tabindex="-1"></a>::: {.content-visible when-format="pdf"}</span>
-<span id="cb8-384"><a href="#cb8-384" aria-hidden="true" tabindex="-1"></a><span class="al">![The same fine-tune produces two very different outcomes -- training recall jumps from 0/16 to 13/16, while held-out generalization stays flat at 0/2.](../figures/diagrams/recall_gap_ch05.pdf)</span>{width="440" fig-align="center" #fig-recall-gap}</span>
+<span id="cb8-383"><a href="#cb8-383" aria-hidden="true" tabindex="-1"></a>The same fine-tune produces two very different outcomes — training recall jumps from 0/16 to 13/16, while held-out generalization stays flat at 0/2.</span>
+<span id="cb8-384"><a href="#cb8-384" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-385"><a href="#cb8-385" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-386"><a href="#cb8-386" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-387"><a href="#cb8-387" aria-hidden="true" tabindex="-1"></a>Be precise about what this run actually shows: fine-tuning **changed**</span>
-<span id="cb8-388"><a href="#cb8-388" aria-hidden="true" tabindex="-1"></a>the model, not simply "improved" it. Training recall jumped from</span>
-<span id="cb8-389"><a href="#cb8-389" aria-hidden="true" tabindex="-1"></a><span class="in">`0/16`</span> to <span class="in">`13/16`</span> — real, measurable learning, not a training artifact.</span>
-<span id="cb8-390"><a href="#cb8-390" aria-hidden="true" tabindex="-1"></a>Held-out generalization stayed at <span class="in">`0/2`</span>, exactly where it started.</span>
-<span id="cb8-391"><a href="#cb8-391" aria-hidden="true" tabindex="-1"></a>Sixteen examples was enough for this small model to memorize sixteen</span>
-<span id="cb8-392"><a href="#cb8-392" aria-hidden="true" tabindex="-1"></a>answers; it was not enough to teach it anything that transfers to a</span>
-<span id="cb8-393"><a href="#cb8-393" aria-hidden="true" tabindex="-1"></a>report it never saw. That's not a bug — it's the honest, predictable</span>
-<span id="cb8-394"><a href="#cb8-394" aria-hidden="true" tabindex="-1"></a>result of a training set this size, and precisely why Chapter 2</span>
-<span id="cb8-395"><a href="#cb8-395" aria-hidden="true" tabindex="-1"></a>reserved that report in the first place.</span>
-<span id="cb8-396"><a href="#cb8-396" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-397"><a href="#cb8-397" aria-hidden="true" tabindex="-1"></a>Of the 18 total questions across both checks (16 training + 2</span>
-<span id="cb8-398"><a href="#cb8-398" aria-hidden="true" tabindex="-1"></a>held-out), 13 training answers came back right, which leaves 5 wrong —</span>
-<span id="cb8-399"><a href="#cb8-399" aria-hidden="true" tabindex="-1"></a>3 from the training set, 2 from the held-out report. Looking at</span>
-<span id="cb8-400"><a href="#cb8-400" aria-hidden="true" tabindex="-1"></a>*which* answers came back wrong is more revealing than the scores</span>
-<span id="cb8-401"><a href="#cb8-401" aria-hidden="true" tabindex="-1"></a>alone. Every one of those 5 is a real answer from a *different* report,</span>
-<span id="cb8-402"><a href="#cb8-402" aria-hidden="true" tabindex="-1"></a>borrowed wholesale — never an invented guess:</span>
-<span id="cb8-403"><a href="#cb8-403" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-404"><a href="#cb8-404" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Question <span class="pp">|</span> Expected <span class="pp">|</span> Model said <span class="pp">|</span> Actually belongs to <span class="pp">|</span></span>
-<span id="cb8-405"><a href="#cb8-405" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
-<span id="cb8-406"><a href="#cb8-406" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Report #3, activity planned <span class="pp">|</span> <span class="in">`CONTINUE RIGGING UP...`</span> <span class="pp">|</span> <span class="in">`CONTINUE BUILDING CURVE TO 65°`</span> <span class="pp">|</span> Report #36 <span class="pp">|</span></span>
-<span id="cb8-407"><a href="#cb8-407" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Report #36, present ops <span class="pp">|</span> <span class="in">`BUILDING CURVE SECTION...`</span> <span class="pp">|</span> <span class="in">`PIPE FREE, TRIP OUT OF HOLE...`</span> <span class="pp">|</span> Report #38 <span class="pp">|</span></span>
-<span id="cb8-408"><a href="#cb8-408" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Report #48, present ops <span class="pp">|</span> <span class="in">`LAYING DOWN COOLING BHA 31`</span> <span class="pp">|</span> <span class="in">`CIRCULATE FOR TEMPERATURE`</span> <span class="pp">|</span> Report #49 <span class="pp">|</span></span>
-<span id="cb8-409"><a href="#cb8-409" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Report #37 (held-out), present ops <span class="pp">|</span> <span class="in">`RIG UP SCHLUMBERGER...`</span> <span class="pp">|</span> <span class="in">`PIPE FREE, TRIP OUT OF HOLE...`</span> <span class="pp">|</span> Report #38 <span class="pp">|</span></span>
-<span id="cb8-410"><a href="#cb8-410" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Report #37 (held-out), activity planned <span class="pp">|</span> <span class="in">`RUN UBI LOG...`</span> <span class="pp">|</span> <span class="in">`CONTINUE BUILDING CURVE TO 65°`</span> <span class="pp">|</span> Report #36 <span class="pp">|</span></span>
-<span id="cb8-411"><a href="#cb8-411" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-412"><a href="#cb8-412" aria-hidden="true" tabindex="-1"></a>The fine-tuned model didn't get vaguer or more hesitant on questions it</span>
-<span id="cb8-413"><a href="#cb8-413" aria-hidden="true" tabindex="-1"></a>couldn't answer — the way the honest, ungrounded base model did back in</span>
-<span id="cb8-414"><a href="#cb8-414" aria-hidden="true" tabindex="-1"></a>Chapter 3. It got *more* confident, and confidently wrong, reaching for</span>
-<span id="cb8-415"><a href="#cb8-415" aria-hidden="true" tabindex="-1"></a>the nearest memorized answer instead. That's a materially worse failure</span>
-<span id="cb8-416"><a href="#cb8-416" aria-hidden="true" tabindex="-1"></a>mode for a production system than "I don't know," and it's the direct</span>
-<span id="cb8-417"><a href="#cb8-417" aria-hidden="true" tabindex="-1"></a>consequence of training on too little, too narrow a dataset.</span>
-<span id="cb8-418"><a href="#cb8-418" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-419"><a href="#cb8-419" aria-hidden="true" tabindex="-1"></a>The principle behind all three results together: a tiny fine-tune can</span>
-<span id="cb8-420"><a href="#cb8-420" aria-hidden="true" tabindex="-1"></a>teach a model to prefer the *shape* of your archive — its vocabulary,</span>
-<span id="cb8-421"><a href="#cb8-421" aria-hidden="true" tabindex="-1"></a>its formatting, the fact that answers are short, well-specific field</span>
-<span id="cb8-422"><a href="#cb8-422" aria-hidden="true" tabindex="-1"></a>values — without teaching it reliable judgment over reports it hasn't</span>
-<span id="cb8-423"><a href="#cb8-423" aria-hidden="true" tabindex="-1"></a>seen. Shape is real and worth having. It is not the same thing as</span>
-<span id="cb8-424"><a href="#cb8-424" aria-hidden="true" tabindex="-1"></a>judgment, and this chapter's numbers are exactly what the difference</span>
-<span id="cb8-425"><a href="#cb8-425" aria-hidden="true" tabindex="-1"></a>looks like.</span>
-<span id="cb8-426"><a href="#cb8-426" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-427"><a href="#cb8-427" aria-hidden="true" tabindex="-1"></a><span class="fu">## Practical exercise</span></span>
-<span id="cb8-428"><a href="#cb8-428" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-429"><a href="#cb8-429" aria-hidden="true" tabindex="-1"></a>🟢 **Beginner**</span>
+<span id="cb8-387"><a href="#cb8-387" aria-hidden="true" tabindex="-1"></a>::: {.content-visible when-format="pdf"}</span>
+<span id="cb8-388"><a href="#cb8-388" aria-hidden="true" tabindex="-1"></a><span class="al">![The same fine-tune produces two very different outcomes -- training recall jumps from 0/16 to 13/16, while held-out generalization stays flat at 0/2.](../figures/diagrams/recall_gap_ch05.pdf)</span>{width="440" fig-align="center" #fig-recall-gap}</span>
+<span id="cb8-389"><a href="#cb8-389" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-390"><a href="#cb8-390" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-391"><a href="#cb8-391" aria-hidden="true" tabindex="-1"></a>Be precise about what this run actually shows: fine-tuning **changed**</span>
+<span id="cb8-392"><a href="#cb8-392" aria-hidden="true" tabindex="-1"></a>the model, not simply "improved" it. Training recall jumped from</span>
+<span id="cb8-393"><a href="#cb8-393" aria-hidden="true" tabindex="-1"></a><span class="in">`0/16`</span> to <span class="in">`13/16`</span> — real, measurable learning, not a training artifact.</span>
+<span id="cb8-394"><a href="#cb8-394" aria-hidden="true" tabindex="-1"></a>Held-out generalization stayed at <span class="in">`0/2`</span>, exactly where it started.</span>
+<span id="cb8-395"><a href="#cb8-395" aria-hidden="true" tabindex="-1"></a>Sixteen examples was enough for this small model to memorize sixteen</span>
+<span id="cb8-396"><a href="#cb8-396" aria-hidden="true" tabindex="-1"></a>answers; it was not enough to teach it anything that transfers to a</span>
+<span id="cb8-397"><a href="#cb8-397" aria-hidden="true" tabindex="-1"></a>report it never saw. That's not a bug — it's the honest, predictable</span>
+<span id="cb8-398"><a href="#cb8-398" aria-hidden="true" tabindex="-1"></a>result of a training set this size, and precisely why Chapter 2</span>
+<span id="cb8-399"><a href="#cb8-399" aria-hidden="true" tabindex="-1"></a>reserved that report in the first place.</span>
+<span id="cb8-400"><a href="#cb8-400" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-401"><a href="#cb8-401" aria-hidden="true" tabindex="-1"></a>Of the 18 total questions across both checks (16 training + 2</span>
+<span id="cb8-402"><a href="#cb8-402" aria-hidden="true" tabindex="-1"></a>held-out), 13 training answers came back right, which leaves 5 wrong —</span>
+<span id="cb8-403"><a href="#cb8-403" aria-hidden="true" tabindex="-1"></a>3 from the training set, 2 from the held-out report. Looking at</span>
+<span id="cb8-404"><a href="#cb8-404" aria-hidden="true" tabindex="-1"></a>*which* answers came back wrong is more revealing than the scores</span>
+<span id="cb8-405"><a href="#cb8-405" aria-hidden="true" tabindex="-1"></a>alone. Every one of those 5 is a real answer from a *different* report,</span>
+<span id="cb8-406"><a href="#cb8-406" aria-hidden="true" tabindex="-1"></a>borrowed wholesale — never an invented guess:</span>
+<span id="cb8-407"><a href="#cb8-407" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-408"><a href="#cb8-408" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Question <span class="pp">|</span> Expected <span class="pp">|</span> Model said <span class="pp">|</span> Actually belongs to <span class="pp">|</span></span>
+<span id="cb8-409"><a href="#cb8-409" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb8-410"><a href="#cb8-410" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Report #3, activity planned <span class="pp">|</span> <span class="in">`CONTINUE RIGGING UP...`</span> <span class="pp">|</span> <span class="in">`CONTINUE BUILDING CURVE TO 65°`</span> <span class="pp">|</span> Report #36 <span class="pp">|</span></span>
+<span id="cb8-411"><a href="#cb8-411" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Report #36, present ops <span class="pp">|</span> <span class="in">`BUILDING CURVE SECTION...`</span> <span class="pp">|</span> <span class="in">`PIPE FREE, TRIP OUT OF HOLE...`</span> <span class="pp">|</span> Report #38 <span class="pp">|</span></span>
+<span id="cb8-412"><a href="#cb8-412" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Report #48, present ops <span class="pp">|</span> <span class="in">`LAYING DOWN COOLING BHA 31`</span> <span class="pp">|</span> <span class="in">`CIRCULATE FOR TEMPERATURE`</span> <span class="pp">|</span> Report #49 <span class="pp">|</span></span>
+<span id="cb8-413"><a href="#cb8-413" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Report #37 (held-out), present ops <span class="pp">|</span> <span class="in">`RIG UP SCHLUMBERGER...`</span> <span class="pp">|</span> <span class="in">`PIPE FREE, TRIP OUT OF HOLE...`</span> <span class="pp">|</span> Report #38 <span class="pp">|</span></span>
+<span id="cb8-414"><a href="#cb8-414" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Report #37 (held-out), activity planned <span class="pp">|</span> <span class="in">`RUN UBI LOG...`</span> <span class="pp">|</span> <span class="in">`CONTINUE BUILDING CURVE TO 65°`</span> <span class="pp">|</span> Report #36 <span class="pp">|</span></span>
+<span id="cb8-415"><a href="#cb8-415" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-416"><a href="#cb8-416" aria-hidden="true" tabindex="-1"></a>The fine-tuned model didn't get vaguer or more hesitant on questions it</span>
+<span id="cb8-417"><a href="#cb8-417" aria-hidden="true" tabindex="-1"></a>couldn't answer — the way the honest, ungrounded base model did back in</span>
+<span id="cb8-418"><a href="#cb8-418" aria-hidden="true" tabindex="-1"></a>Chapter 3. It got *more* confident, and confidently wrong, reaching for</span>
+<span id="cb8-419"><a href="#cb8-419" aria-hidden="true" tabindex="-1"></a>the nearest memorized answer instead. That's a materially worse failure</span>
+<span id="cb8-420"><a href="#cb8-420" aria-hidden="true" tabindex="-1"></a>mode for a production system than "I don't know," and it's the direct</span>
+<span id="cb8-421"><a href="#cb8-421" aria-hidden="true" tabindex="-1"></a>consequence of training on too little, too narrow a dataset.</span>
+<span id="cb8-422"><a href="#cb8-422" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-423"><a href="#cb8-423" aria-hidden="true" tabindex="-1"></a>The principle behind all three results together: a tiny fine-tune can</span>
+<span id="cb8-424"><a href="#cb8-424" aria-hidden="true" tabindex="-1"></a>teach a model to prefer the *shape* of your archive — its vocabulary,</span>
+<span id="cb8-425"><a href="#cb8-425" aria-hidden="true" tabindex="-1"></a>its formatting, the fact that answers are short, well-specific field</span>
+<span id="cb8-426"><a href="#cb8-426" aria-hidden="true" tabindex="-1"></a>values — without teaching it reliable judgment over reports it hasn't</span>
+<span id="cb8-427"><a href="#cb8-427" aria-hidden="true" tabindex="-1"></a>seen. Shape is real and worth having. It is not the same thing as</span>
+<span id="cb8-428"><a href="#cb8-428" aria-hidden="true" tabindex="-1"></a>judgment, and this chapter's numbers are exactly what the difference</span>
+<span id="cb8-429"><a href="#cb8-429" aria-hidden="true" tabindex="-1"></a>looks like.</span>
 <span id="cb8-430"><a href="#cb8-430" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-431"><a href="#cb8-431" aria-hidden="true" tabindex="-1"></a>**Try it yourself:** run</span>
-<span id="cb8-432"><a href="#cb8-432" aria-hidden="true" tabindex="-1"></a><span class="in">`python code/chapter_05/first_lora_finetune.py`</span> from inside <span class="in">`book/`</span> (it</span>
-<span id="cb8-433"><a href="#cb8-433" aria-hidden="true" tabindex="-1"></a>takes about 5 minutes on CPU) and watch the loss fall across the 20</span>
-<span id="cb8-434"><a href="#cb8-434" aria-hidden="true" tabindex="-1"></a>epochs.</span>
-<span id="cb8-435"><a href="#cb8-435" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-436"><a href="#cb8-436" aria-hidden="true" tabindex="-1"></a>**You'll know it worked when:** you see <span class="in">`Training recall: 13/16`</span> and</span>
-<span id="cb8-437"><a href="#cb8-437" aria-hidden="true" tabindex="-1"></a><span class="in">`Held-out generalization: 0/2`</span> — and you can explain, in one sentence,</span>
-<span id="cb8-438"><a href="#cb8-438" aria-hidden="true" tabindex="-1"></a>why those two numbers moving so differently is exactly the point.</span>
+<span id="cb8-431"><a href="#cb8-431" aria-hidden="true" tabindex="-1"></a><span class="fu">## Practical exercise</span></span>
+<span id="cb8-432"><a href="#cb8-432" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-433"><a href="#cb8-433" aria-hidden="true" tabindex="-1"></a>🟢 **Beginner**</span>
+<span id="cb8-434"><a href="#cb8-434" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-435"><a href="#cb8-435" aria-hidden="true" tabindex="-1"></a>**Try it yourself:** run</span>
+<span id="cb8-436"><a href="#cb8-436" aria-hidden="true" tabindex="-1"></a><span class="in">`python code/chapter_05/first_lora_finetune.py`</span> from inside <span class="in">`book/`</span> (it</span>
+<span id="cb8-437"><a href="#cb8-437" aria-hidden="true" tabindex="-1"></a>takes about 5 minutes on CPU) and watch the loss fall across the 20</span>
+<span id="cb8-438"><a href="#cb8-438" aria-hidden="true" tabindex="-1"></a>epochs.</span>
 <span id="cb8-439"><a href="#cb8-439" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-440"><a href="#cb8-440" aria-hidden="true" tabindex="-1"></a><span class="fu">## Field notes</span></span>
-<span id="cb8-441"><a href="#cb8-441" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-442"><a href="#cb8-442" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="Field notes: wrong, but never randomly wrong"}</span>
-<span id="cb8-443"><a href="#cb8-443" aria-hidden="true" tabindex="-1"></a>**Query:** every one of this chapter's 5 wrong answers (3 training</span>
-<span id="cb8-444"><a href="#cb8-444" aria-hidden="true" tabindex="-1"></a>misses, both held-out misses), collected as a set.</span>
+<span id="cb8-440"><a href="#cb8-440" aria-hidden="true" tabindex="-1"></a>**You'll know it worked when:** you see <span class="in">`Training recall: 13/16`</span> and</span>
+<span id="cb8-441"><a href="#cb8-441" aria-hidden="true" tabindex="-1"></a><span class="in">`Held-out generalization: 0/2`</span> — and you can explain, in one sentence,</span>
+<span id="cb8-442"><a href="#cb8-442" aria-hidden="true" tabindex="-1"></a>why those two numbers moving so differently is exactly the point.</span>
+<span id="cb8-443"><a href="#cb8-443" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-444"><a href="#cb8-444" aria-hidden="true" tabindex="-1"></a><span class="fu">## Field notes</span></span>
 <span id="cb8-445"><a href="#cb8-445" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-446"><a href="#cb8-446" aria-hidden="true" tabindex="-1"></a>**Result:** all 5 are word-for-word answers that belong to *other* real</span>
-<span id="cb8-447"><a href="#cb8-447" aria-hidden="true" tabindex="-1"></a>reports in the training set — `"PIPE FREE, TRIP OUT OF HOLE FOR BHA</span>
-<span id="cb8-448"><a href="#cb8-448" aria-hidden="true" tabindex="-1"></a>INSPECTION"` (really report #38's answer) shows up twice, once for</span>
-<span id="cb8-449"><a href="#cb8-449" aria-hidden="true" tabindex="-1"></a>report #36's question and once for the held-out report #37's question.</span>
-<span id="cb8-450"><a href="#cb8-450" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-451"><a href="#cb8-451" aria-hidden="true" tabindex="-1"></a>**Why:** with only 16 examples and 20 epochs of repetition, the model</span>
-<span id="cb8-452"><a href="#cb8-452" aria-hidden="true" tabindex="-1"></a>learned a shortcut: *produce something that looks like a report answer</span>
-<span id="cb8-453"><a href="#cb8-453" aria-hidden="true" tabindex="-1"></a>from this well*, without reliably learning *which* answer belongs to</span>
-<span id="cb8-454"><a href="#cb8-454" aria-hidden="true" tabindex="-1"></a>*which specific report*. Its confusion isn't noise — it consistently</span>
-<span id="cb8-455"><a href="#cb8-455" aria-hidden="true" tabindex="-1"></a>reaches for one of a small set of memorized, real sentences.</span>
-<span id="cb8-456"><a href="#cb8-456" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-457"><a href="#cb8-457" aria-hidden="true" tabindex="-1"></a>**Lesson:** a fine-tuned model's mistakes are diagnostic. Random</span>
-<span id="cb8-458"><a href="#cb8-458" aria-hidden="true" tabindex="-1"></a>gibberish would suggest something broken in training; consistently</span>
-<span id="cb8-459"><a href="#cb8-459" aria-hidden="true" tabindex="-1"></a>borrowed real answers point specifically at "not enough distinct</span>
-<span id="cb8-460"><a href="#cb8-460" aria-hidden="true" tabindex="-1"></a>training signal to tell reports apart" — exactly what Chapter 6's data</span>
-<span id="cb8-461"><a href="#cb8-461" aria-hidden="true" tabindex="-1"></a>quality gate and Chapter 7's richer training examples exist to fix.</span>
-<span id="cb8-462"><a href="#cb8-462" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-463"><a href="#cb8-463" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-464"><a href="#cb8-464" aria-hidden="true" tabindex="-1"></a><span class="fu">## Challenge exercise</span></span>
-<span id="cb8-465"><a href="#cb8-465" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-466"><a href="#cb8-466" aria-hidden="true" tabindex="-1"></a>🟠 **Intermediate**</span>
+<span id="cb8-446"><a href="#cb8-446" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="Field notes: wrong, but never randomly wrong"}</span>
+<span id="cb8-447"><a href="#cb8-447" aria-hidden="true" tabindex="-1"></a>**Query:** every one of this chapter's 5 wrong answers (3 training</span>
+<span id="cb8-448"><a href="#cb8-448" aria-hidden="true" tabindex="-1"></a>misses, both held-out misses), collected as a set.</span>
+<span id="cb8-449"><a href="#cb8-449" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-450"><a href="#cb8-450" aria-hidden="true" tabindex="-1"></a>**Result:** all 5 are word-for-word answers that belong to *other* real</span>
+<span id="cb8-451"><a href="#cb8-451" aria-hidden="true" tabindex="-1"></a>reports in the training set — `"PIPE FREE, TRIP OUT OF HOLE FOR BHA</span>
+<span id="cb8-452"><a href="#cb8-452" aria-hidden="true" tabindex="-1"></a>INSPECTION"` (really report #38's answer) shows up twice, once for</span>
+<span id="cb8-453"><a href="#cb8-453" aria-hidden="true" tabindex="-1"></a>report #36's question and once for the held-out report #37's question.</span>
+<span id="cb8-454"><a href="#cb8-454" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-455"><a href="#cb8-455" aria-hidden="true" tabindex="-1"></a>**Why:** with only 16 examples and 20 epochs of repetition, the model</span>
+<span id="cb8-456"><a href="#cb8-456" aria-hidden="true" tabindex="-1"></a>learned a shortcut: *produce something that looks like a report answer</span>
+<span id="cb8-457"><a href="#cb8-457" aria-hidden="true" tabindex="-1"></a>from this well*, without reliably learning *which* answer belongs to</span>
+<span id="cb8-458"><a href="#cb8-458" aria-hidden="true" tabindex="-1"></a>*which specific report*. Its confusion isn't noise — it consistently</span>
+<span id="cb8-459"><a href="#cb8-459" aria-hidden="true" tabindex="-1"></a>reaches for one of a small set of memorized, real sentences.</span>
+<span id="cb8-460"><a href="#cb8-460" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-461"><a href="#cb8-461" aria-hidden="true" tabindex="-1"></a>**Lesson:** a fine-tuned model's mistakes are diagnostic. Random</span>
+<span id="cb8-462"><a href="#cb8-462" aria-hidden="true" tabindex="-1"></a>gibberish would suggest something broken in training; consistently</span>
+<span id="cb8-463"><a href="#cb8-463" aria-hidden="true" tabindex="-1"></a>borrowed real answers point specifically at "not enough distinct</span>
+<span id="cb8-464"><a href="#cb8-464" aria-hidden="true" tabindex="-1"></a>training signal to tell reports apart" — exactly what Chapter 6's data</span>
+<span id="cb8-465"><a href="#cb8-465" aria-hidden="true" tabindex="-1"></a>quality gate and Chapter 7's richer training examples exist to fix.</span>
+<span id="cb8-466"><a href="#cb8-466" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-467"><a href="#cb8-467" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-468"><a href="#cb8-468" aria-hidden="true" tabindex="-1"></a>**Challenge:** Step 2 targets all four attention projections</span>
-<span id="cb8-469"><a href="#cb8-469" aria-hidden="true" tabindex="-1"></a>(<span class="in">`q_proj`</span>, <span class="in">`k_proj`</span>, <span class="in">`v_proj`</span>, <span class="in">`o_proj`</span>). A more common minimal LoRA</span>
-<span id="cb8-470"><a href="#cb8-470" aria-hidden="true" tabindex="-1"></a>setup only targets <span class="in">`q_proj`</span> and <span class="in">`v_proj`</span>. Rerun fine-tuning with that</span>
-<span id="cb8-471"><a href="#cb8-471" aria-hidden="true" tabindex="-1"></a>lighter config and see whether training recall changes. A reference</span>
-<span id="cb8-472"><a href="#cb8-472" aria-hidden="true" tabindex="-1"></a>solution is at <span class="in">`code/chapter_05/challenge/challenge.py`</span> — on a real</span>
-<span id="cb8-473"><a href="#cb8-473" aria-hidden="true" tabindex="-1"></a>run, it trains <span class="in">`1,089,536`</span> parameters (<span class="in">`0.0705%`</span>, about half of this</span>
-<span id="cb8-474"><a href="#cb8-474" aria-hidden="true" tabindex="-1"></a>chapter's setup) and scores <span class="in">`10/16`</span> training recall, down from <span class="in">`13/16`</span>.</span>
-<span id="cb8-475"><a href="#cb8-475" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-476"><a href="#cb8-476" aria-hidden="true" tabindex="-1"></a><span class="fu">## Key takeaways</span></span>
-<span id="cb8-477"><a href="#cb8-477" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-478"><a href="#cb8-478" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A LoRA adapter trains a small fraction of a model's parameters (here,</span>
-<span id="cb8-479"><a href="#cb8-479" aria-hidden="true" tabindex="-1"></a>  <span class="in">`0.141%`</span>) while the rest stay frozen — a real fine-tune, not a</span>
-<span id="cb8-480"><a href="#cb8-480" aria-hidden="true" tabindex="-1"></a>  simulation of one, at a fraction of full fine-tuning's cost.</span>
-<span id="cb8-481"><a href="#cb8-481" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Training recall and generalization are different claims that need</span>
-<span id="cb8-482"><a href="#cb8-482" aria-hidden="true" tabindex="-1"></a>  different evidence. This chapter's model aced the first (<span class="in">`0/16`</span> →</span>
-<span id="cb8-483"><a href="#cb8-483" aria-hidden="true" tabindex="-1"></a>  <span class="in">`13/16`</span>) and made zero progress on the second (<span class="in">`0/2`</span> → <span class="in">`0/2`</span>), on the</span>
-<span id="cb8-484"><a href="#cb8-484" aria-hidden="true" tabindex="-1"></a>  exact same fine-tune.</span>
-<span id="cb8-485"><a href="#cb8-485" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A fine-tuned model's wrong answers are worth reading, not just</span>
-<span id="cb8-486"><a href="#cb8-486" aria-hidden="true" tabindex="-1"></a>  counting. Every miss here was a real, memorized answer from a</span>
-<span id="cb8-487"><a href="#cb8-487" aria-hidden="true" tabindex="-1"></a>  *different* report — evidence of a specific, fixable data problem,</span>
-<span id="cb8-488"><a href="#cb8-488" aria-hidden="true" tabindex="-1"></a>  not random model failure.</span>
-<span id="cb8-489"><a href="#cb8-489" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Sixteen examples is enough to prove fine-tuning works mechanically.</span>
-<span id="cb8-490"><a href="#cb8-490" aria-hidden="true" tabindex="-1"></a>  It is deliberately not enough to teach real operational judgment —</span>
-<span id="cb8-491"><a href="#cb8-491" aria-hidden="true" tabindex="-1"></a>  that's what Part II's larger, higher-quality training sets are for.</span>
-<span id="cb8-492"><a href="#cb8-492" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-493"><a href="#cb8-493" aria-hidden="true" tabindex="-1"></a><span class="fu">## Repository files</span></span>
-<span id="cb8-494"><a href="#cb8-494" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-495"><a href="#cb8-495" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> File <span class="pp">|</span> Purpose <span class="pp">|</span></span>
-<span id="cb8-496"><a href="#cb8-496" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb8-497"><a href="#cb8-497" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_05/first_lora_finetune.py`</span> <span class="pp">|</span> Fine-tunes a LoRA adapter on Chapter 2's training examples and reports training/held-out scores <span class="pp">|</span></span>
-<span id="cb8-498"><a href="#cb8-498" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_05/challenge/challenge.py`</span> <span class="pp">|</span> Reference solution: a lighter <span class="in">`q_proj`</span>/<span class="in">`v_proj`</span>-only LoRA config <span class="pp">|</span></span>
-<span id="cb8-499"><a href="#cb8-499" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`checkpoints/chapter_05_lora/`</span> <span class="pp">|</span> Generated adapter (not committed — regenerate by running the script) <span class="pp">|</span></span>
-<span id="cb8-500"><a href="#cb8-500" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`notebooks/chapter_05_explore.ipynb`</span> <span class="pp">|</span> Interactive companion notebook <span class="pp">|</span></span>
-<span id="cb8-501"><a href="#cb8-501" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-502"><a href="#cb8-502" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution title="CHECKPOINT — Chapter 5"}</span>
-<span id="cb8-503"><a href="#cb8-503" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Fine-tuned a LoRA adapter on real training data with a plain</span>
-<span id="cb8-504"><a href="#cb8-504" aria-hidden="true" tabindex="-1"></a>      PyTorch training loop</span>
-<span id="cb8-505"><a href="#cb8-505" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Measured a real improvement in training recall (<span class="in">`0/16`</span> → <span class="in">`13/16`</span>)</span>
-<span id="cb8-506"><a href="#cb8-506" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Ran a held-out generalization check for the first time, and</span>
-<span id="cb8-507"><a href="#cb8-507" aria-hidden="true" tabindex="-1"></a>      found it did *not* improve (<span class="in">`0/2`</span> → <span class="in">`0/2`</span>)</span>
-<span id="cb8-508"><a href="#cb8-508" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Traced every wrong answer back to a specific, explainable cause</span>
-<span id="cb8-509"><a href="#cb8-509" aria-hidden="true" tabindex="-1"></a>      rather than shrugging at "the model got it wrong"</span>
-<span id="cb8-510"><a href="#cb8-510" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-511"><a href="#cb8-511" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-512"><a href="#cb8-512" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}</span>
-<span id="cb8-513"><a href="#cb8-513" aria-hidden="true" tabindex="-1"></a>**`first_lora_finetune.py`** — trains a LoRA adapter on Chapter 2's 16</span>
-<span id="cb8-514"><a href="#cb8-514" aria-hidden="true" tabindex="-1"></a>examples and saves it to <span class="in">`checkpoints/chapter_05_lora/`</span> (about 8 MB,</span>
-<span id="cb8-515"><a href="#cb8-515" aria-hidden="true" tabindex="-1"></a>next to the base model's ~2.9 GB of weights on disk). Reruns Chapter</span>
-<span id="cb8-516"><a href="#cb8-516" aria-hidden="true" tabindex="-1"></a>3's exact baseline harness before and after, against both the training</span>
-<span id="cb8-517"><a href="#cb8-517" aria-hidden="true" tabindex="-1"></a>set and the held-out report, so the comparison is honest and</span>
-<span id="cb8-518"><a href="#cb8-518" aria-hidden="true" tabindex="-1"></a>reproducible.</span>
-<span id="cb8-519"><a href="#cb8-519" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb8-520"><a href="#cb8-520" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-521"><a href="#cb8-521" aria-hidden="true" tabindex="-1"></a><span class="fu">## What can you do now that you couldn't do before?</span></span>
-<span id="cb8-522"><a href="#cb8-522" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-523"><a href="#cb8-523" aria-hidden="true" tabindex="-1"></a>You can fine-tune a real language model on your own data and produce</span>
-<span id="cb8-524"><a href="#cb8-524" aria-hidden="true" tabindex="-1"></a>real, measurable evidence of what it learned — and, just as</span>
-<span id="cb8-525"><a href="#cb8-525" aria-hidden="true" tabindex="-1"></a>importantly, honest evidence of what it didn't, instead of assuming a</span>
-<span id="cb8-526"><a href="#cb8-526" aria-hidden="true" tabindex="-1"></a>falling loss number means the job is done.</span>
-<span id="cb8-527"><a href="#cb8-527" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-528"><a href="#cb8-528" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suggested next step</span></span>
-<span id="cb8-529"><a href="#cb8-529" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-530"><a href="#cb8-530" aria-hidden="true" tabindex="-1"></a>**Coming up in Chapter 6:** this chapter's fine-tune worked exactly as</span>
-<span id="cb8-531"><a href="#cb8-531" aria-hidden="true" tabindex="-1"></a>a 16-example, single-well dataset should: real memorization, no</span>
-<span id="cb8-532"><a href="#cb8-532" aria-hidden="true" tabindex="-1"></a>generalization. The obvious next move is more data — but simply</span>
-<span id="cb8-533"><a href="#cb8-533" aria-hidden="true" tabindex="-1"></a>pointing this same pipeline at hundreds of reports, without checking</span>
-<span id="cb8-534"><a href="#cb8-534" aria-hidden="true" tabindex="-1"></a>them first, would just memorize more inconsistencies faster. Chapter 6</span>
-<span id="cb8-535"><a href="#cb8-535" aria-hidden="true" tabindex="-1"></a>builds a data quality gate: the checks a training set needs to pass</span>
-<span id="cb8-536"><a href="#cb8-536" aria-hidden="true" tabindex="-1"></a>*before* it's trusted at the scale Part II is about to introduce.</span>
+<span id="cb8-468"><a href="#cb8-468" aria-hidden="true" tabindex="-1"></a><span class="fu">## Challenge exercise</span></span>
+<span id="cb8-469"><a href="#cb8-469" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-470"><a href="#cb8-470" aria-hidden="true" tabindex="-1"></a>🟠 **Intermediate**</span>
+<span id="cb8-471"><a href="#cb8-471" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-472"><a href="#cb8-472" aria-hidden="true" tabindex="-1"></a>**Challenge:** Step 2 targets all four attention projections</span>
+<span id="cb8-473"><a href="#cb8-473" aria-hidden="true" tabindex="-1"></a>(<span class="in">`q_proj`</span>, <span class="in">`k_proj`</span>, <span class="in">`v_proj`</span>, <span class="in">`o_proj`</span>). A more common minimal LoRA</span>
+<span id="cb8-474"><a href="#cb8-474" aria-hidden="true" tabindex="-1"></a>setup only targets <span class="in">`q_proj`</span> and <span class="in">`v_proj`</span>. Rerun fine-tuning with that</span>
+<span id="cb8-475"><a href="#cb8-475" aria-hidden="true" tabindex="-1"></a>lighter config and see whether training recall changes. A reference</span>
+<span id="cb8-476"><a href="#cb8-476" aria-hidden="true" tabindex="-1"></a>solution is at <span class="in">`code/chapter_05/challenge/challenge.py`</span> — on a real</span>
+<span id="cb8-477"><a href="#cb8-477" aria-hidden="true" tabindex="-1"></a>run, it trains <span class="in">`1,089,536`</span> parameters (<span class="in">`0.0705%`</span>, about half of this</span>
+<span id="cb8-478"><a href="#cb8-478" aria-hidden="true" tabindex="-1"></a>chapter's setup) and scores <span class="in">`10/16`</span> training recall, down from <span class="in">`13/16`</span>.</span>
+<span id="cb8-479"><a href="#cb8-479" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-480"><a href="#cb8-480" aria-hidden="true" tabindex="-1"></a><span class="fu">## Key takeaways</span></span>
+<span id="cb8-481"><a href="#cb8-481" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-482"><a href="#cb8-482" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A LoRA adapter trains a small fraction of a model's parameters (here,</span>
+<span id="cb8-483"><a href="#cb8-483" aria-hidden="true" tabindex="-1"></a>  <span class="in">`0.141%`</span>) while the rest stay frozen — a real fine-tune, not a</span>
+<span id="cb8-484"><a href="#cb8-484" aria-hidden="true" tabindex="-1"></a>  simulation of one, at a fraction of full fine-tuning's cost.</span>
+<span id="cb8-485"><a href="#cb8-485" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Training recall and generalization are different claims that need</span>
+<span id="cb8-486"><a href="#cb8-486" aria-hidden="true" tabindex="-1"></a>  different evidence. This chapter's model aced the first (<span class="in">`0/16`</span> →</span>
+<span id="cb8-487"><a href="#cb8-487" aria-hidden="true" tabindex="-1"></a>  <span class="in">`13/16`</span>) and made zero progress on the second (<span class="in">`0/2`</span> → <span class="in">`0/2`</span>), on the</span>
+<span id="cb8-488"><a href="#cb8-488" aria-hidden="true" tabindex="-1"></a>  exact same fine-tune.</span>
+<span id="cb8-489"><a href="#cb8-489" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A fine-tuned model's wrong answers are worth reading, not just</span>
+<span id="cb8-490"><a href="#cb8-490" aria-hidden="true" tabindex="-1"></a>  counting. Every miss here was a real, memorized answer from a</span>
+<span id="cb8-491"><a href="#cb8-491" aria-hidden="true" tabindex="-1"></a>  *different* report — evidence of a specific, fixable data problem,</span>
+<span id="cb8-492"><a href="#cb8-492" aria-hidden="true" tabindex="-1"></a>  not random model failure.</span>
+<span id="cb8-493"><a href="#cb8-493" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Sixteen examples is enough to prove fine-tuning works mechanically.</span>
+<span id="cb8-494"><a href="#cb8-494" aria-hidden="true" tabindex="-1"></a>  It is deliberately not enough to teach real operational judgment —</span>
+<span id="cb8-495"><a href="#cb8-495" aria-hidden="true" tabindex="-1"></a>  that's what Part II's larger, higher-quality training sets are for.</span>
+<span id="cb8-496"><a href="#cb8-496" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-497"><a href="#cb8-497" aria-hidden="true" tabindex="-1"></a><span class="fu">## Repository files</span></span>
+<span id="cb8-498"><a href="#cb8-498" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-499"><a href="#cb8-499" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> File <span class="pp">|</span> Purpose <span class="pp">|</span></span>
+<span id="cb8-500"><a href="#cb8-500" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb8-501"><a href="#cb8-501" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_05/first_lora_finetune.py`</span> <span class="pp">|</span> Fine-tunes a LoRA adapter on Chapter 2's training examples and reports training/held-out scores <span class="pp">|</span></span>
+<span id="cb8-502"><a href="#cb8-502" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code/chapter_05/challenge/challenge.py`</span> <span class="pp">|</span> Reference solution: a lighter <span class="in">`q_proj`</span>/<span class="in">`v_proj`</span>-only LoRA config <span class="pp">|</span></span>
+<span id="cb8-503"><a href="#cb8-503" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`checkpoints/chapter_05_lora/`</span> <span class="pp">|</span> Generated adapter (not committed — regenerate by running the script) <span class="pp">|</span></span>
+<span id="cb8-504"><a href="#cb8-504" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`notebooks/chapter_05_explore.ipynb`</span> <span class="pp">|</span> Interactive companion notebook <span class="pp">|</span></span>
+<span id="cb8-505"><a href="#cb8-505" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-506"><a href="#cb8-506" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution title="CHECKPOINT — Chapter 5"}</span>
+<span id="cb8-507"><a href="#cb8-507" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Fine-tuned a LoRA adapter on real training data with a plain</span>
+<span id="cb8-508"><a href="#cb8-508" aria-hidden="true" tabindex="-1"></a>      PyTorch training loop</span>
+<span id="cb8-509"><a href="#cb8-509" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Measured a real improvement in training recall (<span class="in">`0/16`</span> → <span class="in">`13/16`</span>)</span>
+<span id="cb8-510"><a href="#cb8-510" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Ran a held-out generalization check for the first time, and</span>
+<span id="cb8-511"><a href="#cb8-511" aria-hidden="true" tabindex="-1"></a>      found it did *not* improve (<span class="in">`0/2`</span> → <span class="in">`0/2`</span>)</span>
+<span id="cb8-512"><a href="#cb8-512" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Traced every wrong answer back to a specific, explainable cause</span>
+<span id="cb8-513"><a href="#cb8-513" aria-hidden="true" tabindex="-1"></a>      rather than shrugging at "the model got it wrong"</span>
+<span id="cb8-514"><a href="#cb8-514" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-515"><a href="#cb8-515" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-516"><a href="#cb8-516" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip .built-box title="✓ WHAT YOU BUILT"}</span>
+<span id="cb8-517"><a href="#cb8-517" aria-hidden="true" tabindex="-1"></a>**`first_lora_finetune.py`** — trains a LoRA adapter on Chapter 2's 16</span>
+<span id="cb8-518"><a href="#cb8-518" aria-hidden="true" tabindex="-1"></a>examples and saves it to <span class="in">`checkpoints/chapter_05_lora/`</span> (about 8 MB,</span>
+<span id="cb8-519"><a href="#cb8-519" aria-hidden="true" tabindex="-1"></a>next to the base model's ~2.9 GB of weights on disk). Reruns Chapter</span>
+<span id="cb8-520"><a href="#cb8-520" aria-hidden="true" tabindex="-1"></a>3's exact baseline harness before and after, against both the training</span>
+<span id="cb8-521"><a href="#cb8-521" aria-hidden="true" tabindex="-1"></a>set and the held-out report, so the comparison is honest and</span>
+<span id="cb8-522"><a href="#cb8-522" aria-hidden="true" tabindex="-1"></a>reproducible.</span>
+<span id="cb8-523"><a href="#cb8-523" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-524"><a href="#cb8-524" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-525"><a href="#cb8-525" aria-hidden="true" tabindex="-1"></a><span class="fu">## What can you do now that you couldn't do before?</span></span>
+<span id="cb8-526"><a href="#cb8-526" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-527"><a href="#cb8-527" aria-hidden="true" tabindex="-1"></a>You can fine-tune a real language model on your own data and produce</span>
+<span id="cb8-528"><a href="#cb8-528" aria-hidden="true" tabindex="-1"></a>real, measurable evidence of what it learned — and, just as</span>
+<span id="cb8-529"><a href="#cb8-529" aria-hidden="true" tabindex="-1"></a>importantly, honest evidence of what it didn't, instead of assuming a</span>
+<span id="cb8-530"><a href="#cb8-530" aria-hidden="true" tabindex="-1"></a>falling loss number means the job is done.</span>
+<span id="cb8-531"><a href="#cb8-531" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-532"><a href="#cb8-532" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suggested next step</span></span>
+<span id="cb8-533"><a href="#cb8-533" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-534"><a href="#cb8-534" aria-hidden="true" tabindex="-1"></a>**Coming up in Chapter 6:** this chapter's fine-tune worked exactly as</span>
+<span id="cb8-535"><a href="#cb8-535" aria-hidden="true" tabindex="-1"></a>a 16-example, single-well dataset should: real memorization, no</span>
+<span id="cb8-536"><a href="#cb8-536" aria-hidden="true" tabindex="-1"></a>generalization. The obvious next move is more data — but simply</span>
+<span id="cb8-537"><a href="#cb8-537" aria-hidden="true" tabindex="-1"></a>pointing this same pipeline at hundreds of reports, without checking</span>
+<span id="cb8-538"><a href="#cb8-538" aria-hidden="true" tabindex="-1"></a>them first, would just memorize more inconsistencies faster. Chapter 6</span>
+<span id="cb8-539"><a href="#cb8-539" aria-hidden="true" tabindex="-1"></a>builds a data quality gate: the checks a training set needs to pass</span>
+<span id="cb8-540"><a href="#cb8-540" aria-hidden="true" tabindex="-1"></a>*before* it's trusted at the scale Part II is about to introduce.</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

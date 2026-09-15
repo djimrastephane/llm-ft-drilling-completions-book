@@ -84,9 +84,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-f352355e9c4cf757a45f4f8798595620.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-911692c0363b1c18dee0691a3385c10d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-5eaba02739cdb78914c5f4540b400244.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-95fa0d8d8559124e34572d25a6a01d3e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -595,7 +595,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="../figures/diagrams/pipeline_ch07_light.svg" class="diagram-light img-fluid" width="180"> <img src="../figures/diagrams/pipeline_ch07_dark.svg" class="diagram-dark img-fluid" width="180"></p>
 </div>
 <div class="chapter-status">
-<p>Progress <code>███████░░░░░░</code> <strong>7 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 30-40 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🟠 Intermediate</p>
+<p>Progress <code>███████░░░░░░</code> <strong>7 / 13</strong> &nbsp;·&nbsp; <strong>Estimated time:</strong> 30–40 min &nbsp;·&nbsp; <strong>Difficulty:</strong> 🟠 Intermediate</p>
 </div>
 <section id="learning-objectives" class="level2" data-number="7.1">
 <h2 data-number="7.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">7.1</span> Learning objectives</h2>
@@ -610,7 +610,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="operational-problem" class="level2" data-number="7.2">
 <h2 data-number="7.2" class="anchored" data-anchor-id="operational-problem"><span class="header-section-number">7.2</span> Operational Problem</h2>
-<p>Sean, the production engineer, looks at Chapter 2’s output and asks the obvious question: <em>“Two lines per report? These reports have a whole shift-by-shift log in them. Are we just throwing the rest away?”</em></p>
+<p>Farid, the production engineer, looks at Chapter 2’s output and asks the obvious question: <em>“Two lines per report? These reports have a whole shift-by-shift log in them. Are we just throwing the rest away?”</em></p>
 <p>He’s right to ask. Every report in this archive has a <code>TIME BREAKDOWN</code> section underneath the two fields Chapter 2 used — a real, multi-entry operational log, one row per logged time window, each with its own narrative. Chapter 2’s regex never looked at it. This chapter does, across all 74 reports Chapter 6’s gate and Chapter 2’s held-out reservation leave available for training.</p>
 </section>
 <section id="example-one-report-ten-training-examples-instead-of-two" class="level2" data-number="7.3">
@@ -687,7 +687,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output" class="level2" data-number="7.9">
 <h2 data-number="7.9" class="anchored" data-anchor-id="expected-output"><span class="header-section-number">7.9</span> Expected Output</h2>
 <p>A list of dictionaries, one per logged time window.</p>
-<div id="7e19f61e" class="cell" data-execution_count="1">
+<div id="cfcb0ab9" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>TIMELINE_SECTION_PATTERN <span class="op">=</span> re.<span class="bu">compile</span>(</span>
@@ -745,7 +745,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output-1" class="level2" data-number="7.14">
 <h2 data-number="7.14" class="anchored" data-anchor-id="expected-output-1"><span class="header-section-number">7.14</span> Expected Output</h2>
 <p>A list of one or more chunks, each within the limit, that concatenate back into the original text exactly.</p>
-<div id="1f1ec1d3" class="cell" data-execution_count="2">
+<div id="bdbcf85a" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> chunk_text(text: <span class="bu">str</span>, max_chars: <span class="bu">int</span> <span class="op">=</span> <span class="dv">300</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">str</span>]:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    words <span class="op">=</span> text.split()</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    chunks, current, current_len <span class="op">=</span> [], [], <span class="dv">0</span></span>
@@ -795,7 +795,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="expected-output-2" class="level2" data-number="7.19">
 <h2 data-number="7.19" class="anchored" data-anchor-id="expected-output-2"><span class="header-section-number">7.19</span> Expected Output</h2>
 <p>A <code>.jsonl</code> file with one example per line, plus counts of how many examples, chunks, and filtered artifacts resulted.</p>
-<div id="37b53d1a" class="cell" data-execution_count="3">
+<div id="816e0ec8" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> contains_cid_artifact(text: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"(cid:"</span> <span class="kw">in</span> text  <span class="co"># pdfplumber's stand-in for an undecoded glyph</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1461,7 +1461,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>::: {.chapter-status}</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`███████░░░░░░`</span> **7 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 30-40 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🟠 Intermediate</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Progress <span class="in">`███████░░░░░░`</span> **7 / 13** &amp;nbsp;·&amp;nbsp; **Estimated time:** 30–40 min &amp;nbsp;·&amp;nbsp; **Difficulty:** 🟠 Intermediate</span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learning objectives</span></span>
@@ -1481,7 +1481,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="fu">## Operational Problem</span></span>
 <span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>Sean, the production engineer, looks at Chapter 2's output and asks the</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>Farid, the production engineer, looks at Chapter 2's output and asks the</span>
 <span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>obvious question: *"Two lines per report? These reports have a whole</span>
 <span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>shift-by-shift log in them. Are we just throwing the rest away?"*</span>
 <span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a></span>
