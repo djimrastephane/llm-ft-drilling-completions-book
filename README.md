@@ -575,11 +575,12 @@ chapter's code under `book/code/chapter_NN/challenge/`.
 ## Automated Tests
 
 Every chapter's real code is tested in [`book/tests/`](book/tests) —
-81 tests across all 13 chapters. The fast, deterministic subset (56 of
-the 81) runs on Linux, Windows, and macOS on every push that touches
-`book/**` (badges above); the rest are marked `slow` and are run
-locally before each chapter ships (see below for why). Run them
-yourself from the `book/` directory:
+81 tests across all 13 chapters (101 including the companion app's own
+tests). The fast, deterministic subset (74 of those 101) runs on
+Linux, Windows, and macOS on every push that touches `book/**` (badges
+above); the rest are marked `slow` and are run locally before each
+chapter ships (see below for why). Run them yourself from the `book/`
+directory:
 
 ```bash
 pip install -r requirements.txt
