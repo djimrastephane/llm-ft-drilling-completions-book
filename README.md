@@ -548,6 +548,24 @@ invents a metric that doesn't already exist in the book's own code — see
 [`book/app/README.md`](book/app/README.md) for exactly what it reuses
 and how to run it.
 
+## Mathematica Companion (Optional)
+
+Not needed to understand or complete the book — a separate, purely
+illustrative notebook under [`mathematica/`](mathematica), for readers
+who already work in Wolfram Language and want to see the same real
+Chapter 5 before/after result explored a second way. It shows the same
+evidence as the Companion App above (`0/16 → 13/16` on the training
+examples, `0/2` on the held-out report), reusing this book's own
+functions and its real trained checkpoint. This one isn't for everyone:
+**Mathematica is commercial software**, so it only applies if you
+already have a Wolfram notebook front end — either paid Mathematica or
+the free [Wolfram Engine](https://www.wolfram.com/engine/) paired with
+a notebook interface. Everyone else should stick with the Companion App
+above, which covers the same evidence and needs nothing beyond this
+book's free, open-source Python stack. See
+[`mathematica/README.md`](mathematica/README.md) for what's inside and
+how to run it.
+
 ## Exercises
 
 Every drafted chapter includes a **Practical exercise** and a
