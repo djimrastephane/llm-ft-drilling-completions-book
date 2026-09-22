@@ -7,10 +7,15 @@ highlights in narrative form.
 ## Releases
 
 - [Unreleased](#unreleased)
+- [1.1.0 -- 2026-09-22](#110---2026-09-22) -- Roadmap diagram, Troubleshooting
+  Guide, Mathematica companion notebook, Appendix C, independent technical
+  review, and a full audit closure
 - [1.0.0 -- 2026-08-19](#100---2026-08-19) -- Part 0 and all 13 chapters
   complete, tested, and published
 
 ## [Unreleased]
+
+## [1.1.0] - 2026-09-22
 
 ### Added
 

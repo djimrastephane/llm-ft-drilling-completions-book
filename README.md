@@ -164,7 +164,7 @@ artifacts — not eleven topics you read about:
 - Progress: Part 0 and all 13 chapters are written, tested, and passing
   CI (short for continuous integration — the project's automated tests,
   which re-run on every change to catch a broken example before you ever
-  see it). Tagged release: [v1.0.0](CHANGELOG.md). See
+  see it). Tagged release: [v1.1.0](CHANGELOG.md). See
   [CHANGELOG.md](CHANGELOG.md) for the full history of what's landed and
   why, and [RELEASE.md](RELEASE.md) for per-release highlights.
 - **Read the book online:**
